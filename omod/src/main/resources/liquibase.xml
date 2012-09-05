@@ -13,28 +13,64 @@
         for a list of supported elements and attributes
     -->
  
- 	<!-- Uncomment this and edit the values below to use this file
+ 	<!-- Uncomment this and edit the values below to use this file-->
  	
-	<changeSet id="mymoduleid-2010-05-25-15:50" author="bwolfe">
+	<changeSet id="amrsreport-2012-09-03-15:50" author="AOjwang">
 		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="mymoduleid_myobject"/></not>
+			<not><tableExists tableName="amrsreport_userlocation"/></not>
 		</preConditions>
 		<comment>
-			Creating the mymoduleid_myobject table
+			Creating the amrsreport_userlocation table
 		</comment>
-		<createTable tableName="mymoduleid_myobject">
-			<column name="mymoduleid_myobject_id" type="int">
+		<createTable tableName="amrsreport_userlocation">
+			<column name="amrsreport_userlocation_id" type="int" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="firstname" type="varchar(255)"/>
-			<column name="lastname" type="varchar(255)"/>
-			<column name="username" type="varchar(255)">
-				<constraints unique="true" nullable="false"/>
+			<column name="uuid" type="char(38)">
+				<constraints nullable="false"/>
 			</column>
-			<column name="testid" type="int" />
+			<column name="userid" type="int"/>
+			<column name="locationid" type="varchar(255)"/>
+			<column name="creator" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="date_created" type="datetime">
+				<constraints nullable="true" />
+			</column>
+			<column name="changed_by" type="int" defaultValue="null"></column>
+			<column name="date_changed" type="datetime" defaultValue="null" ></column>
+
+			<column name="voided" type="boolean" >
+				<constraints nullable="false" />
+			</column>
+
+			<column name="voided_by" type="int">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="date_voided" type="datetime">
+				<constraints nullable="true" />
+			</column>
+
+			<column name="void_reason" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			
+			
 		</createTable>
+		
+	
     </changeSet>
     
-    -->
+    <changeSet id="amrsreport-2012-09-03-16:50" author="AOjwang">
+  	
+			  	<addForeignKeyConstraint constraintName="ref_user_id"
+			    baseTableName="amrsreport_userlocation" baseColumnNames="userid"
+			    referencedTableName="users" referencedColumnNames="user_id"
+			/>
+	
+    </changeSet>
+    
+  
  
 </databaseChangeLog>
