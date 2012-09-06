@@ -48,8 +48,6 @@ public class MohHistoryController {
 
     @RequestMapping(method=RequestMethod.GET, value="module/amrsreport/mohHistory.form")
     public void preparePage(ModelMap map)  {
-        String filename="";
-        List<String> filenames=new ArrayList<String>();
 
         AdministrationService as = Context.getAdministrationService();
         String folderName=as.getGlobalProperty("amrsreport.file_dir");
@@ -57,17 +55,8 @@ public class MohHistoryController {
         File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 
         String[] children = fileDir.list();
-        if (children == null) {
-            // Either dir does not exist or is not a directory
-        } else {
-            for (int i=0; i<children.length; i++) {
-                // Get filename of file or directory
-                filename = children[i];
-                filenames.add(filename);
-            }
-        }
 
-        map.addAttribute("reportHistory",filenames);
+        map.addAttribute("reportHistory", Arrays.asList(children));
 
     }
 
