@@ -31,7 +31,7 @@ public class UserLocation extends BaseOpenmrsObject implements java.io.Serializa
 	
 	private Integer userLocationId;
 	private User sysUser;
-	private List<Location> userLoc;
+	private Location userLoc;
 	private String uuid = null;
 	
 	public Integer getId() {
@@ -63,11 +63,15 @@ public class UserLocation extends BaseOpenmrsObject implements java.io.Serializa
 		this.sysUser = sysUser;
 	}
 
-	public List<Location> getUserLoc() {
+	
+
+
+	public Location getUserLoc() {
 		return userLoc;
 	}
 
-	public void setUserLoc(List<Location> userLoc) {
+
+	public void setUserLoc(Location userLoc) {
 		this.userLoc = userLoc;
 	}
 
