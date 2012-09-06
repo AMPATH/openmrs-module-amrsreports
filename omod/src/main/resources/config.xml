@@ -36,13 +36,12 @@
 	</advice>
 	 /AOP -->
 	
-	
-	<!-- Required Privileges -->
+	<!-- Required Privileges 
 	<privilege>
 		<name>Manage AMRSReports</name>
 		<description>Allows user to access Amrs reports pages/functions</description>
 	</privilege>
-
+	-->
 
 	<!-- Required Global Properties -->
 	<globalProperty>

@@ -1,8 +1,8 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
-<openmrs:require privilege="Manage AMRSReports" otherwise="/login.htm"
-                 redirect="/module/amrsreport/mohRender.form" />
+
+<openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreport/mohRender.form" />
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.dataTables.min.js" />
@@ -28,7 +28,6 @@
 	}
 </style>
 <script type="text/javascript">
-	//var $j = jQuery.noConflict();
 	$j(document).ready(function(){
 
 		var ty = $j('#tblMain').dataTable({
@@ -40,11 +39,8 @@
 				"aButtons": [
 					"print"
 				]
-
 			}
 		} );
-
-		//});
 
 		$j('#tblMain').delegate('tbody td #imgrender','click', function() {
 			var trow=this.parentNode.parentNode;
@@ -53,6 +49,7 @@
 			DWRAmrsReportService.viewMoreDetailsRender("${fileToManipulate}",amrsid1,processThis);
 
 		});
+
 		$j("#dlgData" ).dialog({
 			autoOpen:false,
 			modal: true,
@@ -65,8 +62,8 @@
 			buttons: {
 				"Exit": function () { $j(this).dialog("close"); }
 			}
-
 		});
+
 		function processThis(data){
 			$j("#dlgData").empty();
 			var listSplit=data.split(",");
@@ -89,7 +86,6 @@
 		var titleheader=document.getElementById("titleheader");
 		hidepic.style.display='none';
 		titleheader.style.display='none';
-
 	}
 
 	function maketable(info1){
@@ -98,23 +94,19 @@
 
 		row_num=info1.length; //edit this value to suit
 
-
 		tab=document.createElement('table');
 		tab.setAttribute('id','tblSummary');
 		tab.setAttribute('border','0');
 		tab.setAttribute('cellspacing','2');
 		tab.setAttribute('class','tblformat');
 
-
 		tbo=document.createElement('tbody');
 
 		for(c=0;c<row_num;c++){
 			var rowElement=info1[c].split(":");
 			row[c]=document.createElement('tr');
-			//alert(rowElement.length) ;
 
 			for(k=0;k<rowElement.length;k++) {
-
 				cell[k]=document.createElement('td');
 				cont=document.createTextNode(rowElement[k])
 				cell[k].appendChild(cont);
@@ -126,14 +118,15 @@
 		document.getElementById('dlgData').appendChild(tab);
 	}
 </script>
+
 <c:if test="${not empty loci}">
 	<div id="titleheader">
 		<table align="right">
 			<tr>
 				<td><b>History Report for:</b></td>
 				<td><u>${loci}</u></td>
-			<td><b>As at:</b></td>
-			<td><u>${time}</u></td>
+				<td><b>As at:</b></td>
+				<td><u>${time}</u></td>
 			</tr>
 		</table>
 	</div>
