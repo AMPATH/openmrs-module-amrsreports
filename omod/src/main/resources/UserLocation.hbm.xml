@@ -16,8 +16,9 @@
 			<column name="user_id" />
 		</many-to-one>
 		
+		
 		<property name="uuid" type="java.lang.String"
-			column="uuid" length="255" />
+			column="uuid" length="38" />
 		
 		<many-to-one name="userLoc" class="org.openmrs.Location" not-null="true">
 			<column name="location_id" />
