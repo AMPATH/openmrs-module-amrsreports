@@ -107,6 +107,10 @@
 		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
+	<mappingFiles>
+	${omodHbmConfig}
+	
+	</mappingFiles>
 	
 </module>
 
