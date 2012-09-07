@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+
+	<class name="org.openmrs.module.amrsreport.userlocation.UserLocation" table="amrsreport_userlocation">
+
+        <cache usage="read-write"/>
+
+		<id name="userLocationId" type="java.lang.Integer" unsaved-value="0" column="amrsreport_userlocation_id">
+			<generator class="org.openmrs.api.db.hibernate.NativeIfNotAssignedIdentityGenerator" />
+		</id>
+		
+		<discriminator column="amrsreport_userlocation_id" insert="false"/>
+		
+		<many-to-one name="sysUser" class="org.openmrs.User" not-null="true">
+			<column name="user_id" />
+		</many-to-one>
+		
+		<property name="uuid" type="java.lang.String"
+			column="uuid" length="255" />
+		
+		<many-to-one name="userLoc" class="org.openmrs.Location" not-null="true">
+			<column name="location_id" />
+		</many-to-one>
+		
+		<property name="userLoc" class="org.openmrs.Location"
+			column="location_id"  />
+
+	</class>
+
+</hibernate-mapping>
