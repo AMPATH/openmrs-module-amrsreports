@@ -42,7 +42,7 @@
 			<not><foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_user_ref"/></not>
 	</preConditions>
     <comment>
-			Adding foreign key constraint on user_id column
+			Adding foreign-key constraint on user_id column
 	</comment>
   	
   	<addForeignKeyConstraint 
@@ -60,7 +60,7 @@
 			<not><foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_location_ref"/></not>
 	</preConditions>
     <comment>
-			Adding foreign key constraint on location_id column
+			Adding foreign-key constraint on location_id column
 	</comment>
   	
   	<addForeignKeyConstraint 
