@@ -32,7 +32,7 @@ public class UserLocation extends BaseOpenmrsObject implements java.io.Serializa
 	private Integer userLocationId;
 	private User sysUser;
 	private Location userLoc;
-	private String uuid = null;
+	
 	
 	public Integer getId() {
 		return userLocationId;
@@ -76,15 +76,5 @@ public class UserLocation extends BaseOpenmrsObject implements java.io.Serializa
 	}
 
 
-	public String getUuid() {
-		return uuid;
-	}
-
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
-	
 	
 }

@@ -16,6 +16,7 @@
 			<column name="user_id" />
 		</many-to-one>
 		
+		
 		<property name="uuid" type="java.lang.String"
 			column="uuid" length="38" />
 		
