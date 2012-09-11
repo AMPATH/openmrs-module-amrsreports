@@ -17,12 +17,15 @@ package org.openmrs.module.amrsreport.service;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.User;
+import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
@@ -118,4 +121,10 @@ public interface MohCoreService extends OpenmrsService {
 	                                 final MohFetchRestriction mohFetchRestriction) throws APIException;
 	
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
+	
+	public UserLocation saveUserLocation(UserLocation userlocation);
+	
+	public List<UserLocation>  getUserLocations(Integer uid);
+	
+	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc);*/
 }
