@@ -37,6 +37,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
@@ -45,6 +46,8 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+/*import org.openmrs.module.amrsreport.service.User;*/
+import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;
@@ -259,4 +262,27 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		criteria.add(Restrictions.eq("patient", p));
 		return criteria.list();
 	}
+	
+	/*UserLocation methods
+	 * 
+	 * 
+	 * 
+	 * */
+	public UserLocation saveUserLocation(UserLocation userlocation){
+		sessionFactory.getCurrentSession().saveOrUpdate(userlocation);
+		return userlocation;
+	}
+	
+	public List<UserLocation> getUserLocations(Integer uid){
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserLocation.class);
+		criteria.add(Restrictions.eq("user_id", uid));
+		return criteria.list();
+		
+	}
+	
+	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc){
+		UserLocation ul=new UserLocation();
+		return ul;
+	}*/
+	
 }
