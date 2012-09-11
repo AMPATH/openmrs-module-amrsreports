@@ -14,7 +14,7 @@
 
 package org.openmrs.module.amrsreport.service.impl;
 
-import java.util.Collection;
+import java.util.Collection; 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +25,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
@@ -33,6 +34,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+/*import org.openmrs.module.amrsreport.service.User;*/
+import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 
 /**
@@ -104,4 +107,16 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		
 		return mohCoreDAO.getAllPatientIdenifiers(p);
 	}
+	
+    public UserLocation saveUserLocation(UserLocation userlocation){
+    	return mohCoreDAO.saveUserLocation(userlocation);
+    }
+	
+	public List<UserLocation>  getUserLocations(Integer uid){
+		return mohCoreDAO.getUserLocations(uid);
+	}
+	
+	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc){
+		return mohCoreDAO.purgeUserLocation(sysUser,userLoc);
+	}*/
 }
