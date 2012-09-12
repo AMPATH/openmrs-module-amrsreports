@@ -46,7 +46,6 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
-/*import org.openmrs.module.amrsreport.service.User;*/
 import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -273,16 +272,14 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return userlocation;
 	}
 	
-	public List<UserLocation> getUserLocations(Integer uid){
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserLocation.class);
-		criteria.add(Restrictions.eq("user_id", uid));
-		return criteria.list();
+	public UserLocation  getUserLocation(Integer userlocationId){
 		
+		return (UserLocation) sessionFactory.getCurrentSession().get(UserLocation.class, userlocationId);
+				
 	}
 	
-	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc){
-		UserLocation ul=new UserLocation();
-		return ul;
-	}*/
+	public void purgeUserLocation(UserLocation userlocation){
+		sessionFactory.getCurrentSession().delete(userlocation);
+	}
 	
 }

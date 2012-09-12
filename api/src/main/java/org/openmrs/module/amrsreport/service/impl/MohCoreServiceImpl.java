@@ -34,7 +34,6 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.service.MohCoreService;
-/*import org.openmrs.module.amrsreport.service.User;*/
 import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 
@@ -112,11 +111,12 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
     	return mohCoreDAO.saveUserLocation(userlocation);
     }
 	
-	public List<UserLocation>  getUserLocations(Integer uid){
-		return mohCoreDAO.getUserLocations(uid);
+    public UserLocation  getUserLocation(Integer userlocationId){
+		return mohCoreDAO.getUserLocation(userlocationId);
 	}
 	
-	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc){
-		return mohCoreDAO.purgeUserLocation(sysUser,userLoc);
-	}*/
+    public void purgeUserLocation(UserLocation userlocation){
+		 mohCoreDAO.purgeUserLocation(userlocation);
+	}
+	
 }

@@ -124,7 +124,7 @@ public interface MohCoreService extends OpenmrsService {
 	
 	public UserLocation saveUserLocation(UserLocation userlocation);
 	
-	public List<UserLocation>  getUserLocations(Integer uid);
+	public UserLocation  getUserLocation(Integer userlocationId);
 	
-	/*public UserLocation purgeUserLocation(User sysUser,Location userLoc);*/
+	public void purgeUserLocation(UserLocation userlocation);
 }
