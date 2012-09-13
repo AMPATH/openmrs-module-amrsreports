@@ -121,10 +121,21 @@ public interface MohCoreService extends OpenmrsService {
 	                                 final MohFetchRestriction mohFetchRestriction) throws APIException;
 	
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
-	
+	/**
+	 * @should save a UserLocation
+	 * @param userlocation
+	 * @return
+	 */
 	public UserLocation saveUserLocation(UserLocation userlocation);
-	
+	/**
+	 * @should get a UserLocation by its Id
+	 * @param userlocationId
+	 * @return
+	 */
 	public UserLocation  getUserLocation(Integer userlocationId);
-	
+	/**
+	 * @should purge a UserLocation
+	 * @param userlocation
+	 */
 	public void purgeUserLocation(UserLocation userlocation);
 }
