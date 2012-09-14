@@ -14,7 +14,6 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.User;
 import org.openmrs.Location;
 
-import src.test.java.org.openmrs.module.dataintegrity.DataIntegrityService;
 
 public class MohCoreServiceTest extends BaseModuleContextSensitiveTest{
 
