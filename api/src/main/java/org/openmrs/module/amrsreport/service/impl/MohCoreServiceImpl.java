@@ -34,6 +34,8 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.openmrs.module.amrsreport.userreport.UserReport;
+
 
 /**
  * Actual implementation of the core service contract
@@ -103,5 +105,23 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	public List<PatientIdentifier> getAllPatientIdenifiers(Patient p) {
 		
 		return mohCoreDAO.getAllPatientIdenifiers(p);
+	}
+	@Override
+	public UserReport saveUserReport(UserReport userReport){
+		return mohCoreDAO.saveUserReport(userReport);
+	}
+	
+	@Override
+	public List<UserReport>  getUserReportByUserId(Integer id) {
+    	return mohCoreDAO.getUserReportByUserId(id);
+	}
+	@Override
+	public void purgeUserReport(UserReport userReport){
+		 mohCoreDAO.purgeUserReport(userReport);
+	}
+	@Override
+    public UserReport getUserReportByUuid(String uuid){
+		return mohCoreDAO.getUserReportByUuid(uuid);
+		
 	}
 }
