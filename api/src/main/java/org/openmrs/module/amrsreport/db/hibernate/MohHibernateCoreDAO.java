@@ -48,6 +48,8 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.module.amrsreport.userreport.UserReport;
+import org.hibernate.criterion.Expression;
 
 /**
  *
@@ -259,4 +261,45 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		criteria.add(Restrictions.eq("patient", p));
 		return criteria.list();
 	}
+	
+	/*  Save report user
+	     */
+	    
+	    public UserReport saveUserReport(UserReport userReport) {
+	    	sessionFactory.getCurrentSession().saveOrUpdate(userReport);
+
+			return userReport;
+	    }
+	    /*Find reports that the current user is allowed to view*/
+
+	    public List<UserReport>  getUserReportByUserId(Integer id) {
+	    	Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserReport.class).add(
+			    Expression.eq("user_id", id));
+
+		@SuppressWarnings("unchecked")
+		List<UserReport> userReport = criteria.list();
+		if (null == userReport || userReport.isEmpty()) {
+			return null;
+		}
+		return userReport;
+	    }
+	    
+	    @SuppressWarnings("unchecked")
+	 
+	    public UserReport getUserReportByUuid(String uuid) {
+			Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserReport.class).add(Expression.eq("uuid", uuid));
+		
+			@SuppressWarnings("unchecked")
+			List<UserReport> userReport = criteria.list();
+			if (null == userReport || userReport.isEmpty()) {
+				return null;
+			}
+			return userReport.get(0);
+		}
+
+	    @SuppressWarnings("unchecked")
+		public void purgeUserReport(UserReport userReport){
+			sessionFactory.getCurrentSession().delete(userReport);
+			
+		}
 }
