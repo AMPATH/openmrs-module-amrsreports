@@ -23,9 +23,6 @@
 		<many-to-one name="userLoc" class="org.openmrs.Location" not-null="true">
 			<column name="location_id" />
 		</many-to-one>
-		
-		<property name="userLoc" class="org.openmrs.Location"
-			column="location_id"  />
 
 	</class>
 
