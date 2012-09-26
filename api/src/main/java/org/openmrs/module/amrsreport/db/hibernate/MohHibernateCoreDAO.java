@@ -261,12 +261,11 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		criteria.add(Restrictions.eq("patient", p));
 		return criteria.list();
 	}
-	
-	/*UserLocation methods
-	 * 
-	 * 
-	 * 
-	 * */
+
+    /**
+     * UserLocation methods
+     */
+
 	public UserLocation saveUserLocation(UserLocation userlocation){
 		sessionFactory.getCurrentSession().saveOrUpdate(userlocation);
 		return userlocation;
