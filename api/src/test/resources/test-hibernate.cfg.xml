@@ -5,6 +5,6 @@
 
 <hibernate-configuration>
 	<session-factory>
-		${hbmConfig}
+		<mapping resource="UserLocation.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>
