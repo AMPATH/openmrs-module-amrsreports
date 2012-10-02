@@ -1,4 +1,4 @@
-package org.openmrs.module.amrsreport.ext;
+package org.openmrs.module.amrsreport.extension;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
