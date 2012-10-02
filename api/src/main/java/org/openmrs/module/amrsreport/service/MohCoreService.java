@@ -33,7 +33,7 @@ import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
-import org.openmrs.module.amrsreport.userreport.UserReport;
+import org.openmrs.module.amrsreport.UserReport;
 /**
  * Service contract for the core layer of OpenMRS
  */
@@ -119,23 +119,7 @@ public interface MohCoreService extends OpenmrsService {
 	                                 final MohFetchRestriction mohFetchRestriction) throws APIException;
 	
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
-	
-	/**
-	 * @should save AmrsReportUser
-	 * 
-	 */
 	public UserReport saveUserReport(UserReport userReport);
-
-    /**
-     *  Generting test cases
-     * @param id
-     * @return
-     */
-   /**
-     *    * @param id
-     * @return
-     */
-
 	public List<UserReport>  getUserReportByUserId(Integer id);
 	public void purgeUserReport(UserReport userReport);
     public UserReport getUserReportByUuid(String uuid);

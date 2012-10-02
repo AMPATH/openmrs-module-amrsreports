@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 <hibernate-mapping>
-<class name="org.openmrs.module.amrsreport.userreport.UserReport" table="amrsreport_user_report">
+<class name="org.openmrs.module.amrsreport.UserReport" table="amrsreport_user_report">
  <cache usage="read-write"/>
 		<id name="id" type="int"  column="report_user_id"  unsaved-value="0">
 		<generator class="org.openmrs.api.db.hibernate.NativeIfNotAssignedIdentityGenerator" />

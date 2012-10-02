@@ -29,7 +29,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.openmrs.module.amrsreport.userreport.UserReport;
+import org.openmrs.module.amrsreport.UserReport;
 
 /**
  */
