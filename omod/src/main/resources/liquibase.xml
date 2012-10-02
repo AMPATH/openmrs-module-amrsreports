@@ -1,15 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
- 
+
     <!--
-    	See http://wiki.openmrs.org/display/docs/Module+liquibase+File for 
-    	documentation on this file.
-    
+        See http://wiki.openmrs.org/display/docs/Module+liquibase+File for
+        documentation on this file.
+
         See http://www.liquibase.org/manual/home#available_database_refactorings
         for a list of supported elements and attributes
     -->
+
+
+
+    <changeSet id="amrsreport-2012-09-03-15:50" author="AOjwang">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="amrsreport_userlocation"/></not>
+        </preConditions>
+        <comment>
+            Creating the amrsreport_userlocation table
+        </comment>
+        <createTable tableName="amrsreport_userlocation">
+            <column name="amrsreport_userlocation_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="int"/>
+            <column name="location_id" type="int"/>
+
+        </createTable>
+
+
+    </changeSet>
+
+    <changeSet id="amrsreport-2012-09-03-16:50" author="AOjwang">
+        <preConditions onFail="MARK_RAN">
+            <not><foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_user_ref"/></not>
+        </preConditions>
+        <comment>
+            Adding foreign-key constraint on user_id column
+        </comment>
+
+        <addForeignKeyConstraint
+                constraintName="amrsreports_userlocation_user_ref"
+                baseTableName="amrsreport_userlocation"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="user_id"
+                />
+
+    </changeSet>
+
+    <changeSet id="amrsreport-2012-09-03-17:50" author="AOjwang">
+        <preConditions onFail="MARK_RAN">
+            <not><foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_location_ref"/></not>
+        </preConditions>
+        <comment>
+            Adding foreign-key constraint on location_id column
+        </comment>
+
+        <addForeignKeyConstraint
+                constraintName="amrsreports_userlocation_location_ref"
+                baseTableName="amrsreport_userlocation"
+                baseColumnNames="location_id"
+                referencedTableName="location"
+                referencedColumnNames="location_id"
+                />
+
+    </changeSet>
  
  	
   <changeSet id="create amrsreport_user_report 2012-09-12" author="akwatuha">

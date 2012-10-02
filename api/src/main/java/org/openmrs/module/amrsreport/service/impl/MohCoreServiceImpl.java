@@ -34,7 +34,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.openmrs.module.amrsreport.userreport.UserReport;
+import org.openmrs.module.amrsreport.UserReport;
 
 
 /**
