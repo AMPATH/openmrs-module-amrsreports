@@ -7,9 +7,9 @@
 	<name>@MODULE_NAME@</name>
 	<version>@MODULE_VERSION@</version>
 	<package>@MODULE_PACKAGE@</package>
-	<author>Oliver Mwalo and Nicholas Ingosi</author>
+	<author>AMPATH Developers (Oliver Mwalo, Nicholas Ingosi, Antony Ojwang', Alfayo Kwatuha, Jeremy Keiper)</author>
 	<description>
-			AMRS Reporting Module. MOH Pre-Register Reporting Module.
+		Provides easy access to AMPATH reports, limits visible reports by user and location, and adds custom cohorts and tokens for MOH reporting.
 	</description>
 
 	<activator>org.openmrs.module.amrsreport.AmrsReportModuleActivator</activator>
@@ -25,16 +25,16 @@
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>org.openmrs.module.amrsreport.ext.AmrsReportAdminExt</class>
+		<class>org.openmrs.module.amrsreport.extension.AmrsReportAdminExt</class>
 	</extension>
 	
 	
 	<!-- AOP
-	<advice>
-		<point>org.openmrs.api.FormService</point>
-		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-	</advice>
-	 /AOP -->
+      	<advice>
+      		<point>org.openmrs.api.FormService</point>
+      		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
+      	</advice>
+ /AOP -->
 	
 	<!-- Required Privileges 
 	<privilege>
@@ -51,22 +51,21 @@
 			Site specific Master facility code that is available on http://www.ehealth.or.ke/facilities/
 		</description>
 	</globalProperty>
-    <globalProperty>
-        <property>@MODULE_ID@.file_dir</property>
-        <defaultValue>amrsreport/files</defaultValue>
-        <description>Directory for storing file temporarily for processing</description>
-    </globalProperty>
+	<globalProperty>
+		<property>@MODULE_ID@.file_dir</property>
+		<defaultValue>amrsreport/files</defaultValue>
+		<description>Directory for storing file temporarily for processing</description>
+	</globalProperty>
 	<!-- /Required Global Properties -->
 	
-
 	<dwr>
 		<allow>
 			<create creator="new" javascript="DWRAmrsReportService">
 				<param name="class" value="@MODULE_PACKAGE@.web.dwr.DWRAmrsReportService"/>
 				<include method="viewMoreDetails"/>
-                <include method="viewMoreDetailsRender"/>
-                <include method="downloadCSV"/>
-                <include method="downloadPDF"/>
+				<include method="viewMoreDetailsRender"/>
+				<include method="downloadCSV"/>
+				<include method="downloadPDF"/>
 			</create>
 		</allow>
 
@@ -80,7 +79,6 @@
 			]]>
 		</signatures>	
 	</dwr>
-
 	
 	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
@@ -90,7 +88,6 @@
 	</servlet>
 	-->
 	<!-- /Servlets -->
-	
 	
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
@@ -107,10 +104,9 @@
 		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
+
 	<mappingFiles>
-	${omodHbmConfig}
-	
+		${omodHbmConfig}
 	</mappingFiles>
-	
 </module>
 
