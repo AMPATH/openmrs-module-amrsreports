@@ -23,11 +23,13 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.amrsreport.userlocation.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.module.amrsreport.UserReport;
 
@@ -49,8 +51,17 @@ public interface MohCoreDAO {
 
 
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
-	public UserReport saveUserReport(UserReport userReport);
-	public List<UserReport>  getUserReportByUserId(Integer id);
-	public void purgeUserReport(UserReport userReport);
+
+    public UserReport saveUserReport(UserReport userReport);
+    public List<UserReport>  getUserReportByUserId(Integer id);
+    public void purgeUserReport(UserReport userReport);
     public UserReport getUserReportByUuid(String uuid);
+
+	/*Methods for UserLocation Class*/
+	public UserLocation saveUserLocation(UserLocation userlocation);
+	
+	public UserLocation  getUserLocation(Integer userlocationId);
+	
+	public void purgeUserLocation(UserLocation userlocation);
+
 }
