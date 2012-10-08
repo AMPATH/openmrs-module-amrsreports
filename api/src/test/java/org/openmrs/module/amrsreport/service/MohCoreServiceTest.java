@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreport.service;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -7,7 +8,10 @@ import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.Verifies;
 
 /**
  * Test file for MohCoreService methods
@@ -169,5 +173,94 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		UserLocation uloc = cservice.saveUserLocation(userlocation);
 
 		Assert.assertNotNull(uloc.getUserLocationId());
+	}
+
+	/**
+	 * @see MohCoreService#getAllowedLocationsForUser(User)
+	 */
+	@Test
+	@Verifies(value = "should only get specified locations for user", method ="getAllowedLocationsForUser(User)")
+	public void getAllowedLocationsForUser_shouldOnlyGetSpecifiedLocationsForUser() throws Exception {
+		MohCoreService cservice = Context.getService(MohCoreService.class);
+
+		User sysUser = new User();
+		sysUser.setUserId(501);
+
+		Location userLoc = new Location();
+		userLoc.setLocationId(1);
+
+		// create a userlocation
+		UserLocation userlocation = new UserLocation();
+		userlocation.setSysUser(sysUser);
+		userlocation.setUserLoc(userLoc);
+
+		Assert.assertNull(userlocation.getUserLocationId());
+
+		cservice.saveUserLocation(userlocation);
+
+		List<Location> actual = cservice.getAllowedLocationsForUser(sysUser);
+		Assert.assertEquals(1, actual.size());
+		Assert.assertEquals(1, actual.get(0).getLocationId().intValue());
+	}
+
+	/**
+	 * @see MohCoreService#getAllowedLocationsForUser(User)
+	 */
+	@Test
+	@Verifies(value = "should return empty list if none assigned", method ="getAllowedLocationsForUser(User)")
+	public void getAllowedLocationsForUser_shouldReturnEmptyListIfNoneAssigned() throws Exception {
+		MohCoreService cservice = Context.getService(MohCoreService.class);
+
+		User sysUser = new User();
+		sysUser.setUserId(501);
+
+		List<Location> actual = cservice.getAllowedLocationsForUser(sysUser);
+		Assert.assertNotNull(actual);
+		Assert.assertEquals(0, actual.size());
+	}
+
+	/**
+	 * @see MohCoreService#getAllowedReportDefinitionsForUser(User)
+	 */
+	@Test
+	@Verifies(value = "should only get specified report definitions for user", method ="getAllowedReportDefinitionsForUser(User)")
+	public void getAllowedReportDefinitionsForUser_shouldOnlyGetSpecifiedReportDefinitionsForUser() throws Exception {
+		MohCoreService cservice = Context.getService(MohCoreService.class);
+
+		User sysUser = new User();
+		sysUser.setUserId(501);
+
+		// create a report definition
+		ReportDefinition rd = new ReportDefinition();
+		rd.setName("foo");
+		Context.getService(ReportDefinitionService.class).saveDefinition(rd);
+		String expectedUuid = rd.getUuid();
+		Assert.assertNotNull(expectedUuid);
+		
+		// create a userreport
+		UserReport userreport = new UserReport();
+		userreport.setAmrsReportsUser(sysUser);
+		userreport.setReportDefinitionUuid(expectedUuid);
+		cservice.saveUserReport(userreport);
+
+		List<ReportDefinition> actual = cservice.getAllowedReportDefinitionsForUser(sysUser);
+		Assert.assertEquals(1, actual.size());
+		Assert.assertEquals(expectedUuid, actual.get(0).getUuid());
+	}
+
+	/**
+	 * @see MohCoreService#getAllowedReportDefinitionsForUser(User)
+	 */
+	@Test
+	@Verifies(value = "should return empty list if none assigned", method ="getAllowedReportDefinitionsForUser(User)")
+	public void getAllowedReportDefinitionsForUser_shouldReturnEmptyListIfNoneAssigned() throws Exception {
+		MohCoreService cservice = Context.getService(MohCoreService.class);
+
+		User sysUser = new User();
+		sysUser.setUserId(501);
+
+		List<ReportDefinition> actual = cservice.getAllowedReportDefinitionsForUser(sysUser);
+		Assert.assertNotNull(actual);
+		Assert.assertEquals(0, actual.size());
 	}
 }
