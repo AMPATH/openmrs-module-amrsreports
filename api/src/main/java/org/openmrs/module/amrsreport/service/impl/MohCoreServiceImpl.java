@@ -11,6 +11,7 @@
  */
 package org.openmrs.module.amrsreport.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -26,13 +27,17 @@ import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.User;
 import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.module.amrsreport.UserReport;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 
 /**
  * Actual implementation of the core service contract
@@ -140,5 +145,27 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	@Override
 	public UserReport getUserReport(Integer userReportId) {
 		return mohCoreDAO.getUserReport(userReportId);
+	}
+
+	@Override
+	public List<Location> getAllowedLocationsForUser(User user) {
+		List<Location> locations = new ArrayList<Location>();
+		List<UserLocation> userLocations = mohCoreDAO.getUserLocationsForUser(user);
+		for (UserLocation ul: userLocations) {
+			locations.add(ul.getUserLoc());
+		}
+		return locations;
+	}
+
+	@Override
+	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user) {
+		ReportDefinitionService rds = Context.getService(ReportDefinitionService.class);
+		List<ReportDefinition> definitions = new ArrayList<ReportDefinition>();
+		List<UserReport> userReports = mohCoreDAO.getUserReportsForUser(user);
+		for (UserReport ur: userReports) {
+			String uuid = ur.getReportDefinitionUuid();
+			definitions.add(rds.getDefinitionByUuid(uuid));
+		}
+		return definitions;
 	}
 }

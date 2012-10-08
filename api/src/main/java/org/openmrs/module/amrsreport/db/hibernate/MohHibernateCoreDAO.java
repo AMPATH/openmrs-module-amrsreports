@@ -320,4 +320,18 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	public void purgeUserLocation(UserLocation userlocation) {
 		sessionFactory.getCurrentSession().delete(userlocation);
 	}
+
+	@Override
+	public List<UserLocation> getUserLocationsForUser(User user) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(UserLocation.class)
+			.add(Restrictions.eq("sysUser", user));
+		return (List<UserLocation>) crit.list();
+	}
+
+	@Override
+	public List<UserReport> getUserReportsForUser(User user) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(UserReport.class)
+			.add(Restrictions.eq("amrsReportsUser", user));
+		return (List<UserReport>) crit.list();
+	}
 }
