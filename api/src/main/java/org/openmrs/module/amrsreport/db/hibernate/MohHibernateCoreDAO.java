@@ -46,7 +46,7 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreport.userlocation.UserLocation;
+import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;

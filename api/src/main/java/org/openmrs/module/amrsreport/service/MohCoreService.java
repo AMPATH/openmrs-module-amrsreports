@@ -25,7 +25,7 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.User;
-import org.openmrs.module.amrsreport.userlocation.UserLocation;
+import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;

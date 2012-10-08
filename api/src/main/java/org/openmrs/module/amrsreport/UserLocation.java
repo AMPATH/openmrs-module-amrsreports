@@ -9,7 +9,7 @@
  *
  * Copyright (C) OpenMRS, LLC. All Rights Reserved.
  */
-package org.openmrs.module.amrsreport.userlocation;
+package org.openmrs.module.amrsreport;
 
 import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.User;
