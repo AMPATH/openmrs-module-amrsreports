@@ -2,170 +2,170 @@ package org.openmrs.module.amrsreport.service;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.User;
-
-import org.openmrs.Location;
-import org.openmrs.module.amrsreport.userlocation.UserLocation;
-
 
 /**
- * Created with IntelliJ IDEA.
- * User: alfayo
- * Date: 9/25/12
- * Time: 12:14 PM
+ * Created with IntelliJ IDEA. User: alfayo Date: 9/25/12 Time: 12:14 PM
  *
  */
-public class MohCoreServiceTest   extends BaseModuleContextSensitiveTest{
-   /**
-     * @verifies save AmrsReportUser
-     * @see MohCoreService#saveUserReport(org.openmrs.module.amrsreport.UserReport)
-     */
-    @Test
-    public void saveUserReport_shouldSaveAmrsReportUser() throws Exception {
-        //TODO auto-generated
-        MohCoreService service = Context.getService(MohCoreService.class);
+public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 
-        //Create a sample User
-        User systemUser = new User();
-        systemUser.setUserId(501);
+	/**
+	 * @verifies save AmrsReportUser
+	 * @see
+	 * MohCoreService#saveUserReport(org.openmrs.module.amrsreport.UserReport)
+	 */
+	@Test
+	public void saveUserReport_shouldSaveAmrsReportUser() throws Exception {
+		//TODO auto-generated
+		MohCoreService service = Context.getService(MohCoreService.class);
 
-        //sample user report instance
-        UserReport userrpt = new UserReport();
-        userrpt.setAmrsReportsUser(systemUser);
-        userrpt.setReporDefinitionUuid("testuuid");
-        Assert.assertNotNull( service.saveUserReport(userrpt));
-    }
+		//Create a sample User
+		User systemUser = new User();
+		systemUser.setUserId(501);
 
-    /**
-     * @verifies get userreport by id
-     * @see MohCoreService#getUserReportByUserId(Integer)
-     */
-    @Test
-    public void getUserReportByUserId_shouldGetUserreportById() throws Exception {
-        //TODO auto-generated
-        //Create an instance of the service object
+		//sample user report instance
+		UserReport userrpt = new UserReport();
+		userrpt.setAmrsReportsUser(systemUser);
+		userrpt.setReportDefinitionUuid("testuuid");
+		Assert.assertNotNull(service.saveUserReport(userrpt));
+	}
 
-        MohCoreService service = Context.getService(MohCoreService.class);
+	/**
+	 * @verifies get userreport by id
+	 * @see MohCoreService#getUserReportByUserId(Integer)
+	 */
+	@Test
+	public void getUserReportByUserId_shouldGetUserreportById() throws Exception {
+		//TODO auto-generated
+		//Create an instance of the service object
 
-        //Create a sample User
-        User systemUser = new User();
-        systemUser.setUserId(501);
+		MohCoreService service = Context.getService(MohCoreService.class);
 
-        //sample user report instance
-        UserReport userrpt = new UserReport();
-        userrpt.setAmrsReportsUser(systemUser);
-        userrpt.setReporDefinitionUuid("testuuid");
-        UserReport userreport=service.saveUserReport(userrpt);
-       Assert.assertNotNull( service.getUserReportByUserId(userreport.getId()));
-    }
+		//Create a sample User
+		User systemUser = new User();
+		systemUser.setUserId(501);
 
-  /**
-     * @verifies  delete user report  based on user report uuid
-     * @see MohCoreService#purgeUserReport(org.openmrs.module.amrsreport.UserReport)
-     */
-    @Test
-    public void getUserReportByUserId_shouldPurgeUserReport() throws Exception {
-        //TODO auto-generated
-        //Create an instance of the service object
+		//sample user report instance
+		UserReport userrpt = new UserReport();
+		userrpt.setAmrsReportsUser(systemUser);
+		userrpt.setReportDefinitionUuid("testuuid");
+		UserReport userreport = service.saveUserReport(userrpt);
+		Assert.assertNotNull(service.getUserReportByUserId(userreport.getId()));
+	}
 
-        MohCoreService service = Context.getService(MohCoreService.class);
+	/**
+	 * @verifies delete user report based on user report uuid
+	 * @see
+	 * MohCoreService#purgeUserReport(org.openmrs.module.amrsreport.UserReport)
+	 */
+	@Test
+	public void getUserReportByUserId_shouldPurgeUserReport() throws Exception {
+		//TODO auto-generated
+		//Create an instance of the service object
 
-        //Create a sample User
-        User systemUser = new User();
-        systemUser.setUserId(501);
+		MohCoreService service = Context.getService(MohCoreService.class);
 
-     //sample user report instance
-        UserReport userrpt = new UserReport();
-        userrpt.setAmrsReportsUser(systemUser);
-        userrpt.setReporDefinitionUuid("testuuid");
-        UserReport userreport=service.saveUserReport(userrpt);
-        service.purgeUserReport(userreport);
-       Assert.assertNull( service.getUserReportByUuid(userreport.getUuid()));
-    }
+		//Create a sample User
+		User systemUser = new User();
+		systemUser.setUserId(501);
 
-    /**
-     * @see MohCoreService#getUserLocation(Integer)
-     * @Verifies(value = "should get a UserLocation by its Id", method = "getUserLocation(Integer)")
-     * @should get a UserLocation by its Id
-     */
-    @Test
-    public void getUserLocation_shouldGetAUserLocationByItsId()
-            throws Exception {
+		//sample user report instance
+		UserReport userrpt = new UserReport();
+		userrpt.setAmrsReportsUser(systemUser);
+		userrpt.setReportDefinitionUuid("testuuid");
+		UserReport userreport = service.saveUserReport(userrpt);
+		service.purgeUserReport(userreport);
+		Assert.assertNull(service.getUserReportByUuid(userreport.getUuid()));
+	}
 
-        MohCoreService cservice = Context.getService(MohCoreService.class);
-        User sysUser = new User();
-        sysUser.setUserId(501);
+	/**
+	 * @see MohCoreService#getUserLocation(Integer)
+	 * @Verifies(value = "should get a UserLocation by its Id", method =
+	 * "getUserLocation(Integer)")
+	 * @should get a UserLocation by its Id
+	 */
+	@Test
+	public void getUserLocation_shouldGetAUserLocationByItsId()
+		throws Exception {
 
-        Location userLoc = new Location();
-        userLoc.setLocationId(1);
+		MohCoreService cservice = Context.getService(MohCoreService.class);
+		User sysUser = new User();
+		sysUser.setUserId(501);
 
-        UserLocation userlocation = new UserLocation();
-        userlocation.setSysUser(sysUser);
-        userlocation.setUserLoc(userLoc);
+		Location userLoc = new Location();
+		userLoc.setLocationId(1);
 
-        UserLocation returnedUserLocation = cservice.saveUserLocation(userlocation);
+		UserLocation userlocation = new UserLocation();
+		userlocation.setSysUser(sysUser);
+		userlocation.setUserLoc(userLoc);
 
-        Assert.assertNotNull(cservice.getUserLocation(returnedUserLocation.getUserLocationId()));
-    }
+		UserLocation returnedUserLocation = cservice.saveUserLocation(userlocation);
 
-    /**
-     * @see MohCoreService#purgeUserLocation(UserLocation)
-     * @verifies(value = "should Purge a UserLocation", method = "purgeUserLocation(UserLocation)")
-     * @should purge a UserLocation
-     */
-    @Test
-    public void purgeUserLocation_shouldPurgeAUserLocation() throws Exception {
+		Assert.assertNotNull(cservice.getUserLocation(returnedUserLocation.getUserLocationId()));
+	}
 
-        MohCoreService cservice = Context.getService(MohCoreService.class);
+	/**
+	 * @see MohCoreService#purgeUserLocation(UserLocation)
+	 * @verifies(value = "should Purge a UserLocation", method =
+	 * "purgeUserLocation(UserLocation)")
+	 * @should purge a UserLocation
+	 */
+	@Test
+	public void purgeUserLocation_shouldPurgeAUserLocation() throws Exception {
 
-        User sysUser = new User();
-        sysUser.setUserId(501);
+		MohCoreService cservice = Context.getService(MohCoreService.class);
 
-        Location userLoc = new Location();
-        userLoc.setLocationId(1);
+		User sysUser = new User();
+		sysUser.setUserId(501);
 
-        UserLocation userlocation = new UserLocation();
-        userlocation.setSysUser(sysUser);
-        userlocation.setUserLoc(userLoc);
+		Location userLoc = new Location();
+		userLoc.setLocationId(1);
 
-        UserLocation uloc = cservice.saveUserLocation(userlocation);
+		UserLocation userlocation = new UserLocation();
+		userlocation.setSysUser(sysUser);
+		userlocation.setUserLoc(userLoc);
 
-        Integer userlocationid = uloc.getUserLocationId();
-        Assert.assertNotNull(userlocationid);
+		UserLocation uloc = cservice.saveUserLocation(userlocation);
 
-        cservice.purgeUserLocation(uloc);
+		Integer userlocationid = uloc.getUserLocationId();
+		Assert.assertNotNull(userlocationid);
 
-        Assert.assertNull(cservice.getUserLocation(userlocationid));
-    }
+		cservice.purgeUserLocation(uloc);
 
-    /**
-     * @see MohCoreService#saveUserLocation(UserLocation)
-     * @verifies(value = "should save a UserLocation", method = "saveUserLocation(UserLocation)")
-     * @should save a UserLocation
-     */
-    @Test
-    public void saveUserLocation_shouldSaveAUserLocation() throws Exception {
+		Assert.assertNull(cservice.getUserLocation(userlocationid));
+	}
 
-        MohCoreService cservice = Context.getService(MohCoreService.class);
+	/**
+	 * @see MohCoreService#saveUserLocation(UserLocation)
+	 * @verifies(value = "should save a UserLocation", method =
+	 * "saveUserLocation(UserLocation)")
+	 * @should save a UserLocation
+	 */
+	@Test
+	public void saveUserLocation_shouldSaveAUserLocation() throws Exception {
 
-        User sysUser = new User();
-        sysUser.setUserId(501);
+		MohCoreService cservice = Context.getService(MohCoreService.class);
 
-        Location userLoc = new Location();
-        userLoc.setLocationId(1);
+		User sysUser = new User();
+		sysUser.setUserId(501);
 
-        UserLocation userlocation = new UserLocation();
-        userlocation.setSysUser(sysUser);
-        userlocation.setUserLoc(userLoc);
+		Location userLoc = new Location();
+		userLoc.setLocationId(1);
 
-        Assert.assertNull(userlocation.getUserLocationId());
+		UserLocation userlocation = new UserLocation();
+		userlocation.setSysUser(sysUser);
+		userlocation.setUserLoc(userLoc);
 
-        UserLocation uloc = cservice.saveUserLocation(userlocation);
+		Assert.assertNull(userlocation.getUserLocationId());
 
-        Assert.assertNotNull(uloc.getUserLocationId());
-    }
+		UserLocation uloc = cservice.saveUserLocation(userlocation);
 
+		Assert.assertNotNull(uloc.getUserLocationId());
+	}
 }
