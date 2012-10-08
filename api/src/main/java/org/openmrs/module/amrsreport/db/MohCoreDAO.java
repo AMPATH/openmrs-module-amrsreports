@@ -62,4 +62,8 @@ public interface MohCoreDAO {
 	public UserLocation getUserLocation(Integer userlocationId);
 
 	public void purgeUserLocation(UserLocation userlocation);
+
+	public List<UserLocation> getUserLocationsForUser(User user);
+
+	public List<UserReport> getUserReportsForUser(User user);
 }

@@ -25,6 +25,7 @@ import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
@@ -32,6 +33,7 @@ import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.amrsreport.UserReport;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
 
 /**
  * Service contract for the core layer of OpenMRS
@@ -160,4 +162,20 @@ public interface MohCoreService extends OpenmrsService {
 	 * @param userlocation
 	 */
 	public void purgeUserLocation(UserLocation userlocation);
+
+	/**
+	 * @should only get specified locations for user
+	 * @should return empty list if none assigned
+	 * @param user
+	 * @return list of allowed locations
+	 */
+	public List<Location> getAllowedLocationsForUser(User user);
+
+	/**
+	 * @should only get specified report definitions for user
+	 * @should return empty list if none assigned
+	 * @param user
+	 * @return list of allowed reports
+	 */
+	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user);
 }
