@@ -1,19 +1,15 @@
 /**
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+ * The contents of this file are subject to the OpenMRS Public License Version
+ * 1.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at http://license.openmrs.org
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
+ * the specific language governing rights and limitations under the License.
  *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS, LLC. All Rights Reserved.
  */
-
 package org.openmrs.module.amrsreport.db.hibernate;
-
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,11 +55,11 @@ import org.hibernate.criterion.Expression;
 public class MohHibernateCoreDAO implements MohCoreDAO {
 
 	private Log log = LogFactory.getLog(MohHibernateCoreDAO.class);
-
 	private SessionFactory sessionFactory;
 
 	/**
-	 * Method that will be called by Spring to inject the Hibernate's SessionFactory.
+	 * Method that will be called by Spring to inject the Hibernate's
+	 * SessionFactory.
 	 *
 	 * @param sessionFactory the session factory to be injected
 	 */
@@ -72,24 +68,28 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreport.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map,
+	 * org.openmrs.module.amrsreport.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                        final MohFetchRestriction mohFetchRestriction) throws DAOException {
+		final MohFetchRestriction mohFetchRestriction) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.eq("personId", patientId));
 
 		criteria.setFirstResult(0);
-		if (mohFetchRestriction.getStart() != null)
+		if (mohFetchRestriction.getStart() != null) {
 			criteria.setFirstResult(mohFetchRestriction.getStart());
+		}
 
-		if (mohFetchRestriction.getSize() != null && mohFetchRestriction.getSize() == 1)
+		if (mohFetchRestriction.getSize() != null && mohFetchRestriction.getSize() == 1) {
 			criteria.setMaxResults(mohFetchRestriction.getSize());
+		}
 
 		Order order = Order.desc("obsDatetime");
-		if (OpenmrsUtil.nullSafeEquals(MohFetchOrdering.ORDER_ASCENDING, mohFetchRestriction.getFetchOrdering()))
+		if (OpenmrsUtil.nullSafeEquals(MohFetchOrdering.ORDER_ASCENDING, mohFetchRestriction.getFetchOrdering())) {
 			order = Order.asc("obsDatetime");
+		}
 
 		criteria.addOrder(order);
 
@@ -118,10 +118,11 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 			// TODO: thanks to Ampath for the duplicate data, we need to sanitize the query results here
 			if (processedObs != null && !obs.isObsGrouping()) {
 				if (DateUtils.isSameDay(processedObs.getObsDatetime(), obs.getObsDatetime())
-						&& OpenmrsUtil.nullSafeEquals(processedObs.getConcept(), obs.getConcept())
-						&& OpenmrsUtil.nullSafeEquals(processedObs.getValueCoded(), obs.getValueCoded())
-						&& (OpenmrsUtil.nullSafeEquals(processedObs.getValueNumeric(), obs.getValueNumeric())))
+					&& OpenmrsUtil.nullSafeEquals(processedObs.getConcept(), obs.getConcept())
+					&& OpenmrsUtil.nullSafeEquals(processedObs.getValueCoded(), obs.getValueCoded())
+					&& (OpenmrsUtil.nullSafeEquals(processedObs.getValueNumeric(), obs.getValueNumeric()))) {
 					continue;
+				}
 			}
 			processedObs = obs;
 			observations.add(obs);
@@ -131,11 +132,12 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreport.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map,
+	 * org.openmrs.module.amrsreport.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                            final MohFetchRestriction mohFetchRestriction) throws DAOException {
+		final MohFetchRestriction mohFetchRestriction) throws DAOException {
 		// create a hibernate criteria on the encounter object
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Encounter.class);
 		// restrict the encounter that will be returned to specific patient only
@@ -144,20 +146,23 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		// default ordering for the returned encounter is descending on encounter datetime
 		Order order = Order.desc("encounterDatetime");
 		// change the default ordering if the user pass the ascending ordering in the parameters
-		if (OpenmrsUtil.nullSafeEquals(MohFetchOrdering.ORDER_ASCENDING, mohFetchRestriction.getFetchOrdering()))
+		if (OpenmrsUtil.nullSafeEquals(MohFetchOrdering.ORDER_ASCENDING, mohFetchRestriction.getFetchOrdering())) {
 			order = Order.asc("encounterDatetime");
+		}
 		// add the ordering object to the criteria
 		criteria.addOrder(order);
 
 		// always get from the first result
 		criteria.setFirstResult(0);
 		// set the first result to a number if the user pass any value on this parameter (currently not being used)
-		if (mohFetchRestriction.getStart() != null)
+		if (mohFetchRestriction.getStart() != null) {
 			criteria.setFirstResult(mohFetchRestriction.getStart());
+		}
 
 		// specify how many records should be returned
-		if (mohFetchRestriction.getSize() != null)
+		if (mohFetchRestriction.getSize() != null) {
 			criteria.setMaxResults(mohFetchRestriction.getSize());
+		}
 
 		// create a dummy encounter object
 		Encounter encounter = new Encounter();
@@ -184,29 +189,34 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		// scroll the results and add them to the above list of encounter
 		Integer counter = 0;
 		ScrollableResults scrollableResults = criteria.scroll(ScrollMode.FORWARD_ONLY);
-		while (scrollableResults.next())
+		while (scrollableResults.next()) {
 			encounters.add((Encounter) scrollableResults.get(0));
+		}
 		scrollableResults.close();
 		return encounters;
 	}
 
 	/**
-	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location, java.util.Date, java.util.Date)
+	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location,
+	 * java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getDateCreatedCohort(final Location location, final Date startDate, final Date endDate) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 
-		if (location != null)
+		if (location != null) {
 			criteria.add(Restrictions.eq("location", location));
-		else
+		} else {
 			criteria.add(Restrictions.isNull("location"));
+		}
 
-		if (startDate != null)
+		if (startDate != null) {
 			criteria.add(Restrictions.ge("dateCreated", startDate));
+		}
 
-		if (endDate != null)
+		if (endDate != null) {
 			criteria.add(Restrictions.le("dateCreated", endDate));
+		}
 
 		criteria.setProjection(Projections.property("person.personId"));
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
@@ -214,23 +224,27 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location, java.util.Date, java.util.Date)
+	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location,
+	 * java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getReturnDateCohort(final Location location, final Date startDate, final Date endDate) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.eq("concept", MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE)));
 
-		if (location != null)
+		if (location != null) {
 			criteria.add(Restrictions.eq("location", location));
-		else
+		} else {
 			criteria.add(Restrictions.isNull("location"));
+		}
 
-		if (startDate != null)
+		if (startDate != null) {
 			criteria.add(Restrictions.ge("valueDatetime", startDate));
+		}
 
-		if (endDate != null)
+		if (endDate != null) {
 			criteria.add(Restrictions.le("valueDatetime", endDate));
+		}
 
 		criteria.setProjection(Projections.property("person.personId"));
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
@@ -238,25 +252,27 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getObservationCohort(java.util.List, java.util.Date, java.util.Date)
+	 * @see MohCoreDAO#getObservationCohort(java.util.List, java.util.Date,
+	 * java.util.Date)
 	 */
 	@Override
 	public Cohort getObservationCohort(final List<Concept> concepts, final Date startDate, final Date endDate) throws DAOException {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.in("concept", concepts));
 
-		if (startDate != null)
+		if (startDate != null) {
 			criteria.add(Restrictions.ge("dateCreated", startDate));
+		}
 
-		if (endDate != null)
+		if (endDate != null) {
 			criteria.add(Restrictions.le("dateCreated", endDate));
+		}
 
 		criteria.setProjection(Projections.property("person.personId"));
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
 		return new Cohort(criteria.list());
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public List<PatientIdentifier> getAllPatientIdenifiers(Patient p) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PatientIdentifier.class);
@@ -264,61 +280,44 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return criteria.list();
 	}
 
-	
 	/*  Save report user
-	     */
-	    
-	    public UserReport saveUserReport(UserReport userReport) {
-	    	sessionFactory.getCurrentSession().saveOrUpdate(userReport);
+	 */
+	public UserReport saveUserReport(UserReport userReport) {
+		sessionFactory.getCurrentSession().saveOrUpdate(userReport);
 
-			return userReport;
-	    }
-	    /*Find reports that the current user is allowed to view*/
-
-	    public List<UserReport>  getUserReportByUserId(Integer id) {
-	    	Criteria criteria = sessionFactory.getCurrentSession().createCriteria(UserReport.class).add(
-			    Expression.eq("user_id", id));
-
-		@SuppressWarnings("unchecked")
-		List<UserReport> userReport = criteria.list();
-		if (null == userReport || userReport.isEmpty()) {
-			return null;
-		}
 		return userReport;
-	    }
-	    
-	    @SuppressWarnings("unchecked")
-    public UserReport getUserReportByUuid(String uuid) {
-        return (UserReport) sessionFactory.getCurrentSession().
-                createCriteria(UserReport.class)
-                .add(Expression.eq("uuid", uuid))
-                .uniqueResult();
-    }
-	    @SuppressWarnings("unchecked")
-		public void purgeUserReport(UserReport userReport){
-			sessionFactory.getCurrentSession().delete(userReport);
-			
-		}
+	}
 
+	public UserReport getUserReport(Integer userReportId) {
+		return (UserReport) sessionFactory.getCurrentSession().get(UserReport.class, userReportId);
+	}
 
-    /**
-     * UserLocation methods
-     */
+	@SuppressWarnings("unchecked")
+	public UserReport getUserReportByUuid(String uuid) {
+		return (UserReport) sessionFactory.getCurrentSession().
+			createCriteria(UserReport.class)
+			.add(Expression.eq("uuid", uuid))
+			.uniqueResult();
+	}
 
-	public UserLocation saveUserLocation(UserLocation userlocation){
+	@SuppressWarnings("unchecked")
+	public void purgeUserReport(UserReport userReport) {
+		sessionFactory.getCurrentSession().delete(userReport);
+	}
+
+	/**
+	 * UserLocation methods
+	 */
+	public UserLocation saveUserLocation(UserLocation userlocation) {
 		sessionFactory.getCurrentSession().saveOrUpdate(userlocation);
 		return userlocation;
 	}
-	
-	public UserLocation  getUserLocation(Integer userlocationId){
-		
+
+	public UserLocation getUserLocation(Integer userlocationId) {
 		return (UserLocation) sessionFactory.getCurrentSession().get(UserLocation.class, userlocationId);
-				
 	}
-	
-	public void purgeUserLocation(UserLocation userlocation){
+
+	public void purgeUserLocation(UserLocation userlocation) {
 		sessionFactory.getCurrentSession().delete(userlocation);
 	}
-	
-
 }

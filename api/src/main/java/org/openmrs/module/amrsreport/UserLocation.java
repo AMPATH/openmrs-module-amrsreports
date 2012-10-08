@@ -12,9 +12,9 @@
 package org.openmrs.module.amrsreport;
 
 import org.openmrs.BaseOpenmrsMetadata;
-import org.openmrs.User;
-import org.openmrs.Location;
 import org.openmrs.BaseOpenmrsObject;
+import org.openmrs.Location;
+import org.openmrs.User;
 //import javax.xml.stream.Location;
 
 /**
