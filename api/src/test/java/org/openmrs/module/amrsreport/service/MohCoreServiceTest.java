@@ -10,8 +10,7 @@ import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
- * Created with IntelliJ IDEA. User: alfayo Date: 9/25/12 Time: 12:14 PM
- *
+ * Test file for MohCoreService methods
  */
 public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 
@@ -55,8 +54,11 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		UserReport userrpt = new UserReport();
 		userrpt.setAmrsReportsUser(systemUser);
 		userrpt.setReportDefinitionUuid("testuuid");
-		UserReport userreport = service.saveUserReport(userrpt);
-		Assert.assertNotNull(service.getUserReportByUserId(userreport.getId()));
+		userrpt = service.saveUserReport(userrpt);
+		
+		Context.flushSession();
+
+		Assert.assertNotNull(service.getUserReport(userrpt.getId()));
 	}
 
 	/**
