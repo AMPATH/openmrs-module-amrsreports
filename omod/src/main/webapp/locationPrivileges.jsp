@@ -15,21 +15,18 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/css/TableTools.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/css/TableTools_JUI.css" />
 
-<%--<openmrs:htmlInclude file="/dwr/interface/DwrUserLocation.js"/>--%>
+<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
 
 <script type="text/javascript">
-$j(document).ready(function(){
-
     $j(document).ready(function(){
-        var oTable = $j("#avpriv").dataTable();
+       /* var oTable = $j("#avpriv").dataTable();*/
 
 	$j("#uassign").click(function(){
-		//alert("You clicked me Boss!");
-		//DwrUserLocation.testDwr(handleResponse);
+
 		var locid=$j("#locname").val();
 		var usersid=$j("#seluser").val();
-		DwrUserLocation.alertInput(locid,usersid,handleResponse);
+        DWRAmrsReportService.saveUserLoc(usersid,locid,handleResponse);
 		
 	}); 
 	
@@ -48,7 +45,7 @@ $j(document).ready(function(){
             <tr>
                 <td><b>User:</b></td>
                 <td>
-                    <select name="seluser" id="seluser" multiple="multiple" size="5">
+                    <select name="seluser" id="seluser" <%--multiple="multiple" size="5"--%>>
                         <option value="0">Select Users</option>
                         <c:forEach var="suser" items="${userlist}">
                             <option value="${suser.userId}">${suser.username}</option>
