@@ -7,6 +7,8 @@ import org.openmrs.User;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +35,11 @@ public class LocationPrivilegesController {
         List<User> userslist=userservinstance.getAllUsers();
 
         model.addAttribute("userlist", userslist);
+
+        MohCoreService getallUserlocpriv = Context.getService(MohCoreService.class);
+        List<UserLocation> allUserLocPrivileges =getallUserlocpriv.getAllUserLocationPrivileges();
+
+        model.addAttribute("userlocpriv", allUserLocPrivileges);
+
     }
 }

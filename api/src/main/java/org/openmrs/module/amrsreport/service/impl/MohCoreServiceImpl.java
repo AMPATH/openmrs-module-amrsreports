@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -137,6 +138,11 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	public UserLocation getUserLocation(Integer userlocationId) {
 		return mohCoreDAO.getUserLocation(userlocationId);
 	}
+
+    public List<UserLocation> getAllUserLocationPrivileges(){
+
+        return mohCoreDAO.getAllUserLocationPrivileges();
+    }
 
 	public void purgeUserLocation(UserLocation userlocation) {
 		mohCoreDAO.purgeUserLocation(userlocation);

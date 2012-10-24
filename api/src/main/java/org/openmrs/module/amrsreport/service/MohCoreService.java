@@ -161,6 +161,8 @@ public interface MohCoreService extends OpenmrsService {
 	 * @should purge a UserLocation
 	 * @param userlocation
 	 */
+
+    public List<UserLocation> getAllUserLocationPrivileges();
 	public void purgeUserLocation(UserLocation userlocation);
 
 	/**

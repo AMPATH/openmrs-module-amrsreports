@@ -67,9 +67,11 @@
 				<include method="viewMoreDetailsRender"/>
 				<include method="downloadCSV"/>
 				<include method="downloadPDF"/>
-                <include method="alertInput"/>
+                <include method="purgeUserLocation"/>
                 <include method="saveUserLoc"/>
                 <convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
+                <convert match="org.openmrs.Location" converter="bean" />
+                <convert match="org.openmrs.User" converter="bean"/>
 			</create>
 		</allow>
 
@@ -82,6 +84,7 @@
 			DWRAmrsReportService.downloadPDF(String file);
             DWRAmrsReportService.alertInput(String loc,String userr);
             DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
+            DWRAmrsReportService.purgeUserLocation(Integer rowid);
 			]]>
 		</signatures>	
 	</dwr>

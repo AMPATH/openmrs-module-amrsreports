@@ -220,5 +220,16 @@ public class DWRAmrsReportService {
 
     }
 
+    public String purgeUserLocation(Integer rowid){
+
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
+
+        UserLocation userlocation = userlocservice.getUserLocation(rowid);
+
+        userlocservice.purgeUserLocation(userlocation);
+
+        return "Record removed successfully";
+    }
+
 
 }
