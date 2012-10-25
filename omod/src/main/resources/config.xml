@@ -69,6 +69,7 @@
 				<include method="downloadPDF"/>
                 <include method="purgeUserLocation"/>
                 <include method="saveUserLoc"/>
+                <include method="purgeMultiplePrivileges"/>
                 <convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
                 <convert match="org.openmrs.Location" converter="bean" />
                 <convert match="org.openmrs.User" converter="bean"/>
@@ -85,6 +86,7 @@
             DWRAmrsReportService.alertInput(String loc,String userr);
             DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
             DWRAmrsReportService.purgeUserLocation(Integer rowid);
+            DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
 			]]>
 		</signatures>	
 	</dwr>

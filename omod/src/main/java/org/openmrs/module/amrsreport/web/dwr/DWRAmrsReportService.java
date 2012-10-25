@@ -17,10 +17,7 @@ import org.springframework.util.FileCopyUtils;
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -226,9 +223,25 @@ public class DWRAmrsReportService {
 
         UserLocation userlocation = userlocservice.getUserLocation(rowid);
 
+        Integer usuuid = userlocation.getId();
+
+        log.info("This uuid has been found, and it is = "+usuuid);
+
         userlocservice.purgeUserLocation(userlocation);
 
         return "Record removed successfully";
+    }
+
+    public String purgeMultiplePrivileges(List<Integer> myList){
+
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
+       for(Integer privID:myList){
+           UserLocation userlocation = userlocservice.getUserLocation(privID);
+           userlocservice.purgeUserLocation(userlocation);
+
+       }
+
+        return "A total of  "+myList.size()+" privileges have been processed";
     }
 
 

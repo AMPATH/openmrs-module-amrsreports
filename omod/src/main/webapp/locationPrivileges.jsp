@@ -27,7 +27,7 @@
 <script type="text/javascript">
     $j(document).ready(function(){
       var oTable = $j("#avpriv").dataTable();
-
+        selectedPrivileges = [];
 
 	$j("#uassign").click(function(){
 
@@ -81,12 +81,35 @@
 
             var rowidd=$j(this).parents("tr").attr("id");
 
-          alert(rowidd);
+
+            if ($j(this).is(":checked")){
+               selectedPrivileges.push(rowidd);
+
+                /*$(this).prop('checked',false);*/
+                /*alert("Checked");*/
+            }
+            else{
+
+                var itempos=selectedPrivileges.indexOf(rowidd);
+                selectedPrivileges.splice(itempos,1);
+                 /* $(this).prop('checked',true);*/
+                /*alert("Not Checked");*/
+            }
+
 
 
         });
-	
-});
+
+        $j("#pickAllSel").click(function(){
+            DWRAmrsReportService.purgeMultiplePrivileges(selectedPrivileges,testResponse);
+            //alert(selectedPrivileges);
+        });
+
+        function testResponse(datam){
+          alert(datam);
+        }
+
+    });
 </script>
 <div id="dialog-form" title="Create new user" style="display:none;">
     <p class="validateTips">All form fields are required.</p>
@@ -143,6 +166,7 @@
 <br>
 <b class="boxHeader">Available UserLocation Privileges</b>
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
+    <div align="right"><input type="button" id="pickAllSel" value="Process All"></div>
 
     <table id="avpriv" align="left" width="95%">
         <thead>
