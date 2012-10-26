@@ -38,7 +38,7 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 /**
  * Service contract for the core layer of OpenMRS
  */
-@Transactional(readOnly = true)
+@Transactional
 public interface MohCoreService extends OpenmrsService {
 
 	/**
@@ -161,8 +161,8 @@ public interface MohCoreService extends OpenmrsService {
 	 * @should purge a UserLocation
 	 * @param userlocation
 	 */
+	public List<UserLocation> getAllUserLocationPrivileges();
 
-    public List<UserLocation> getAllUserLocationPrivileges();
 	public void purgeUserLocation(UserLocation userlocation);
 
 	/**
