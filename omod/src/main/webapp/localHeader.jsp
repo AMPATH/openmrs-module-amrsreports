@@ -16,4 +16,9 @@
             </a>
         </li>
     </openmrs:hasPrivilege>
+    <li <c:if test='<%= request.getRequestURI().contains("locationPrivileges") %>'>class="active"</c:if>>
+    <a href="${pageContext.request.contextPath}/module/amrsreport/locationPrivileges.form">
+        Location Privileges
+    </a>
+    </li>
 </ul>

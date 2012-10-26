@@ -5,18 +5,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.directwebremoting.util.MimeConstants;
+import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.util.FileCopyUtils;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -185,4 +186,63 @@ public class DWRAmrsReportService {
         }
         return str;
     }
+
+    public String testDwr(){
+
+        return "This is a response from DWR class";
+    }
+
+  /*  public String alertInput(String loc,String userr){
+        String inputStr="You have selected Location Id "+loc+" and Users Id "+userr;
+        return inputStr;
+
+    }*/
+    public String saveUserLoc(Integer suser,Integer syslocc ){
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
+
+        //set user
+        User sysUser = new User();
+        sysUser.setUserId(suser);
+
+        // set location
+        Location userlocc = new Location();
+        userlocc.setLocationId(syslocc);
+
+        UserLocation userlocation = new UserLocation();
+        userlocation.setSysUser(sysUser);
+        userlocation.setUserLoc(userlocc);
+
+        userlocservice.saveUserLocation(userlocation);
+        return "Record saved successfully";
+
+    }
+
+    public String purgeUserLocation(Integer rowid){
+
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
+
+        UserLocation userlocation = userlocservice.getUserLocation(rowid);
+
+        Integer usuuid = userlocation.getId();
+
+        log.info("This uuid has been found, and it is = "+usuuid);
+
+        userlocservice.purgeUserLocation(userlocation);
+
+        return "Record removed successfully";
+    }
+
+    public String purgeMultiplePrivileges(List<Integer> myList){
+
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
+       for(Integer privID:myList){
+           UserLocation userlocation = userlocservice.getUserLocation(privID);
+           userlocservice.purgeUserLocation(userlocation);
+
+       }
+
+        return "A total of  "+myList.size()+" privileges have been processed";
+    }
+
+
 }
