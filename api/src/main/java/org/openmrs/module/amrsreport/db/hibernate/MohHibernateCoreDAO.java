@@ -273,7 +273,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return new Cohort(criteria.list());
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
 	public List<PatientIdentifier> getAllPatientIdenifiers(Patient p) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PatientIdentifier.class);
 		criteria.add(Restrictions.eq("patient", p));
@@ -282,17 +282,19 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 
 	/*  Save report user
 	 */
+	@Override
 	public UserReport saveUserReport(UserReport userReport) {
 		sessionFactory.getCurrentSession().saveOrUpdate(userReport);
 
 		return userReport;
 	}
 
+	@Override
 	public UserReport getUserReport(Integer userReportId) {
 		return (UserReport) sessionFactory.getCurrentSession().get(UserReport.class, userReportId);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
 	public UserReport getUserReportByUuid(String uuid) {
 		return (UserReport) sessionFactory.getCurrentSession().
 			createCriteria(UserReport.class)
@@ -300,7 +302,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 			.uniqueResult();
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
 	public void purgeUserReport(UserReport userReport) {
 		sessionFactory.getCurrentSession().delete(userReport);
 	}
@@ -308,24 +310,26 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	/**
 	 * UserLocation methods
 	 */
+	@Override
 	public UserLocation saveUserLocation(UserLocation userlocation) {
 		sessionFactory.getCurrentSession().saveOrUpdate(userlocation);
 		return userlocation;
 	}
 
+	@Override
 	public UserLocation getUserLocation(Integer userlocationId) {
 		return (UserLocation) sessionFactory.getCurrentSession().get(UserLocation.class, userlocationId);
 	}
 
-    public List<UserLocation> getAllUserLocationPrivileges(){
-        Criteria crt = sessionFactory.getCurrentSession().createCriteria(UserLocation.class);
-        return crt.list();
-    }
+	@Override
+	public List<UserLocation> getAllUserLocationPrivileges() {
+		Criteria crt = sessionFactory.getCurrentSession().createCriteria(UserLocation.class);
+		return crt.list();
+	}
 
-	public void deleteUserLocation(UserLocation userlocation) {
-        log.info("This one exists before calling purge method");
-		sessionFactory.getCurrentSession().delete(userlocation);
-        log.info("This one exists after calling purge method");
+	@Override
+	public void deleteUserLocation(UserLocation userLocation) {
+		sessionFactory.getCurrentSession().delete(userLocation);
 	}
 
 	@Override

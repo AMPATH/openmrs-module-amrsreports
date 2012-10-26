@@ -138,10 +138,10 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		return mohCoreDAO.getUserLocation(userlocationId);
 	}
 
-    public List<UserLocation> getAllUserLocationPrivileges(){
+	public List<UserLocation> getAllUserLocationPrivileges() {
 
-        return mohCoreDAO.getAllUserLocationPrivileges();
-    }
+		return mohCoreDAO.getAllUserLocationPrivileges();
+	}
 
 	public void purgeUserLocation(UserLocation userlocation) {
 		mohCoreDAO.deleteUserLocation(userlocation);
@@ -156,7 +156,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	public List<Location> getAllowedLocationsForUser(User user) {
 		List<Location> locations = new ArrayList<Location>();
 		List<UserLocation> userLocations = mohCoreDAO.getUserLocationsForUser(user);
-		for (UserLocation ul: userLocations) {
+		for (UserLocation ul : userLocations) {
 			locations.add(ul.getUserLoc());
 		}
 		return locations;
@@ -167,7 +167,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		ReportDefinitionService rds = Context.getService(ReportDefinitionService.class);
 		List<ReportDefinition> definitions = new ArrayList<ReportDefinition>();
 		List<UserReport> userReports = mohCoreDAO.getUserReportsForUser(user);
-		for (UserReport ur: userReports) {
+		for (UserReport ur : userReports) {
 			String uuid = ur.getReportDefinitionUuid();
 			definitions.add(rds.getDefinitionByUuid(uuid));
 		}
