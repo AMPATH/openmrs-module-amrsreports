@@ -66,8 +66,29 @@
             var f1=aData2[4];
             var rowid=$j(this).parents("tr").attr("id");
 
-            DWRAmrsReportService.purgeUserLocation(rowid,purgeResponse);
-            window.location.reload();
+
+            $j( "#dialog-form" ).dialog({
+                height: 150,
+                width: 'auto',
+                modal: true,
+                buttons:{
+                    "OK":function(){
+                        DWRAmrsReportService.purgeUserLocation(rowid,purgeResponse);
+                        $j(this).dialog( "close" );
+                        window.location.reload();
+                    },
+                    Cancel: function() {
+                        $j(this).dialog( "close" );
+                    }
+                }
+
+            });
+
+
+
+
+
+
 
 
         });
@@ -85,15 +106,12 @@
             if ($j(this).is(":checked")){
                selectedPrivileges.push(rowidd);
 
-                /*$(this).prop('checked',false);*/
-                /*alert("Checked");*/
             }
             else{
 
                 var itempos=selectedPrivileges.indexOf(rowidd);
                 selectedPrivileges.splice(itempos,1);
-                 /* $(this).prop('checked',true);*/
-                /*alert("Not Checked");*/
+
             }
 
 
@@ -101,7 +119,24 @@
         });
 
         $j("#pickAllSel").click(function(){
-            DWRAmrsReportService.purgeMultiplePrivileges(selectedPrivileges,testResponse);
+
+            $j( "#dialog-form" ).dialog({
+                height: 150,
+                width: 'auto',
+                modal: true,
+                buttons:{
+                    "OK":function(){
+                     DWRAmrsReportService.purgeMultiplePrivileges(selectedPrivileges,testResponse);
+                     $j(this).dialog( "close" );
+                    },
+                    Cancel: function() {
+                        $j(this).dialog( "close" );
+                    }
+                }
+
+            });
+
+           // DWRAmrsReportService.purgeMultiplePrivileges(selectedPrivileges,testResponse);
             //alert(selectedPrivileges);
         });
 
@@ -111,20 +146,8 @@
 
     });
 </script>
-<div id="dialog-form" title="Create new user" style="display:none;">
-    <p class="validateTips">All form fields are required.</p>
-
-    <fieldset>
-        <label for="jassetno">Asset No</label>
-        <input type="text" name="jassetno" id="jassetno" class="" readonly="readonly" />
-        <label for="jassetname">Asset Name</label>
-        <input type="text" name="jassetname" id="jassetname" value="" class="" />
-        <label for="jlocation">Location</label>
-        <input type="text" name="jlocation" id="jlocation" value="" class="" />
-        <label for="javalue">Value</label>
-        <input type="text" name="javalue" id="javalue" value="" class="" />
-    </fieldset>
-
+<div id="dialog-form" title="Delete UserLocation Privileges" style="display:none;">
+    <p class="validateTips">Are you sure you want to delete the selected privileges?</p>
 </div>
 
 <b class="boxHeader">UserLocation Privileges</b>

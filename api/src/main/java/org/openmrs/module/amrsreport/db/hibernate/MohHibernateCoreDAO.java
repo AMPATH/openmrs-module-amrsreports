@@ -322,8 +322,10 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
         return crt.list();
     }
 
-	public void purgeUserLocation(UserLocation userlocation) {
+	public void deleteUserLocation(UserLocation userlocation) {
+        log.info("This one exists before calling purge method");
 		sessionFactory.getCurrentSession().delete(userlocation);
+        log.info("This one exists after calling purge method");
 	}
 
 	@Override
