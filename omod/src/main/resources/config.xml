@@ -2,20 +2,22 @@
 
 <module configVersion="1.2">
 	
-	<!-- Base Module Properties -->
-	<id>@MODULE_ID@</id>
-	<name>@MODULE_NAME@</name>
-	<version>@MODULE_VERSION@</version>
-	<package>@MODULE_PACKAGE@</package>
+	<!-- Module Properties -->
+	<id>${project.parent.artifactId}</id>
+	<name>${project.parent.name}</name>
+	<version>${project.parent.version}</version>
+	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
 	<author>AMPATH Developers (Oliver Mwalo, Nicholas Ingosi, Antony Ojwang', Alfayo Kwatuha, Jeremy Keiper)</author>
 	<description>
-		Provides easy access to AMPATH reports, limits visible reports by user and location, and adds custom cohorts and tokens for MOH reporting.
+		${project.parent.description}
 	</description>
+	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
+	<require_version>${openMRSVersion}</require_version>
+	<!-- / Module Properties -->
 
-	<activator>org.openmrs.module.amrsreport.AmrsReportModuleActivator</activator>
 	
-	<updateURL>https://modules.openmrs.org/modules/download/@MODULE_ID@/update.rdf</updateURL>
-	<!-- /Base Module Properties -->
+	<!-- Module Activator -->
+	<activator>${project.parent.groupId}.${project.parent.artifactId}.AmrsReportModuleActivator</activator>
 	
 	<require_modules>
 		<require_module version="0.7.0">org.openmrs.module.reporting</require_module>
@@ -25,17 +27,14 @@
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>org.openmrs.module.amrsreport.extension.AmrsReportAdminExt</class>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.AmrsReportAdminExt</class>
 	</extension>
 	
-	
-	<!-- AOP
-      	<advice>
-      		<point>org.openmrs.api.FormService</point>
-      		<class>@MODULE_PACKAGE@.advice.DuplicateFormAdvisor</class>
-      	</advice>
- /AOP -->
-	
+	<!-- Maps hibernate files, if present -->
+	<mappingFiles>
+		UserLocation.hbm.xml
+		UserReport.hbm.xml
+	</mappingFiles>
 	
 	<!-- Required Privileges -->
 	<privilege>
@@ -46,14 +45,14 @@
 
 	<!-- Required Global Properties -->
 	<globalProperty>
-		<property>@MODULE_ID@.MOHFacilityCode</property>
+		<property>${project.parent.artifactId}.MOHFacilityCode</property>
 		<defaultValue>15204</defaultValue>
 		<description>
 			Site specific Master facility code that is available on http://www.ehealth.or.ke/facilities/
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>@MODULE_ID@.file_dir</property>
+		<property>${project.parent.artifactId}.file_dir</property>
 		<defaultValue>amrsreport/files</defaultValue>
 		<description>Directory for storing file temporarily for processing</description>
 	</globalProperty>
@@ -62,31 +61,31 @@
 	<dwr>
 		<allow>
 			<create creator="new" javascript="DWRAmrsReportService">
-				<param name="class" value="@MODULE_PACKAGE@.web.dwr.DWRAmrsReportService"/>
+				<param name="class" value="${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService"/>
 				<include method="viewMoreDetails"/>
 				<include method="viewMoreDetailsRender"/>
 				<include method="downloadCSV"/>
 				<include method="downloadPDF"/>
-                <include method="purgeUserLocation"/>
-                <include method="saveUserLoc"/>
-                <include method="purgeMultiplePrivileges"/>
-                <convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
-                <convert match="org.openmrs.Location" converter="bean" />
-                <convert match="org.openmrs.User" converter="bean"/>
+				<include method="purgeUserLocation"/>
+				<include method="saveUserLoc"/>
+				<include method="purgeMultiplePrivileges"/>
+				<convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
+				<convert match="org.openmrs.Location" converter="bean" />
+				<convert match="org.openmrs.User" converter="bean"/>
 			</create>
 		</allow>
 
 		<signatures>
 			<![CDATA[
-			import @MODULE_PACKAGE@.@MODULE_ID@.web.dwr.DWRAmrsReportService;
+			import ${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService;
 			DWRAmrsReportService.viewMoreDetails(String file,String amrsid);
 			DWRAmrsReportService.viewMoreDetailsRender(String bff,String id);
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
-            DWRAmrsReportService.alertInput(String loc,String userr);
-            DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
-            DWRAmrsReportService.purgeUserLocation(Integer rowid);
-            DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
+			DWRAmrsReportService.alertInput(String loc,String userr);
+			DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
+			DWRAmrsReportService.purgeUserLocation(Integer rowid);
+			DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
 			]]>
 		</signatures>	
 	</dwr>
@@ -95,13 +94,13 @@
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
 	<servlet>
 		<servlet-name>formDownload</servlet-name>
-		<servlet-class>@MODULE_PACKAGE@.web.FormDownloadServlet</servlet-class>
+		<servlet-class>${project.parent.groupId}.${project.parent.artifactId}.web.FormDownloadServlet</servlet-class>
 	</servlet>
 	-->
 	<!-- /Servlets -->
 	
 	<!-- Internationalization -->
-	<!-- All message codes should start with @MODULE_ID@.* -->
+	<!-- All message codes should start with ${project.parent.artifactId}. -->
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>
@@ -115,11 +114,6 @@
 		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
-
-
-	<mappingFiles>
-		${omodHbmConfig}
-	</mappingFiles>
 
 </module>
 
