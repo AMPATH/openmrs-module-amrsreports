@@ -6,8 +6,8 @@
 			<generator class="native"/>
 		</id>
 		<discriminator column="amrsreport_userlocation_id" insert="false"/>
-		<many-to-one class="org.openmrs.User" name="sysUser" not-null="true"/>
-		<many-to-one class="org.openmrs.Location" name="userLoc" not-null="true"/>
+		<many-to-one class="org.openmrs.User" name="sysUser" column="user_id" not-null="true"/>
+		<many-to-one class="org.openmrs.Location" name="userLoc" column="location_id" not-null="true"/>
 		<property length="38" name="uuid" type="java.lang.String" unique="true"/>
 	</class>
 </hibernate-mapping>
