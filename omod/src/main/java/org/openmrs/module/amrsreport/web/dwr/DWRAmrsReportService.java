@@ -187,33 +187,54 @@ public class DWRAmrsReportService {
         return str;
     }
 
-    public String testDwr(){
 
-        return "This is a response from DWR class";
-    }
-
-  /*  public String alertInput(String loc,String userr){
-        String inputStr="You have selected Location Id "+loc+" and Users Id "+userr;
-        return inputStr;
-
-    }*/
-    public String saveUserLoc(Integer suser,Integer syslocc ){
+    public String saveUserLoc(String suser,String syslocc ){
         MohCoreService userlocservice=Context.getService(MohCoreService.class);
+        Boolean locExist=false;
+
+
 
         //set user
         User sysUser = new User();
-        sysUser.setUserId(suser);
+        sysUser.setUserId(Integer.parseInt(suser));
 
-        // set location
-        Location userlocc = new Location();
-        userlocc.setLocationId(syslocc);
+        //check to see if the user already have privilege for the selected location
+        List<Location> existingPriv = userlocservice.getAllowedLocationsForUser(sysUser);
+         log.info(syslocc);
+        for(Location lc:existingPriv){
+          Integer locid =lc.getLocationId();
 
-        UserLocation userlocation = new UserLocation();
-        userlocation.setSysUser(sysUser);
-        userlocation.setUserLoc(userlocc);
+            if(Integer.parseInt(syslocc)==locid){
+              locExist = true;
+               // log.info("db "+locid+" is compared to "+syslocc+" and results is true");
+            }
+            else{
+               // log.info("db "+locid+" is compared to "+syslocc+" and results is false");
+            }
 
-        userlocservice.saveUserLocation(userlocation);
-        return "Record saved successfully";
+
+        }
+
+        if(locExist){
+            log.info("The privilege already exist");
+           return "The privilege already exist";
+
+        }
+        else{
+
+            log.info("A new privilge has been added");
+            // set location
+            Location userlocc = new Location();
+            userlocc.setLocationId(Integer.parseInt(syslocc));
+
+            UserLocation userlocation = new UserLocation();
+            userlocation.setSysUser(sysUser);
+            userlocation.setUserLoc(userlocc);
+
+            userlocservice.saveUserLocation(userlocation);
+            return "Record saved successfully";
+        }
+
 
     }
 
@@ -224,8 +245,6 @@ public class DWRAmrsReportService {
         UserLocation userlocation = userlocservice.getUserLocation(rowid);
 
         Integer usuuid = userlocation.getId();
-
-        log.info("This uuid has been found, and it is = "+usuuid);
 
         userlocservice.purgeUserLocation(userlocation);
 

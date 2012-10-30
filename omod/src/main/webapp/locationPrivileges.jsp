@@ -4,17 +4,7 @@
 <%@ include file="localHeader.jsp"%>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
-<%--<openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.dataTables.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.tools.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/js/TableTools.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/js/ZeroClipboard.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/js/jspdf.js" />--%>
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
-<%--<openmrs:htmlInclude file="/moduleResources/amrsreport/css/smoothness/jquery-ui-1.8.16.custom.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/css/dataTables_jui.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/css/TableTools.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/TableTools/css/TableTools_JUI.css" />--%>
-
 <openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.dataTables.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.tools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreport/css/dataTables_jui.css" />
@@ -38,24 +28,18 @@
         var useridtext =  $j('#seluser option:selected').text();
 
         DWRAmrsReportService.saveUserLoc(usersid,locid,handleResponse);
-        var delbutt='<input type="button" value="Delete" id="deleteMe">';
-        var chkbx='<input type="checkbox" >';
-        var lstcol="";
 
-        oTable.fnAddData([
-            useridtext,
-            locidtext ,
-            delbutt,
-            chkbx,
-            lstcol
-        ]);
-        //this is just for now-- it will be refined later
-        window.location.reload();
-		
 	}); 
 	
 	function handleResponse(data){
 		alert(data);
+        if(data=="The privilege already exist"){
+
+        }
+        else{
+            window.location.reload(true);
+        }
+
 	}
 
         $j("#avpriv").delegate('tbody td #deleteMe','click',function(){
@@ -75,7 +59,9 @@
                     "OK":function(){
                         DWRAmrsReportService.purgeUserLocation(rowid,purgeResponse);
                         $j(this).dialog( "close" );
-                        window.location.reload();
+
+
+
                     },
                     Cancel: function() {
                         $j(this).dialog( "close" );
@@ -85,16 +71,11 @@
             });
 
 
-
-
-
-
-
-
         });
 
         function purgeResponse(dataa){
             alert(dataa);
+            window.location.reload(true);
         }
 
         //-------------------------------------------------
@@ -136,12 +117,11 @@
 
             });
 
-           // DWRAmrsReportService.purgeMultiplePrivileges(selectedPrivileges,testResponse);
-            //alert(selectedPrivileges);
         });
 
         function testResponse(datam){
           alert(datam);
+          window.location.reload(true);
         }
 
     });
@@ -199,7 +179,7 @@
             <th>Location</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
-            <th>&nbsp;</th>
+
         </tr>
         </thead>
         <tbody>
@@ -212,7 +192,7 @@
 
                 <td><input type="button" value="Delete" id="deleteMe"  ></td>
                 <td><input type="checkbox" id="selMe"   ></td>
-                <td><input type="hidden" value="${details.userLocationId}"   ></td>
+
             </tr>
 
         </c:forEach>
