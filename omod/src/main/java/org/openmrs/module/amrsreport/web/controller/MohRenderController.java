@@ -22,9 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Location;
+import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.render.AmrReportRender;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -54,7 +56,7 @@ public class MohRenderController {
 	public void preparePage(ModelMap map, @RequestParam(required = false, value = "includeRetired") Boolean includeRetired) {
 
 		CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
-
+        MohCoreService userlocservice=Context.getService(MohCoreService.class);
 		// Get list of existing reports
 		boolean includeRet = (includeRetired == Boolean.TRUE);
 		List<ReportDefinition> reportDefinitions = Context.getService(ReportDefinitionService.class).getAllDefinitions(includeRet);
@@ -64,7 +66,8 @@ public class MohRenderController {
 		List<CohortDefinition> listOfCohorts = cohortDefinitionService.getAllDefinitions(false);
 
 		//get a list of all the locations
-		List<Location> locationList = Context.getLocationService().getAllLocations();
+        User currUser = Context.getAuthenticatedUser();
+		List<Location> locationList =  userlocservice.getAllowedLocationsForUser(currUser);
 
 		//log.info("all cohorts listed "+listOfCohorts.size()+"All definition "+reportDefinitions.size());
 		map.addAttribute("cohortdefinitions", listOfCohorts);
