@@ -180,4 +180,6 @@ public interface MohCoreService extends OpenmrsService {
 	 * @return list of allowed reports
 	 */
 	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user);
+
+    public Boolean hasLocationPrivilege(User user,Location location);
 }

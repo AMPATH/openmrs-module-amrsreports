@@ -8,6 +8,8 @@ import org.directwebremoting.util.MimeConstants;
 import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.service.MohCoreService;
@@ -187,33 +189,38 @@ public class DWRAmrsReportService {
         return str;
     }
 
-    public String testDwr(){
 
-        return "This is a response from DWR class";
-    }
-
-  /*  public String alertInput(String loc,String userr){
-        String inputStr="You have selected Location Id "+loc+" and Users Id "+userr;
-        return inputStr;
-
-    }*/
     public String saveUserLoc(Integer suser,Integer syslocc ){
         MohCoreService userlocservice=Context.getService(MohCoreService.class);
+        UserService userservice =Context.getUserService();
+        LocationService locservice = Context.getLocationService();
 
         //set user
-        User sysUser = new User();
-        sysUser.setUserId(suser);
 
-        // set location
-        Location userlocc = new Location();
-        userlocc.setLocationId(syslocc);
+        User sysUser = userservice.getUser(suser);
 
-        UserLocation userlocation = new UserLocation();
-        userlocation.setSysUser(sysUser);
-        userlocation.setUserLoc(userlocc);
+        Location userlocc = locservice.getLocation(syslocc);
 
-        userlocservice.saveUserLocation(userlocation);
-        return "Record saved successfully";
+        Boolean locExist=userlocservice.hasLocationPrivilege(sysUser,userlocc);
+
+        if(locExist){
+            log.info("The privilege already exist");
+           return "The privilege already exist";
+
+        }
+        else{
+
+            log.info("A new privilge has been added");
+            // set location
+
+            UserLocation userlocation = new UserLocation();
+            userlocation.setSysUser(sysUser);
+            userlocation.setUserLoc(userlocc);
+
+            userlocservice.saveUserLocation(userlocation);
+            return "Record saved successfully";
+        }
+
 
     }
 
@@ -224,8 +231,6 @@ public class DWRAmrsReportService {
         UserLocation userlocation = userlocservice.getUserLocation(rowid);
 
         Integer usuuid = userlocation.getId();
-
-        log.info("This uuid has been found, and it is = "+usuuid);
 
         userlocservice.purgeUserLocation(userlocation);
 
