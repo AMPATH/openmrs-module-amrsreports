@@ -8,6 +8,8 @@ import org.directwebremoting.util.MimeConstants;
 import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.service.MohCoreService;
@@ -188,32 +190,18 @@ public class DWRAmrsReportService {
     }
 
 
-    public String saveUserLoc(String suser,String syslocc ){
+    public String saveUserLoc(Integer suser,Integer syslocc ){
         MohCoreService userlocservice=Context.getService(MohCoreService.class);
-        Boolean locExist=false;
-
-
+        UserService userservice =Context.getUserService();
+        LocationService locservice = Context.getLocationService();
 
         //set user
-        User sysUser = new User();
-        sysUser.setUserId(Integer.parseInt(suser));
 
-        //check to see if the user already have privilege for the selected location
-        List<Location> existingPriv = userlocservice.getAllowedLocationsForUser(sysUser);
-         log.info(syslocc);
-        for(Location lc:existingPriv){
-          Integer locid =lc.getLocationId();
+        User sysUser = userservice.getUser(suser);
 
-            if(Integer.parseInt(syslocc)==locid){
-              locExist = true;
-               // log.info("db "+locid+" is compared to "+syslocc+" and results is true");
-            }
-            else{
-               // log.info("db "+locid+" is compared to "+syslocc+" and results is false");
-            }
+        Location userlocc = locservice.getLocation(syslocc);
 
-
-        }
+        Boolean locExist=userlocservice.hasLocationPrivilege(sysUser,userlocc);
 
         if(locExist){
             log.info("The privilege already exist");
@@ -224,8 +212,6 @@ public class DWRAmrsReportService {
 
             log.info("A new privilge has been added");
             // set location
-            Location userlocc = new Location();
-            userlocc.setLocationId(Integer.parseInt(syslocc));
 
             UserLocation userlocation = new UserLocation();
             userlocation.setSysUser(sysUser);

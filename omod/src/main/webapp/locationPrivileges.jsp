@@ -37,6 +37,7 @@
 
         }
         else{
+            //TODO reload datatable and not the whole page.
             window.location.reload(true);
         }
 
@@ -75,6 +76,7 @@
 
         function purgeResponse(dataa){
             alert(dataa);
+            //TODO reload datatable and not the whole page.
             window.location.reload(true);
         }
 
@@ -121,6 +123,7 @@
 
         function testResponse(datam){
           alert(datam);
+            //TODO reload datatable and not the whole page.
           window.location.reload(true);
         }
 

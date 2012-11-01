@@ -173,4 +173,8 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		}
 		return definitions;
 	}
+    @Override
+    public Boolean hasLocationPrivilege(User user,Location location){
+        return mohCoreDAO.hasLocationPrivilege(user,location);
+    }
 }
