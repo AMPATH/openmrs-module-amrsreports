@@ -16,6 +16,18 @@ public abstract class PatientSnapshot {
 
     private MohEvaluableNameConstants.AgeGroup ageGroup;
 
+    public void setProperties(Properties properties) {
+
+        this.properties = properties;
+    }
+
+    public Properties getProperties() {
+        if(this.properties==null){
+            this.properties= new Properties();
+        }
+        return this.properties;
+    }
+
     private Properties properties;
     private Map<String, Concept> cachedConcepts = null;
 
@@ -23,8 +35,8 @@ public abstract class PatientSnapshot {
         return properties.get(key);
     }
 
-    public Object addProperty(String key,Object value) {
-        return this.properties.put(key,value);
+    public Object setProperty(String key, Object value) {
+        return this.getProperties().put(key,value);
     }
 
     public MohEvaluableNameConstants.AgeGroup getAgeGroup() {
@@ -51,9 +63,19 @@ public abstract class PatientSnapshot {
         return cachedConcepts.get(name);
     }
 
+    /**
+     * set flags based on observation values. if a flag is set, return true.  otherwise, false.
+     *
+     * @param o observation to be consumed
+     * @return whether a flag was set
+     */
     public abstract Boolean consume(Obs o);
 
-    public abstract boolean eligible(MohEvaluableNameConstants.AgeGroup ageGroup);
+    /**
+     * determine eligibility based on age group and flags
+     * @return eligibility
+     */
+    public abstract boolean eligible();
 
 
 }
