@@ -1,6 +1,5 @@
 package org.openmrs.module.amrsreport.service;
 
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -8,10 +7,14 @@ import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreport.rule.observation.ARVPatientSnapshot;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
+
+import java.util.List;
 
 /**
  * Test file for MohCoreService methods
@@ -21,7 +24,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @verifies save AmrsReportUser
 	 * @see
-	 * MohCoreService#saveUserReport(org.openmrs.module.amrsreport.UserReport)
+	 * org.openmrs.module.amrsreport.service.MohCoreService#saveUserReport(org.openmrs.module.amrsreport.UserReport)
 	 */
 	@Test
 	public void saveUserReport_shouldSaveAmrsReportUser() throws Exception {
@@ -41,7 +44,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 
 	/**
 	 * @verifies get userreport by id
-	 * @see MohCoreService#getUserReportByUserId(Integer)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getUserReportByUserId(Integer)
 	 */
 	@Test
 	public void getUserReportByUserId_shouldGetUserreportById() throws Exception {
@@ -59,7 +62,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		userrpt.setAmrsReportsUser(systemUser);
 		userrpt.setReportDefinitionUuid("testuuid");
 		userrpt = service.saveUserReport(userrpt);
-		
+
 		Context.flushSession();
 
 		Assert.assertNotNull(service.getUserReport(userrpt.getId()));
@@ -68,7 +71,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * @verifies delete user report based on user report uuid
 	 * @see
-	 * MohCoreService#purgeUserReport(org.openmrs.module.amrsreport.UserReport)
+	 * org.openmrs.module.amrsreport.service.MohCoreService#purgeUserReport(org.openmrs.module.amrsreport.UserReport)
 	 */
 	@Test
 	public void getUserReportByUserId_shouldPurgeUserReport() throws Exception {
@@ -91,7 +94,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#getUserLocation(Integer)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getUserLocation(Integer)
 	 * @Verifies(value = "should get a UserLocation by its Id", method =
 	 * "getUserLocation(Integer)")
 	 * @should get a UserLocation by its Id
@@ -117,7 +120,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#purgeUserLocation(UserLocation)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#purgeUserLocation(org.openmrs.module.amrsreport.UserLocation)
 	 * @verifies(value = "should Purge a UserLocation", method =
 	 * "purgeUserLocation(UserLocation)")
 	 * @should purge a UserLocation
@@ -148,7 +151,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#saveUserLocation(UserLocation)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#saveUserLocation(org.openmrs.module.amrsreport.UserLocation)
 	 * @verifies(value = "should save a UserLocation", method =
 	 * "saveUserLocation(UserLocation)")
 	 * @should save a UserLocation
@@ -176,7 +179,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#getAllowedLocationsForUser(User)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getAllowedLocationsForUser(org.openmrs.User)
 	 */
 	@Test
 	@Verifies(value = "should only get specified locations for user", method ="getAllowedLocationsForUser(User)")
@@ -204,7 +207,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#getAllowedLocationsForUser(User)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getAllowedLocationsForUser(org.openmrs.User)
 	 */
 	@Test
 	@Verifies(value = "should return empty list if none assigned", method ="getAllowedLocationsForUser(User)")
@@ -220,7 +223,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#getAllowedReportDefinitionsForUser(User)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getAllowedReportDefinitionsForUser(org.openmrs.User)
 	 */
 	@Test
 	@Verifies(value = "should only get specified report definitions for user", method ="getAllowedReportDefinitionsForUser(User)")
@@ -236,7 +239,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		Context.getService(ReportDefinitionService.class).saveDefinition(rd);
 		String expectedUuid = rd.getUuid();
 		Assert.assertNotNull(expectedUuid);
-		
+
 		// create a userreport
 		UserReport userreport = new UserReport();
 		userreport.setAmrsReportsUser(sysUser);
@@ -249,7 +252,7 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @see MohCoreService#getAllowedReportDefinitionsForUser(User)
+	 * @see org.openmrs.module.amrsreport.service.MohCoreService#getAllowedReportDefinitionsForUser(org.openmrs.User)
 	 */
 	@Test
 	@Verifies(value = "should return empty list if none assigned", method ="getAllowedReportDefinitionsForUser(User)")
@@ -263,4 +266,22 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertNotNull(actual);
 		Assert.assertEquals(0, actual.size());
 	}
+    @Test
+    public void testCheckEligibility() throws Exception {
+        MohCoreService cservice = Context.getService(MohCoreService.class);
+
+        Boolean isElgible= cservice.checkEligibility(MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS);
+
+        if(isElgible){
+            Assert.assertTrue("Is eligible",isElgible);
+        }
+        else{
+            Assert.assertFalse("Not Eligible",isElgible);
+        }
+    }
+
+   /* @Test
+    public void testCheckObsConsumed() throws Exception {
+
+    }*/
 }
