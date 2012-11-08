@@ -93,5 +93,10 @@ public class PatientSnapshotTest {
         //Assert.assertTrue(expectedReason.equals("Clinical Only"));
         assert expectedReason.equals("Clinical Only"):"They are not equal";
 
+
+        arvPatientSnapshot.setProperty("reason","Clinical Only");
+        Integer expectedStage = (Integer) arvPatientSnapshot.getProperty("pedsWHOStage");
+        assert expectedStage ==4:"That is pedsWHOStage";
+
     }
 }
