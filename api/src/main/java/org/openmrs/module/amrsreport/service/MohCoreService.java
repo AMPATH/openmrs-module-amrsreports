@@ -185,24 +185,4 @@ public interface MohCoreService extends OpenmrsService {
 
     public Boolean hasLocationPrivilege(User user,Location location);
 
-    /**
-     * @should check eligibility of patients for ARV
-     *
-     * @param ageGrp
-     * @return true or false
-     */
-
-    public Boolean checkEligibility(MohEvaluableNameConstants.AgeGroup ageGrp);
-
-    /**
-     * @should check if a given Obs in patients
-     *
-     * @param obs
-     * @return true or false
-     */
-    public Boolean checkObsConsumed(Obs obs);
-
-
-
-
 }

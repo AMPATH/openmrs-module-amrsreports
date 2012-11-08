@@ -65,7 +65,7 @@ public abstract class PatientSnapshot {
 
     /**
      * set flags based on observation values. if a flag is set, return true.  otherwise, false.
-     *
+     * @should recognize and set WHO stage from an obs or specify peds WHO
      * @param o observation to be consumed
      * @return whether a flag was set
      */
@@ -73,6 +73,7 @@ public abstract class PatientSnapshot {
 
     /**
      * determine eligibility based on age group and flags
+     * @should determine eligibility based on age group and flags
      * @return eligibility
      */
     public abstract boolean eligible();

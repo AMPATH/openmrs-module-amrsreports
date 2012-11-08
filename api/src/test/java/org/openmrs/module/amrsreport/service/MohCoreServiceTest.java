@@ -266,22 +266,5 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		Assert.assertNotNull(actual);
 		Assert.assertEquals(0, actual.size());
 	}
-    @Test
-    public void testCheckEligibility() throws Exception {
-        MohCoreService cservice = Context.getService(MohCoreService.class);
 
-        Boolean isElgible= cservice.checkEligibility(MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS);
-
-        if(isElgible){
-            Assert.assertTrue("Is eligible",isElgible);
-        }
-        else{
-            Assert.assertFalse("Not Eligible",isElgible);
-        }
-    }
-
-   /* @Test
-    public void testCheckObsConsumed() throws Exception {
-
-    }*/
 }

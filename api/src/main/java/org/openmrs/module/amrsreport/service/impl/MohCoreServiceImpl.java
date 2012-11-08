@@ -180,19 +180,4 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
         return mohCoreDAO.hasLocationPrivilege(user,location);
     }
 
-    @Override
-    public Boolean checkEligibility(MohEvaluableNameConstants.AgeGroup ageGrp) {
-        ARVPatientSnapshot arvPatientSnapshot = new ARVPatientSnapshot();
-        arvPatientSnapshot.setAgeGroup(ageGrp);
-        return arvPatientSnapshot.eligible();
-    }
-
-    @Override
-    public Boolean checkObsConsumed(Obs obs) {
-        ARVPatientSnapshot arvPatientSnapshot = new ARVPatientSnapshot();
-        return arvPatientSnapshot.consume(obs);
-
-    }
-
-
 }
