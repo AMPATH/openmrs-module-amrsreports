@@ -31,10 +31,21 @@ public abstract class PatientSnapshot {
     private Properties properties;
     private Map<String, Concept> cachedConcepts = null;
 
+    /**
+     * @should get value of property with a given key
+     * @param key
+     * @return
+     */
     public Object getProperty(String key) {
         return properties.get(key);
     }
 
+    /**
+     * @should create a property and sets its value
+     * @param key
+     * @param value
+     * @return
+     */
     public Object setProperty(String key, Object value) {
         return this.getProperties().put(key,value);
     }
