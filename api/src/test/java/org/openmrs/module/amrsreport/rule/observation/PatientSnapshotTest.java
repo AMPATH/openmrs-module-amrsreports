@@ -1,6 +1,5 @@
 package org.openmrs.module.amrsreport.rule.observation;
 
-import org.h2.java.lang.Integer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.Concept;
@@ -90,7 +89,7 @@ public class PatientSnapshotTest extends BaseModuleContextSensitiveTest {
 		Assert.assertTrue("They are not equal", expectedReason.equals("Clinical Only"));
 
 		arvPatientSnapshot.setProperty("reason", "Clinical Only");
-		Assert.assertEquals("That is pedsWHOStage", 4, (Integer) arvPatientSnapshot.getProperty("pedsWHOStage"));
+		Assert.assertEquals("That is pedsWHOStage", 4, arvPatientSnapshot.getProperty("pedsWHOStage"));
 	}
 
 	/**
