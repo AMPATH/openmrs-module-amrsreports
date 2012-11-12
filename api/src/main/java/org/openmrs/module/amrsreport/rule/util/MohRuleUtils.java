@@ -16,6 +16,7 @@ package org.openmrs.module.amrsreport.rule.util;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -26,7 +27,9 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 
 /**
@@ -135,5 +138,48 @@ public class MohRuleUtils {
 		return s;
 		
 	}
+
+    /**
+     * determine the age group for a patient at a given date
+     *
+     * @param birthdate birth date of the patient whose age is used in the calculations
+     * @param when the date upon which the age should be identified
+     * @return the appropriate age group
+     */
+    public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
+        //birthdate = patient.getBirthdate();
+        if (birthdate == null) {
+            return null;
+        }
+
+        Calendar now = Calendar.getInstance();
+        if (when != null) {
+            now.setTime(when);
+        }
+
+        Calendar then = Calendar.getInstance();
+        then.setTime(birthdate);
+
+        int ageInMonths = 0;
+        while (!then.after(now)) {
+            then.add(Calendar.MONTH, 1);
+            ageInMonths++;
+        }
+        ageInMonths--;
+
+        if (ageInMonths < 18) {
+            return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
+        }
+
+        if (ageInMonths < 60) {
+            return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
+        }
+
+        if (ageInMonths < 144) {
+            return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
+        }
+
+        return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
+    }
 	
 }

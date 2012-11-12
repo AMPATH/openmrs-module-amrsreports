@@ -40,6 +40,7 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants.AgeGroup;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.util.OpenmrsUtil;
 
 /**
@@ -72,6 +73,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	}
 
 	/**
+     * @should get the date and reason for ART eligibility
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
@@ -81,7 +83,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		try {
 			Patient patient = Context.getPatientService().getPatient(patientId);
 			ARVPatientSnapshot flags = new ARVPatientSnapshot();
-            /*if (flags.eligible(getAgeGroupAtDate(patient, o.getObsDatetime())))*/
+
 
 			// get relevant observations
 			List<Obs> obs = Context.getObsService().getObservations(
@@ -97,7 +99,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 				// flip a flag, if possible
 				if (flags.consume(o)) // if a flag was flipped, check eligibility
 				{
-                    flags.setAgeGroup(this.getAgeGroupAtDate(patient, o.getObsDatetime()));
+                    flags.setAgeGroup(MohRuleUtils.getAgeGroupAtDate(patient.getBirthdate(), o.getObsDatetime()));
 					if (flags.eligible()) // this obs marks the first eligible date; return it
 					{
 						return formatResult(o.getObsDatetime(), (String)flags.getProperty("reason"));
@@ -120,7 +122,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	/**
 	 * @see org.openmrs.logic.Rule#getParameterList()
 	 */
-	@Override
+
 	public Set<RuleParameterInfo> getParameterList() {
 		return null;
 	}
@@ -128,7 +130,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	/**
 	 * @see org.openmrs.logic.Rule#getDependencies()
 	 */
-	@Override
+
 	public String[] getDependencies() {
 		return new String[]{};
 	}
@@ -136,7 +138,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	/**
 	 * @see org.openmrs.logic.Rule#getTTL()
 	 */
-	@Override
+
 	public int getTTL() {
 		return 60 * 60 * 24; // 1 day
 	}
@@ -144,52 +146,9 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	/**
 	 * @see org.openmrs.logic.Rule#getDefaultDatatype()
 	 */
-	@Override
+
 	public Datatype getDefaultDatatype() {
 		return Datatype.TEXT;
-	}
-
-	/**
-	 * determine the age group for a patient at a given date
-	 *
-	 * @param patient the patient whose age is used in the calculations
-	 * @param when the date upon which the age should be identified
-	 * @return the appropriate age group
-	 */
-	private AgeGroup getAgeGroupAtDate(Patient patient, Date when) {
-		Date birthdate = patient.getBirthdate();
-		if (birthdate == null) {
-			return null;
-		}
-
-		Calendar now = Calendar.getInstance();
-		if (when != null) {
-			now.setTime(when);
-		}
-
-		Calendar then = Calendar.getInstance();
-		then.setTime(birthdate);
-
-		int ageInMonths = 0;
-		while (!then.after(now)) {
-			then.add(Calendar.MONTH, 1);
-			ageInMonths++;
-		}
-		ageInMonths--;
-
-		if (ageInMonths < 18) {
-			return AgeGroup.UNDER_EIGHTEEN_MONTHS;
-		}
-
-		if (ageInMonths < 60) {
-			return AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
-		}
-
-		if (ageInMonths < 144) {
-			return AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
-		}
-
-		return AgeGroup.ABOVE_TWELVE_YEARS;
 	}
 
 	/**
