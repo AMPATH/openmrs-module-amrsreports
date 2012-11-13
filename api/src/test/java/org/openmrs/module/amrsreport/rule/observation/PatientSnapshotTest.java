@@ -12,7 +12,7 @@ import java.lang.AssertionError;
 /**
  * A test class for set and get property methods in PatientSnapshot class
  */
-public class PatientSnapshotTest extends BaseModuleContextSensitiveTest {
+public class PatientSnapshotTest {
 
     PatientSnapshot ps;
     @Test

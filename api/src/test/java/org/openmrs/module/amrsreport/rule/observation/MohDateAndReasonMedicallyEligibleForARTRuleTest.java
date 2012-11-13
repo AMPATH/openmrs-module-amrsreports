@@ -2,23 +2,33 @@ package org.openmrs.module.amrsreport.rule.observation;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptAnswer;
+import org.openmrs.ConceptName;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientSetService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
+import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.rule.observation.MohDateAndReasonMedicallyEligibleForARTRule;
+import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+
+import java.lang.Integer;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import org.openmrs.ConceptAnswer;
-import org.openmrs.ConceptName;
-import org.openmrs.Concept;
+import java.util.HashSet;
+
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 
 /**
@@ -30,7 +40,7 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
  */
 public class MohDateAndReasonMedicallyEligibleForARTRuleTest extends BaseModuleContextSensitiveTest {
 
-    ConceptService conceptService;
+    ConceptService conceptService = Context.getConceptService();
     /**
      * @verifies get the date and reason for ART eligibility
      * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
@@ -38,77 +48,71 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest extends BaseModuleC
     @Test
     public void evaluate_shouldGetTheDateAndReasonForARTEligibility() throws Exception {
 
-        this.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
                 MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
                 MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
                 MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
                 MohEvaluableNameConstants.WHO_STAGE_4_ADULT
         });
-        this.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
                 MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
                 MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
                 MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
                 MohEvaluableNameConstants.WHO_STAGE_4_PEDS
         });
-        this.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
                 MohEvaluableNameConstants.POSITIVE
         });
+        Patient patient = new Patient();
+        patient.setPersonId(2);
 
-        Patient samplePatient = new Patient(501);
+        PatientIdentifierType pit = new PatientIdentifierType();
+        pit.setPatientIdentifierTypeId(1);
 
-        Date birthdate =     new SimpleDateFormat("yyyy-MM-dd").parse("1975-01-01");
+        PatientIdentifier pi = new PatientIdentifier("23452",pit, null);
+        pi.setPatient(patient);
 
-        samplePatient.setBirthdate(birthdate) ;
+        Date birthdate =     new Date(1975,01,01);
+        patient.setBirthdate(birthdate);
 
-        EncounterService service = Context.getEncounterService();;
-        EncounterType et = new EncounterType();
-        et.setName("ADULTRETURN");
+        EncounterService service = Context.getEncounterService();
 
         Encounter sampleEncounter = new Encounter() ;
         Date encounterDate = new Date() ;
-        sampleEncounter.setEncounterId(22);
         sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(samplePatient);
-        sampleEncounter.setEncounterType(et);
-        //ObsService os = Context.getObsService();
+        sampleEncounter.setPatient(patient);
+        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+
+        /*ObsService obsService = Context.getObsService();*/
+
         Obs obs = new Obs();
-
-        obs.setConcept(conceptService.getConceptByName("CURRENT WHO HIV STAGE"));
-        obs.setValueCoded(conceptService.getConceptByName("WHO STAGE 2 ADULT"));
-
+        obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_ADULT));
+        obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_1_ADULT));
+        obs.setObsDatetime(new Date());
         obs.setEncounter(sampleEncounter);
 
+        //sampleEncounter.setObs(allObs);
+
+        Encounter resEncounter=service.saveEncounter(sampleEncounter);
+        Integer patientID= resEncounter.getPatient().getPersonId();
+
+        /*Checks if the Encounter has been saved*/
+        Assert.assertNotNull("Encounter is Null",resEncounter);
+
+        /*Checks to find id patient Id is not null*/
+        Assert.assertNotNull("PatientID is Null",patientID);
+
+
+        Assert.assertNotNull("Encounter is Null",resEncounter);
+
+
         MohDateAndReasonMedicallyEligibleForARTRule sampleRule = new MohDateAndReasonMedicallyEligibleForARTRule();
-        //assert "True";
 
+        Result evalResult= sampleRule.evaluate(null,patientID, null);
+
+        Assert.assertNotNull("Evaluate Method returns Null",evalResult);
 
     }
 
-    /**
-     * create a question concept with associated set of answers from strings
-     *
-     * @param question
-     * @param answers
-     */
-    private void createQuestion(String question, String[] answers) {
-        // create a new question concept
-        Concept q = new Concept();
-        q.addName(new ConceptName(question, Context.getLocale()));
-        q.setConceptClass(conceptService.getConceptClassByName("Question"));
 
-        // loop over answers and add them one by one to the question
-        for (String answer: answers) {
-            // create a new concept for the answer
-            Concept a = new Concept();
-            a.addName(new ConceptName(answer, Context.getLocale()));
-            conceptService.saveConcept(a);
-            // create a ConceptAnswer and add it to the question
-            ConceptAnswer ca = new ConceptAnswer();
-            ca.setAnswerConcept(a);
-            q.addAnswer(ca);
-        }
-
-        // save the question
-        conceptService.saveConcept(q);
-    }
 }

@@ -11,6 +11,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
 
 /**
  * Test class for PatientSnapshot
@@ -27,19 +28,19 @@ public class ARVPatientSnapshotTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void consume_shouldRecognizeAndSetWHOStageFromAnObsOrSpecifyPedsWHO() throws Exception {
 		// create mock data for reference in this test
-		this.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
 				MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
 				MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
 				MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
 				MohEvaluableNameConstants.WHO_STAGE_4_ADULT
 		});
-		this.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
 				MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
 				MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
 				MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
 				MohEvaluableNameConstants.WHO_STAGE_4_PEDS
 		});
-		this.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
+        MohTestUtils.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
 				MohEvaluableNameConstants.POSITIVE
 		});
 
@@ -92,31 +93,5 @@ public class ARVPatientSnapshotTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals("That is pedsWHOStage", 4, arvPatientSnapshot.getProperty("pedsWHOStage"));
 	}
 
-	/**
-	 * create a question concept with associated set of answers from strings
-	 *
-	 * @param question
-	 * @param answers
-	 */
-	private void createQuestion(String question, String[] answers) {
-		// create a new question concept
-		Concept q = new Concept();
-		q.addName(new ConceptName(question, Context.getLocale()));
-		q.setConceptClass(conceptService.getConceptClassByName("Question"));
 
-		// loop over answers and add them one by one to the question
-		for (String answer: answers) {
-			// create a new concept for the answer
-			Concept a = new Concept();
-			a.addName(new ConceptName(answer, Context.getLocale()));
-			conceptService.saveConcept(a);
-			// create a ConceptAnswer and add it to the question
-			ConceptAnswer ca = new ConceptAnswer();
-			ca.setAnswerConcept(a);
-			q.addAnswer(ca);
-		}
-
-		// save the question
-		conceptService.saveConcept(q);
-	}
 }
