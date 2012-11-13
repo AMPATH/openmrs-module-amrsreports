@@ -327,7 +327,21 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return crt.list();
 	}
 
-	@Override
+    @Override
+    public Boolean hasLocationPrivilege(User user, Location location) {
+        Boolean privilegeExist=false;
+        Criteria crit =sessionFactory.getCurrentSession().createCriteria(UserLocation.class)
+                .add(Restrictions.eq("sysUser",user))
+                .add(Restrictions.eq("userLoc",location));
+
+        Integer foundRecords = crit.list().size();
+        if(foundRecords>=1){
+           privilegeExist = true;
+        }
+        return privilegeExist;
+    }
+
+    @Override
 	public void deleteUserLocation(UserLocation userLocation) {
 		sessionFactory.getCurrentSession().delete(userLocation);
 	}
@@ -345,4 +359,5 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 			.add(Restrictions.eq("amrsReportsUser", user));
 		return (List<UserReport>) crit.list();
 	}
+
 }

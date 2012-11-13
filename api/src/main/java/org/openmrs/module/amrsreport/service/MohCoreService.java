@@ -29,11 +29,13 @@ import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.amrsreport.rule.observation.ARVPatientSnapshot;
 
 /**
  * Service contract for the core layer of OpenMRS
@@ -182,4 +184,5 @@ public interface MohCoreService extends OpenmrsService {
 	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user);
 
     public Boolean hasLocationPrivilege(User user,Location location);
+
 }

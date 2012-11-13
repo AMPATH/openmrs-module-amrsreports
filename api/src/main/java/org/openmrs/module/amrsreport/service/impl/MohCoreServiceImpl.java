@@ -32,6 +32,8 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreport.rule.observation.ARVPatientSnapshot;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -177,4 +179,5 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
     public Boolean hasLocationPrivilege(User user,Location location){
         return mohCoreDAO.hasLocationPrivilege(user,location);
     }
+
 }
