@@ -9,6 +9,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,22 +25,25 @@ public class LocationPrivilegesController {
 
 	private static final Log log = LogFactory.getLog(LocationPrivilegesController.class);
 
-    @RequestMapping(value = "module/amrsreport/locationPrivileges.form", method = RequestMethod.GET)
-    public void onloadLocationPrivileges(ModelMap model) {
-        LocationService locationservinstance =Context.getService(LocationService.class);
-        List<Location> locationlist=locationservinstance.getAllLocations(true);
+	@Autowired
+	LocationService locationService;
 
-        model.addAttribute("locationlist", locationlist);
+	@Autowired
+	UserService userService;
 
-        UserService userservinstance =Context.getService(UserService.class);
-        List<User> userslist=userservinstance.getAllUsers();
+	@RequestMapping(value = "module/amrsreport/locationPrivileges.form", method = RequestMethod.GET)
+	public void populateModel(ModelMap model) {
+		List<Location> locations = locationService.getAllLocations(true);
 
-        model.addAttribute("userlist", userslist);
+		model.addAttribute("locationlist", locations);
 
-        MohCoreService getallUserlocpriv = Context.getService(MohCoreService.class);
-        List<UserLocation> allUserLocPrivileges =getallUserlocpriv.getAllUserLocationPrivileges();
+		List<User> users = userService.getAllUsers();
 
-        model.addAttribute("userlocpriv", allUserLocPrivileges);
+		model.addAttribute("userlist", users);
 
-    }
+		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+		List<UserLocation> allUserLocPrivileges = mohCoreService.getAllUserLocationPrivileges();
+
+		model.addAttribute("userlocpriv", allUserLocPrivileges);
+	}
 }
