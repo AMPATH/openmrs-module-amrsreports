@@ -65,7 +65,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 
 	/**
 	 * @see MohCoreService#getDateCreatedCohort(org.openmrs.Location,
-	 * java.util.Date, java.util.Date)
+	 *      java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getDateCreatedCohort(final Location location, final Date startDate, final Date endDate) throws APIException {
@@ -74,7 +74,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 
 	/**
 	 * @see MohCoreService#getReturnDateCohort(org.openmrs.Location,
-	 * java.util.Date, java.util.Date)
+	 *      java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getReturnDateCohort(final Location location, final Date startDate, final Date endDate) throws APIException {
@@ -83,7 +83,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 
 	/**
 	 * @see MohCoreService#getObservationCohort(java.util.List,
-	 * java.util.Date, java.util.Date)
+	 *      java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getObservationCohort(final List<Concept> concepts, final Date startDate, final Date endDate) throws APIException {
@@ -92,21 +92,21 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 
 	/**
 	 * @see MohCoreService#getPatientEncounters(Integer, java.util.Map,
-	 * org.openmrs.module.amrsreport.util.MohFetchRestriction)
+	 *      org.openmrs.module.amrsreport.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws APIException {
+	                                            final MohFetchRestriction mohFetchRestriction) throws APIException {
 		return mohCoreDAO.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
 	}
 
 	/**
 	 * @see MohCoreService#getPatientObservations(Integer, java.util.Map,
-	 * org.openmrs.module.amrsreport.util.MohFetchRestriction)
+	 *      org.openmrs.module.amrsreport.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws APIException {
+	                                        final MohFetchRestriction mohFetchRestriction) throws APIException {
 		return mohCoreDAO.getPatientObservations(patientId, restrictions, mohFetchRestriction);
 	}
 
@@ -175,9 +175,10 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		}
 		return definitions;
 	}
-    @Override
-    public Boolean hasLocationPrivilege(User user,Location location){
-        return mohCoreDAO.hasLocationPrivilege(user,location);
-    }
+
+	@Override
+	public Boolean hasLocationPrivilege(User user, Location location) {
+		return mohCoreDAO.hasLocationPrivilege(user, location);
+	}
 
 }
