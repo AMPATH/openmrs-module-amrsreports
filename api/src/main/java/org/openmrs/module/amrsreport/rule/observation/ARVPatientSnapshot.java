@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreport.rule.observation;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 
 /**
@@ -35,42 +36,42 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 		Concept answer = o.getValueCoded();
 		Double value = o.getValueNumeric();
 
-		if (q.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT))) {
-			if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT))) {
+		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT))) {
+			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT))) {
 				this.setProperty("adultWHOStage", 1);
 
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT))) {
 				this.setProperty("adultWHOStage", 2);
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_3_ADULT))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_ADULT))) {
 				this.setProperty("adultWHOStage", 3);
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_4_ADULT))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_ADULT))) {
 				this.setProperty("adultWHOStage", 4);
 			}
 			return true;
 		}
-		if (q.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS))) {
-			if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_1_PEDS))) {
+		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS))) {
+			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_PEDS))) {
 				this.setProperty("pedsWHOStage", 1);
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_2_PEDS))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_PEDS))) {
 				this.setProperty("pedsWHOStage", 2);
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_3_PEDS))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_PEDS))) {
 				this.setProperty("pedsWHOStage", 3);
-			} else if (answer.equals(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_4_PEDS))) {
+			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_PEDS))) {
 				this.setProperty("pedsWHOStage", 4);
 			}
 			return true;
 		}
-		if (q.equals(getCachedConcept(MohEvaluableNameConstants.HIV_DNA_PCR))) {
-			if (answer.equals(getCachedConcept(MohEvaluableNameConstants.POSITIVE))) {
+		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_DNA_PCR))) {
+			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE))) {
 				this.setProperty("HIVDNAPCRPositive", true);
 				return true;
 			}
 		}
-		if (q.equals(getCachedConcept(MohEvaluableNameConstants.CD4_BY_FACS))) {
+		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_BY_FACS))) {
 			this.setProperty("cd4ByFacs", value);
 			return true;
 		}
-		if (q.equals(getCachedConcept(MohEvaluableNameConstants.CD4_PERCENT))) {
+		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_PERCENT))) {
 			this.setProperty("cd4PercentByFacs", value);
 			return true;
 		}
