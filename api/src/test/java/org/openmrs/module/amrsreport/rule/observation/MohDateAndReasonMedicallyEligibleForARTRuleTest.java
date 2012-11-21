@@ -40,79 +40,80 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
  */
 public class MohDateAndReasonMedicallyEligibleForARTRuleTest extends BaseModuleContextSensitiveTest {
 
-    ConceptService conceptService = Context.getConceptService();
-    /**
-     * @verifies get the date and reason for ART eligibility
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldGetTheDateAndReasonForARTEligibility() throws Exception {
+	ConceptService conceptService = Context.getConceptService();
 
-        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
-                MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
-                MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
-                MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
-                MohEvaluableNameConstants.WHO_STAGE_4_ADULT
-        });
-        MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
-                MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
-                MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
-                MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
-                MohEvaluableNameConstants.WHO_STAGE_4_PEDS
-        });
-        MohTestUtils.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
-                MohEvaluableNameConstants.POSITIVE
-        });
-        Patient patient = new Patient();
-        patient.setPersonId(2);
+	/**
+	 * @verifies get the date and reason for ART eligibility
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldGetTheDateAndReasonForARTEligibility() throws Exception {
 
-        PatientIdentifierType pit = new PatientIdentifierType();
-        pit.setPatientIdentifierTypeId(1);
+		MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
+				MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
+				MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
+				MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
+				MohEvaluableNameConstants.WHO_STAGE_4_ADULT
+		});
+		MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
+				MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
+				MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
+				MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
+				MohEvaluableNameConstants.WHO_STAGE_4_PEDS
+		});
+		MohTestUtils.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
+				MohEvaluableNameConstants.POSITIVE
+		});
+		Patient patient = new Patient();
+		patient.setPersonId(2);
 
-        PatientIdentifier pi = new PatientIdentifier("23452",pit, null);
-        pi.setPatient(patient);
+		PatientIdentifierType pit = new PatientIdentifierType();
+		pit.setPatientIdentifierTypeId(1);
 
-        Date birthdate =     new Date(1975,01,01);
-        patient.setBirthdate(birthdate);
+		PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
+		pi.setPatient(patient);
 
-        EncounterService service = Context.getEncounterService();
+		Date birthdate = new Date(1975, 01, 01);
+		patient.setBirthdate(birthdate);
 
-        Encounter sampleEncounter = new Encounter() ;
-        Date encounterDate = new Date() ;
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient);
-        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+		EncounterService service = Context.getEncounterService();
 
-        /*ObsService obsService = Context.getObsService();*/
+		Encounter sampleEncounter = new Encounter();
+		Date encounterDate = new Date();
+		sampleEncounter.setEncounterDatetime(encounterDate);
+		sampleEncounter.setPatient(patient);
+		sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
 
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_ADULT));
-        obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_1_ADULT));
-        obs.setObsDatetime(new Date());
-        obs.setEncounter(sampleEncounter);
+		/*ObsService obsService = Context.getObsService();*/
 
-        //sampleEncounter.setObs(allObs);
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_ADULT));
+		obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_1_ADULT));
+		obs.setObsDatetime(new Date());
+		obs.setEncounter(sampleEncounter);
 
-        Encounter resEncounter=service.saveEncounter(sampleEncounter);
-        Integer patientID= resEncounter.getPatient().getPersonId();
+		//sampleEncounter.setObs(allObs);
 
-        /*Checks if the Encounter has been saved*/
-        Assert.assertNotNull("Encounter is Null",resEncounter);
+		Encounter resEncounter = service.saveEncounter(sampleEncounter);
+		Integer patientID = resEncounter.getPatient().getPersonId();
 
-        /*Checks to find id patient Id is not null*/
-        Assert.assertNotNull("PatientID is Null",patientID);
+		/*Checks if the Encounter has been saved*/
+		Assert.assertNotNull("Encounter is Null", resEncounter);
 
-
-        Assert.assertNotNull("Encounter is Null",resEncounter);
+		/*Checks to find id patient Id is not null*/
+		Assert.assertNotNull("PatientID is Null", patientID);
 
 
-        MohDateAndReasonMedicallyEligibleForARTRule sampleRule = new MohDateAndReasonMedicallyEligibleForARTRule();
+		Assert.assertNotNull("Encounter is Null", resEncounter);
 
-        Result evalResult= sampleRule.evaluate(null,patientID, null);
 
-        Assert.assertNotNull("Evaluate Method returns Null",evalResult);
+		MohDateAndReasonMedicallyEligibleForARTRule sampleRule = new MohDateAndReasonMedicallyEligibleForARTRule();
 
-    }
+		Result evalResult = sampleRule.evaluate(null, patientID, null);
+
+		Assert.assertNotNull("Evaluate Method returns Null", evalResult);
+
+	}
 
 
 }
