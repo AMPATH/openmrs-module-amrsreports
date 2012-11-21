@@ -14,23 +14,21 @@
 package org.openmrs.module.amrsreport.cache;
 
 
-import org.openmrs.Concept;
+import org.openmrs.PatientIdentifierType;
 
 /**
- * Lightweight concept caching based on the concept name.
+ * Lightweight concept caching based on the Identifier Type name.
  */
-class MohConceptCacheInstance extends MohCacheInstance<Concept> {
+class MohPatientIdentifierTypeCacheInstance extends MohCacheInstance<PatientIdentifierType> {
 
-	private static final MohConceptCacheInstance ourInstance = new MohConceptCacheInstance();
+	private static MohPatientIdentifierTypeCacheInstance ourInstance = new MohPatientIdentifierTypeCacheInstance();
 
-	private MohConceptCacheInstance() {
+	private MohPatientIdentifierTypeCacheInstance() {
 		super();
 	}
 
-	/**
-	 * @return
-	 */
-	public static MohConceptCacheInstance getInstance() {
+	public static MohPatientIdentifierTypeCacheInstance getInstance() {
 		return ourInstance;
 	}
+
 }

@@ -12,53 +12,19 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 package org.openmrs.module.amrsreport.cache;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 import org.openmrs.EncounterType;
 
-import java.util.HashMap;
-import java.util.Map;
-
-class MohEncounterTypeCacheInstance {
-
-	private static final Log log = LogFactory.getLog(MohEncounterTypeCacheInstance.class);
+class MohEncounterTypeCacheInstance extends MohCacheInstance<EncounterType> {
 
 	private static MohEncounterTypeCacheInstance ourInstance = new MohEncounterTypeCacheInstance();
+
+	private MohEncounterTypeCacheInstance() {
+		super();
+	}
 
 	public static MohEncounterTypeCacheInstance getInstance() {
 		return ourInstance;
 	}
 
-	private final Map<String, EncounterType> encounterTypeMap;
-
-	private MohEncounterTypeCacheInstance() {
-		encounterTypeMap = new HashMap<String, EncounterType>();
-	}
-
-	/**
-	 * Add an element to the cache system
-	 *
-	 * @param conceptName
-	 * @param encounterType
-	 */
-	synchronized void addEncounterType(String conceptName, EncounterType encounterType) {
-		encounterTypeMap.put(conceptName, encounterType);
-	}
-
-	/**
-	 * Clear content of the cache
-	 */
-	synchronized void clearCache() {
-		encounterTypeMap.clear();
-	}
-
-	/**
-	 * Internal implementation of getting an element from the cache
-	 *
-	 * @param encounterTypeName
-	 * @return
-	 */
-	EncounterType getEncounterType(String encounterTypeName) {
-		return encounterTypeMap.get(encounterTypeName);
-	}
 }

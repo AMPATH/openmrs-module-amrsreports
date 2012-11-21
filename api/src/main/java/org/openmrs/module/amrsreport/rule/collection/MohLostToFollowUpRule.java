@@ -19,13 +19,14 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
  
  /**
   * Author jmwogi
   */
-public class MohLostToFollowUpRule  extends MohEvaluableRule {
+public class MohLostToFollowUpRule extends MohEvaluableRule {
  
  	private static final Log log = LogFactory.getLog(MohLostToFollowUpRule.class);
  
@@ -57,31 +58,31 @@ public class MohLostToFollowUpRule  extends MohEvaluableRule {
 			Set<Obs> o = Context.getObsService().getObservations(encounter);
 		    for (Iterator<Obs> obs = o.iterator();obs.hasNext();) {
 		    	Obs ob = obs.next();
-		    	if(ob.getConcept() == Context.getConceptService().getConcept("DATE OF DEATH")){
+		    	if(ob.getConcept() == MohCacheUtils.getConcept("DATE OF DEATH")){
 					return new Result("DEAD | " + sdf.format(sdf.format(ob.getObsDatetime())));
-				}else if(ob.getConcept() == Context.getConceptService().getConcept("DEATH REPORTED BY")){
+				}else if(ob.getConcept() == MohCacheUtils.getConcept("DEATH REPORTED BY")){
 					return new Result("DEAD | " + sdf.format(sdf.format(ob.getObsDatetime())));
-				}else if(ob.getConcept() == Context.getConceptService().getConcept("CAUSE FOR DEATH")){
+				}else if(ob.getConcept() == MohCacheUtils.getConcept("CAUSE FOR DEATH")){
 					return new Result("DEAD | " + sdf.format(sdf.format(ob.getObsDatetime())));
-				}else if(/*(ob.getConcept() == Context.getConceptService().getConcept("REASON FOR MISSED VISIT")) &&
-						(*/ob.getValueCoded() == Context.getConceptService().getConcept("DECEASED")){
+				}else if(/*(ob.getConcept() == MohCacheUtils.getConcept("REASON FOR MISSED VISIT")) &&
+						(*/ob.getValueCoded() == MohCacheUtils.getConcept("DECEASED")){
 					return new Result("DEAD | " + sdf.format(sdf.format(ob.getObsDatetime())));
-				}else if(/*(ob.getConcept() == Context.getConceptService().getConcept("REASON EXITED CARE")) &&
-						(*/ob.getValueCoded() == Context.getConceptService().getConcept("PATIENT DIED")){
+				}else if(/*(ob.getConcept() == MohCacheUtils.getConcept("REASON EXITED CARE")) &&
+						(*/ob.getValueCoded() == MohCacheUtils.getConcept("PATIENT DIED")){
 					return new Result("DEAD | " + sdf.format(ob.getObsDatetime()));
-				}/*else if((ob.getConcept() == Context.getConceptService().getConcept("OUTCOME AT END OF TUBERCULOSIS TREATMENT")) &&
-						(ob.getValueCoded() == Context.getConceptService().getConcept("DECEASED"))){
+				}/*else if((ob.getConcept() == MohCacheUtils.getConcept("OUTCOME AT END OF TUBERCULOSIS TREATMENT")) &&
+						(ob.getValueCoded() == MohCacheUtils.getConcept("DECEASED"))){
 					return new Result("DEAD - " + sdf.format(ob.getObsDatetime()));
 				}*/
 				
-				if(ob.getConcept() == Context.getConceptService().getConcept("TRANSFER CARE TO OTHER CENTER")){
-					if(ob.getValueCoded() == Context.getConceptService().getConcept("AMPATH"))
+				if(ob.getConcept() == MohCacheUtils.getConcept("TRANSFER CARE TO OTHER CENTER")){
+					if(ob.getValueCoded() == MohCacheUtils.getConcept("AMPATH"))
 						return new Result("TO | (Ampath) " + sdf.format(ob.getObsDatetime()));
 					else
 						return new Result("TO | (Non-Ampath) " + sdf.format(ob.getObsDatetime()));
 				}
 				if((encTpInit == encounter.getEncounterType()) || (encounter.getEncounterType() == encTpRet)){
-					if(ob.getConcept().getConceptId() == Context.getConceptService().getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE).getConceptId()){
+					if(ob.getConcept().getConceptId() == MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE).getConceptId()){
 						if(sdf.format(ob.getObsDatetime()) != null){
 							long requiredTimeToShowup = ((ob.getValueDatetime().getTime()) - (ob.getObsDatetime().getTime())) + (long)(1000 * 60 * 60 * 24 * 30.4375 * 3);
 							long todayTimeFromSchedule = (new Date()).getTime() - (ob.getObsDatetime().getTime());
@@ -90,7 +91,7 @@ public class MohLostToFollowUpRule  extends MohEvaluableRule {
 							}
 						}
 					}
-					if(ob.getConcept() == Context.getConceptService().getConcept("RETURN VISIT DATE, EXPRESS CARE NURSE")){
+					if(ob.getConcept() == MohCacheUtils.getConcept("RETURN VISIT DATE, EXPRESS CARE NURSE")){
 						if(sdf.format(ob.getObsDatetime()) != null){
 							long requiredTimeToShowup = ((ob.getValueDatetime().getTime()) - (ob.getObsDatetime().getTime())) + (long)(1000 * 60 * 60 * 24 * 30.4375 * 3);
 							long todayTimeFromSchedule = (new Date()).getTime() - (ob.getObsDatetime().getTime());

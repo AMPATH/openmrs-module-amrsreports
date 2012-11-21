@@ -11,12 +11,13 @@ import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.util.OpenmrsUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,59 +28,58 @@ import java.util.List;
  */
 public class MohIdentifierRule extends MohEvaluableRule {
 
-    private static final Log log = LogFactory.getLog(MohIdentifierRule.class);
+	private static final Log log = LogFactory.getLog(MohIdentifierRule.class);
 
-    public static final String TOKEN ="MOH Ampath Identifier";
-
-
-    public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-            String identifier="";
-
-        Patient patient = Context.getPatientService().getPatient(patientId);
-        AdministrationService ams=Context.getAdministrationService();
-        PatientIdentifierType patientIdentifierType=Context.getPatientService().getPatientIdentifierTypeByName(ams.getGlobalProperty("mflgenerator.mfl"));
+	public static final String TOKEN = "MOH Ampath Identifier";
 
 
-        List<PatientIdentifier>  listPi= patient.getActiveIdentifiers() ;
+	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+		Patient patient = Context.getPatientService().getPatient(patientId);
+		AdministrationService ams = Context.getAdministrationService();
+		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
 
-        for(PatientIdentifier pid:listPi) {
+		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
 
-            if(!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), patientIdentifierType)){
-                return new Result(pid.getIdentifier());
-            }
-        }
+		for (PatientIdentifier pid : listPi) {
 
-        return new Result();
-    }
-    @Override
-    protected String getEvaluableToken() {
-        return TOKEN;
-    }
+			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), patientIdentifierType)) {
+				return new Result(pid.getIdentifier());
+			}
+		}
 
-    /**
-     * @see org.openmrs.logic.Rule#getDependencies()
-     */
-    @Override
-    public String[] getDependencies() {
-        return new String[]{};
-    }
-    /**
-     * Get the definition of each parameter that should be passed to this rule execution
-     *
-     * @return all parameter that applicable for each rule execution
-     */
+		return new Result();
+	}
 
-    @Override
-    public Result.Datatype getDefaultDatatype() {
-        return Result.Datatype.TEXT;
-    }
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
+	}
 
-    public Set<RuleParameterInfo> getParameterList() {
-        return null;
-    }
+	/**
+	 * @see org.openmrs.logic.Rule#getDependencies()
+	 */
+	@Override
+	public String[] getDependencies() {
+		return new String[]{};
+	}
 
-    @Override
-    public int getTTL() {
-        return 0;
-    }
+	/**
+	 * Get the definition of each parameter that should be passed to this rule execution
+	 *
+	 * @return all parameter that applicable for each rule execution
+	 */
+
+	@Override
+	public Result.Datatype getDefaultDatatype() {
+		return Result.Datatype.TEXT;
+	}
+
+	public Set<RuleParameterInfo> getParameterList() {
+		return null;
+	}
+
+	@Override
+	public int getTTL() {
+		return 0;
+	}
 }

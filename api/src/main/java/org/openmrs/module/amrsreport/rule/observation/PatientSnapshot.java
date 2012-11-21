@@ -59,22 +59,6 @@ public abstract class PatientSnapshot {
     }
 
     /**
-     * maintains a cache of concepts and stores them by name
-     *
-     * @param name the name of the cached concept to retrieve
-     * @return the concept matching the name
-     */
-    public Concept getCachedConcept(String name) {
-        if (cachedConcepts == null) {
-            cachedConcepts = new HashMap<String, Concept>();
-        }
-        if (!cachedConcepts.containsKey(name)) {
-            cachedConcepts.put(name, Context.getConceptService().getConcept(name));
-        }
-        return cachedConcepts.get(name);
-    }
-
-    /**
      * set flags based on observation values. if a flag is set, return true.  otherwise, false.
      * @should recognize and set WHO stage from an obs or specify peds WHO
      * @param o observation to be consumed

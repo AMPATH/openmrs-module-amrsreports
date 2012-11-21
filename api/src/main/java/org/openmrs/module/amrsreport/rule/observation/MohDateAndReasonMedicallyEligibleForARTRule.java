@@ -37,6 +37,7 @@ import org.openmrs.logic.Rule;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants.AgeGroup;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
@@ -55,9 +56,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	public static final String REASON_CLINICAL_CD4 = "Clinical + CD4";
 	public static final String REASON_CLINICAL_CD4_HIV_DNA_PCR = "Clinical + CD4 + HIV DNA PCR";
 	public static final String REASON_CLINICAL_HIV_DNA_PCR = "Clinical + HIV DNA PCR";
-
-	private Map<String, Concept> cachedConcepts = null;
-	private List<Concept> cachedQuestions = null;
 
 	/**
 	 * comparator for sorting observations
@@ -152,36 +150,18 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	}
 
 	/**
-	 * maintains a cache of concepts and stores them by name
-	 * 
-	 * @param name the name of the cached concept to retrieve
-	 * @return the concept matching the name
-	 */
-	private Concept getCachedConcept(String name) {
-		if (cachedConcepts == null) {
-			cachedConcepts = new HashMap<String, Concept>();
-		}
-		if (!cachedConcepts.containsKey(name)) {
-			cachedConcepts.put(name, Context.getConceptService().getConcept(name));
-		}
-		return cachedConcepts.get(name);
-	}
-
-	/**
 	 * obtain the list of questions for observations we are interested in to determine ART medical eligibility
 	 *
 	 * @return a list of concepts for use in finding relevant observations
 	 */
 	private List<Concept> getQuestionConcepts() {
-		if (cachedQuestions == null) {
-			cachedQuestions = new ArrayList<Concept>();
-			cachedQuestions.add(getCachedConcept(MohEvaluableNameConstants.CD4_BY_FACS));
-			cachedQuestions.add(getCachedConcept(MohEvaluableNameConstants.CD4_PERCENT));
-			cachedQuestions.add(getCachedConcept(MohEvaluableNameConstants.HIV_DNA_PCR));
-			cachedQuestions.add(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS));
-			cachedQuestions.add(getCachedConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT));
-		}
-		return cachedQuestions;
+		List<Concept> questions = new ArrayList<Concept>();
+			questions.add(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_BY_FACS));
+			questions.add(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_PERCENT));
+			questions.add(MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_DNA_PCR));
+			questions.add(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS));
+			questions.add(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT));
+		return questions;
 	}
 
 	private Result formatResult(Date date, String reason) {

@@ -14,67 +14,51 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Nicholas Ingosi Magaja
- * Date: 5/24/12
- * Time: 12:17 PM
- * To change this template use File | Settings | File Templates.
- */
 public class MohGenderRule extends MohEvaluableRule {
 
-    private static final Log log = LogFactory.getLog(MohGenderRule.class);
+	private static final Log log = LogFactory.getLog(MohGenderRule.class);
 
-    public static final String TOKEN ="MOH Gender";
+	public static final String TOKEN = "MOH Gender";
 
+	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+		String gender = "";
+		Patient patient = Context.getPatientService().getPatient(patientId);
+		if (!StringUtils.isEmpty(patient.getGender()))
+			gender = patient.getGender();
 
-    public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+		return new Result(gender);
+	}
 
-      String gender="";
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
+	}
 
-        Patient patient = Context.getPatientService().getPatient(patientId);
+	/**
+	 * @see org.openmrs.logic.Rule#getDependencies()
+	 */
+	@Override
+	public String[] getDependencies() {
+		return new String[]{};
+	}
 
+	/**
+	 * Get the definition of each parameter that should be passed to this rule execution
+	 *
+	 * @return all parameter that applicable for each rule execution
+	 */
+	@Override
+	public Result.Datatype getDefaultDatatype() {
+		return Result.Datatype.TEXT;
+	}
 
+	public Set<RuleParameterInfo> getParameterList() {
+		return null;
+	}
 
-        if(!StringUtils.isEmpty(patient.getGender()))
-
-           gender=patient.getGender();
-
-
-
-
-        return new Result(gender);
-    }
-    @Override
-    protected String getEvaluableToken() {
-        return TOKEN;
-    }
-
-    /**
-     * @see org.openmrs.logic.Rule#getDependencies()
-     */
-    @Override
-    public String[] getDependencies() {
-        return new String[]{};
-    }
-    /**
-     * Get the definition of each parameter that should be passed to this rule execution
-     *
-     * @return all parameter that applicable for each rule execution
-     */
-
-    @Override
-    public Result.Datatype getDefaultDatatype() {
-        return Result.Datatype.TEXT;
-    }
-
-    public Set<RuleParameterInfo> getParameterList() {
-        return null;
-    }
-
-    @Override
-    public int getTTL() {
-        return 0;
-    }
+	@Override
+	public int getTTL() {
+		return 0;
+	}
 
 }
