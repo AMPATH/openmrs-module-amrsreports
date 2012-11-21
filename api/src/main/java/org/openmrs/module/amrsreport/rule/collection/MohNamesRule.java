@@ -23,64 +23,67 @@ import java.util.Set;
  */
 public class MohNamesRule extends MohEvaluableRule {
 
-    private static final Log log = LogFactory.getLog(MohNamesRule.class);
-    public static final String TOKEN ="MOH Patient Names";
+	private static final Log log = LogFactory.getLog(MohNamesRule.class);
+	public static final String TOKEN = "MOH Patient Names";
 
+	/**
+	 * TODO figure out why we can't just use person.getName().getFullName()
+	 *
+	 * @param context
+	 * @param patientId
+	 * @param parameters
+	 * @return
+	 * @throws LogicException
+	 */
+	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+		String givenname = "";
+		String middlename = "";
+		String lastname = "";
 
-    public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-        String patientnames="";
-        String  givenname="";
-        String  middlename="";
-        String  lastname="";
+		Patient patient = Context.getPatientService().getPatient(patientId);
 
+		if (!StringUtils.isEmpty(patient.getGivenName()))
+			givenname = patient.getGivenName();
 
-        Patient patient = Context.getPatientService().getPatient(patientId);
+		if (!StringUtils.isEmpty(patient.getMiddleName()))
+			middlename = patient.getMiddleName();
 
+		if (!StringUtils.isEmpty(patient.getFamilyName()))
+			lastname = patient.getFamilyName();
 
+		return new Result(givenname + " " + middlename + " " + lastname);
+	}
 
-        if(!StringUtils.isEmpty(patient.getGivenName()))
-            givenname=patient.getGivenName();
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
+	}
 
-        if(!StringUtils.isEmpty(patient.getMiddleName()))
-            middlename=patient.getMiddleName();
+	/**
+	 * @see org.openmrs.logic.Rule#getDependencies()
+	 */
+	@Override
+	public String[] getDependencies() {
+		return new String[]{};
+	}
 
-        if(!StringUtils.isEmpty(patient.getFamilyName()))
-            lastname=patient.getFamilyName();
+	/**
+	 * Get the definition of each parameter that should be passed to this rule execution
+	 *
+	 * @return all parameter that applicable for each rule execution
+	 */
+	@Override
+	public Result.Datatype getDefaultDatatype() {
+		return Result.Datatype.TEXT;
+	}
 
-        patientnames=givenname +" "+  middlename +" "+  lastname ;
+	public Set<RuleParameterInfo> getParameterList() {
+		return null;
+	}
 
-        return new Result(patientnames);
-    }
-    @Override
-    protected String getEvaluableToken() {
-        return TOKEN;
-    }
-
-    /**
-     * @see org.openmrs.logic.Rule#getDependencies()
-     */
-    @Override
-    public String[] getDependencies() {
-        return new String[]{};
-    }
-    /**
-     * Get the definition of each parameter that should be passed to this rule execution
-     *
-     * @return all parameter that applicable for each rule execution
-     */
-
-    @Override
-    public Result.Datatype getDefaultDatatype() {
-        return Result.Datatype.TEXT;
-    }
-
-    public Set<RuleParameterInfo> getParameterList() {
-        return null;
-    }
-
-    @Override
-    public int getTTL() {
-        return 0;
-    }
+	@Override
+	public int getTTL() {
+		return 0;
+	}
 
 }
