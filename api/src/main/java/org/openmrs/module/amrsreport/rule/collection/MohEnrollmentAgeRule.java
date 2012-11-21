@@ -1,14 +1,9 @@
 package org.openmrs.module.amrsreport.rule.collection;
- 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
@@ -16,90 +11,101 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
- 
- /**
-  * Author jmwogi
-  */
-public class MohEnrollmentAgeRule  extends MohEvaluableRule {
- 
- 	private static final Log log = LogFactory.getLog(MohEnrollmentAgeRule.class);
- 
- 	public static final String TOKEN = "MOH Age At Enrollment";
 
- 	
- 	/**
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Author jmwogi
+ */
+public class MohEnrollmentAgeRule extends MohEvaluableRule {
+
+	private static final Log log = LogFactory.getLog(MohEnrollmentAgeRule.class);
+	private static final long ageDivisor = 31557600000L; // 1000 * 60 * 60 * 24 * 30.4375 * 12
+	public static final String TOKEN = "MOH Age At Enrollment";
+
+	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
- 	 */
+	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		double age = 0.0;
-        Date dob =  null;
-        try {
-            Patient patient = Context.getPatientService().getPatient(patientId);
-            dob = patient.getBirthdate();
-            
-            List<Encounter> e = Context.getEncounterService().getEncountersByPatient(patient);
-            //Iterate though encounters for the patient
-            Date encounterDate = null;
-            Boolean isChild = true;
-            for (Iterator<Encounter> it = e.iterator(); it.hasNext();) {
-                Encounter encounter = it.next();
-                encounterDate = encounter.getEncounterDatetime();
-                if(encounter.getEncounterType() == (Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL)) |
-                        (encounter.getEncounterType() == Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN)))
-                    isChild = false;
-                break;
-            }
-            //Get age in years
-            if(encounterDate!=null)
-                if(!isChild){
-                    age = ((encounterDate.getTime() - dob.getTime())/(1000 * 60 * 60 * 24 * 30.4375 * 12));
-                    return new Result(((int) Math.floor( age )) + "y");
-                }
-                else{
-                    age = ((encounterDate.getTime() - dob.getTime())/(1000 * 60 * 60 * 24 * 30.4375 * 12));
-                    if(age<1){
-                        age = ((encounterDate.getTime() - dob.getTime())/(1000 * 60 * 60 * 24 * 30.4375));
-                        return new Result(((int) Math.floor( age )) + "m");
-                    }
-                    else
-                        return new Result(((int) Math.floor( age )) + "y");
-                }
-            
-        } catch (Exception e) {}
-        return new Result("");
- 	}
-	
+
+		try {
+			EncounterType adultInitialType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
+			EncounterType adultReturnType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
+
+			Patient patient = Context.getPatientService().getPatient(patientId);
+
+			if (patient == null)
+				return null;
+
+			if (patient.getBirthdate() == null)
+				return new Result("unknown");
+
+			List<Encounter> e = Context.getEncounterService().getEncountersByPatient(patient);
+
+			//Iterate though encounters for the patient
+			Date encounterDate = null;
+			Boolean isChild = true;
+			Iterator<Encounter> it = e.iterator();
+			while (it.hasNext() && isChild) {
+				Encounter encounter = it.next();
+				encounterDate = encounter.getEncounterDatetime();
+				if (encounter.getEncounterType().equals(adultInitialType) || encounter.getEncounterType().equals(adultReturnType))
+					isChild = false;
+			}
+
+			//Get age in years
+			if (encounterDate != null) {
+				Double ageInYears = (double)(encounterDate.getTime() - patient.getBirthdate().getTime()) / ageDivisor;
+				if (isChild && ageInYears < 1) {
+					return new Result(((int) Math.floor(ageInYears * 12)) + "m");
+				}
+				return new Result(((int) Math.floor(ageInYears)) + "y");
+			}
+		} catch (Exception e) {
+			// TODO log something here?
+		}
+
+		return new Result("");
+	}
+
 	protected String getEvaluableToken() {
 		return TOKEN;
- 	}
-	
+	}
+
 	/**
- 	 * @see org.openmrs.logic.Rule#getDependencies()
- 	 */
+	 * @see org.openmrs.logic.Rule#getDependencies()
+	 */
 	@Override
- 	public String[] getDependencies() {
+	public String[] getDependencies() {
 		return new String[]{};
- 	}
- 	/**
- 	 * Get the definition of each parameter that should be passed to this rule execution
- 	 *
- 	 * @return all parameter that applicable for each rule execution
- 	 */
-	
- 	@Override
+	}
+
+	/**
+	 * Get the definition of each parameter that should be passed to this rule execution
+	 *
+	 * @return all parameter that applicable for each rule execution
+	 */
+	@Override
 	public Datatype getDefaultDatatype() {
 		return Datatype.TEXT;
- 	}
+	}
+
 	public Set<RuleParameterInfo> getParameterList() {
 		return null;
- 	}
+	}
+
 	@Override
 	public int getTTL() {
 		return 0;
 	}
-	
- }
+
+}
