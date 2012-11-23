@@ -28,9 +28,6 @@ public class MohEntryPointRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Point Of Entry";
 
-	@Autowired
-	private PatientService patientService;
-
 	private static Map<String, String> locationMap;
 
 	static {
@@ -53,10 +50,6 @@ public class MohEntryPointRule extends MohEvaluableRule {
 		return MohCacheUtils.getConcept(conceptName).getConceptId().toString();
 	}
 
-	public void setPatientService(PatientService patientService) {
-		this.patientService = patientService;
-	}
-
 	/**
 	 * returns the value of the entry point location, based on the point of HIV testing person attribute
 	 *
@@ -74,7 +67,7 @@ public class MohEntryPointRule extends MohEvaluableRule {
 	 * @should return Other if point of HIV testing is not recognized
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
-		Patient patient = patientService.getPatient(patientId);
+		Patient patient = Context.getPatientService().getPatient(patientId);
 		PersonAttribute pa = patient.getAttribute(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
 
 		if (pa == null)

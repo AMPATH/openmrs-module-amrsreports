@@ -68,10 +68,10 @@ public class MohEntryPointRuleTest {
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
 		Mockito.when(Context.getConceptService()).thenReturn(conceptService);
+		Mockito.when(Context.getPatientService()).thenReturn(patientService);
 
 		// create a rule instance
 		rule = new MohEntryPointRule();
-		rule.setPatientService(patientService);
 	}
 
 	/**
