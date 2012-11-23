@@ -3,15 +3,19 @@ package org.openmrs.module.amrsreport.rule.collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
+import org.openmrs.PersonAttribute;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
-import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,42 +28,62 @@ public class MohEntryPointRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Point Of Entry";
 
-	/**
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
-	 */
-	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		try {
-			Patient patient = Context.getPatientService().getPatient(patientId);
-			Integer intPoint = Context.getPersonService().getPersonAttributeTypeByName(MohEvaluableNameConstants.POINT_OF_HIV_TESTING).getId();
-			int entryPointConcept = Integer.parseInt(patient.getAttribute(intPoint).getValue());
-			String entryPoint = Context.getConceptService().getConcept(entryPointConcept).getName().toString();
+	private static Map<String, String> locationMap;
 
-			if (entryPoint.equals(MohEvaluableNameConstants.MOBILE_VOLUNTARY_COUNSELING_AND_TESTING))
-				return new Result("MVCT");
-			if (entryPoint.equals(MohEvaluableNameConstants.MATERNAL_CHILD_HEALTH_PROGRAM))
-				return new Result("MCH");
-			if (entryPoint.equals(MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV))
-				return new Result("PMTCT");
-			if (entryPoint.equals(MohEvaluableNameConstants.VOLUNTARY_COUNSELING_AND_TESTING_CENTER))
-				return new Result("VCT");
-			if (entryPoint.equals(MohEvaluableNameConstants.TUBERCULOSIS))
-				return new Result("TB");
-			if (entryPoint.equals(MohEvaluableNameConstants.HOME_BASED_TESTING_PROGRAM))
-				return new Result("HCT");
-			if (entryPoint.equals(MohEvaluableNameConstants.OTHER_NON_CODED))
-				return new Result("Other");
-			if (entryPoint.equals(MohEvaluableNameConstants.INPATIENT_CARE_OR_HOSPITALIZATION))
-				return new Result("IPD");
-			if (entryPoint.equals(MohEvaluableNameConstants.PROVIDER_INITIATED_TESTING_AND_COUNSELING))
-				return new Result("PITC");
-			if (entryPoint.equals(MohEvaluableNameConstants.PEDIATRIC_OUTPATIENT_CLINIC))
-				return new Result("POC");
-		} catch (Exception e) {
-		}
+	static {
+		locationMap = new HashMap<String, String>();
+		locationMap.put(getConceptId(MohEvaluableNameConstants.MOBILE_VOLUNTARY_COUNSELING_AND_TESTING), "MVCT");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.MATERNAL_CHILD_HEALTH_PROGRAM), "MCH");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV), "PMTCT");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.VOLUNTARY_COUNSELING_AND_TESTING_CENTER), "VCT");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.TUBERCULOSIS), "TB");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.HOME_BASED_TESTING_PROGRAM), "HCT");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.INPATIENT_CARE_OR_HOSPITALIZATION), "IPD");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.PROVIDER_INITIATED_TESTING_AND_COUNSELING), "PITC");
+		locationMap.put(getConceptId(MohEvaluableNameConstants.PEDIATRIC_OUTPATIENT_CLINIC), "POC");
+
+		// unnecessary ... "Other" is the default
+		// locationMap.put(MohEvaluableNameConstants.OTHER_NON_CODED, "Other");
+	}
+
+	private static String getConceptId(String conceptName) {
+		return MohCacheUtils.getConcept(conceptName).getConceptId().toString();
+	}
+
+	/**
+	 * returns the value of the entry point location, based on the point of HIV testing person attribute
+	 *
+	 * @should return MVCT for Mobile Voluntary Counseling and Testing
+	 * @should return MCH for Maternal Child Health Program
+	 * @should return PMTCT for Prevention of Mother to Child Transmission of HIV
+	 * @should return VCT for Voluntary Counseling and Testing Center
+	 * @should return TB for Tuberculosis
+	 * @should return HCT for Home Based Testing Program
+	 * @should return IPD for Inpatient Care or Hospitalization
+	 * @should return PITC for Provider Initiated Testing and Counseling
+	 * @should return POC for Pediatric Outpatient Clinic
+	 * @should return Other for Other Non Coded
+	 * @should return Other if no point of HIV testing exists
+	 * @should return Other if point of HIV testing is not recognized
+	 */
+	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
+		Patient patient = Context.getPatientService().getPatient(patientId);
+		PersonAttribute pa = patient.getAttribute(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
+
+		if (pa == null)
+			return new Result("Other");
+
+		String entryPoint = locationMap.get(pa.getValue());
+
+		if (entryPoint != null)
+			return new Result(entryPoint);
+
 		return new Result("Other");
 	}
 
+	/**
+	 * @see org.openmrs.module.amrsreport.rule.MohEvaluableRule#getEvaluableToken()
+	 */
 	protected String getEvaluableToken() {
 		return TOKEN;
 	}
@@ -77,7 +101,6 @@ public class MohEntryPointRule extends MohEvaluableRule {
 	 *
 	 * @return all parameter that applicable for each rule execution
 	 */
-
 	@Override
 	public Datatype getDefaultDatatype() {
 		return Datatype.TEXT;
