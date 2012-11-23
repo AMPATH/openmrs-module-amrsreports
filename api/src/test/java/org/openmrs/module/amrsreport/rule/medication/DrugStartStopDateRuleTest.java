@@ -1,0 +1,191 @@
+package org.openmrs.module.amrsreport.rule.medication;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.openmrs.Concept;
+import org.openmrs.Obs;
+import org.openmrs.OpenmrsObject;
+import org.openmrs.Patient;
+import org.openmrs.PersonAttributeType;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
+import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Test class for DrugStartStopDateRule
+ */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Context.class)
+public class DrugStartStopDateRuleTest {
+
+	private static final String START_CONCEPT = "startConcept";
+	private static final String STOP_CONCEPT = "stopConcept";
+
+	private static final int PATIENT_ID = 5;
+
+	private ConceptService conceptService;
+	private PatientService patientService;
+	private MohCoreService mohCoreService;
+
+	private Patient patient;
+	private DrugStartStopDateRule rule;
+
+	private List<Obs> currentObs;
+
+	@Before
+	public void setup() {
+
+		// build the patient
+		patient = new Patient();
+
+		// initialize the current obs
+		currentObs = new ArrayList<Obs>();
+
+		// build the mock patient service
+		patientService = Mockito.mock(PatientService.class);
+		Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
+
+		// build the concept service
+		int i = 0;
+		conceptService = Mockito.mock(ConceptService.class);
+		Mockito.when(conceptService.getConcept(START_CONCEPT)).thenReturn(new Concept(i++));
+		Mockito.when(conceptService.getConcept(STOP_CONCEPT)).thenReturn(new Concept(i++));
+
+		// build the MOH Core service
+		mohCoreService = Mockito.mock(MohCoreService.class);
+		Mockito.when(mohCoreService.getPatientObservations(Mockito.anyInt(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+
+		// set up Context
+		PowerMockito.mockStatic(Context.class);
+		Mockito.when(Context.getConceptService()).thenReturn(conceptService);
+		Mockito.when(Context.getPatientService()).thenReturn(patientService);
+		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
+
+		// create a rule instance
+		rule = new TestDrugStartStopDateRule();
+	}
+
+	/**
+	 * adds an observation with the given date as the obs datetime
+	 *
+	 * @param conceptName
+	 * @param date
+	 */
+	private void addDateObs(String conceptName, Date date) {
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConcept(conceptName));
+		obs.setObsDatetime(date);
+		currentObs.add(obs);
+	}
+
+	/**
+	 * @verifies return blank result for no dates found
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldReturnBlankResultForNoDatesFound() throws Exception {
+		Assert.assertEquals(new Result(""), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format a single start date
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatASingleStartDate() throws Exception {
+		addDateObs(START_CONCEPT, new Date("10/16/1975"));
+		Assert.assertEquals(new Result("16-Oct-75 - "), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format a single stop date
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatASingleStopDate() throws Exception {
+		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
+		Assert.assertEquals(new Result(" - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format a start and stop date
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatAStartAndStopDate() throws Exception {
+		addDateObs(START_CONCEPT, new Date("10/12/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format two starts followed by one stop
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatTwoStartsFollowedByOneStop() throws Exception {
+		addDateObs(START_CONCEPT, new Date("10/12/1975"));
+		addDateObs(START_CONCEPT, new Date("10/14/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - ;14-Oct-75 - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format one start followed by two stops
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatOneStartFollowedByTwoStops() throws Exception {
+		addDateObs(START_CONCEPT, new Date("10/12/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/14/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75; - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * @verifies properly format two start and stop periods
+	 * @see DrugStartStopDateRule#getResult(Integer)
+	 */
+	@Test
+	public void getResult_shouldProperlyFormatTwoStartAndStopPeriods() throws Exception {
+		addDateObs(START_CONCEPT, new Date("10/12/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/14/1975"));
+		addDateObs(START_CONCEPT, new Date("10/16/1975"));
+		addDateObs(STOP_CONCEPT, new Date("10/18/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;16-Oct-75 - 18-Oct-75;"), rule.getResult(PATIENT_ID));
+	}
+
+	/**
+	 * implementation of DrugStartStopDateRule for testing
+	 */
+	private class TestDrugStartStopDateRule extends DrugStartStopDateRule {
+
+		public TestDrugStartStopDateRule() {
+			this.startConcept = MohCacheUtils.getConcept(START_CONCEPT);
+			this.stopConcept = MohCacheUtils.getConcept(STOP_CONCEPT);
+		}
+
+		@Override
+		protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
+			return this.getResult(patientId);
+		}
+	}
+}
