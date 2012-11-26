@@ -4,18 +4,16 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
-import org.openmrs.api.EncounterService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.observation.PatientSnapshot;
 import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.web.OpenmrsBindingInitializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+
  * Patient snapshot for use with LTFU Rule
  */
 public class LostToFollowUpPatientSnapshot extends PatientSnapshot {

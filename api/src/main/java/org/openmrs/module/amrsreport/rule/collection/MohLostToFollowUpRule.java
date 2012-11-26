@@ -1,9 +1,9 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
-import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
@@ -17,21 +17,17 @@ import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.service.MohCoreService;
-import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+
 
 /**
  * Author jmwogi
  */
+
 public class MohLostToFollowUpRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(MohLostToFollowUpRule.class);
@@ -115,5 +111,5 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 	public int getTTL() {
 		return 0;
 	}
-
 }
+
