@@ -42,6 +42,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest extends BaseModuleC
 
 	ConceptService conceptService = Context.getConceptService();
 
+
 	/**
 	 * @verifies get the date and reason for ART eligibility
 	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
