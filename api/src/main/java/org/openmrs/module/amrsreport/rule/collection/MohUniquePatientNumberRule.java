@@ -31,6 +31,7 @@ public class MohUniquePatientNumberRule extends MohEvaluableRule {
 	private static final PatientIdentifierType cccPatientIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
 
 	/**
+     * @should return a Unique Patient Number
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
