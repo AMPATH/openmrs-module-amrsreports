@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.module.amrsreport.rule.collection.MohUniquePatientNumberRule;
 import org.openmrs.api.context.Context;
@@ -36,6 +37,12 @@ public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTe
 
         Patient patient1 = Context.getPatientService().getPatient(6);
         AdministrationService ams = Context.getAdministrationService();
+
+        GlobalProperty globalProperty = new GlobalProperty();
+        globalProperty.setProperty("mflgenerator.mfl");
+        globalProperty.setPropertyValue("CCC Number");
+        ams.saveGlobalProperty(globalProperty);
+
         PatientIdentifierType pit = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
 
         PatientIdentifier pi = new PatientIdentifier("11740-00001", pit, null);
