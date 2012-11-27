@@ -20,7 +20,7 @@ import java.util.Set;
 
 
 /**
- * Author ningosi
+ * MohUniquePatientNumberRule class checks and returns CCC Number for a patient
  */
 public class MohUniquePatientNumberRule extends MohEvaluableRule {
 
