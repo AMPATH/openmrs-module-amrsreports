@@ -14,11 +14,7 @@ import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import java.lang.String;
 
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 11/27/12
- * Time: 11:03 AM
- * To change this template use File | Settings | File Templates.
+ * Test file for MohUniquePatientNumberRule class. Should check and return CCC Number for a patient
  */
 public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTest {
     /**
