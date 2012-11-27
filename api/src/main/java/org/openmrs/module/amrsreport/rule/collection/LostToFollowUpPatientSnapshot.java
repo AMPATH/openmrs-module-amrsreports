@@ -14,11 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 11/15/12
- * Time: 12:47 PM
- * To change this template use File | Settings | File Templates.
+ * LostToFollowUpPatientSnapshot class that checks and sets reason why a patient was lost to follow-up
  */
 public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
@@ -103,7 +99,12 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
     @Override
     public boolean eligible() {
-        return false;
+        if(this.getProperty("reason")!=null){
+        return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**

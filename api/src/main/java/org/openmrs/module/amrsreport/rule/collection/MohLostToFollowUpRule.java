@@ -24,7 +24,7 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 
 /**
- * Author jmwogi
+ * A class that returns the date and reason when a patient was lost to follow up
  */
 public class MohLostToFollowUpRule  extends MohEvaluableRule {
 
