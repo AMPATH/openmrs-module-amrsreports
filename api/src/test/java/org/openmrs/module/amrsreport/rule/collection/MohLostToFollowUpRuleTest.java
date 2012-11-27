@@ -16,11 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 11/15/12
- * Time: 10:16 AM
- * To change this template use File | Settings | File Templates.
+ * A test file for MohLostToFollowUpRule class.
  */
 public class MohLostToFollowUpRuleTest extends BaseModuleContextSensitiveTest {
 

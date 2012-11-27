@@ -133,4 +133,5 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 		return false;
 	}
 
+
 }
