@@ -131,6 +131,9 @@ public class MohRuleUtils {
 	}
 	
 	public static String formatdates(Date date){
+		if (date == null)
+			return "Unknown";
+
 		Format formatter;
 		formatter = new SimpleDateFormat("dd-MMM-yy");
 		String s = formatter.format(date);

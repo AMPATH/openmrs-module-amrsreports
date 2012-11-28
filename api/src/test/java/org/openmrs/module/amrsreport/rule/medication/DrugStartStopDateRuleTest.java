@@ -10,7 +10,6 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
-import org.openmrs.PersonAttributeType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
@@ -18,14 +17,17 @@ import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +50,8 @@ public class DrugStartStopDateRuleTest {
 	private Patient patient;
 	private DrugStartStopDateRule rule;
 
-	private List<Obs> currentObs;
+	private List<Obs> currentStartObs;
+	private List<Obs> currentStopObs;
 
 	@Before
 	public void setup() {
@@ -57,7 +60,8 @@ public class DrugStartStopDateRuleTest {
 		patient = new Patient();
 
 		// initialize the current obs
-		currentObs = new ArrayList<Obs>();
+		currentStartObs = new ArrayList<Obs>();
+		currentStopObs = new ArrayList<Obs>();
 
 		// build the mock patient service
 		patientService = Mockito.mock(PatientService.class);
@@ -71,7 +75,15 @@ public class DrugStartStopDateRuleTest {
 
 		// build the MOH Core service
 		mohCoreService = Mockito.mock(MohCoreService.class);
-		Mockito.when(mohCoreService.getPatientObservations(Mockito.anyInt(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+
+		Map<String, Collection<OpenmrsObject>> startRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		startRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{conceptService.getConcept(START_CONCEPT)}));
+
+		Map<String, Collection<OpenmrsObject>> stopRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		stopRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{conceptService.getConcept(STOP_CONCEPT)}));
+
+		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentStartObs);
+		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentStopObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -84,16 +96,29 @@ public class DrugStartStopDateRuleTest {
 	}
 
 	/**
-	 * adds an observation with the given date as the obs datetime
+	 * adds a start observation with the given date as the obs datetime
 	 *
 	 * @param conceptName
 	 * @param date
 	 */
-	private void addDateObs(String conceptName, Date date) {
+	private void addStartObs(Date date) {
 		Obs obs = new Obs();
-		obs.setConcept(conceptService.getConcept(conceptName));
+		obs.setConcept(conceptService.getConcept(START_CONCEPT));
 		obs.setObsDatetime(date);
-		currentObs.add(obs);
+		currentStartObs.add(obs);
+	}
+
+	/**
+	 * adds a stop observation with the given date as the obs datetime
+	 *
+	 * @param conceptName
+	 * @param date
+	 */
+	private void addStopObs(Date date) {
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConcept(STOP_CONCEPT));
+		obs.setObsDatetime(date);
+		currentStopObs.add(obs);
 	}
 
 	/**
@@ -111,8 +136,8 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatASingleStartDate() throws Exception {
-		addDateObs(START_CONCEPT, new Date("10/16/1975"));
-		Assert.assertEquals(new Result("16-Oct-75 - "), rule.getResult(PATIENT_ID));
+		addStartObs(new Date("10/16/1975"));
+		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -121,8 +146,8 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatASingleStopDate() throws Exception {
-		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
-		Assert.assertEquals(new Result(" - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+		addStopObs(new Date("10/16/1975"));
+		Assert.assertEquals(new Result("Unknown - 16-Oct-75"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -131,9 +156,9 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatAStartAndStopDate() throws Exception {
-		addDateObs(START_CONCEPT, new Date("10/12/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
-		Assert.assertEquals(new Result("12-Oct-75 - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+		addStartObs(new Date("10/12/1975"));
+		addStopObs(new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 16-Oct-75"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -142,10 +167,10 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatTwoStartsFollowedByOneStop() throws Exception {
-		addDateObs(START_CONCEPT, new Date("10/12/1975"));
-		addDateObs(START_CONCEPT, new Date("10/14/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
-		Assert.assertEquals(new Result("12-Oct-75 - ;14-Oct-75 - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+		addStartObs(new Date("10/12/1975"));
+		addStartObs(new Date("10/14/1975"));
+		addStopObs(new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - Unknown;14-Oct-75 - 16-Oct-75"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -154,10 +179,10 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatOneStartFollowedByTwoStops() throws Exception {
-		addDateObs(START_CONCEPT, new Date("10/12/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/14/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/16/1975"));
-		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75; - 16-Oct-75;"), rule.getResult(PATIENT_ID));
+		addStartObs(new Date("10/12/1975"));
+		addStopObs(new Date("10/14/1975"));
+		addStopObs(new Date("10/16/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;Unknown - 16-Oct-75"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -166,11 +191,11 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldProperlyFormatTwoStartAndStopPeriods() throws Exception {
-		addDateObs(START_CONCEPT, new Date("10/12/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/14/1975"));
-		addDateObs(START_CONCEPT, new Date("10/16/1975"));
-		addDateObs(STOP_CONCEPT, new Date("10/18/1975"));
-		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;16-Oct-75 - 18-Oct-75;"), rule.getResult(PATIENT_ID));
+		addStartObs(new Date("10/12/1975"));
+		addStopObs(new Date("10/14/1975"));
+		addStartObs(new Date("10/16/1975"));
+		addStopObs(new Date("10/18/1975"));
+		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;16-Oct-75 - 18-Oct-75"), rule.getResult(PATIENT_ID));
 	}
 
 	/**

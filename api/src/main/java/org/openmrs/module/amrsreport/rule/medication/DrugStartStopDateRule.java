@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,44 +61,70 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 		// set up query for observations in order by ascending date
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{startConcept, stopConcept}));
+		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{startConcept}));
 		MohFetchRestriction fetchRestriction = new MohFetchRestriction();
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
-		// get the observations
-		List<Obs> observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+		// get the start observations
+		List<Obs> startObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		String ret = "";
+		// get the stop observations
+		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{stopConcept}));
+		List<Obs> stopObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+
 		boolean wasStart = true;
 
-		for (Obs obs : observations) {
-			String formattedDate = MohRuleUtils.formatdates(obs.getObsDatetime());
+		Iterator<Obs> startObs = startObservations.iterator();
+		Iterator<Obs> stopObs = stopObservations.iterator();
 
-			if (obs.getConcept().equals(startConcept)) {
-				if (wasStart) {
-					if (ret.equals(""))
-						ret += formattedDate + " - ";
-					else
-						ret += (";" + formattedDate + " - ");
-				} else {
-					ret += (formattedDate + " - ");
-				}
-				wasStart = true;
-			} else {
-				if (ret.equals("")) {
-					ret += (" - " + formattedDate + ";");
-				} else {
-					if (wasStart) {
-						ret += (formattedDate + ";");
+		List<Date[]> ranges = new ArrayList<Date[]>();
+		Date currentStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
+		Date currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
+
+		while (currentStartDate != null || currentStopDate != null) {
+
+			if (currentStopDate != null) {
+				// we are dealing with a real stop date
+				if (currentStartDate == null || currentStopDate.before(currentStartDate)) {
+					// start date is either empty or after the stop date
+					ranges.add(new Date[]{null, currentStopDate});
+					currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
+				} else if (currentStartDate != null) {
+					// start date is after start date and is not null
+					Date nextStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
+					if (nextStartDate != null && currentStopDate.after(nextStartDate)) {
+						// next start date exists and is after stop date
+						ranges.add(new Date[]{currentStartDate, null});
 					} else {
-						ret += (" - " + formattedDate + ";");
+						// current start date and stop date are good
+						ranges.add(new Date[]{currentStartDate, currentStopDate});
+						currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
 					}
+					currentStartDate = nextStartDate;
 				}
-				wasStart = false;
+			} else if (currentStartDate != null) {
+				// no more stop dates
+				ranges.add(new Date[]{currentStartDate, null});
+				currentStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
 			}
 		}
 
-		return new Result(ret);
+		// build the response
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (Date[] range : ranges) {
+			if (first) {
+				first = false;
+			} else {
+				sb.append(";");
+			}
+
+			sb.append(MohRuleUtils.formatdates(range[0]));
+			sb.append(" - ");
+			sb.append(MohRuleUtils.formatdates(range[1]));
+		}
+
+		return new Result(sb.toString());
 	}
 
 	/**
