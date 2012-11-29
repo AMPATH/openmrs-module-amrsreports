@@ -17,10 +17,8 @@ package org.openmrs.module.amrsreport.rule.collection;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
@@ -31,7 +29,6 @@ import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,23 +75,16 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 
 	public static final String ANTENATAL_CARE = "ANTENATAL CARE";
 
+	@Autowired
 	private MohCoreService mohCoreService;
-
-	public void setMohCoreService(MohCoreService mohCoreService) {
-		this.mohCoreService = mohCoreService;
-	}
-
-	public MohPregnancyPMTCReferralRule() {
-		setMohCoreService(Context.getService(MohCoreService.class));
-	}
 
 	/**
 	 * @param context
 	 * @param patientId
 	 * @param parameters
 	 * @return
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 * @should return due date for patient with one pregnancy
+	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Override
 	protected Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) {
@@ -108,31 +98,27 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		// get the observations
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction);
 
-            for (Obs observation : observations) {
-		Date dueDate = null;
+		// instantiate a patient snapshot
+		MohPregnancyPMTCReferralRuleSnapshot snapshot = new MohPregnancyPMTCReferralRuleSnapshot();
 
-                    if (observation.getConcept().equals(getCachedConcept(ESTIMATED_DATE_OF_CONFINEMENT)))
-                            dueDate = observation.getValueDatetime();
-                    else if (observation.getConcept().equals(getCachedConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)))
+		// set up the result
+		Result result = new Result();
+
+		for (Obs observation : observations) {
+			Date dueDate = null;
+
+			if (observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT)))
+				dueDate = observation.getValueDatetime();
+			else if (observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)))
 				dueDate = observation.getValueDatetime();
 
-                    if (mohPregnancyPMTCReferralRuleSnapshot.consume(observation))
-				result = new Result(new Date(), Result.Datatype.DATETIME, Boolean.TRUE, null, dueDate, null, "PMTCT", null);
+			if (snapshot.consume(observation))
+				result.add(new Result(new Date(), Result.Datatype.DATETIME, Boolean.TRUE, null, dueDate, null, "PMTCT", null));
 			else
-				result = new Result(new Date(), Result.Datatype.DATETIME, Boolean.FALSE, null, null, null, StringUtils.EMPTY, null);
+				result.add(new Result(new Date(), Result.Datatype.DATETIME, Boolean.FALSE, null, null, null, StringUtils.EMPTY, null));
 		}
 
 		return result;
-	}
-
-		}
-
-		}
-
-		}
-
-
-		}
 	}
 
 	private Collection<OpenmrsObject> getQuestionConcepts() {
