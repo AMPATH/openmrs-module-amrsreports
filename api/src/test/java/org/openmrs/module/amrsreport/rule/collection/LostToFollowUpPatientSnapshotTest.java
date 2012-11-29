@@ -1,14 +1,17 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
@@ -22,6 +25,14 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 
 	public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
 	public static final String CONCEPT_AMPATH = "AMPATH";
+
+	@Before
+	public void setup() {
+		EncounterType encounterType = new EncounterType();
+		encounterType.setName(MohEvaluableNameConstants.ENCOUNTER_TYPE_DEATH_REPORT);
+		encounterType.setDescription("foo");
+		Context.getEncounterService().saveEncounterType(encounterType);
+	}
 
 	/**
 	 * @verifies find out if a particular Obs is consumed
