@@ -56,10 +56,8 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 
 		//pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		obsRestrictions.put("concept",
-				(Collection<OpenmrsObject>) Arrays.asList(new Concept[]{CONCEPT_ENZYME, CONCEPT_RAPID}));
-		obsRestrictions.put("valueCoded",
-				(Collection<OpenmrsObject>) Arrays.asList(new Concept[]{CONCEPT_POSITIVE}));
+		obsRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_ENZYME, CONCEPT_RAPID}));
+		obsRestrictions.put("valueCoded", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_POSITIVE}));
 
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
 
