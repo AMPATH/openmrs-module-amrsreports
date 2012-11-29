@@ -2,119 +2,104 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.Patient;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreport.rule.collection.MohLostToFollowUpRule;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.Concept;
-import org.openmrs.ConceptAnswer;
-import org.openmrs.ConceptName;
 import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
-import org.openmrs.api.PatientSetService;
-
+import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
-import java.lang.String;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.openmrs.logic.result.Result;
 import java.util.Set;
+
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 11/15/12
- * Time: 10:16 AM
- * To change this template use File | Settings | File Templates.
+ * Test file for MohLostToFollowUpRule
  */
 public class MohLostToFollowUpRuleTest extends BaseModuleContextSensitiveTest {
 
-    public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
-    public static final String CONCEPT_AMPATH = "AMPATH";
+	public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
+	public static final String CONCEPT_AMPATH = "AMPATH";
 
 
-    /**
-     * @verifies get date and reason why a patient was lost
-     * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldGetDateAndReasonWhyAPatientWasLost() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+	/**
+	 * @verifies get date and reason why a patient was lost
+	 * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldGetDateAndReasonWhyAPatientWasLost() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
-        Patient patient = Context.getPatientService().getPatient(2);
+		Patient patient = Context.getPatientService().getPatient(2);
 
-        patient.setDead(true);
+		patient.setDead(true);
 
-        patient.setDeathDate(new Date());
+		patient.setDeathDate(new Date());
 
-        Assert.assertNotNull(patient) ;
-        Assert.assertTrue("The patient is not dead",patient.isDead());
+		Assert.assertNotNull(patient);
+		Assert.assertTrue("The patient is not dead", patient.isDead());
 
-        MohLostToFollowUpRule lostToFollowUpRule = new MohLostToFollowUpRule();
-        String result= lostToFollowUpRule.evaluate(null,patient.getId(), null).toString();
-        String expectedRes ="DEAD | " + sdf.format(new Date());
+		MohLostToFollowUpRule lostToFollowUpRule = new MohLostToFollowUpRule();
+		String result = lostToFollowUpRule.evaluate(null, patient.getId(), null).toString();
+		String expectedRes = "DEAD | " + sdf.format(new Date());
 
-        Assert.assertTrue(result, result.equals(expectedRes));
+		Assert.assertTrue(result, result.equals(expectedRes));
+	}
 
-    }
+	@Test
+	public void evaluateUsingObs() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
-    @Test
-    public void evaluateUsingObs() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+		Patient patient2 = Context.getPatientService().getPatient(8);
+		patient2.setDead(false);
 
-        Patient patient2 = Context.getPatientService().getPatient(8);
-        patient2.setDead(false);
+		Assert.assertNotNull(patient2);
+		Assert.assertTrue("The patient should be alive", !(patient2.isDead()));
 
-        Assert.assertNotNull(patient2) ;
-        Assert.assertTrue("The patient should be alive",!(patient2.isDead()));
+		MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
+				CONCEPT_AMPATH,
+				"NON-AMPATH"
+		});
 
+		ConceptService conceptService = Context.getConceptService();
 
-        MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
-                CONCEPT_AMPATH,
-                "NON-AMPATH"
-        });
+		EncounterService service = Context.getEncounterService();
 
-        ConceptService conceptService = Context.getConceptService();
+		Encounter sampleEncounter = new Encounter();
+		Date encounterDate = new Date();
+		sampleEncounter.setEncounterDatetime(encounterDate);
+		sampleEncounter.setPatient(patient2);
+		sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
 
-        EncounterService service = Context.getEncounterService();
+		ObsService obsService = Context.getObsService();
 
-        Encounter sampleEncounter = new Encounter() ;
-        Date encounterDate = new Date() ;
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient2);
-        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
+		obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
+		obs.setObsDatetime(new Date());
+		obs.setEncounter(sampleEncounter);
 
-        ObsService obsService = Context.getObsService();
+		//sampleEncounter.setObs(allObs);
 
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
-        obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
-        obs.setObsDatetime(new Date());
-        obs.setEncounter(sampleEncounter);
+		Encounter resEncounter = service.saveEncounter(sampleEncounter);
 
-        //sampleEncounter.setObs(allObs);
+		Assert.assertNotNull("The encounter was not saved", resEncounter.getUuid() != null);
 
-        Encounter resEncounter=service.saveEncounter(sampleEncounter);
+		Assert.assertNotNull("No Obs was saved", resEncounter.getObs().size() > 0);
 
-        Assert.assertNotNull("The encounter was not saved",resEncounter.getUuid()!=null);
+		Assert.assertTrue("The patient is dead", patient2.getDeathDate() == null);
 
-        Assert.assertNotNull("No Obs was saved",resEncounter.getObs().size()>0);
+		MohLostToFollowUpRule testTransferService = new MohLostToFollowUpRule();
 
-        Assert.assertTrue("The patient is dead",patient2.getDeathDate()==null);
+		Set<Obs> savedObs = resEncounter.getObs();
 
-        MohLostToFollowUpRule testTransferService = new MohLostToFollowUpRule();
+		String transferResult = testTransferService.evaluate(null, patient2.getId(), null).toString();
 
-        Set<Obs> savedObs = resEncounter.getObs();
+		String expectedTransferRes = "TO | (Ampath) " + sdf.format(obs.getObsDatetime());
 
-        String transferResult= testTransferService.evaluate(null,patient2.getId(), null).toString();
-
-        String expectedTransferRes ="TO | (Ampath) " + sdf.format(obs.getObsDatetime());
-
-        //Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
-
-
-    }
+		//Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
+	}
 }

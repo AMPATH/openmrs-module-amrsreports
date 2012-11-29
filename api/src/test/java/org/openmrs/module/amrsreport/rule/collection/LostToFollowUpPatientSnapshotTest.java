@@ -2,152 +2,137 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.module.amrsreport.rule.collection.LostToFollowUpPatientSnapshot;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
-import org.openmrs.Concept;
-import org.openmrs.ConceptAnswer;
-import org.openmrs.ConceptName;
 import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
-import org.openmrs.api.PatientSetService;
-import java.util.Set;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
-import org.openmrs.api.context.Context;
-import org.openmrs.Patient;
 
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 11/20/12
- * Time: 11:25 AM
- * To change this template use File | Settings | File Templates.
+ * Unit tests for LostToFollowUpPatientSnapshot
  */
 public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiveTest {
 
-    public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
-    public static final String CONCEPT_AMPATH = "AMPATH";
-    /**
-     * @verifies find out if a particular Obs is consumed
-     * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Obs)
-     */
-    @Test
-    public void consume_shouldFindOutIfAParticularObsIsConsumed() throws Exception {
+	public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
+	public static final String CONCEPT_AMPATH = "AMPATH";
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+	/**
+	 * @verifies find out if a particular Obs is consumed
+	 * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Obs)
+	 */
+	@Test
+	public void consume_shouldFindOutIfAParticularObsIsConsumed() throws Exception {
 
-        Patient patient2 = Context.getPatientService().getPatient(8);
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
+		Patient patient2 = Context.getPatientService().getPatient(8);
 
-        Assert.assertNotNull(patient2) ;
-        Assert.assertTrue("The patient should be alive",!(patient2.isDead()));
+		Assert.assertNotNull(patient2);
+		Assert.assertTrue("The patient should be alive", !(patient2.isDead()));
 
+		MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
+				CONCEPT_AMPATH,
+				"NON-AMPATH"
+		});
 
-        MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
-                CONCEPT_AMPATH,
-                "NON-AMPATH"
-        });
+		ConceptService conceptService = Context.getConceptService();
 
-        ConceptService conceptService = Context.getConceptService();
+		EncounterService service = Context.getEncounterService();
 
-        EncounterService service = Context.getEncounterService();
+		Encounter sampleEncounter = new Encounter();
+		Date encounterDate = new Date();
+		sampleEncounter.setEncounterDatetime(encounterDate);
+		sampleEncounter.setPatient(patient2);
+		sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
 
-        Encounter sampleEncounter = new Encounter() ;
-        Date encounterDate = new Date() ;
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient2);
-        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+		ObsService obsService = Context.getObsService();
 
-        ObsService obsService = Context.getObsService();
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
+		obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
+		obs.setObsDatetime(new Date());
+		obs.setEncounter(sampleEncounter);
 
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
-        obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
-        obs.setObsDatetime(new Date());
-        obs.setEncounter(sampleEncounter);
+		//sampleEncounter.setObs(allObs);
 
-        //sampleEncounter.setObs(allObs);
+		Encounter resEncounter = service.saveEncounter(sampleEncounter);
 
-        Encounter resEncounter=service.saveEncounter(sampleEncounter);
+		Assert.assertNotNull("The encounter was not saved", resEncounter.getUuid() != null);
 
-        Assert.assertNotNull("The encounter was not saved",resEncounter.getUuid()!=null);
+		Assert.assertNotNull("No Obs was saved", resEncounter.getObs().size() > 0);
 
-        Assert.assertNotNull("No Obs was saved",resEncounter.getObs().size()>0);
+		Assert.assertTrue("The patient is dead", patient2.getDeathDate() == null);
 
-        Assert.assertTrue("The patient is dead",patient2.getDeathDate()==null);
+		LostToFollowUpPatientSnapshot samplePatientSnapshot = new LostToFollowUpPatientSnapshot();
+		samplePatientSnapshot.consume(obs);
 
-        LostToFollowUpPatientSnapshot samplePatientSnapshot = new LostToFollowUpPatientSnapshot();
-        samplePatientSnapshot.consume(obs);
+		String transferResult = samplePatientSnapshot.getProperty("reason").toString();
 
+		String expectedTransferRes = "TO | (Ampath) " + sdf.format(obs.getObsDatetime());
 
-        String transferResult= samplePatientSnapshot.getProperty("reason").toString();
+		Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
+	}
 
-        String expectedTransferRes ="TO | (Ampath) " + sdf.format(obs.getObsDatetime());
+	/**
+	 * @verifies test if a given encounter is consumed
+	 * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Encounter)
+	 */
+	@Test
+	public void consume_shouldTestIfAGivenEncounterIsConsumed() throws Exception {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
-        Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
-    }
+		Patient patient2 = Context.getPatientService().getPatient(8);
 
-    /**
-     * @verifies test if a given encounter is consumed
-     * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Encounter)
-     */
-    @Test
-    public void consume_shouldTestIfAGivenEncounterIsConsumed() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+		Assert.assertNotNull(patient2);
+		Assert.assertTrue("The patient should be alive", !(patient2.isDead()));
 
-        Patient patient2 = Context.getPatientService().getPatient(8);
+		MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
+				CONCEPT_AMPATH,
+				"NON-AMPATH"
+		});
 
+		ConceptService conceptService = Context.getConceptService();
 
-        Assert.assertNotNull(patient2) ;
-        Assert.assertTrue("The patient should be alive",!(patient2.isDead()));
+		EncounterService service = Context.getEncounterService();
 
+		Encounter sampleEncounter = new Encounter();
+		Date encounterDate = new Date();
+		sampleEncounter.setEncounterDatetime(encounterDate);
+		sampleEncounter.setPatient(patient2);
+		sampleEncounter.setEncounterType(service.getEncounterType(31));
 
-        MohTestUtils.createQuestion(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, new String[]{
-                CONCEPT_AMPATH,
-                "NON-AMPATH"
-        });
+		ObsService obsService = Context.getObsService();
 
-        ConceptService conceptService = Context.getConceptService();
+		Obs obs = new Obs();
+		obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
+		obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
+		obs.setObsDatetime(new Date());
+		obs.setEncounter(sampleEncounter);
 
-        EncounterService service = Context.getEncounterService();
+		//sampleEncounter.setObs(allObs);
 
-        Encounter sampleEncounter = new Encounter() ;
-        Date encounterDate = new Date() ;
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient2);
-        sampleEncounter.setEncounterType(service.getEncounterType(31));
+		Encounter resEncounter = service.saveEncounter(sampleEncounter);
 
-        ObsService obsService = Context.getObsService();
+		Assert.assertNotNull("The encounter was not saved", resEncounter.getUuid() != null);
 
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
-        obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
-        obs.setObsDatetime(new Date());
-        obs.setEncounter(sampleEncounter);
+		Assert.assertNotNull("No Obs was saved", resEncounter.getObs().size() > 0);
 
-        //sampleEncounter.setObs(allObs);
+		Assert.assertTrue("The patient is dead", patient2.getDeathDate() == null);
 
-        Encounter resEncounter=service.saveEncounter(sampleEncounter);
+		LostToFollowUpPatientSnapshot samplePatientSnapshot = new LostToFollowUpPatientSnapshot();
+		samplePatientSnapshot.consume(sampleEncounter);
 
-        Assert.assertNotNull("The encounter was not saved",resEncounter.getUuid()!=null);
+		String transferResult = samplePatientSnapshot.getProperty("reason").toString();
 
-        Assert.assertNotNull("No Obs was saved",resEncounter.getObs().size()>0);
+		String expectedTransferRes = "DEAD | " + sdf.format(sampleEncounter.getEncounterDatetime());
 
-        Assert.assertTrue("The patient is dead",patient2.getDeathDate()==null);
-
-        LostToFollowUpPatientSnapshot samplePatientSnapshot = new LostToFollowUpPatientSnapshot();
-        samplePatientSnapshot.consume(sampleEncounter);
-
-
-        String transferResult= samplePatientSnapshot.getProperty("reason").toString();
-
-        String expectedTransferRes ="DEAD | " + sdf.format(sampleEncounter.getEncounterDatetime());
-
-        Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
-    }
+		Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
+	}
 }
