@@ -13,7 +13,8 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
-
+import org.openmrs.Location;
+import org.openmrs.api.LocationService;
 import java.lang.Exception;
 import java.lang.String;
 
@@ -72,14 +73,17 @@ public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTe
 
         PatientIdentifierType pit = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
 
-        PatientIdentifier pi = new PatientIdentifier("11740-00001", pit, null);
-        pi.setPatient(patient1);
+        Location location = Context.getLocationService().getLocation(1);
+
+        PatientIdentifier pi = new PatientIdentifier("11740-00001", pit, location);
+        patient1.addIdentifier(pi);
+
 
         patientService.savePatient(patient1);
+        Context.flushSession();
 
-
-        String result1 = mohUniquePatientNumberRule.evaluate(null, patient1.getId(), null).toString();
-        String expectedResult1 = "11740-00001";
-        Assert.assertEquals("The two identifiers are not equal",expectedResult1,result1);
+        Result result1 = mohUniquePatientNumberRule.evaluate(null, patient1.getId(), null);
+        Result  expectedResult1 = new Result("11740-00001");
+        Assert.assertEquals("The two identifiers are not equal",expectedResult1.toString(),result1.toString());
     }
 }
