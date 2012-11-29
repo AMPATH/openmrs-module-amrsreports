@@ -38,6 +38,8 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	private static final long MONTHS_3 = 7889400000L; // 1000 * 60 * 60 * 24 * 30.4375 * 3
 	private static final long MONTHS_6 = 15778800000L; // 1000 * 60 * 60 * 24 * 30.4375 * 6
 
+	private Encounter lastEncounter = null;
+
 	/**
 	 * @param o observation to be consumed
 	 * @return
@@ -45,9 +47,15 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	 */
 	@Override
 	public Boolean consume(Obs o) {
+		Boolean encounterConsumed = false;
+		Encounter encounter = o.getEncounter();
+		if (!OpenmrsUtil.nullSafeEquals(encounter, lastEncounter)) {
+			lastEncounter = encounter;
+			encounterConsumed = this.consume(encounter);
+		}
+
 		Concept concept = o.getConcept();
 		Concept answer = o.getValueCoded();
-
 
 		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
@@ -97,12 +105,13 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 			}
 		}
 
-		return false;
+		return encounterConsumed;
 	}
 
 	@Override
 	public boolean eligible() {
-		return false;
+		// todo put the eligibility requirements in here
+		return true;
 	}
 
 	/**
