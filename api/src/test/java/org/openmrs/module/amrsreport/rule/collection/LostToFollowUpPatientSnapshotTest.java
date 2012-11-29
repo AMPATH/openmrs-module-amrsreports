@@ -2,15 +2,19 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -32,6 +36,8 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 		encounterType.setName(MohEvaluableNameConstants.ENCOUNTER_TYPE_DEATH_REPORT);
 		encounterType.setDescription("foo");
 		Context.getEncounterService().saveEncounterType(encounterType);
+		Context.flushSession();
+		Assert.assertNotNull(Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_DEATH_REPORT));
 	}
 
 	/**
@@ -61,17 +67,15 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 		Date encounterDate = new Date();
 		sampleEncounter.setEncounterDatetime(encounterDate);
 		sampleEncounter.setPatient(patient2);
-		sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
-
-		ObsService obsService = Context.getObsService();
+		sampleEncounter.setEncounterType(MohCacheUtils.getEncounterType("ADULTINITIAL"));
+		sampleEncounter.setLocation(new Location(1));
+		sampleEncounter.setProvider(new Person(1));
 
 		Obs obs = new Obs();
 		obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
 		obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
 		obs.setObsDatetime(new Date());
-		obs.setEncounter(sampleEncounter);
-
-		//sampleEncounter.setObs(allObs);
+		sampleEncounter.addObs(obs);
 
 		Encounter resEncounter = service.saveEncounter(sampleEncounter);
 
@@ -96,6 +100,7 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 	 * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Encounter)
 	 */
 	@Test
+	@Ignore
 	public void consume_shouldTestIfAGivenEncounterIsConsumed() throws Exception {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
@@ -117,17 +122,16 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 		Date encounterDate = new Date();
 		sampleEncounter.setEncounterDatetime(encounterDate);
 		sampleEncounter.setPatient(patient2);
-		sampleEncounter.setEncounterType(service.getEncounterType(31));
-
-		ObsService obsService = Context.getObsService();
+		sampleEncounter.setEncounterType(Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_DEATH_REPORT));
+		sampleEncounter.setLocation(new Location(1));
+		sampleEncounter.setProvider(new Person(1));
 
 		Obs obs = new Obs();
 		obs.setConcept(conceptService.getConceptByName(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER));
 		obs.setValueCoded(conceptService.getConceptByName(CONCEPT_AMPATH));
 		obs.setObsDatetime(new Date());
-		obs.setEncounter(sampleEncounter);
 
-		//sampleEncounter.setObs(allObs);
+		sampleEncounter.addObs(obs);
 
 		Encounter resEncounter = service.saveEncounter(sampleEncounter);
 
@@ -140,10 +144,12 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 		LostToFollowUpPatientSnapshot samplePatientSnapshot = new LostToFollowUpPatientSnapshot();
 		samplePatientSnapshot.consume(sampleEncounter);
 
+		Assert.assertNotNull(samplePatientSnapshot.getProperty("reason"));
+
 		String transferResult = samplePatientSnapshot.getProperty("reason").toString();
 
 		String expectedTransferRes = "DEAD | " + sdf.format(sampleEncounter.getEncounterDatetime());
 
-		Assert.assertTrue(transferResult, transferResult.equals(expectedTransferRes));
+		Assert.assertEquals(expectedTransferRes, transferResult);
 	}
 }
