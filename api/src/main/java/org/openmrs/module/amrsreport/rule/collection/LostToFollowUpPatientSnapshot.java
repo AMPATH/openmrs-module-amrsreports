@@ -29,6 +29,13 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
+	private static final EncounterType encTpInit = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
+	private static final EncounterType encTpRet = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
+	private static final EncounterType encTpDeath = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_DEATH_REPORT);
+
+	private static final long MONTHS_3 = 7889400000L; // 1000 * 60 * 60 * 24 * 30.4375 * 3
+	private static final long MONTHS_6 = 15778800000L; // 1000 * 60 * 60 * 24 * 30.4375 * 6
+
 	/**
 	 * @param o observation to be consumed
 	 * @return
@@ -36,29 +43,28 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	 */
 	@Override
 	public Boolean consume(Obs o) {
-		Concept ob = o.getConcept();
+		Concept concept = o.getConcept();
 		Concept answer = o.getValueCoded();
 
 
-		if (ob.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
+		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
-		} else if (ob.equals(MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY))) {
+		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
-		} else if (ob.equals(MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH))) {
+		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
-		} else if (ob.equals(MohCacheUtils.getConcept(CONCEPT_DECEASED))) {
+		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DECEASED))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
-		} else if (ob.equals(MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED))) {
+		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED))) {
 			this.setProperty("reason", "DEAD | " + sdf.format(o.getObsDatetime()));
 			return true;
 		}
 
-
-		if (ob.equals(MohCacheUtils.getConcept(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER))) {
+		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER))) {
 			if (answer == MohCacheUtils.getConcept(CONCEPT_AMPATH))
 				this.setProperty("reason", "TO | (Ampath) " + sdf.format(o.getObsDatetime()));
 			else
@@ -67,9 +73,9 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 			return true;
 		}
 
-		if (ob.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE).getConceptId())) {
+		if (concept.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE).getConceptId())) {
 			if (sdf.format(o.getObsDatetime()) != null) {
-				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + (long) (1000 * 60 * 60 * 24 * 30.4375 * 3);
+				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
 				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
 				if (requiredTimeToShowup < todayTimeFromSchedule) {
 					this.setProperty("reason", "LTFU | " + sdf.format(o.getValueDatetime()));
@@ -78,9 +84,9 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 			}
 		}
 
-		if (ob.equals(MohCacheUtils.getConcept(CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE))) {
+		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE))) {
 			if (sdf.format(o.getObsDatetime()) != null) {
-				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + (long) (1000 * 60 * 60 * 24 * 30.4375 * 3);
+				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
 				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
 				if (requiredTimeToShowup < todayTimeFromSchedule) {
 					this.setProperty("reason", "LTFU | " + sdf.format(o.getValueDatetime()));
@@ -91,7 +97,6 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
 		return false;
 	}
-
 
 	@Override
 	public boolean eligible() {
@@ -104,27 +109,16 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	 * @should test if a given encounter is consumed
 	 */
 	public Boolean consume(Encounter e) {
-
-		EncounterType encTpInit = Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
-		EncounterType encTpRet = Context.getEncounterService().getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
-		// DEAD
-		EncounterService et = Context.getEncounterService();
-
-		if (et.getEncounterType(31) == e.getEncounterType()) {
+		if (encTpDeath.equals(e.getEncounterType())) {
 			this.setProperty("reason", "DEAD | " + sdf.format(e.getEncounterDatetime()));
 			return true;
-		} else if ((encTpInit == e.getEncounterType()) || (e.getEncounterType() == encTpRet)) {
-			int requiredTimeToShowup = (int) (1000 * 60 * 60 * 24 * 30.4375 * 6);
-			int todayTimeFromEncounter = (int) ((new Date()).getTime() - (e.getEncounterDatetime().getTime()));
-			if (!(requiredTimeToShowup >= todayTimeFromEncounter)) {
+		} else if (encTpInit.equals(e.getEncounterType()) || encTpRet.equals(e.getEncounterType())) {
+			if (Math.abs(new Date().getTime() - e.getEncounterDatetime().getTime()) < MONTHS_6) {
 				this.setProperty("reason", "LTFU | " + sdf.format(e.getEncounterDatetime()));
 				return true;
 			}
-
 		}
-
 		return false;
 	}
-
 
 }
