@@ -52,10 +52,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	private static final Log log = LogFactory.getLog(MohDateAndReasonMedicallyEligibleForARTRule.class);
 
 	public static final String TOKEN = "MOH Date and Reason Medically Eligible For ART";
-	public static final String REASON_CLINICAL = "Clinical Only";
-	public static final String REASON_CLINICAL_CD4 = "Clinical + CD4";
-	public static final String REASON_CLINICAL_CD4_HIV_DNA_PCR = "Clinical + CD4 + HIV DNA PCR";
-	public static final String REASON_CLINICAL_HIV_DNA_PCR = "Clinical + HIV DNA PCR";
 
 	/**
 	 * comparator for sorting observations

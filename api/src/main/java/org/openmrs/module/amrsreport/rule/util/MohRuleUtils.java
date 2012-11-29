@@ -13,13 +13,6 @@
  */
 package org.openmrs.module.amrsreport.rule.util;
 
-import java.text.Format;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,10 +20,16 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Obs;
-import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
+
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  */
@@ -144,7 +143,7 @@ public class MohRuleUtils {
 
     /**
      * determine the age group for a patient at a given date
-     *
+     * @should determine the age group for a patient at a given date
      * @param birthdate birth date of the patient whose age is used in the calculations
      * @param when the date upon which the age should be identified
      * @return the appropriate age group

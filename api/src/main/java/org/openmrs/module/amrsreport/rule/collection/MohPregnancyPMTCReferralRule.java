@@ -108,17 +108,15 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		// get the observations
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		Result result = new Result();
+            for (Obs observation : observations) {
 		Date dueDate = null;
 
-		// iterate over the observations
-		for (Obs observation : observations) {
-
-			if (observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT))
-					|| observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)))
+                    if (observation.getConcept().equals(getCachedConcept(ESTIMATED_DATE_OF_CONFINEMENT)))
+                            dueDate = observation.getValueDatetime();
+                    else if (observation.getConcept().equals(getCachedConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)))
 				dueDate = observation.getValueDatetime();
 
-			if (isPregnant(observation))
+                    if (mohPregnancyPMTCReferralRuleSnapshot.consume(observation))
 				result = new Result(new Date(), Result.Datatype.DATETIME, Boolean.TRUE, null, dueDate, null, "PMTCT", null);
 			else
 				result = new Result(new Date(), Result.Datatype.DATETIME, Boolean.FALSE, null, null, null, StringUtils.EMPTY, null);
@@ -127,91 +125,14 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		return result;
 	}
 
-	private Boolean isPregnant(Obs obs) {
-		Concept concept = obs.getConcept();
-		Date valueDatetime = obs.getValueDatetime();
-		Double valueNumeric = obs.getValueNumeric();
-		Concept valueCoded = obs.getValueCoded();
-
-		// ESTIMATED DATE OF CONFINEMENT (5596)-OBS. DATE)<=42 OR
-		if (concept.equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT))) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(obs.getObsDatetime());
-			calendar.add(Calendar.DATE, 42 * 7);
-			if (calendar.getTime().after(valueDatetime))
-				return true;
 		}
 
-		// ESTIMATED DATE OF CONFINEMENT, ULTRASOUND (6743)-OBS. DATE)<=294 OR
-		if (concept.equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND))) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(obs.getObsDatetime());
-			calendar.add(Calendar.DATE, 294);
-			if (calendar.getTime().after(valueDatetime))
-				return true;
 		}
 
-		// CURRENT PREGNANT (5272)=YES (1065) OR
-		if (concept.equals(MohCacheUtils.getConcept(CURRENT_PREGNANT))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(YES)))
-				return true;
 		}
 
-		// NO OF WEEK OF PREGNANCY (1279)>0 OR
-		if (concept.equals(MohCacheUtils.getConcept(NO_OF_WEEK_OF_PREGNANCY))) {
-			if (valueNumeric > 0)
-				return true;
+
 		}
-
-		// MONTH OF CURRENT GESTATION (5992)>0 OR
-		if (concept.equals(MohCacheUtils.getConcept(MONTH_OF_CURRENT_GESTATION))) {
-			if (valueNumeric > 0)
-				return true;
-		}
-
-		// FUNDAL LENGTH (1855) >0 OR
-		if (concept.equals(MohCacheUtils.getConcept(FUNDAL_LENGTH))) {
-			if (valueNumeric > 0)
-				return true;
-		}
-
-		// PREGNANCY URINE TEST (45)=POSITIVE (703) OR
-		if (concept.equals(MohCacheUtils.getConcept(PREGNANCY_URINE_TEST))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(POSITIVE)))
-				return true;
-		}
-
-		// URGENT MEDICAL ISSUES (1790) = PREGNANCY (44) OR
-		if (concept.equals(MohCacheUtils.getConcept(URGENT_MEDICAL_ISSUES))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(PREGNANCY)))
-				return true;
-		}
-
-		/*// PROBLEM ADDED (6042) = PREGNANCY, ECTOPIC (46) OR
-					if (concept.equals(MohCacheUtils.getConcept(PROBLEM_ADDED))) {
-							if (valueCoded.equals(MohCacheUtils.getConcept(PREGNANCY_ECTOPIC)))
-									return true;
-					}*/
-
-		// FOETAL MOVEMENT (1856)=YES (1065) OR
-		if (concept.equals(MohCacheUtils.getConcept(FOETAL_MOVEMENT))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(YES)))
-				return true;
-		}
-
-		// REASON FOR CURRENT VISIT (1834)=ANTENATAL CARE (1831) OR
-		if (concept.equals(MohCacheUtils.getConcept(REASON_FOR_CURRENT_VISIT))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(ANTENATAL_CARE)))
-				return true;
-		}
-
-		// REASON FOR NEXT VISIT (1835)=ANTENATAL CARE (1831) OR
-		if (concept.equals(MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT))) {
-			if (valueCoded.equals(MohCacheUtils.getConcept(ANTENATAL_CARE)))
-				return true;
-		}
-
-		return false;
 	}
 
 	private Collection<OpenmrsObject> getQuestionConcepts() {
