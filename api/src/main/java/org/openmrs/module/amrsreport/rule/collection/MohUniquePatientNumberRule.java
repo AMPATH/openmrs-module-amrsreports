@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -29,16 +28,15 @@ public class MohUniquePatientNumberRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Unique Patient Number";
 
+	private static final PatientIdentifierType cccPatientIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("mflgenerator.mfl"));
+
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		AdministrationService ams = Context.getAdministrationService();
-
 		Patient patient = Context.getPatientService().getPatient(patientId);
-		PatientIdentifierType pit = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
-		List<PatientIdentifier> mflIdentifiers = patient.getPatientIdentifiers(pit);
+		List<PatientIdentifier> mflIdentifiers = patient.getPatientIdentifiers(cccPatientIdentifierType);
 
 		if (mflIdentifiers.isEmpty()) {
 			log.error("CCC Number not found for patient " + patientId);

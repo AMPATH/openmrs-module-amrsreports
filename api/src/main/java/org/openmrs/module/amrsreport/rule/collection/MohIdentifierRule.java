@@ -32,17 +32,13 @@ public class MohIdentifierRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Ampath Identifier";
 
+	private static final PatientIdentifierType cccIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("mflgenerator.mfl"));
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
-		AdministrationService ams = Context.getAdministrationService();
-		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
 
-		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
-
-		for (PatientIdentifier pid : listPi) {
-
-			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), patientIdentifierType)) {
+		for (PatientIdentifier pid : patient.getActiveIdentifiers()) {
+			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), cccIdentifierType)) {
 				return new Result(pid.getIdentifier());
 			}
 		}
