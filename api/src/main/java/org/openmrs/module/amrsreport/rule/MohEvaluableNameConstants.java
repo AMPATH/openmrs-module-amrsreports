@@ -308,6 +308,8 @@ public interface MohEvaluableNameConstants {
 	public static final String PEDS_WHO_SPECIFIC_CONDITION_QUERY = "PEDS WHO SPECIFIC CONDITION QUERY";
 	public static final String DAPSONE = "DAPSONE";
 
+	public static final String UNKNOWN = "Unknown";
+
 	// Age group for use in some rules
 	public static enum AgeGroup {
 		UNDER_EIGHTEEN_MONTHS,
