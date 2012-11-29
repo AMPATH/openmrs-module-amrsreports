@@ -9,6 +9,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.observation.PatientSnapshot;
+import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.web.OpenmrsBindingInitializer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,10 +111,13 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	 * @should test if a given encounter is consumed
 	 */
 	public Boolean consume(Encounter e) {
-		if (encTpDeath.equals(e.getEncounterType())) {
+		if (e == null)
+			return false;
+
+		if (OpenmrsUtil.nullSafeEquals(encTpDeath, e.getEncounterType())) {
 			this.setProperty("reason", "DEAD | " + sdf.format(e.getEncounterDatetime()));
 			return true;
-		} else if (encTpInit.equals(e.getEncounterType()) || encTpRet.equals(e.getEncounterType())) {
+		} else if (OpenmrsUtil.nullSafeEquals(encTpInit, e.getEncounterType()) || OpenmrsUtil.nullSafeEquals(encTpRet, e.getEncounterType())) {
 			if (Math.abs(new Date().getTime() - e.getEncounterDatetime().getTime()) < MONTHS_6) {
 				this.setProperty("reason", "LTFU | " + sdf.format(e.getEncounterDatetime()));
 				return true;
