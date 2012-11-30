@@ -2,44 +2,33 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.ObsService;
-import org.openmrs.api.context.Context;
+import org.openmrs.Concept;
+import org.openmrs.EncounterType;
+import org.openmrs.Obs;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
-import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
-import org.openmrs.Concept;
-import org.openmrs.Patient;
-import org.openmrs.Person;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Obs;
-import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreport.rule.medication.DrugStartStopDateRule;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Nicholas Ingosi Magaja
- * Date: 5/29/12
- * Time: 9:03 AM
- * To change this template use File | Settings | File Templates.
- */
-public class MohPEPStartStopDateRule extends MohEvaluableRule {
+public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 
 	private static final Log log = LogFactory.getLog(MohPEPStartStopDateRule.class);
 
 	public static final String TOKEN = "MOH PEP Start Stop Date";
-
-	private Map<String, Concept> cachedConcepts = null;
-	private List<Concept> cachedQuestions = null;
-
-	private Map<String, EncounterType> cachedEncounterType = null;
-	//private List<Encounter> cachedEncounters = null;
-
 
 	public static final String POST_EXPOSURE_INITIAL_FORM = "PEPINITIAL";
 	public static final String POST_EXPOSURE_RETURN_FORM = "PEPRETURN";
@@ -67,126 +56,64 @@ public class MohPEPStartStopDateRule extends MohEvaluableRule {
 	public static final String INTERRUPTED = "INTERRUPTED";
 	public static final String UNKNOWN = "UNKNOWN";
 
-	private static class SortByDateComparator implements Comparator<Object> {
+	private static final List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
+			MohCacheUtils.getConcept(ANTIRETROVIRAL_THERAPY_STATUS),
+			MohCacheUtils.getConcept(ARVs_RECOMMENDED_FOR_PEP),
+			MohCacheUtils.getConcept(REASON_ANTIRETROVIRALS_STOPPED)
+	});
 
-		@Override
-		public int compare(Object a, Object b) {
-			Obs ao = (Obs) a;
-			Obs bo = (Obs) b;
-			return ao.getObsDatetime().compareTo(bo.getObsDatetime());
-		}
-	}
+	private static final List<OpenmrsObject> encounterTypes = Arrays.<OpenmrsObject>asList(new EncounterType[]{
+			MohCacheUtils.getEncounterType(POST_EXPOSURE_INITIAL_FORM),
+			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
+	});
+
+	@Autowired
+	MohCoreService mohCoreService;
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		ObsService obsService = Context.getObsService();
 
-		Patient patient = Context.getPatientService().getPatient(patientId);
-		String pepDates = "";
-		boolean startPep = true;
+		//pull relevant observations then loop while checking concepts
+		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		obsRestrictions.put("concept", questionConcepts);
+		obsRestrictions.put("encounter.encounterType", encounterTypes);
+		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
 
-		List<Obs> observations = obsService.getObservations(Arrays.<Person>asList(patient), getCachedEncounters(patient), getQuestionConcepts(),
-				null, null, null, null, null, null, null, null, false);
-
-		Collections.sort(observations, new SortByDateComparator());
+		List<Obs> startObs = new ArrayList<Obs>();
+		List<Obs> stopObs = new ArrayList<Obs>();
 
 		for (Obs observation : observations) {
+			Concept value = observation.getValueCoded();
 
-			if (
-					(observation.getValueCoded().equals(MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(NOT_ON_ANTIRETROVIRAL_THERAPY)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(INTERRUPTED)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(UNKNOWN)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(ZIDOVUDINE_AND_LAMIVUDINE)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(LOPINAVIR_AND_RITONAVIR)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(OTHER_ANTIRETROVIRAL_DRUG)))
+			if (value.equals(MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY))
+					|| value.equals(MohCacheUtils.getConcept(NOT_ON_ANTIRETROVIRAL_THERAPY))
+					|| value.equals(MohCacheUtils.getConcept(INTERRUPTED))
+					|| value.equals(MohCacheUtils.getConcept(UNKNOWN))
+					|| value.equals(MohCacheUtils.getConcept(ZIDOVUDINE_AND_LAMIVUDINE))
+					|| value.equals(MohCacheUtils.getConcept(LOPINAVIR_AND_RITONAVIR))
+					|| value.equals(MohCacheUtils.getConcept(OTHER_ANTIRETROVIRAL_DRUG))
+					) {
+				startObs.add(observation);
+			} else if (value.equals(MohCacheUtils.getConcept(REGIMEN_FAILURE))
+					|| value.equals(MohCacheUtils.getConcept(WEIGHT_CHANGE))
+					|| value.equals(MohCacheUtils.getConcept(TOXICITY_DRUG))
+					|| value.equals(MohCacheUtils.getConcept(OTHER_NON_CODED))
+					|| value.equals(MohCacheUtils.getConcept(COMPLETED_TOTAL_PMTCT))
+					|| value.equals(MohCacheUtils.getConcept(POOR_ADHERENCE_NOS))
+					|| value.equals(MohCacheUtils.getConcept(ADD_DRUGS))
+					|| value.equals(MohCacheUtils.getConcept(FACILITY_STOCKED_OUT_OF_MEDICATION))
+					|| value.equals(MohCacheUtils.getConcept(TUBERCULOSIS))
+					|| value.equals(MohCacheUtils.getConcept(PREGNANCY_RISK))
+					|| value.equals(MohCacheUtils.getConcept(FIRST_TRIMESTER_OF_PREGNANCY))
+					|| value.equals(MohCacheUtils.getConcept(PATIENT_REFUSAL))
+					|| value.equals(MohCacheUtils.getConcept(COMPLETED))
 					) {
 
-
-				if (startPep) {
-					if (pepDates.equals(""))
-						pepDates += MohRuleUtils.formatdates(observation.getObsDatetime()) + " - ";
-					else
-						pepDates += ";" + (MohRuleUtils.formatdates(observation.getObsDatetime())) + " - ";
-				} else {
-					pepDates += MohRuleUtils.formatdates(observation.getObsDatetime()) + " - ";
-				}
+				stopObs.add(observation);
 			}
-			if (
-					(observation.getValueCoded().equals(MohCacheUtils.getConcept(REGIMEN_FAILURE)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(WEIGHT_CHANGE)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(TOXICITY_DRUG)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(OTHER_NON_CODED)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(COMPLETED_TOTAL_PMTCT)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(POOR_ADHERENCE_NOS)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(ADD_DRUGS)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(FACILITY_STOCKED_OUT_OF_MEDICATION)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(TUBERCULOSIS)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(PREGNANCY_RISK)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(FIRST_TRIMESTER_OF_PREGNANCY)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(PATIENT_REFUSAL)))
-							|| (observation.getValueCoded().equals(MohCacheUtils.getConcept(COMPLETED)))
-					) {
-
-				startPep = false;
-				if (pepDates.equals("")) {
-					pepDates += (" - " + (MohRuleUtils.formatdates(observation.getObsDatetime())) + ";");
-				} else {
-					if (startPep) {
-						pepDates += ((MohRuleUtils.formatdates(observation.getObsDatetime())) + ";");
-					} else {
-						pepDates += (" - " + (MohRuleUtils.formatdates(observation.getObsDatetime())) + ";");
-					}
-
-				}
-
-			}
-
-
 		}
 
-		return new Result(pepDates);
-
-
-	}
-
-	private List<Concept> getQuestionConcepts() {
-		return Arrays.asList(
-				new Concept[]{
-						MohCacheUtils.getConcept(ANTIRETROVIRAL_THERAPY_STATUS),
-						MohCacheUtils.getConcept(ARVs_RECOMMENDED_FOR_PEP),
-						MohCacheUtils.getConcept(REASON_ANTIRETROVIRALS_STOPPED)
-				});
-	}
-
-	private EncounterType getCachedEncounterType(String name) {
-
-		if (cachedEncounterType == null)
-			cachedEncounterType = new HashMap<String, EncounterType>();
-		if (!cachedEncounterType.containsKey(name))
-			cachedEncounterType.put(name, Context.getEncounterService().getEncounterType(name));
-		return cachedEncounterType.get(name);
-
-	}
-
-	private List<Encounter> getCachedEncounters(Patient patient) {
-		List<Encounter> pepinitialreturn = new ArrayList<Encounter>();
-		List<Encounter> cachedEncounters = new ArrayList<Encounter>();
-
-
-		cachedEncounters.addAll(Context.getEncounterService().getEncountersByPatient(patient));
-
-		//log.info("All encounters for patient "+patient.getPatientId()+"  is"+cachedEncounters.size());
-
-		for (Encounter encounters : cachedEncounters) {
-
-			if (encounters.getEncounterType().equals(getCachedEncounterType(POST_EXPOSURE_INITIAL_FORM))
-					|| encounters.getEncounterType().equals(getCachedEncounterType(POST_EXPOSURE_RETURN_FORM)))
-
-				pepinitialreturn.add(encounters);
-		}
-
-
-		return pepinitialreturn;
+		return buildResultFromObservations(startObs, stopObs);
 	}
 
 	protected String getEvaluableToken() {

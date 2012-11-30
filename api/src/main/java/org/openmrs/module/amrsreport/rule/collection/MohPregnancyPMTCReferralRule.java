@@ -17,6 +17,7 @@ package org.openmrs.module.amrsreport.rule.collection;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.logic.LogicContext;
@@ -42,38 +43,37 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 	public static final String TOKEN = "MOH Pregnancy PMTC Referral";
 
 	public static final String ESTIMATED_DATE_OF_CONFINEMENT = "ESTIMATED DATE OF CONFINEMENT";
-
 	public static final String ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND = "ESTIMATED DATE OF CONFINEMENT, ULTRASOUND";
-
 	public static final String CURRENT_PREGNANT = "CURRENT PREGNANT";
-
 	public static final String NO_OF_WEEK_OF_PREGNANCY = "NO OF WEEK OF PREGNANCY";
-
 	public static final String FUNDAL_LENGTH = "FUNDAL LENGTH";
-
 	public static final String PREGNANCY_URINE_TEST = "PREGNANCY URINE TEST";
-
 	public static final String URGENT_MEDICAL_ISSUES = "URGENT MEDICAL ISSUES";
-
 	public static final String PROBLEM_ADDED = "PROBLEM ADDED";
-
 	public static final String FOETAL_MOVEMENT = "FOETAL MOVEMENT";
-
 	public static final String REASON_FOR_CURRENT_VISIT = "REASON FOR CURRENT VISIT";
-
 	public static final String REASON_FOR_NEXT_VISIT = "REASON FOR NEXT VISIT";
-
 	public static final String YES = "YES";
-
 	public static final String MONTH_OF_CURRENT_GESTATION = "MONTH OF CURRENT GESTATION";
-
 	public static final String POSITIVE = "POSITIVE";
-
 	public static final String PREGNANCY = "PREGNANCY";
-
 	public static final String PREGNANCY_ECTOPIC = "PREGNANCY, ECTOPIC";
-
 	public static final String ANTENATAL_CARE = "ANTENATAL CARE";
+
+	private static final Collection<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
+			MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),
+			MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND),
+			MohCacheUtils.getConcept(CURRENT_PREGNANT),
+			MohCacheUtils.getConcept(NO_OF_WEEK_OF_PREGNANCY),
+			MohCacheUtils.getConcept(MONTH_OF_CURRENT_GESTATION),
+			MohCacheUtils.getConcept(FUNDAL_LENGTH),
+			MohCacheUtils.getConcept(PREGNANCY_URINE_TEST),
+			MohCacheUtils.getConcept(URGENT_MEDICAL_ISSUES),
+			MohCacheUtils.getConcept(PROBLEM_ADDED),
+			MohCacheUtils.getConcept(FOETAL_MOVEMENT),
+			MohCacheUtils.getConcept(REASON_FOR_CURRENT_VISIT),
+			MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT)
+	});
 
 	@Autowired
 	private MohCoreService mohCoreService;
@@ -91,7 +91,7 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 
 		// set up fetching of observations
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		restrictions.put("concept", getQuestionConcepts());
+		restrictions.put("concept", questionConcepts);
 		MohFetchRestriction fetchRestriction = new MohFetchRestriction();
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
@@ -119,24 +119,6 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		}
 
 		return result;
-	}
-
-	private Collection<OpenmrsObject> getQuestionConcepts() {
-		return Arrays.asList(
-				new OpenmrsObject[]{
-						MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),
-						MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND),
-						MohCacheUtils.getConcept(CURRENT_PREGNANT),
-						MohCacheUtils.getConcept(NO_OF_WEEK_OF_PREGNANCY),
-						MohCacheUtils.getConcept(MONTH_OF_CURRENT_GESTATION),
-						MohCacheUtils.getConcept(FUNDAL_LENGTH),
-						MohCacheUtils.getConcept(PREGNANCY_URINE_TEST),
-						MohCacheUtils.getConcept(URGENT_MEDICAL_ISSUES),
-						MohCacheUtils.getConcept(PROBLEM_ADDED),
-						MohCacheUtils.getConcept(FOETAL_MOVEMENT),
-						MohCacheUtils.getConcept(REASON_FOR_CURRENT_VISIT),
-						MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT)
-				});
 	}
 
 	/**

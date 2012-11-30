@@ -2,9 +2,7 @@ package org.openmrs.module.amrsreport.rule.medication;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
-import org.openmrs.Patient;
-import org.openmrs.Person;
-import org.openmrs.api.ObsService;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -13,41 +11,32 @@ import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
-import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MohFluconazoleStartStopDateRule extends MohEvaluableRule {
+public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 
 	public static final String TOKEN = "MOH Fluconazole Start-Stop Date";
 
-	//START ANSWERS
-	Concept StartDrugs = MohCacheUtils.getConcept(MohEvaluableNameConstants.START_DRUGS);
-	Concept FluconazoleDrug = MohCacheUtils.getConcept(MohEvaluableNameConstants.FLUCONAZOLE);
+	private static final Concept StartDrugs = MohCacheUtils.getConcept(MohEvaluableNameConstants.START_DRUGS);
+	private static final Concept FluconazoleDrug = MohCacheUtils.getConcept(MohEvaluableNameConstants.FLUCONAZOLE);
+	private static final Concept StopDrugs = MohCacheUtils.getConcept(MohEvaluableNameConstants.STOP_ALL);
 
-	//STOP ANSWERS :Not necessary
-	Concept StopDrugs = MohCacheUtils.getConcept(MohEvaluableNameConstants.STOP_ALL);
-
-
-	private static class SortByDateComparator implements Comparator<Object> {
-
-		@Override
-		public int compare(Object a, Object b) {
-			Obs ao = (Obs) a;
-			Obs bo = (Obs) b;
-			return ao.getObsDatetime().compareTo(bo.getObsDatetime());
-		}
-	}
-
+	private static final List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(
+			new Concept[]{
+					MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN),
+					MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED)
+			});
 
 	/**
 	 * MOH Fluconazole Start-Stop Date
@@ -59,75 +48,32 @@ public class MohFluconazoleStartStopDateRule extends MohEvaluableRule {
 	 */
 	@Override
 	protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		ObsService obsService = Context.getObsService();
-		Patient patient = Context.getPatientService().getPatient(patientId);
+		// set up query for observations in order by ascending date
+		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		restrictions.put("concept", questionConcepts);
+		MohFetchRestriction fetchRestriction = new MohFetchRestriction();
+		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
-		//find obs based on the start-Stop dates 
-		List<Obs> obsCol = obsService.getObservations(Arrays.<Person>asList(patient), null, getQuestionConcepts(),
-				null, null, null, null, null, null, null, null, false);
+		// get the start observations
+		List<Obs> observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		Collections.sort(obsCol, new SortByDateComparator());
+		List<Obs> startObs = new ArrayList<Obs>();
+		List<Obs> stopObs = new ArrayList<Obs>();
 
-		List<Obs> uniqueObs = popObs(obsCol);
-
-		String ret = "";
-		boolean wasStart = true;
-		for (Obs observations : uniqueObs) {
-			if ((observations.getValueCoded().equals(StartDrugs)) || (observations.getValueCoded().equals(FluconazoleDrug))) {
-				if (wasStart) {
-					if (ret.equals(""))
-						ret += (MohRuleUtils.formatdates(observations.getObsDatetime()) + " - ");
-					else
-						ret += (";" + (MohRuleUtils.formatdates(observations.getObsDatetime())) + " - ");
-				} else {
-					ret += ((MohRuleUtils.formatdates(observations.getObsDatetime())) + " - ");
-				}
-				wasStart = true;
-			} else if (observations.getValueCoded().equals(StopDrugs)) {
-				if (ret.equals("")) {
-					ret += (" - " + (MohRuleUtils.formatdates(observations.getObsDatetime())) + ";");
-				} else {
-					if (wasStart) {
-						ret += ((MohRuleUtils.formatdates(observations.getObsDatetime())) + ";");
-					} else {
-						ret += (" - " + (MohRuleUtils.formatdates(observations.getObsDatetime())) + ";");
-					}
-				}
-				wasStart = false;
-			} else {
+		// find start and stop observations
+		for (Obs obs : observations) {
+			if (OpenmrsUtil.nullSafeEquals(StartDrugs, obs.getValueCoded()) || OpenmrsUtil.nullSafeEquals(FluconazoleDrug, obs.getValueCoded())) {
+				startObs.add(obs);
+			} else if (OpenmrsUtil.nullSafeEquals(StopDrugs, obs.getValueCoded())) {
+				stopObs.add(obs);
 			}
 		}
-		return new Result(ret);
-	}
-
-	private List<Obs> popObs(List<Obs> listObs) {
-		Set<Date> setObs = new HashSet<Date>();
-		List<Obs> retObs = new ArrayList<Obs>();
-
-		for (Obs obs2 : listObs) {
-			if (!setObs.contains(obs2.getObsDatetime())) {
-				if (obs2.getValueCoded().equals(StartDrugs) || obs2.getValueCoded().equals(FluconazoleDrug) || obs2.getValueCoded().equals(StopDrugs)) {
-					setObs.add(obs2.getObsDatetime());
-					retObs.add(obs2);
-				}
-			}
-		}
-
-		return retObs;
-	}
-
-	private List<Concept> getQuestionConcepts() {
-		return Arrays.asList(
-				new Concept[]{
-						MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN),
-						MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED)
-				});
+		return buildResultFromObservations(startObs, stopObs);
 	}
 
 	protected String getEvaluableToken() {
 		return TOKEN;
 	}
-
 
 	/**
 	 * @see org.openmrs.logic.Rule#getDependencies()
@@ -142,21 +88,17 @@ public class MohFluconazoleStartStopDateRule extends MohEvaluableRule {
 	 *
 	 * @return all parameter that applicable for each rule execution
 	 */
-
 	@Override
 	public Datatype getDefaultDatatype() {
-		// TODO Auto-generated method stub
 		return Datatype.TEXT;
 	}
 
 	public Set<RuleParameterInfo> getParameterList() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getTTL() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

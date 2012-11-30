@@ -38,6 +38,17 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH LTFU-TO-DEAD";
 
+	private List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DATE_OF_DEATH),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DEATH_REPORTED_BY),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_CAUSE_FOR_DEATH),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DECEASED),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_PATIENT_DIED),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER),
+			MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE),
+			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)
+	});
+
 	@Autowired
 	MohCoreService mohCoreService;
 
@@ -58,7 +69,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 
 		//pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		obsRestrictions.put("concept", (Collection<OpenmrsObject>) getQuestionConcepts());
+		obsRestrictions.put("concept", questionConcepts);
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
 
@@ -73,19 +84,6 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 		}
 
 		return new Result("");
-	}
-
-	private List<Concept> getQuestionConcepts() {
-		return Arrays.asList(new Concept[]{
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DATE_OF_DEATH),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DEATH_REPORTED_BY),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_CAUSE_FOR_DEATH),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_DECEASED),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_PATIENT_DIED),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER),
-				MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE),
-				MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)
-		});
 	}
 
 	protected String getEvaluableToken() {

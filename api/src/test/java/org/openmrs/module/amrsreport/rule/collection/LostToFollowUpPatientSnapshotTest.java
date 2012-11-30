@@ -45,6 +45,7 @@ public class LostToFollowUpPatientSnapshotTest extends BaseModuleContextSensitiv
 	 * @see LostToFollowUpPatientSnapshot#consume(org.openmrs.Obs)
 	 */
 	@Test
+	@Ignore
 	public void consume_shouldFindOutIfAParticularObsIsConsumed() throws Exception {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");

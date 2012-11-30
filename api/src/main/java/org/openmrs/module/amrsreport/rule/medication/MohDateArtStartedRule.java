@@ -1,23 +1,9 @@
 package org.openmrs.module.amrsreport.rule.medication;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Concept;
 import org.openmrs.Obs;
-import org.openmrs.Patient;
-import org.openmrs.Person;
-import org.openmrs.api.ObsService;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -28,7 +14,16 @@ import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
-import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MohDateArtStartedRule extends MohEvaluableRule {
 
@@ -36,58 +31,26 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Date ART Started";
 
-	private static class SortByDateComparator implements Comparator<Object> {
-
-		@Override
-		public int compare(Object a, Object b) {
-			Obs ao = (Obs) a;
-			Obs bo = (Obs) b;
-			return ao.getValueDatetime().compareTo(bo.getValueDatetime());
-		}
-	}
+	private static final List<OpenmrsObject> questionConcepts = Collections.<OpenmrsObject>singletonList(MohCacheUtils.getConcept(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE));
 
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		ObsService obsService = Context.getObsService();
-		//find the patient
-		Patient patient = Context.getPatientService().getPatient(patientId);
+		// set up query for observations in order by ascending date
+		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		restrictions.put("concept", questionConcepts);
+		MohFetchRestriction fetchRestriction = new MohFetchRestriction();
+		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
-		//find obs based on the start-Stop dates 
-		List<Obs> obsCol = obsService.getObservations(Arrays.<Person>asList(patient), null, getQuestionConcepts(),
-				null, null, null, null, null, null, null, null, false);
+		// get the start observations
+		List<Obs> observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		Collections.sort(obsCol, new SortByDateComparator());
-
-		List<Obs> uniqueObs = popObs(obsCol);
 		//loop through the obsCol list of obs
 		String ret = "";
-		boolean wasStart = true;
-		for (Obs observations : uniqueObs) {
-			ret += MohRuleUtils.formatdates(observations.getValueDatetime()) + ";";
+		for (Obs obs : observations) {
+			ret += MohRuleUtils.formatdates(obs.getValueDatetime()) + ";";
 		}
 
 		return new Result(ret);
-	}
-
-	private List<Concept> getQuestionConcepts() {
-		return Collections.singletonList(MohCacheUtils.getConcept(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE));
-	}
-
-	//pass to a function setObsPop(obsCol)
-	//loop thru the obsCol and get unique obsValueDateTime > Then add to newSet
-	//return newSet
-	private List<Obs> popObs(List<Obs> listObs) {
-		Set<Date> setObs = new HashSet<Date>();
-		List<Obs> retObs = new ArrayList<Obs>();
-
-		for (Obs obs2 : listObs) {
-			if (!setObs.contains(obs2.getValueDatetime())) {
-				setObs.add(obs2.getValueDatetime());
-				retObs.add(obs2);
-			}
-		}
-
-		return retObs;
 	}
 
 	protected String getEvaluableToken() {
@@ -109,19 +72,15 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 	 */
 	@Override
 	public Datatype getDefaultDatatype() {
-		// TODO Auto-generated method stub
 		return Datatype.DATETIME;
 	}
 
 	public Set<RuleParameterInfo> getParameterList() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getTTL() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

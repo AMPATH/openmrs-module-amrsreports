@@ -72,10 +72,21 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{stopConcept}));
 		List<Obs> stopObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
+		return buildResultFromObservations(startObservations, stopObservations);
+	}
+
+	/**
+	 * creates a Result from two lists, one with start observations and the second with stop observations.
+	 *
+	 * @param starters
+	 * @param stoppers
+	 * @return
+	 */
+	protected Result buildResultFromObservations(List<Obs> starters, List<Obs> stoppers) {
 		boolean wasStart = true;
 
-		Iterator<Obs> startObs = startObservations.iterator();
-		Iterator<Obs> stopObs = stopObservations.iterator();
+		Iterator<Obs> startObs = starters.iterator();
+		Iterator<Obs> stopObs = stoppers.iterator();
 
 		List<Date[]> ranges = new ArrayList<Date[]>();
 		Date currentStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
