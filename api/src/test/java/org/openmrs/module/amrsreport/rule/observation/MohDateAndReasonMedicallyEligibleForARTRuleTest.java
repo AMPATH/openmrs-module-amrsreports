@@ -21,8 +21,7 @@ import java.util.Date;
 
 public class MohDateAndReasonMedicallyEligibleForARTRuleTest extends BaseModuleContextSensitiveTest {
 
-	@Autowired
-	ConceptService conceptService;
+	private static final ConceptService conceptService = Context.getConceptService();
 
 	/**
 	 * @verifies get the date and reason for ART eligibility

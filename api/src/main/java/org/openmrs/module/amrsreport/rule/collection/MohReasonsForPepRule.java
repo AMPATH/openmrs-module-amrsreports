@@ -54,8 +54,7 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
 	});
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		List<String> pepReasons = new ArrayList<String>();

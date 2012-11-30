@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
@@ -142,8 +143,7 @@ public class MohWHOStageRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.PEDS_WHO_SPECIFIC_CONDITION_QUERY)
 	});
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,

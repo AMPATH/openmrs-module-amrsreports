@@ -46,8 +46,7 @@ public class MohLocationRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.PATIENT_TRANSFERRED_OUT)
 	});
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	@Override
 	protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {

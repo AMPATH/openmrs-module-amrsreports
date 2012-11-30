@@ -40,8 +40,7 @@ public class MohEnrollmentAgeRule extends MohEvaluableRule {
 	private static final EncounterType adultInitialType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
 	private static final EncounterType adultReturnType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,

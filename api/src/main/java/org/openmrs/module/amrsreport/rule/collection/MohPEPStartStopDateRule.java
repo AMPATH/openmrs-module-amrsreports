@@ -6,6 +6,7 @@ import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
@@ -67,8 +68,7 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
 	});
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 

@@ -60,8 +60,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT)
 	});
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @should get the date and reason for ART eligibility

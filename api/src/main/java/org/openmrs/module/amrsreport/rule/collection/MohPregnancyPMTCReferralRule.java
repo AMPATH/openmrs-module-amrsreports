@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
@@ -75,8 +76,7 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT)
 	});
 
-	@Autowired
-	private MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @param context

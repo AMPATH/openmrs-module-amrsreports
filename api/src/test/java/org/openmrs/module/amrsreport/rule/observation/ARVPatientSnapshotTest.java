@@ -9,6 +9,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
@@ -18,8 +19,7 @@ import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
  */
 public class ARVPatientSnapshotTest extends BaseModuleContextSensitiveTest {
 
-	@Autowired
-	ConceptService conceptService;
+	private static final ConceptService conceptService = Context.getConceptService();
 
 	/**
 	 * @verifies recognize and set WHO stage from an obs or specify peds WHO

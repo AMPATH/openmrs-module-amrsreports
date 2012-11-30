@@ -45,8 +45,7 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	private static final Concept CONCEPT_RAPID = MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE);
 	private static final Concept CONCEPT_POSITIVE = MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE);
 
-	@Autowired
-	MohCoreService mohCoreService;
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
