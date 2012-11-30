@@ -41,9 +41,6 @@ public class MohEntryPointRule extends MohEvaluableRule {
 		locationMap.put(getConceptId(MohEvaluableNameConstants.INPATIENT_CARE_OR_HOSPITALIZATION), "IPD");
 		locationMap.put(getConceptId(MohEvaluableNameConstants.PROVIDER_INITIATED_TESTING_AND_COUNSELING), "PITC");
 		locationMap.put(getConceptId(MohEvaluableNameConstants.PEDIATRIC_OUTPATIENT_CLINIC), "POC");
-
-		// unnecessary ... "Other" is the default
-		// locationMap.put(MohEvaluableNameConstants.OTHER_NON_CODED, "Other");
 	}
 
 	private static String getConceptId(String conceptName) {
@@ -70,10 +67,16 @@ public class MohEntryPointRule extends MohEvaluableRule {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 		PersonAttribute pa = patient.getAttribute(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
 
+		if (log.isDebugEnabled())
+			log.debug("pa value is " + (pa != null ? pa.getValue() : "null (pa is null)"));
+
 		if (pa == null)
 			return new Result("Other");
 
 		String entryPoint = locationMap.get(pa.getValue());
+
+		if (log.isDebugEnabled())
+			log.debug("entryPoint is " + entryPoint);
 
 		if (entryPoint != null)
 			return new Result(entryPoint);
