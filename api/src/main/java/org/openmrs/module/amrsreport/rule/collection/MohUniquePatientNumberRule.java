@@ -28,7 +28,7 @@ public class MohUniquePatientNumberRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Unique Patient Number";
 
-	private static final PatientIdentifierType cccPatientIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("mflgenerator.mfl"));
+	private static final PatientIdentifierType cccPatientIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
 
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
