@@ -32,7 +32,14 @@ public class MohIdentifierRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Ampath Identifier";
 
-
+    /**
+     * @should return patient's Ampath Identifier from a list of Identifiers
+     * @param context
+     * @param patientId
+     * @param parameters
+     * @return
+     * @throws LogicException
+     */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 		AdministrationService ams = Context.getAdministrationService();
