@@ -46,30 +46,5 @@ public class MohNamesRuleTest extends BaseModuleContextSensitiveTest {
 
     }
 
-    /**
-     * @should return two names for the patient
-     * @verifies that only two names are returned
-     * @see MohNamesRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnTwoNames() throws Exception {
 
-        Patient patient = new Patient();
-        patient.setPersonId(501);
-
-        Assert.assertNotNull("The patient is null",patient);
-
-        PatientIdentifierType pit = new PatientIdentifierType(2);
-
-        Location location = new Location(2);
-        PatientIdentifier pi = new PatientIdentifier("234", pit, location);
-
-
-        pi.setPatient(patient);
-        PatientService ps = Context.getPatientService();
-        Patient savedPatient =ps.savePatient(patient);
-
-
-
-    }
 }
