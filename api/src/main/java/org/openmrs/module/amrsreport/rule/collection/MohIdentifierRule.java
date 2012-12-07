@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -15,7 +14,6 @@ import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +23,18 @@ public class MohIdentifierRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Ampath Identifier";
 
+
 	private static final PatientIdentifierType cccIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
+
+
+    /**
+     * @should return patient's Ampath Identifier from a list of Identifiers
+     * @param context
+     * @param patientId
+     * @param parameters
+     * @return
+     * @throws LogicException
+     */
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
