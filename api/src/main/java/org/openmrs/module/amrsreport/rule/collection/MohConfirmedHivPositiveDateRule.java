@@ -48,6 +48,7 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
+     * @should return the the first date a patient was confirmed HIV positive
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
