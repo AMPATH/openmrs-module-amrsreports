@@ -33,6 +33,7 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	public static final String TOKEN = "MOH Confirmed HIV Positive Date";
 
 	/**
+     * @should return the the first date a patient was confirmed HIV positive
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
