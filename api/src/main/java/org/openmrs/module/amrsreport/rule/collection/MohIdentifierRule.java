@@ -20,11 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: oliver
- * Date: 5/24/12
- * Time: 12:22 PM
- * To change this template use File | Settings | File Templates.
+ * This class selects from a list of identifiers Patient Identifier other than CCC Number
  */
 public class MohIdentifierRule extends MohEvaluableRule {
 
@@ -43,7 +39,7 @@ public class MohIdentifierRule extends MohEvaluableRule {
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 		AdministrationService ams = Context.getAdministrationService();
-		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("mflgenerator.mfl"));
+		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("cccgenerator.CCC"));
 
 		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
 
