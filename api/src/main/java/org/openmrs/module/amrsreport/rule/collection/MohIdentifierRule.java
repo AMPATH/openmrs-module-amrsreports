@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -14,8 +15,14 @@ import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.util.OpenmrsUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+
+/**
+ * This class selects from a list of identifiers Patient Identifier other than CCC Number
+ */
 
 public class MohIdentifierRule extends MohEvaluableRule {
 
@@ -39,7 +46,13 @@ public class MohIdentifierRule extends MohEvaluableRule {
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 
-		for (PatientIdentifier pid : patient.getActiveIdentifiers()) {
+		AdministrationService ams = Context.getAdministrationService();
+		//PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("cccgenerator.CCC"));
+
+		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
+
+		for (PatientIdentifier pid : listPi) {
+
 			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), cccIdentifierType)) {
 				return new Result(pid.getIdentifier());
 			}
