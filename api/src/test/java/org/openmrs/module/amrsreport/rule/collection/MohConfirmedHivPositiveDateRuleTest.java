@@ -21,6 +21,8 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.api.context.Context;
 
+import java.lang.System;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -45,13 +47,29 @@ public class MohConfirmedHivPositiveDateRuleTest extends BaseModuleContextSensit
         PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
         pi.setPatient(patient);
 
-        Date birthdate = new Date(1975, 01, 01);
+        Calendar cal = Calendar.getInstance();
+        cal.set(1975,Calendar.JANUARY,1);
+
+
+        Date birthdate = cal.getTime();
         patient.setBirthdate(birthdate);
 
         EncounterService service = Context.getEncounterService();
 
+       // System.out.println(birthdate.toString());
         Encounter sampleEncounter = new Encounter();
-        Date encounterDate = new Date();
+
+        Calendar encDate = Calendar.getInstance();
+        encDate.set(2012,Calendar.DECEMBER, 10);
+        encDate.set(Calendar.HOUR_OF_DAY, 0);
+        encDate.set(Calendar.MINUTE,0);
+        encDate.set(Calendar.SECOND, 0);
+
+
+        Date encounterDate = encDate.getTime();
+
+
+
         sampleEncounter.setEncounterDatetime(encounterDate);
         sampleEncounter.setPatient(patient);
         sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
@@ -61,27 +79,30 @@ public class MohConfirmedHivPositiveDateRuleTest extends BaseModuleContextSensit
         Obs obs = new Obs();
         obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE));
         obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.POSITIVE));
-        obs.setObsDatetime(new Date());
+
+        Calendar obsDate = Calendar.getInstance();
+        obsDate.set(2012,Calendar.DECEMBER, 10);
+        obsDate.set(Calendar.HOUR_OF_DAY, 0);
+        obsDate.set(Calendar.MINUTE,0);
+        obsDate.set(Calendar.SECOND, 0);
+
+        Date obDate = obsDate.getTime();
+        obs.setObsDatetime(obDate);
         obs.setEncounter(sampleEncounter);
 
         //sampleEncounter.setObs(allObs);
         Encounter resEncounter = service.saveEncounter(sampleEncounter);
-        Integer patientID = resEncounter.getPatient().getPersonId();
-
-        //Checks if the Encounter has been saved
-        Assert.assertNotNull("Encounter is Null", resEncounter);
-
-        //Checks to find id patient Id is not null
-        Assert.assertNotNull("PatientID is Null", patientID);
-
-
-        Assert.assertNotNull("Encounter is Null", resEncounter);
 
         MohConfirmedHivPositiveDateRule mohConfirmedHivPositiveDateRule = new MohConfirmedHivPositiveDateRule();
         Result result = mohConfirmedHivPositiveDateRule.evaluate(null,patient.getId(), null);
+
+
+        System.out.println("Obs date is "+obDate.toString());
+        System.out.println("Found result is "+ result.toString());
+
         Result expectedResult = new Result("10/12/2012");
 
-        Assert.assertEquals("The date fetched is incorrect",expectedResult.toString(), result.toString());
+        Assert.assertEquals("Obs date comparison was not successful",expectedResult.toString(), result.toString());
 
     }
 
@@ -98,13 +119,26 @@ public class MohConfirmedHivPositiveDateRuleTest extends BaseModuleContextSensit
         PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
         pi.setPatient(patient);
 
-        Date birthdate = new Date(1975, 01, 01);
+        Calendar cal = Calendar.getInstance();
+        cal.set(1975,Calendar.JANUARY,1);
+
+
+        Date birthdate = cal.getTime();
         patient.setBirthdate(birthdate);
 
         EncounterService service = Context.getEncounterService();
 
         Encounter sampleEncounter = new Encounter();
-        Date encounterDate = new Date();
+
+        Calendar encDate = Calendar.getInstance();
+        encDate.set(2012,Calendar.DECEMBER, 10);
+        encDate.set(Calendar.HOUR_OF_DAY, 0);
+        encDate.set(Calendar.MINUTE,0);
+        encDate.set(Calendar.SECOND, 0);
+
+
+        Date encounterDate = encDate.getTime();
+
         sampleEncounter.setEncounterDatetime(encounterDate);
         sampleEncounter.setPatient(patient);
         sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
@@ -114,21 +148,22 @@ public class MohConfirmedHivPositiveDateRuleTest extends BaseModuleContextSensit
         Obs obs = new Obs();
         obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE));
         obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.POSITIVE));
-        obs.setObsDatetime(new Date());
+
+        Calendar obsDate = Calendar.getInstance();
+        obsDate.set(2012,Calendar.DECEMBER, 10);
+        obsDate.set(Calendar.HOUR_OF_DAY, 0);
+        obsDate.set(Calendar.MINUTE,0);
+        obsDate.set(Calendar.SECOND, 0);
+
+        Date obDate = obsDate.getTime();
+        obs.setObsDatetime(obDate);
+
         obs.setEncounter(sampleEncounter);
 
         //sampleEncounter.setObs(allObs);
         Encounter resEncounter = service.saveEncounter(sampleEncounter);
-        Integer patientID = resEncounter.getPatient().getPersonId();
+        Context.flushSession();
 
-        //Checks if the Encounter has been saved
-        Assert.assertNotNull("Encounter is Null", resEncounter);
-
-        //Checks to find id patient Id is not null
-        Assert.assertNotNull("PatientID is Null", patientID);
-
-
-        Assert.assertNotNull("Encounter is Null", resEncounter);
 
         MohConfirmedHivPositiveDateRule mohConfirmedHivPositiveDateRule = new MohConfirmedHivPositiveDateRule();
         Result result = mohConfirmedHivPositiveDateRule.evaluate(null,patient.getId(), null);
