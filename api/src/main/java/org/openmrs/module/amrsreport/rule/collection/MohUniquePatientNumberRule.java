@@ -13,6 +13,7 @@ import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,6 @@ public class MohUniquePatientNumberRule extends MohEvaluableRule {
 	private static final Log log = LogFactory.getLog(MohUniquePatientNumberRule.class);
 
 	public static final String TOKEN = "MOH Unique Patient Number";
-
-	private static final PatientIdentifierType cccPatientIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
-
 	/**
      * @should return a Unique Patient Number
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
@@ -37,23 +35,25 @@ public class MohUniquePatientNumberRule extends MohEvaluableRule {
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
-		List<PatientIdentifier> mflIdentifiers = patient.getPatientIdentifiers(cccPatientIdentifierType);
 
-		if (mflIdentifiers.isEmpty()) {
-			log.error("CCC Number not found for patient " + patientId);
-			return new Result("not found");
-		}
+        PatientIdentifier mflIdentifier = patient.getPatientIdentifier(MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC")));
 
-		if (mflIdentifiers.size() > 1) {
-			log.error("Multiple CCC Numbers found for patient " + patientId);
-		}
 
-		Result result = new Result();
-		for (PatientIdentifier identifier : mflIdentifiers) {
-			result.add(new Result(identifier.getIdentifier()));
-		}
 
-		return result;
+        try{
+            if (mflIdentifier == null) {
+
+            log.error("CCC Number not found for patient " + patientId);
+            return new Result("not found");
+        }
+
+        }
+        catch(NullPointerException nullPointerException){
+            log.info("CCC Number not found  "+nullPointerException.toString());
+        }
+
+
+        return new Result(mflIdentifier.getIdentifier());
 	}
 
 	protected String getEvaluableToken() {
