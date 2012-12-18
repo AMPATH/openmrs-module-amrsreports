@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/AMPATH/openmrs-module-amrsreports.png?branch=master)](https://travis-ci.org/AMPATH/openmrs-module-amrsreports)
+[![Build Status](https://secure.travis-ci.org/AMPATH/openmrs-module-amrsreports.png)](https://travis-ci.org/AMPATH/openmrs-module-amrsreports)
 
 AMRS Reports Module (OpenMRS)
 ==========================
