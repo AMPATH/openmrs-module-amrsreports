@@ -47,10 +47,9 @@ public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTe
 
         MohUniquePatientNumberRule mohUniquePatientNumberRule = new MohUniquePatientNumberRule();
         PatientService  patientService = Context.getPatientService();
+
         /*Create a patient and assign a CCC Number*/
-
-
-        Patient patient1 = patientService.getPatient(8);
+        Patient patient1 = patientService.getPatient(6);
 
         AdministrationService ams = Context.getAdministrationService();
 
@@ -68,10 +67,7 @@ public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTe
         globalProperty.setPropertyValue("CCC Number");
         ams.saveGlobalProperty(globalProperty);
 
-
         Context.flushSession();
-
-        String savedProperty = ams.getGlobalProperty("cccgenerator.CCC");
 
         PatientIdentifierType pit =  MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
 
