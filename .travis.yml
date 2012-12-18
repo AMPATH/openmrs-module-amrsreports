@@ -13,7 +13,7 @@ notifications:
   email: false
   irc:
     channels:
-      - "irc.freenode.org#OpenMRS"
+      - "irc.freenode.org#ampath"
     template:
       - "[%{repository}] [%{commit}] [%{author}] %{message} - %{build_url}"
 
