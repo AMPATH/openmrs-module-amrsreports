@@ -19,19 +19,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * This class selects from a list of identifiers Patient Identifier other than CCC Number
+ */
+
 public class MohIdentifierRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(MohIdentifierRule.class);
 
 	public static final String TOKEN = "MOH Ampath Identifier";
 
-	private static final PatientIdentifierType cccIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
+
+    /**
+     * @should return patient's Ampath Identifier from a list of Identifiers
+     * @param context
+     * @param patientId
+     * @param parameters
+     * @return
+     * @throws LogicException
+     */
 
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 
-		for (PatientIdentifier pid : patient.getActiveIdentifiers()) {
-			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), cccIdentifierType)) {
+		AdministrationService ams = Context.getAdministrationService();
+		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("cccgenerator.CCC"));
+
+		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
+
+		for (PatientIdentifier pid : listPi) {
+
+			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), patientIdentifierType)) {
 				return new Result(pid.getIdentifier());
 			}
 		}
