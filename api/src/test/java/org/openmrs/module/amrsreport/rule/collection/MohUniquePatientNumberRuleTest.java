@@ -87,6 +87,6 @@ public class MohUniquePatientNumberRuleTest extends BaseModuleContextSensitiveTe
         Result result1 = mohUniquePatientNumberRule.evaluate(null, patient1.getId(), null);
 
         Result  expectedResult1 = new Result("11740-00001");
-        Assert.assertEquals("The two identifiers are not equal",expectedResult1.toString(),result1.toString());
+        Assert.assertEquals("The two identifiers are not equal",expectedResult1,result1);
     }
 }
