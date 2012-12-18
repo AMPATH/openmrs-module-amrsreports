@@ -31,9 +31,6 @@ public class MohIdentifierRule extends MohEvaluableRule {
 	public static final String TOKEN = "MOH Ampath Identifier";
 
 
-	private static final PatientIdentifierType cccIdentifierType = MohCacheUtils.getPatientIdentifierType(Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
-
-
     /**
      * @should return patient's Ampath Identifier from a list of Identifiers
      * @param context
@@ -47,13 +44,13 @@ public class MohIdentifierRule extends MohEvaluableRule {
 		Patient patient = Context.getPatientService().getPatient(patientId);
 
 		AdministrationService ams = Context.getAdministrationService();
-		//PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("cccgenerator.CCC"));
+		PatientIdentifierType patientIdentifierType = MohCacheUtils.getPatientIdentifierType(ams.getGlobalProperty("cccgenerator.CCC"));
 
 		List<PatientIdentifier> listPi = patient.getActiveIdentifiers();
 
 		for (PatientIdentifier pid : listPi) {
 
-			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), cccIdentifierType)) {
+			if (!OpenmrsUtil.nullSafeEquals(pid.getIdentifierType(), patientIdentifierType)) {
 				return new Result(pid.getIdentifier());
 			}
 		}
