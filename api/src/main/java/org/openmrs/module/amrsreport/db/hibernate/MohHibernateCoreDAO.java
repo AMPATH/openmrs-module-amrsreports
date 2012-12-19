@@ -11,12 +11,6 @@
  */
 package org.openmrs.module.amrsreport.db.hibernate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -26,6 +20,7 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -33,21 +28,26 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
-import org.openmrs.User;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.module.amrsreport.UserReport;
-import org.hibernate.criterion.Expression;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -74,6 +74,91 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
 	                                        final MohFetchRestriction mohFetchRestriction) throws DAOException {
+		// build the criteria
+		Criteria criteria = buildPatientObservationsCriteria(patientId, restrictions, mohFetchRestriction);
+
+		// process the observations
+		List<Obs> observations = processObs(criteria, mohFetchRestriction);
+
+		return observations;
+	}
+
+	/**
+	 * @see MohCoreDAO#getPatientObservationsWithEncounterRestrictions(Integer, java.util.Map, java.util.Map, org.openmrs.module.amrsreport.util.MohFetchRestriction)
+	 */
+	@Override
+	public List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
+	                                                                 final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+	                                                                 final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+	                                                                 final MohFetchRestriction mohFetchRestriction) {
+
+		// build the criteria
+		Criteria criteria = buildPatientObservationsCriteria(patientId, obsRestrictions, mohFetchRestriction);
+
+		// add encounter criteria subquery
+		Encounter encounter = new Encounter();
+		Criteria encounterCriteria = criteria.createCriteria("encounter");
+		for (String property : encounterRestrictions.keySet()) {
+			Collection<OpenmrsObject> propertyValues = encounterRestrictions.get(property);
+			if (CollectionUtils.isNotEmpty(propertyValues) && PropertyUtils.isReadable(encounter, property)) {
+				encounterCriteria.add(Restrictions.in(property, propertyValues));
+				encounterCriteria.addOrder(Order.asc(property));
+			}
+		}
+
+		// process the observations
+		List<Obs> observations = processObs(criteria, mohFetchRestriction);
+
+		return observations;
+	}
+
+	/**
+	 * post-process a list of observations from a criteria; duplicate data FTL
+	 *
+	 * @param criteria the object with data in it
+	 * @param mohFetchRestriction information for limiting fetch, specifically the size
+	 * @return a list of processed (cleaned) observations
+	 */
+	private List<Obs> processObs(Criteria criteria, MohFetchRestriction mohFetchRestriction) {
+		List<Obs> observations = new ArrayList<Obs>();
+
+		// TODO: further optimization would be adding start date and end date parameter in the obs restrictions
+		ScrollableResults scrollableResults = criteria.scroll(ScrollMode.FORWARD_ONLY);
+
+		Integer size = mohFetchRestriction.getSize();
+
+		// scroll the results
+		Obs processedObs = null;
+		while (scrollableResults.next() && OpenmrsUtil.compareWithNullAsGreatest(observations.size(), size) == -1) {
+			Obs obs = (Obs) scrollableResults.get(0);
+			// TODO: thanks to Ampath for the duplicate data, we need to sanitize the query results here
+			if (processedObs != null && !obs.isObsGrouping()) {
+				if (DateUtils.isSameDay(processedObs.getObsDatetime(), obs.getObsDatetime())
+						&& OpenmrsUtil.nullSafeEquals(processedObs.getConcept(), obs.getConcept())
+						&& OpenmrsUtil.nullSafeEquals(processedObs.getValueCoded(), obs.getValueCoded())
+						&& (OpenmrsUtil.nullSafeEquals(processedObs.getValueNumeric(), obs.getValueNumeric()))) {
+					continue;
+				}
+			}
+			processedObs = obs;
+			observations.add(obs);
+		}
+		scrollableResults.close();
+		return observations;
+	}
+
+	/**
+	 * creates a Criteria from restrictions provided
+	 *
+	 * @param patientId the patient connected to the desired observations
+	 * @param restrictions a map of restrictions on the observations
+	 * @param mohFetchRestriction a map of fetch restrictions
+	 * @return a Criteria for use in evaluation
+	 */
+	private Criteria buildPatientObservationsCriteria(final Integer patientId,
+	                                                  final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                                  final MohFetchRestriction mohFetchRestriction) {
+
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.eq("personId", patientId));
 
@@ -104,31 +189,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
 
-		List<Obs> observations = new ArrayList<Obs>();
-
-		// TODO: further optimization would be adding start date and end date parameter in the obs restrictions
-		ScrollableResults scrollableResults = criteria.scroll(ScrollMode.FORWARD_ONLY);
-
-		Integer size = mohFetchRestriction.getSize();
-
-		// scroll the results
-		Obs processedObs = null;
-		while (scrollableResults.next() && OpenmrsUtil.compareWithNullAsGreatest(observations.size(), size) == -1) {
-			Obs obs = (Obs) scrollableResults.get(0);
-			// TODO: thanks to Ampath for the duplicate data, we need to sanitize the query results here
-			if (processedObs != null && !obs.isObsGrouping()) {
-				if (DateUtils.isSameDay(processedObs.getObsDatetime(), obs.getObsDatetime())
-						&& OpenmrsUtil.nullSafeEquals(processedObs.getConcept(), obs.getConcept())
-						&& OpenmrsUtil.nullSafeEquals(processedObs.getValueCoded(), obs.getValueCoded())
-						&& (OpenmrsUtil.nullSafeEquals(processedObs.getValueNumeric(), obs.getValueNumeric()))) {
-					continue;
-				}
-			}
-			processedObs = obs;
-			observations.add(obs);
-		}
-		scrollableResults.close();
-		return observations;
+		return criteria;
 	}
 
 	/**
