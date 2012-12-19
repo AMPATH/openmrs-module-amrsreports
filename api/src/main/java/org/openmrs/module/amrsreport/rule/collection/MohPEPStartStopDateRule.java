@@ -14,8 +14,9 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.medication.DrugStartStopDateRule;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,59 +57,91 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 	public static final String NOT_ON_ANTIRETROVIRAL_THERAPY = "NOT ON ANTIRETROVIRAL THERAPY";
 	public static final String INTERRUPTED = "INTERRUPTED";
 	public static final String UNKNOWN = "UNKNOWN";
+	public static final String DAYS_ON_PEP_MEDS1 = "DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO NON-ADHERENCE, ANTIRETROVIRALS";
+	public static final String DAYS_ON_PEP_MEDS2 = "DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO SIDE EFFECTS, ANTIRETROVIRALS";
 
-	private static final List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
+	private static final List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(
 			MohCacheUtils.getConcept(ANTIRETROVIRAL_THERAPY_STATUS),
 			MohCacheUtils.getConcept(ARVs_RECOMMENDED_FOR_PEP),
-			MohCacheUtils.getConcept(REASON_ANTIRETROVIRALS_STOPPED)
-	});
+			MohCacheUtils.getConcept(REASON_ANTIRETROVIRALS_STOPPED),
+			MohCacheUtils.getConcept(DAYS_ON_PEP_MEDS1),
+			MohCacheUtils.getConcept(DAYS_ON_PEP_MEDS2)
+	);
 
-	private static final List<OpenmrsObject> encounterTypes = Arrays.<OpenmrsObject>asList(new EncounterType[]{
+	private static final List<Concept> numericQuestions = Arrays.<Concept>asList(
+			MohCacheUtils.getConcept(DAYS_ON_PEP_MEDS1),
+			MohCacheUtils.getConcept(DAYS_ON_PEP_MEDS2)
+	);
+
+	private static final List<OpenmrsObject> encounterTypes = Arrays.<OpenmrsObject>asList(
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_INITIAL_FORM),
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
-	});
+	);
 
 	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
+	private static final List<Concept> START_CONCEPTS = Arrays.<Concept>asList(
+			MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY),
+			//MohCacheUtils.getConcept(NOT_ON_ANTIRETROVIRAL_THERAPY),
+			//MohCacheUtils.getConcept(INTERRUPTED),
+			//MohCacheUtils.getConcept(UNKNOWN),
+			MohCacheUtils.getConcept(ZIDOVUDINE_AND_LAMIVUDINE),
+			MohCacheUtils.getConcept(LOPINAVIR_AND_RITONAVIR)
+			//MohCacheUtils.getConcept(OTHER_ANTIRETROVIRAL_DRUG)
+	);
+
+	private static final List<Concept> STOP_CONCEPTS = Arrays.<Concept>asList(
+			//MohCacheUtils.getConcept(REGIMEN_FAILURE),
+			//MohCacheUtils.getConcept(WEIGHT_CHANGE),
+			//MohCacheUtils.getConcept(TOXICITY_DRUG),
+			//MohCacheUtils.getConcept(OTHER_NON_CODED),
+			//MohCacheUtils.getConcept(COMPLETED_TOTAL_PMTCT),
+			//MohCacheUtils.getConcept(POOR_ADHERENCE_NOS),
+			//MohCacheUtils.getConcept(ADD_DRUGS),
+			//MohCacheUtils.getConcept(FACILITY_STOCKED_OUT_OF_MEDICATION),
+			//MohCacheUtils.getConcept(TUBERCULOSIS),
+			//MohCacheUtils.getConcept(PREGNANCY_RISK),
+			//MohCacheUtils.getConcept(FIRST_TRIMESTER_OF_PREGNANCY),
+			MohCacheUtils.getConcept(PATIENT_REFUSAL),
+			MohCacheUtils.getConcept(COMPLETED)
+	);
+
+	/**
+	 * @see org.openmrs.module.amrsreport.rule.MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 *
+	 * @should start on ANTIRETROVIRAL THERAPY STATUS of ON ANTIRETROVIRAL THERAPY
+	 * @should start on ARVs RECOMMENDED FOR PEP is ZIDOVUDINE AND LAMIVUDINE
+	 * @should start on ARVs RECOMMENDED FOR PEP is LOPINAVIR AND RITONAVIR
+	 * @should stop on REASON ANTIRETROVIRALS STOPPED is PATIENT REFUSAL
+	 * @should stop on REASON ANTIRETROVIRALS STOPPED is COMPLETED
+	 * @should stop on any value for DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO NON ADHERENCE ANTIRETROVIRALS
+	 * @should stop on any value for DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO SIDE EFFECTS ANTIRETROVIRALS
+	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
 		//pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
-		obsRestrictions.put("encounter.encounterType", encounterTypes);
+		Map<String, Collection<OpenmrsObject>> encounterRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		obsRestrictions.put("encounterType", encounterTypes);
+
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
+
+		List<Obs> observations = mohCoreService.getPatientObservationsWithEncounterRestrictions(
+				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
 
 		List<Obs> startObs = new ArrayList<Obs>();
 		List<Obs> stopObs = new ArrayList<Obs>();
 
 		for (Obs observation : observations) {
+			System.out.println("..." + observation.getConcept().toString() + "::" + observation.getValueCoded().toString());
 			Concept value = observation.getValueCoded();
 
-			if (value.equals(MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY))
-					|| value.equals(MohCacheUtils.getConcept(NOT_ON_ANTIRETROVIRAL_THERAPY))
-					|| value.equals(MohCacheUtils.getConcept(INTERRUPTED))
-					|| value.equals(MohCacheUtils.getConcept(UNKNOWN))
-					|| value.equals(MohCacheUtils.getConcept(ZIDOVUDINE_AND_LAMIVUDINE))
-					|| value.equals(MohCacheUtils.getConcept(LOPINAVIR_AND_RITONAVIR))
-					|| value.equals(MohCacheUtils.getConcept(OTHER_ANTIRETROVIRAL_DRUG))
-					) {
+			if (OpenmrsUtil.isConceptInList(value, START_CONCEPTS)) {
 				startObs.add(observation);
-			} else if (value.equals(MohCacheUtils.getConcept(REGIMEN_FAILURE))
-					|| value.equals(MohCacheUtils.getConcept(WEIGHT_CHANGE))
-					|| value.equals(MohCacheUtils.getConcept(TOXICITY_DRUG))
-					|| value.equals(MohCacheUtils.getConcept(OTHER_NON_CODED))
-					|| value.equals(MohCacheUtils.getConcept(COMPLETED_TOTAL_PMTCT))
-					|| value.equals(MohCacheUtils.getConcept(POOR_ADHERENCE_NOS))
-					|| value.equals(MohCacheUtils.getConcept(ADD_DRUGS))
-					|| value.equals(MohCacheUtils.getConcept(FACILITY_STOCKED_OUT_OF_MEDICATION))
-					|| value.equals(MohCacheUtils.getConcept(TUBERCULOSIS))
-					|| value.equals(MohCacheUtils.getConcept(PREGNANCY_RISK))
-					|| value.equals(MohCacheUtils.getConcept(FIRST_TRIMESTER_OF_PREGNANCY))
-					|| value.equals(MohCacheUtils.getConcept(PATIENT_REFUSAL))
-					|| value.equals(MohCacheUtils.getConcept(COMPLETED))
-					) {
-
+			} else if (OpenmrsUtil.isConceptInList(value, STOP_CONCEPTS) ||
+					OpenmrsUtil.isConceptInList(observation.getConcept(), numericQuestions)) {
 				stopObs.add(observation);
 			}
 		}
