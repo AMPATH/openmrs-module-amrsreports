@@ -3,7 +3,6 @@ package org.openmrs.module.amrsreport.rule.collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
-import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.api.context.Context;
@@ -78,7 +77,7 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
 	);
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	private static final List<Concept> START_CONCEPTS = Arrays.<Concept>asList(
 			MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY),
@@ -107,8 +106,6 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 	);
 
 	/**
-	 * @see org.openmrs.module.amrsreport.rule.MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 *
 	 * @should start on ANTIRETROVIRAL THERAPY STATUS of ON ANTIRETROVIRAL THERAPY
 	 * @should start on ARVs RECOMMENDED FOR PEP is ZIDOVUDINE AND LAMIVUDINE
 	 * @should start on ARVs RECOMMENDED FOR PEP is LOPINAVIR AND RITONAVIR
@@ -116,6 +113,7 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 	 * @should stop on REASON ANTIRETROVIRALS STOPPED is COMPLETED
 	 * @should stop on any value for DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO NON ADHERENCE ANTIRETROVIRALS
 	 * @should stop on any value for DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO SIDE EFFECTS ANTIRETROVIRALS
+	 * @see org.openmrs.module.amrsreport.rule.MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
@@ -135,7 +133,6 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 		List<Obs> stopObs = new ArrayList<Obs>();
 
 		for (Obs observation : observations) {
-			System.out.println("..." + observation.getConcept().toString() + "::" + observation.getValueCoded().toString());
 			Concept value = observation.getValueCoded();
 
 			if (OpenmrsUtil.isConceptInList(value, START_CONCEPTS)) {

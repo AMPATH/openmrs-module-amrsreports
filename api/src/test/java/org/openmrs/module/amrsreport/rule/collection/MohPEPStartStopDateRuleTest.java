@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * test file for MohPEPStartStopDateRule
@@ -77,7 +76,6 @@ public class MohPEPStartStopDateRuleTest {
 		int i = 0;
 		conceptService = Mockito.mock(ConceptService.class);
 		for (String conceptName : initConcepts) {
-			System.out.println(i + ": " + conceptName);
 			Mockito.when(conceptService.getConcept(conceptName)).thenReturn(new Concept(i++));
 		}
 		Mockito.when(conceptService.getConcept((String) null)).thenReturn(null);
@@ -90,7 +88,7 @@ public class MohPEPStartStopDateRuleTest {
 		// build the MOH Core service
 		mohCoreService = Mockito.mock(MohCoreService.class);
 		Mockito.when(mohCoreService.getPatientObservationsWithEncounterRestrictions(Mockito.eq(PATIENT_ID),
-				Mockito.any(Map.class), Mockito.any(Map.class), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -130,7 +128,6 @@ public class MohPEPStartStopDateRuleTest {
 		obs.setValueCoded(conceptService.getConcept(answer));
 		obs.setObsDatetime(makeDate(date));
 		currentObs.add(obs);
-		System.out.println(obs.getConcept() + "::" + obs.getValueCoded());
 	}
 
 	/**
@@ -150,9 +147,9 @@ public class MohPEPStartStopDateRuleTest {
 	 */
 	@Test
 	public void evaluate_shouldStartOnARVsRECOMMENDEDFORPEPIsZIDOVUDINEANDLAMIVUDINE() throws Exception {
-		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.ZIDOVUDINE_AND_LAMIVUDINE, "16 Oct 1975");
+		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.ZIDOVUDINE_AND_LAMIVUDINE, "17 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("17-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -161,9 +158,9 @@ public class MohPEPStartStopDateRuleTest {
 	 */
 	@Test
 	public void evaluate_shouldStartOnARVsRECOMMENDEDFORPEPIsLOPINAVIRANDRITONAVIR() throws Exception {
-		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.LOPINAVIR_AND_RITONAVIR, "16 Oct 1975");
+		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.LOPINAVIR_AND_RITONAVIR, "18 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("18-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -209,4 +206,5 @@ public class MohPEPStartStopDateRuleTest {
 		Assert.assertEquals(1, currentObs.size());
 		Assert.assertEquals(new Result("Unknown - 16-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
 	}
+
 }
