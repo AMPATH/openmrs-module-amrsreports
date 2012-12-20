@@ -11,14 +11,15 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,9 +36,10 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 	public static String TOKEN;
 
-	// List of concepts to be used in comparison as for start dates
-	protected Concept startConcept = null;
-	protected Concept stopConcept = null;
+	// Lists of concepts and possible answers to be used in comparison as for start and stop dates
+	protected List<OpenmrsObject> startConcepts = null;
+	protected List<OpenmrsObject> stopConcepts = null;
+
 
 	/**
 	 * returns a list of date ranges based on start and stop concepts for a given patient
@@ -45,7 +47,6 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	 * @param patientId the patient for evaluation
 	 * @return formatted list of start and stop dates
 	 * @throws LogicException
-	 *
 	 * @should return blank result for no dates found
 	 * @should properly format a single start date
 	 * @should properly format a single stop date
@@ -61,7 +62,7 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 		// set up query for observations in order by ascending date
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{startConcept}));
+		restrictions.put("concept", startConcepts);
 		MohFetchRestriction fetchRestriction = new MohFetchRestriction();
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
@@ -69,11 +70,37 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 		List<Obs> startObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
 		// get the stop observations
-		restrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{stopConcept}));
+		restrictions.put("concept", stopConcepts);
 		List<Obs> stopObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
 
 		return buildResultFromObservations(startObservations, stopObservations);
 	}
+
+	/**
+	 * helper method to reduce code for validation methods
+	 * @param concept
+	 * @param name
+	 * @return
+	 */
+	protected boolean compareConceptToName(Concept concept, String name) {
+		return OpenmrsUtil.nullSafeEquals(concept, MohCacheUtils.getConcept(name));
+	}
+
+	/**
+	 * validates the start observation, possibly evaluating the answer against a list of expected questions
+	 *
+	 * @param obs the observation to be validated
+	 * @return whether the observation is valid
+	 */
+	protected abstract boolean validateStartObs(Obs obs);
+
+	/**
+	 * validates the stop observation, possibly evaluating the answer against a list of expected questions
+	 *
+	 * @param obs the observation to be validated
+	 * @return whether the observation is valid
+	 */
+	protected abstract boolean validateStopObs(Obs obs);
 
 	/**
 	 * creates a Result from two lists, one with start observations and the second with stop observations.
@@ -83,40 +110,54 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	 * @return
 	 */
 	protected Result buildResultFromObservations(List<Obs> starters, List<Obs> stoppers) {
-		boolean wasStart = true;
-
 		Iterator<Obs> startObs = starters.iterator();
 		Iterator<Obs> stopObs = stoppers.iterator();
+		Obs currentStartObs = startObs.hasNext() ? startObs.next() : null;
+		Obs currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
 
 		List<Date[]> ranges = new ArrayList<Date[]>();
-		Date currentStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
-		Date currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
+		Date currentStartDate;
+		Date currentStopDate;
 
-		while (currentStartDate != null || currentStopDate != null) {
+		while (currentStartObs != null || currentStopObs != null) {
 
-			if (currentStopDate != null) {
+			// validate observations
+			while (currentStartObs != null && !validateStartObs(currentStartObs)) {
+				currentStartObs = startObs.hasNext() ? startObs.next() : null;
+			}
+			while (currentStopObs != null && !validateStopObs(currentStopObs)) {
+				currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
+			}
+
+			// set dates
+			currentStartDate = currentStartObs == null ? null : currentStartObs.getObsDatetime();
+			currentStopDate = currentStopObs == null ? null : currentStopObs.getObsDatetime();
+
+			// decide where to go next
+			if (currentStopObs != null) {
 				// we are dealing with a real stop date
-				if (currentStartDate == null || currentStopDate.before(currentStartDate)) {
+				if (currentStartObs == null || currentStopDate.before(currentStartDate)) {
 					// start date is either empty or after the stop date
 					ranges.add(new Date[]{null, currentStopDate});
-					currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
-				} else if (currentStartDate != null) {
+					currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
+				} else if (currentStartObs != null) {
 					// start date is after start date and is not null
-					Date nextStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
+					Obs nextStartObs = startObs.hasNext() ? startObs.next() : null;
+					Date nextStartDate = nextStartObs == null ? null : nextStartObs.getObsDatetime();
 					if (nextStartDate != null && currentStopDate.after(nextStartDate)) {
 						// next start date exists and is after stop date
 						ranges.add(new Date[]{currentStartDate, null});
 					} else {
 						// current start date and stop date are good
 						ranges.add(new Date[]{currentStartDate, currentStopDate});
-						currentStopDate = stopObs.hasNext() ? stopObs.next().getObsDatetime() : null;
+						currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
 					}
-					currentStartDate = nextStartDate;
+					currentStartObs = nextStartObs;
 				}
-			} else if (currentStartDate != null) {
+			} else if (currentStartObs != null) {
 				// no more stop dates
 				ranges.add(new Date[]{currentStartDate, null});
-				currentStartDate = startObs.hasNext() ? startObs.next().getObsDatetime() : null;
+				currentStartObs = startObs.hasNext() ? startObs.next() : null;
 			}
 		}
 

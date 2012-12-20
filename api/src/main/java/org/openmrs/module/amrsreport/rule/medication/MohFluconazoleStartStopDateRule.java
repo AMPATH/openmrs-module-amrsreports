@@ -71,6 +71,16 @@ public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 		return buildResultFromObservations(startObs, stopObs);
 	}
 
+	@Override
+	protected boolean validateStartObs(Obs obs) {
+		return true;
+	}
+
+	@Override
+	protected boolean validateStopObs(Obs obs) {
+		return true;
+	}
+
 	protected String getEvaluableToken() {
 		return TOKEN;
 	}

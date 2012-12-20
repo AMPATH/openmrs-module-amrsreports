@@ -16,12 +16,15 @@ package org.openmrs.module.amrsreport.rule.medication;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Obs;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -32,8 +35,8 @@ public class MohTBStartStopDateRule extends DrugStartStopDateRule {
 	private static final Log log = LogFactory.getLog(MohTBStartStopDateRule.class);
 
 	public MohTBStartStopDateRule() {
-		this.startConcept = MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED);
-		this.stopConcept = MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_COMPLETED_DATE);
+		this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED));
+		this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_COMPLETED_DATE));
 		this.TOKEN = "MOH TB Start-Stop Date";
 	}
 
@@ -42,5 +45,15 @@ public class MohTBStartStopDateRule extends DrugStartStopDateRule {
 	 */
 	public Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
 		return this.getResult(patientId);
+	}
+
+	@Override
+	protected boolean validateStartObs(Obs obs) {
+		return true;
+	}
+
+	@Override
+	protected boolean validateStopObs(Obs obs) {
+		return true;
 	}
 }
