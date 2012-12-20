@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
@@ -40,7 +39,6 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	protected List<OpenmrsObject> startConcepts = null;
 	protected List<OpenmrsObject> stopConcepts = null;
 
-
 	/**
 	 * returns a list of date ranges based on start and stop concepts for a given patient
 	 *
@@ -56,9 +54,6 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	 * @should properly format two start and stop periods
 	 */
 	protected Result getResult(final Integer patientId) throws LogicException {
-
-		// find the patient based on the patient id
-		Patient patient = Context.getPatientService().getPatient(patientId);
 
 		// set up query for observations in order by ascending date
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
@@ -78,6 +73,7 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 	/**
 	 * helper method to reduce code for validation methods
+	 *
 	 * @param concept
 	 * @param name
 	 * @return
