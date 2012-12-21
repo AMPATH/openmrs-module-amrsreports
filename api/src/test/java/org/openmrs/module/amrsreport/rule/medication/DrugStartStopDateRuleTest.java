@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,7 @@ import java.util.Map;
 @PrepareForTest(Context.class)
 public class DrugStartStopDateRuleTest {
 
-	private static final String START_CONCEPT = "startConcept";
+	private static final String START_CONCEPT = "startConcepts";
 	private static final String STOP_CONCEPT = "stopConcept";
 
 	private static final int PATIENT_ID = 5;
@@ -219,13 +220,23 @@ public class DrugStartStopDateRuleTest {
 	private class TestDrugStartStopDateRule extends DrugStartStopDateRule {
 
 		public TestDrugStartStopDateRule() {
-			this.startConcept = MohCacheUtils.getConcept(START_CONCEPT);
-			this.stopConcept = MohCacheUtils.getConcept(STOP_CONCEPT);
+			this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(START_CONCEPT));
+			this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(STOP_CONCEPT));
 		}
 
 		@Override
 		protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
 			return this.getResult(patientId);
+		}
+
+		@Override
+		protected boolean validateStartObs(Obs obs) {
+			return true;
+		}
+
+		@Override
+		protected boolean validateStopObs(Obs obs) {
+			return true;
 		}
 	}
 }

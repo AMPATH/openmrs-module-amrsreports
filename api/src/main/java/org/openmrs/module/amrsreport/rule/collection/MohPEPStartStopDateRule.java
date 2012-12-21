@@ -146,6 +146,27 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 		return buildResultFromObservations(startObs, stopObs);
 	}
 
+	@Override
+	protected boolean validateStartObs(Obs obs) {
+		return (compareConceptToName(obs.getConcept(), ANTIRETROVIRAL_THERAPY_STATUS) &&
+				compareConceptToName(obs.getValueCoded(), ON_ANTIRETROVIRAL_THERAPY))
+				||
+				(compareConceptToName(obs.getConcept(), ARVs_RECOMMENDED_FOR_PEP) &&
+						(compareConceptToName(obs.getValueCoded(), LOPINAVIR_AND_RITONAVIR) ||
+								compareConceptToName(obs.getValueCoded(), ZIDOVUDINE_AND_LAMIVUDINE))
+				);
+	}
+
+	@Override
+	protected boolean validateStopObs(Obs obs) {
+		return (compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS1) ||
+				compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS2) ||
+				(compareConceptToName(obs.getConcept(), REASON_ANTIRETROVIRALS_STOPPED) &&
+						(compareConceptToName(obs.getValueCoded(), PATIENT_REFUSAL) ||
+								compareConceptToName(obs.getValueCoded(), COMPLETED))
+				));
+	}
+
 	protected String getEvaluableToken() {
 		return TOKEN;
 	}
