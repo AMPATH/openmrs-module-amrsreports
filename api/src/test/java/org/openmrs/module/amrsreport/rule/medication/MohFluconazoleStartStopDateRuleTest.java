@@ -31,17 +31,18 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * test class for {@link MOHCTXStartStopDateRule}
+ * tests for {@link MohFluconazoleStartStopDateRule}
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
-public class MOHCTXStartStopDateRuleTest {
+public class MohFluconazoleStartStopDateRuleTest {
 
 	private static final List<String> initConcepts = Arrays.asList(
-			MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED,
-			MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED,
-			MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED,
-			MohEvaluableNameConstants.NONE
+			MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN,
+			MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED,
+			MohEvaluableNameConstants.START_DRUGS,
+			MohEvaluableNameConstants.FLUCONAZOLE,
+			MohEvaluableNameConstants.STOP_ALL
 	);
 
 	private static final int PATIENT_ID = 5;
@@ -49,7 +50,8 @@ public class MOHCTXStartStopDateRuleTest {
 	private ConceptService conceptService;
 	private MohCoreService mohCoreService;
 
-	private MOHCTXStartStopDateRule rule;
+	private Patient patient;
+	private MohFluconazoleStartStopDateRule rule;
 
 	private List<Obs> currentStartObs;
 	private List<Obs> currentStopObs;
@@ -74,13 +76,13 @@ public class MOHCTXStartStopDateRuleTest {
 
 		Map<String, Collection<OpenmrsObject>> startRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		startRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
-				conceptService.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED)));
+				conceptService.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN),
+				conceptService.getConcept(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED)
+		));
 
 		Map<String, Collection<OpenmrsObject>> stopRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		stopRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
-				conceptService.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED),
-				conceptService.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
-		));
+				conceptService.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN)));
 
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions),
 				Mockito.any(MohFetchRestriction.class))).thenReturn(currentStartObs);
@@ -93,7 +95,7 @@ public class MOHCTXStartStopDateRuleTest {
 		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
 
 		// create a rule instance
-		rule = new MOHCTXStartStopDateRule();
+		rule = new MohFluconazoleStartStopDateRule();
 	}
 
 	/**
@@ -140,62 +142,53 @@ public class MOHCTXStartStopDateRuleTest {
 	}
 
 	/**
-	 * @verifies start on PCP_PROPHYLAXIS_STARTED with not null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 * @verifies start on CRYPTOCOCCAL_TREATMENT_PLAN is START_DRUGS
+	 * @see MohFluconazoleStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldStartOnPCP_PROPHYLAXIS_STARTEDWithNotNullAnswer() throws Exception {
-		addStartObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, MohEvaluableNameConstants.NONE, "16 Oct 1975");
+	public void evaluate_shouldStartOnCRYPTOCOCCAL_TREATMENT_PLANIsSTART_DRUGS() throws Exception {
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
 		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
-	 * @verifies not start on PCP_PROPHYLAXIS_STARTED with null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 * @verifies start on CRYPTOCOSSUS_TREATMENT_STARTED is FLUCONAZOLE
+	 * @see MohFluconazoleStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldNotStartOnPCP_PROPHYLAXIS_STARTEDWithNullAnswer() throws Exception {
-		addStartObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, null, "17 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
+	public void evaluate_shouldStartOnCRYPTOCOSSUS_TREATMENT_STARTEDIsFLUCONAZOLE() throws Exception {
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED, MohEvaluableNameConstants.FLUCONAZOLE, "17 Oct 1975");
+		Assert.assertEquals(new Result("17-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
-	 * @verifies stop on REASON_PCP_PROPHYLAXIS_STOPPED with not null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 * @verifies stop on CRYPTOCOCCAL_TREATMENT_PLAN is STOP_ALL
+	 * @see MohFluconazoleStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNotNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED, MohEvaluableNameConstants.NONE, "18 Oct 1975");
+	public void evaluate_shouldStopOnCRYPTOCOCCAL_TREATMENT_PLANIsSTOP_ALL() throws Exception {
+		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "18 Oct 1975");
 		Assert.assertEquals(new Result("Unknown - 18-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
-	 * @verifies not stop on REASON_PCP_PROPHYLAXIS_STOPPED with null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 * @verifies start and stop on CRYPTOCOCCAL_TREATMENT_PLAN with correct values
+	 * @see MohFluconazoleStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, null, "19 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
-	}
+	public void evaluate_shouldStartAndStopOnCRYPTOCOCCAL_TREATMENT_PLANWithCorrectValues() throws Exception {
+		// valid values: 16th and 18th - invalid will still get picked up due to same obs.concept
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "17 Oct 1975");
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "18 Oct 1975");
+		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "19 Oct 1975");
 
-	/**
-	 * @verifies stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with not null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNotNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, MohEvaluableNameConstants.NONE, "20 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 20-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
-	}
+		// valid values: 17th and 19th - invalid will still get picked up due to same obs.concept
+		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
+		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "17 Oct 1975");
+		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "18 Oct 1975");
+		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "19 Oct 1975");
 
-	/**
-	 * @verifies not stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with null answer
-	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, null, "21 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16-Oct-75 - 17-Oct-75;18-Oct-75 - 19-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
 	}
 }
