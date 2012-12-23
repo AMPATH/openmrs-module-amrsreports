@@ -1,12 +1,12 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.LogicException;
@@ -15,8 +15,8 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,23 +27,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Reasons for PEP Rule
+ * <p/>
+ * METHOD OF HIV EXPOSURE (2054) =
+ * <ul>
+ *     <li>SEXUAL ASSAULT (165) OR</li>
+ *     <li>SPOUSES PARTNER SUSPECTED HIV+ (5564) OR</li>
+ *     <li>PHYSICAL ASSAULT (1789) OR</li>
+ *     <li>OCCUPATIONAL EXPOSURE (7094) OR</li>
+ *     <li>OTHER (5622)</li>
+ * </ul>
+ */
 public class MohReasonsForPepRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(MohReasonsForPepRule.class);
 
 	public static final String TOKEN = "MOH Reasons For PEP";
 
+	// concepts
 	public static final String METHOD_OF_HIV_EXPOSURE = "METHOD OF HIV EXPOSURE";
 	public static final String SEXUAL_ASSAULT = "SEXUAL ASSAULT";
 	public static final String SPOUSES_PARTNER_SUSPECTED_HIV = "SPOUSES PARTNER SUSPECTED HIV+";
-	public static final String OCCUPATIONAL_EXPOSURE = "OCCUPATIONAL EXPOSURE";
 	public static final String PHYSICAL_ASSAULT = "PHYSICAL ASSAULT";
-	public static final String SUSPECTED_PAST_HIV_EXPOSURE = "SUSPECTED PAST HIV EXPOSURE";
-	public static final String CONTAMINATED_NEEDLE_STICK = "CONTAMINATED NEEDLE STICK";
-	public static final String BLOOD_TRANSFUSION = "BLOOD TRANSFUSION";
-	public static final String INTRAVENOUS_DRUG_USE = "INTRAVENOUS DRUG USE";
+	public static final String OCCUPATIONAL_EXPOSURE = "OCCUPATIONAL EXPOSURE";
 	public static final String OTHER_NON_CODED = "OTHER NON-CODED";
-	public static final String UNKNOWN = "UNKNOWN";
+
+	// encounters
 	public static final String POST_EXPOSURE_INITIAL_FORM = "PEPINITIAL";
 	public static final String POST_EXPOSURE_RETURN_FORM = "PEPRETURN";
 
@@ -54,17 +64,36 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 			MohCacheUtils.getEncounterType(POST_EXPOSURE_RETURN_FORM)
 	});
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
+	/**
+	 * @should recognize SEXUAL_ASSAULT
+	 * @should recognize SPOUSES_PARTNER_SUSPECTED_HIV
+	 * @should recognize PHYSICAL_ASSAULT
+	 * @should recognize OCCUPATIONAL_EXPOSURE
+	 * @should recognize OTHER_NON_CODED
+	 * @should recognize multiple reasons
+	 * @should not recognize other reasons
+	 * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
+	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		List<String> pepReasons = new ArrayList<String>();
 
-		//pull relevant observations then loop while checking concepts
+		// pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
-		obsRestrictions.put("encounter.encounterType", encounterTypes);
+		Map<String, Collection<OpenmrsObject>> encounterRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		obsRestrictions.put("encounterType", encounterTypes);
+
+		// set order of observations
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
+
+		// get the observations
+		List<Obs> observations = mohCoreService.getPatientObservationsWithEncounterRestrictions(
+				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
+
+		// create the list of reasons
+		List<String> pepReasons = new ArrayList<String>();
 
 		for (Obs obs : observations) {
 			Concept value = obs.getValueCoded();
@@ -77,34 +106,14 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 					pepReasons.add(OCCUPATIONAL_EXPOSURE);
 				} else if (value.equals(MohCacheUtils.getConcept(PHYSICAL_ASSAULT))) {
 					pepReasons.add(PHYSICAL_ASSAULT);
-				} else if (value.equals(MohCacheUtils.getConcept(SUSPECTED_PAST_HIV_EXPOSURE))) {
-					pepReasons.add(SUSPECTED_PAST_HIV_EXPOSURE);
-				} else if (value.equals(MohCacheUtils.getConcept(CONTAMINATED_NEEDLE_STICK))) {
-					pepReasons.add(CONTAMINATED_NEEDLE_STICK);
-				} else if (value.equals(MohCacheUtils.getConcept(BLOOD_TRANSFUSION))) {
-					pepReasons.add(BLOOD_TRANSFUSION);
-				} else if (value.equals(MohCacheUtils.getConcept(INTRAVENOUS_DRUG_USE))) {
-					pepReasons.add(INTRAVENOUS_DRUG_USE);
 				} else if (obs.getValueCoded().equals(MohCacheUtils.getConcept(OTHER_NON_CODED))) {
 					pepReasons.add(OTHER_NON_CODED);
-				} else if (obs.getValueCoded().equals(MohCacheUtils.getConcept(UNKNOWN))) {
-					pepReasons.add(UNKNOWN);
 				}
 			}
 		}
 
-		boolean first = true;
-		StringBuilder sb = new StringBuilder();
-		for (String reason : pepReasons) {
-			if (!first) {
-				sb.append(";");
-			} else {
-				first = false;
-			}
-			sb.append(reason);
-		}
-
-		return new Result(sb.toString());
+		// make a result from all reasons joined by a semicolon
+		return new Result(StringUtils.join(pepReasons, ";"));
 	}
 
 	protected String getEvaluableToken() {
@@ -120,9 +129,7 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 	}
 
 	/**
-	 * Get the definition of each parameter that should be passed to this rule execution
-	 *
-	 * @return all parameter that applicable for each rule execution
+	 * @see org.openmrs.module.amrsreport.rule.MohEvaluableRule#getDefaultDatatype()
 	 */
 	@Override
 	public Result.Datatype getDefaultDatatype() {
