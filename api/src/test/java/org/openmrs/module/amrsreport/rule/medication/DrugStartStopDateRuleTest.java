@@ -45,10 +45,8 @@ public class DrugStartStopDateRuleTest {
 	private static final int PATIENT_ID = 5;
 
 	private ConceptService conceptService;
-	private PatientService patientService;
 	private MohCoreService mohCoreService;
 
-	private Patient patient;
 	private DrugStartStopDateRule rule;
 
 	private List<Obs> currentStartObs;
@@ -57,16 +55,9 @@ public class DrugStartStopDateRuleTest {
 	@Before
 	public void setup() {
 
-		// build the patient
-		patient = new Patient();
-
 		// initialize the current obs
 		currentStartObs = new ArrayList<Obs>();
 		currentStopObs = new ArrayList<Obs>();
-
-		// build the mock patient service
-		patientService = Mockito.mock(PatientService.class);
-		Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
 		// build the concept service
 		int i = 0;
@@ -89,7 +80,6 @@ public class DrugStartStopDateRuleTest {
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
 		Mockito.when(Context.getConceptService()).thenReturn(conceptService);
-		Mockito.when(Context.getPatientService()).thenReturn(patientService);
 		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
 
 		// create a rule instance
