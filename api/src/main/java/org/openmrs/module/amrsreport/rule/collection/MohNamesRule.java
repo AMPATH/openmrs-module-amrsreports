@@ -24,6 +24,7 @@ public class MohNamesRule extends MohEvaluableRule {
 
 	/**
 	 * TODO figure out why we can't just use person.getName().getFullName()
+	 *
 	 * @should return the full name of a patient
 	 * @param context
 	 * @param patientId
