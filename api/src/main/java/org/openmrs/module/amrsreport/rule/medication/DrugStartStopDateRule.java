@@ -72,17 +72,6 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	}
 
 	/**
-	 * helper method to reduce code for validation methods
-	 *
-	 * @param concept
-	 * @param name
-	 * @return
-	 */
-	protected boolean compareConceptToName(Concept concept, String name) {
-		return OpenmrsUtil.nullSafeEquals(concept, MohCacheUtils.getConcept(name));
-	}
-
-	/**
 	 * validates the start observation, possibly evaluating the answer against a list of expected questions
 	 *
 	 * @param obs the observation to be validated
