@@ -12,6 +12,7 @@ import org.openmrs.logic.result.Result;
 import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.medication.DrugStartStopDateRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -148,22 +149,22 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 
 	@Override
 	protected boolean validateStartObs(Obs obs) {
-		return (compareConceptToName(obs.getConcept(), ANTIRETROVIRAL_THERAPY_STATUS) &&
-				compareConceptToName(obs.getValueCoded(), ON_ANTIRETROVIRAL_THERAPY))
+		return (MohRuleUtils.compareConceptToName(obs.getConcept(), ANTIRETROVIRAL_THERAPY_STATUS) &&
+				MohRuleUtils.compareConceptToName(obs.getValueCoded(), ON_ANTIRETROVIRAL_THERAPY))
 				||
-				(compareConceptToName(obs.getConcept(), ARVs_RECOMMENDED_FOR_PEP) &&
-						(compareConceptToName(obs.getValueCoded(), LOPINAVIR_AND_RITONAVIR) ||
-								compareConceptToName(obs.getValueCoded(), ZIDOVUDINE_AND_LAMIVUDINE))
+				(MohRuleUtils.compareConceptToName(obs.getConcept(), ARVs_RECOMMENDED_FOR_PEP) &&
+						(MohRuleUtils.compareConceptToName(obs.getValueCoded(), LOPINAVIR_AND_RITONAVIR) ||
+								MohRuleUtils.compareConceptToName(obs.getValueCoded(), ZIDOVUDINE_AND_LAMIVUDINE))
 				);
 	}
 
 	@Override
 	protected boolean validateStopObs(Obs obs) {
-		return (compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS1) ||
-				compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS2) ||
-				(compareConceptToName(obs.getConcept(), REASON_ANTIRETROVIRALS_STOPPED) &&
-						(compareConceptToName(obs.getValueCoded(), PATIENT_REFUSAL) ||
-								compareConceptToName(obs.getValueCoded(), COMPLETED))
+		return (MohRuleUtils.compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS1) ||
+				MohRuleUtils.compareConceptToName(obs.getConcept(), DAYS_ON_PEP_MEDS2) ||
+				(MohRuleUtils.compareConceptToName(obs.getConcept(), REASON_ANTIRETROVIRALS_STOPPED) &&
+						(MohRuleUtils.compareConceptToName(obs.getValueCoded(), PATIENT_REFUSAL) ||
+								MohRuleUtils.compareConceptToName(obs.getValueCoded(), COMPLETED))
 				));
 	}
 

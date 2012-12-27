@@ -7,6 +7,7 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,16 +45,16 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 
 	@Override
 	protected boolean validateStartObs(Obs obs) {
-		return compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) &&
+		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) &&
 				obs.getValueCoded() != null;
 	}
 
 	@Override
 	protected boolean validateStopObs(Obs obs) {
 		return (obs.getValueCoded() != null) && (
-				compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
+				MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
 						||
-						compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
+						MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
 		);
 	}
 }

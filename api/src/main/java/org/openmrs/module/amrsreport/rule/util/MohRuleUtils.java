@@ -19,10 +19,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.text.Format;
 import java.text.ParseException;
@@ -183,5 +186,15 @@ public class MohRuleUtils {
 
         return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
     }
-	
+
+	/**
+	 * helper method to reduce code for validation methods
+	 *
+	 * @param concept
+	 * @param name
+	 * @return
+	 */
+	public static boolean compareConceptToName(Concept concept, String name) {
+		return OpenmrsUtil.nullSafeEquals(concept, MohCacheUtils.getConcept(name));
+	}
 }

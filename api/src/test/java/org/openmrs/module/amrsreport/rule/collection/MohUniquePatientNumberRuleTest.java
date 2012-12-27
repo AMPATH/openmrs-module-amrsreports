@@ -17,6 +17,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 
 /**
  * Test file for MohUniquePatientNumberRule class. Should check and return CCC Number for a patient
@@ -78,14 +81,12 @@ public class MohUniquePatientNumberRuleTest {
 	}
 
 	/**
-	 * @verifies return a Unique Patient Number
+	 * @verifies return not found if no Unique Patient Number exists
 	 * @see MohUniquePatientNumberRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldReturnAUniquePatientNumber() throws Exception {
-		Result result = rule.evaluate(null, PATIENT_ID, null);
-		Result expectedResult = new Result("not found");
-		Assert.assertEquals("The patient has no CCC Number", expectedResult, result);
+	public void evaluate_shouldReturnNotFoundIfNoUniquePatientNumberExists() throws Exception {
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("not found")));
 	}
 
 	/**
@@ -93,10 +94,8 @@ public class MohUniquePatientNumberRuleTest {
 	 * @see MohUniquePatientNumberRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldReturnAvalidCCCNumber() throws Exception {
+	public void evaluate_shouldReturnAUniquePatientNumber() throws Exception {
 		addCCCNumber("11740-00001");
-		Result result = rule.evaluate(null, PATIENT_ID, null);
-		Result expectedResult = new Result("11740-00001");
-		Assert.assertEquals("The two identifiers are not equal", expectedResult, result);
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("11740-00001")));
 	}
 }
