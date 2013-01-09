@@ -176,11 +176,9 @@ public class LostToFollowUpPatientSnapshotTest {
 
         rule.consume(encounter);
 
-        System.out.println("Encounter date is "+encounter.getEncounterDatetime().toString()+" and today is "+new Date().toString());
-
         String expectedRes = "LTFU | 16-Oct-2012";
 
-         Assert.assertEquals("They are not equal",expectedRes,rule.getProperty("reason"));
+        Assert.assertEquals("They are not equal",expectedRes,rule.getProperty("reason"));
 
 
     }
