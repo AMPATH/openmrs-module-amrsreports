@@ -19,7 +19,6 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 

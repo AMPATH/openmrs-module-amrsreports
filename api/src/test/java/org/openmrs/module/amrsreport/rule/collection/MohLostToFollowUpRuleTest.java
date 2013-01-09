@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -14,6 +15,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import java.util.Set;
 /**
  * A test file for MohLostToFollowUpRule class.
