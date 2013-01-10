@@ -43,7 +43,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)
 	});
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private  MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @should get date and reason why a patient was lost
