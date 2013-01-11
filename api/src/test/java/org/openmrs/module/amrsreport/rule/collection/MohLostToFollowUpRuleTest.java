@@ -129,9 +129,10 @@ public class MohLostToFollowUpRuleTest {
      * @param conceptName
      * @param date
      */
-    private void addOpenObs(String concept,String date) {
+    private void addObsValueDateTime(String concept,String valueDatetime,String date) {
         Obs obs = new Obs();
         obs.setConcept(conceptService.getConcept(concept));
+        obs.setValueDatetime(makeDate(valueDatetime));
         obs.setObsDatetime(makeDate(date));
         currentObs.add(obs);
     }
@@ -184,12 +185,12 @@ public class MohLostToFollowUpRuleTest {
 
     @Test
     public void consume_shouldProperlyDetermineLTFUfromAnObs() throws Exception {
-        addEncounter(this.ENCOUNTER_TYPE_ADULT_INITIAL,"16 Aug 2012" );
-        addOpenObs(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE,"16 Aug 2012");
+
+        addObsValueDateTime(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE,"25 Aug 2012","16 Aug 2012");
 
         Assert.assertNotNull("A null encounter was encountered", currentObs);
 
-        Result expectedRes = new Result("LTFU | 20-Dec-2012");
+        Result expectedRes = new Result("LTFU | 25-Aug-2012");
 
         Assert.assertEquals("Result for LFTU has tested negative",expectedRes,rule.evaluate(null,PATIENT_ID, null));
 
