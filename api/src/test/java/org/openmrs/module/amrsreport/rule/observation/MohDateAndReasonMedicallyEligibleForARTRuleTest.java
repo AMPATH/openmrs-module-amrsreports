@@ -18,11 +18,14 @@ import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.rule.MohEvaluableConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.observation.MohDateAndReasonMedicallyEligibleForARTRule;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.Double;
+import java.lang.String;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,18 +48,22 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
             MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
+            MohEvaluableNameConstants.WHO_STAGE_4_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
+            MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
             MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
+            MohEvaluableNameConstants.WHO_STAGE_4_PEDS,
             MohEvaluableNameConstants.WHO_STAGE_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_PEDS,
-            MohEvaluableNameConstants.HIV_DNA_PCR
+            MohEvaluableNameConstants.HIV_DNA_PCR,
+            MohEvaluableNameConstants.POSITIVE
     );
 
     private static final int PATIENT_ID = 5;
     private Patient patient;
     private ConceptService conceptService;
     private PatientService patientService;
-    private ObsService obsService;
+    private MohCoreService mohCoreService;
     private MohDateAndReasonMedicallyEligibleForARTRule rule;
     private List<Obs> currentObs;
 
@@ -77,111 +84,153 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
             Mockito.when(conceptService.getConcept(conceptName)).thenReturn(new Concept(i++));
         }
         Mockito.when(conceptService.getConcept((String) null)).thenReturn(null);
+
         Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
-        obsService = Mockito.mock(ObsService.class);
-       /* List<Obs> obs = Context.getObsService().getObservations(
-                Arrays.asList(new Person[]{patient}), null, getQuestionConcepts(),
-                null, null, null, null, null, null, null, null, false);*/
+        mohCoreService = Mockito.mock(MohCoreService.class);
 
-        Mockito.when(obsService.getObservations(
-                Arrays.asList(patient),
-                Mockito.anyList(),
-                Mockito.anyList(),
-                Mockito.anyList(),
-                Mockito.anyList(),
-                Mockito.anyList(),
-                Mockito.anyList(),
-                Mockito.anyInt(),
-                Mockito.anyInt(),
-                Mockito.any(Date.class),
-                Mockito.any(Date.class),
-                Mockito.anyBoolean()
-                )).thenReturn(currentObs);
+        Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
+                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
 
 
         // set up Context
         PowerMockito.mockStatic(Context.class);
         Mockito.when(Context.getConceptService()).thenReturn(conceptService);
-        Mockito.when(Context.getObsService()).thenReturn(obsService);
+        Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
         Mockito.when(Context.getPatientService()).thenReturn(patientService);
 
         rule = new MohDateAndReasonMedicallyEligibleForARTRule();
     }
 
+    /**
+     * generate a date from a string
+     *
+     * @param date
+     * @return
+     */
+    private Date makeDate(String date) {
+        try {
+            return new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).parse(date);
+        } catch (Exception e) {
+            // pass
+        }
+        return new Date();
+    }
 
-	/**
+    /**
+     * adds an observation with the given date as the obs datetime
+     *
+     * @param concept
+     * @param date
+     */
+    private void addObs(String concept, String answer, String date) {
+        Obs obs = new Obs();
+        obs.setConcept(conceptService.getConcept(concept));
+        obs.setValueCoded(conceptService.getConcept(answer));
+        obs.setObsDatetime(makeDate(date));
+        currentObs.add(obs);
+    }
+
+    /**
+     * adds an observation with the given date as the obs datetime
+     *
+     * @param concept
+     * @param date
+     */
+    private void addObsValue(String concept, String answer, String date) {
+        Obs obs = new Obs();
+        obs.setConcept(conceptService.getConcept(concept));
+        obs.setValueNumeric((Double)answer);
+        obs.setObsDatetime(makeDate(date));
+        currentObs.add(obs);
+    }
+
+    /**
 	 * @verifies get the date and reason for ART eligibility
 	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldGetTheDateAndReasonForARTEligibility() throws Exception {
+	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
 
-		/*MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_ADULT, new String[]{
-				MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
-				MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
-				MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
-				MohEvaluableNameConstants.WHO_STAGE_4_ADULT
-		});
-		MohTestUtils.createQuestion(MohEvaluableNameConstants.WHO_STAGE_PEDS, new String[]{
-				MohEvaluableNameConstants.WHO_STAGE_1_PEDS,
-				MohEvaluableNameConstants.WHO_STAGE_2_PEDS,
-				MohEvaluableNameConstants.WHO_STAGE_3_PEDS,
-				MohEvaluableNameConstants.WHO_STAGE_4_PEDS
-		});
-		MohTestUtils.createQuestion(MohEvaluableNameConstants.HIV_DNA_PCR, new String[]{
-				MohEvaluableNameConstants.POSITIVE
-		});
-		Patient patient = new Patient();
-		patient.setPersonId(2);
+        Date dob = makeDate("16 Oct 1975");
+        patient.setBirthdate(dob);
 
-		PatientIdentifierType pit = new PatientIdentifierType();
-		pit.setPatientIdentifierTypeId(1);
+        addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT,MohEvaluableNameConstants.WHO_STAGE_1_ADULT,"16 Oct 2012");
 
-		PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
-		pi.setPatient(patient);
+        //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
+        Assert.assertEquals("Current Obs is null", 1, currentObs.size());
 
-		Date birthdate = new Date(1975, 01, 01);
-		patient.setBirthdate(birthdate);
+    }
 
-		EncounterService service = Context.getEncounterService();
+    /**
+     * @verifies get the date and reason for ART eligibility
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
 
-		Encounter sampleEncounter = new Encounter();
-		Date encounterDate = new Date();
-		sampleEncounter.setEncounterDatetime(encounterDate);
-		sampleEncounter.setPatient(patient);
-		sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+        Date dob = makeDate("16 Oct 1975");
+        patient.setBirthdate(dob);
 
-		*//*ObsService obsService = Context.getObsService();*//*
+        addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT,MohEvaluableNameConstants.WHO_STAGE_4_ADULT,"16 Oct 2012");
 
-		Obs obs = new Obs();
-		obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_ADULT));
-		obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.WHO_STAGE_1_ADULT));
-		obs.setObsDatetime(new Date());
-		obs.setEncounter(sampleEncounter);
+        //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
+        Assert.assertEquals("Current Obs is null",1,currentObs.size());
 
-		//sampleEncounter.setObs(allObs);
+    }
 
-		Encounter resEncounter = service.saveEncounter(sampleEncounter);
-		Integer patientID = resEncounter.getPatient().getPersonId();
+    /**
+     * @verifies get the date and reason for ART eligibility
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
 
-		*//*Checks if the Encounter has been saved*//*
-		Assert.assertNotNull("Encounter is Null", resEncounter);
+        Date dob = makeDate("16 Oct 2006");
+        patient.setBirthdate(dob);
 
-		*//*Checks to find id patient Id is not null*//*
-		Assert.assertNotNull("PatientID is Null", patientID);
+        addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS,MohEvaluableNameConstants.WHO_STAGE_4_PEDS,"16 Oct 2012");
 
+        //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
+        Assert.assertEquals("Current Obs is null",1,currentObs.size());
 
-		Assert.assertNotNull("Encounter is Null", resEncounter);
+    }
 
+    /**
+     * @verifies get the date and reason for ART eligibility
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
 
-		MohDateAndReasonMedicallyEligibleForARTRule sampleRule = new MohDateAndReasonMedicallyEligibleForARTRule();
+        Date dob = makeDate("16 Oct 2012");
+        patient.setBirthdate(dob);
 
-		Result evalResult = sampleRule.evaluate(null, patientID, null);
+        addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS,MohEvaluableNameConstants.WHO_STAGE_2_PEDS,"16 Oct 2012");
+        addObs(MohEvaluableNameConstants.HIV_DNA_PCR,MohEvaluableNameConstants.POSITIVE);
+        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS,340);
 
-		Assert.assertNotNull("Evaluate Method returns Null", evalResult);
+        //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
+        Assert.assertEquals("Current Obs is null",1,currentObs.size());
 
-	}
-*/
+    }
+
+    /**
+     * @verifies get the date and reason for ART eligibility
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
+
+        Date dob = makeDate("16 Oct 1975");
+        patient.setBirthdate(dob);
+
+        addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS,MohEvaluableNameConstants.WHO_STAGE_3_PEDS,"16 Oct 2012");
+        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS,340,"16 Oct 2012");
+        addObsValue(MohEvaluableNameConstants.CD4_PERCENT,20,"16 Oct 2012");
+
+        //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
+        Assert.assertEquals("Current Obs is null",1,currentObs.size());
+
     }
 }
