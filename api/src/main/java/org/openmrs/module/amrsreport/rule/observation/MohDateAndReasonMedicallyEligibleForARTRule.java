@@ -100,6 +100,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		return new Result();
 	}
 
+
 	@Override
 	protected String getEvaluableToken() {
 		return TOKEN;
