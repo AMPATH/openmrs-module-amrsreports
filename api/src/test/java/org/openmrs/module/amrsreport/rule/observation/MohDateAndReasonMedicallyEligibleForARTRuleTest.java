@@ -41,10 +41,10 @@ import java.util.Locale;
 public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
 
     private static final List<String> initConcepts = Arrays.asList(
-            MohDateAndReasonMedicallyEligibleForARTRule.REASON_CLINICAL,
-            MohDateAndReasonMedicallyEligibleForARTRule.REASON_CLINICAL_CD4,
-            MohDateAndReasonMedicallyEligibleForARTRule.REASON_CLINICAL_CD4_HIV_DNA_PCR,
-            MohDateAndReasonMedicallyEligibleForARTRule.REASON_CLINICAL_HIV_DNA_PCR,
+		    ARVPatientSnapshot.REASON_CLINICAL,
+		    ARVPatientSnapshot.REASON_CLINICAL_CD4,
+		    ARVPatientSnapshot.REASON_CLINICAL_CD4_HIV_DNA_PCR,
+		    ARVPatientSnapshot.REASON_CLINICAL_HIV_DNA_PCR,
             MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
             MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
@@ -137,10 +137,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
      * @param concept
      * @param date
      */
-    private void addObsValue(String concept, String answer, String date) {
+    private void addObsValue(String concept, Double answer, String date) {
         Obs obs = new Obs();
         obs.setConcept(conceptService.getConcept(concept));
-        obs.setValueNumeric((Double)answer);
+        obs.setValueNumeric(answer);
         obs.setObsDatetime(makeDate(date));
         currentObs.add(obs);
     }
@@ -207,8 +207,8 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
         patient.setBirthdate(dob);
 
         addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS,MohEvaluableNameConstants.WHO_STAGE_2_PEDS,"16 Oct 2012");
-        addObs(MohEvaluableNameConstants.HIV_DNA_PCR,MohEvaluableNameConstants.POSITIVE);
-        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS,340);
+        addObs(MohEvaluableNameConstants.HIV_DNA_PCR,MohEvaluableNameConstants.POSITIVE,"16 Oct 2012");
+        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 
         //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
         Assert.assertEquals("Current Obs is null",1,currentObs.size());
@@ -226,8 +226,8 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest{
         patient.setBirthdate(dob);
 
         addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS,MohEvaluableNameConstants.WHO_STAGE_3_PEDS,"16 Oct 2012");
-        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS,340,"16 Oct 2012");
-        addObsValue(MohEvaluableNameConstants.CD4_PERCENT,20,"16 Oct 2012");
+        addObsValue(MohEvaluableNameConstants.CD4_BY_FACS,340d,"16 Oct 2012");
+        addObsValue(MohEvaluableNameConstants.CD4_PERCENT,20d,"16 Oct 2012");
 
         //Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
         Assert.assertEquals("Current Obs is null",1,currentObs.size());
