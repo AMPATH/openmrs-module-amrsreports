@@ -32,8 +32,6 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.openmrs.util.OpenmrsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,7 +58,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT)
 	});
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @should get the date and reason for ART eligibility
@@ -135,6 +133,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	}
 
 	private Result formatResult(Date date, String reason) {
-		return new Result(OpenmrsUtil.getDateFormat(Context.getLocale()).format(date) + " - " + reason);
+		return new Result(MohRuleUtils.formatdates(date) + " - " + reason);
 	}
 }
