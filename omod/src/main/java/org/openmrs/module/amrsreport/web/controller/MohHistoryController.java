@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
@@ -41,7 +42,9 @@ public class MohHistoryController {
 
 		String[] children = fileDir.list();
 
-		map.addAttribute("reportHistory", Arrays.asList(children));
+		List<String> filenames = children != null ? Arrays.asList(children) : new ArrayList<String>();
+		Collections.sort(filenames);
+		map.addAttribute("reportHistory", filenames);
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreport/mohHistory.form")
@@ -61,6 +64,7 @@ public class MohHistoryController {
 			filenames = Arrays.asList(children);
 		}
 
+		Collections.sort(filenames);
 		map.addAttribute("reportHistory", filenames);
 
 		///end of interface population after submitting

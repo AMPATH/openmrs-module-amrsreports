@@ -15,11 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Nicholas Ingosi Magaja
- * Date: 5/24/12
- * Time: 11:54 AM
- * To change this template use File | Settings | File Templates.
+ * MohNamesRule class returns a patient's full names
  */
 public class MohNamesRule extends MohEvaluableRule {
 
@@ -29,6 +25,7 @@ public class MohNamesRule extends MohEvaluableRule {
 	/**
 	 * TODO figure out why we can't just use person.getName().getFullName()
 	 *
+	 * @should return the full name of a patient
 	 * @param context
 	 * @param patientId
 	 * @param parameters

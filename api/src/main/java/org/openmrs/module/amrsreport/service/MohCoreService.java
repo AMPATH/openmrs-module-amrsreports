@@ -59,6 +59,7 @@ public interface MohCoreService extends OpenmrsService {
 	 * observations between certain date
 	 * @should return empty cohort when no patient match the criteria
 	 */
+	@Transactional(readOnly=true)
 	@Authorized({PrivilegeConstants.VIEW_LOCATIONS, PrivilegeConstants.VIEW_PATIENTS})
 	Cohort getDateCreatedCohort(final Location location, final Date startDate, final Date endDate) throws APIException;
 
@@ -78,6 +79,7 @@ public interface MohCoreService extends OpenmrsService {
 	 * observations between certain date
 	 * @should return empty cohort when no patient match the criteria
 	 */
+	@Transactional(readOnly=true)
 	Cohort getReturnDateCohort(final Location location, final Date startDate, final Date endDate) throws APIException;
 
 	/**
@@ -96,6 +98,7 @@ public interface MohCoreService extends OpenmrsService {
 	 * observations between certain date
 	 * @should return empty cohort when no patient match the criteria
 	 */
+	@Transactional(readOnly=true)
 	Cohort getObservationCohort(List<Concept> concepts, Date startDate, Date endDate) throws APIException;
 
 	/**
@@ -112,6 +115,7 @@ public interface MohCoreService extends OpenmrsService {
 	 * @should return all encounters that match the search criteria
 	 * @should return empty list when no encounter match the criteria
 	 */
+	@Transactional(readOnly=true)
 	@Authorized({PrivilegeConstants.VIEW_ENCOUNTERS})
 	List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
 		final MohFetchRestriction mohFetchRestriction) throws APIException;
@@ -131,11 +135,17 @@ public interface MohCoreService extends OpenmrsService {
 	 * @should return all observations that match the search criteria
 	 * @should return empty list when no observation match the criteria
 	 */
+	@Transactional(readOnly=true)
 	@Authorized({PrivilegeConstants.VIEW_OBS})
 	List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
 		final MohFetchRestriction mohFetchRestriction) throws APIException;
 
-	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
+	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId, final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+	                                                          final MohFetchRestriction mohFetchRestriction) throws APIException;
+
+	@Transactional(readOnly=true)
+	List<PatientIdentifier> getAllPatientIdentifiers(Patient p);
 
 	public UserReport saveUserReport(UserReport userReport);
 

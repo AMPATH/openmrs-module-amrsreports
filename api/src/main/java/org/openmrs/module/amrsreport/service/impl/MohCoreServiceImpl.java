@@ -111,7 +111,12 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	@Override
-	public List<PatientIdentifier> getAllPatientIdenifiers(Patient p) {
+	public List<Obs> getPatientObservationsWithEncounterRestrictions(Integer patientId, Map<String, Collection<OpenmrsObject>> obsRestrictions, Map<String, Collection<OpenmrsObject>> encounterRestrictions, MohFetchRestriction mohFetchRestriction) throws APIException {
+		return mohCoreDAO.getPatientObservationsWithEncounterRestrictions(patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
+	}
+
+	@Override
+	public List<PatientIdentifier> getAllPatientIdentifiers(Patient p) {
 
 		return mohCoreDAO.getAllPatientIdenifiers(p);
 	}

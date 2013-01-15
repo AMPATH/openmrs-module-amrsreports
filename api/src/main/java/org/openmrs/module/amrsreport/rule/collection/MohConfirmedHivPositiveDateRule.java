@@ -2,8 +2,10 @@ package org.openmrs.module.amrsreport.rule.collection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
@@ -14,10 +16,17 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchOrdering;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,54 +41,48 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 
 	public static final String TOKEN = "MOH Confirmed HIV Positive Date";
 
+	private static final Concept CONCEPT_ENZYME = MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE);
+	private static final Concept CONCEPT_RAPID = MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE);
+	private static final Concept CONCEPT_POSITIVE = MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE);
+
+	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
 	 *      java.util.Map)
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
-		Date firstEncounterDate = null;
 
-		try {
-			Patient patient = Context.getPatientService().getPatient(patientId);
+		//pull relevant observations then loop while checking concepts
+		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		obsRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_ENZYME, CONCEPT_RAPID}));
+		obsRestrictions.put("valueCoded", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_POSITIVE}));
 
-			List<Encounter> e = Context.getEncounterService().getEncountersByPatient(patient);
+		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
 
-			//sort the encounters
-			Collections.sort(e, new SortByDateComparator());
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
 
-			//Iterate though encounters for the patient
-			Iterator<Encounter> it = e.iterator();
-			boolean first = true;
-
-			while (it.hasNext()) {
-				// get next encounter
-				Encounter encounter = it.next();
-
-				// set firstEncounterDate if it is first
-				if (first) {
-					firstEncounterDate = encounter.getEncounterDatetime();
-					first = false;
-				}
-
-				//pull encounter obs then loop while checking concepts
-				Iterator<Obs> it1 = encounter.getAllObs().iterator();
-				while (it1.hasNext()) {
-					Obs obs = it1.next();
-					if (
-							(obs.getConcept() == MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE)
-									&& (obs.getValueCoded() == MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE)))
-									||
-									(obs.getConcept() == MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE)
-											&& (obs.getValueCoded() == MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE)))) {
-						return new Result(obs.getObsDatetime());
-					}
-				}
-			}
-		} catch (Exception e) {
-			// do nothing? TODO log something here ...
+		if (!observations.isEmpty()) {
+			Obs obs = observations.get(0);
+			return new Result(obs.getObsDatetime());
 		}
 
 		// return the first encounter date if nothing else is found
+		Date firstEncounterDate = null;
+
+		// set up query for encounters in order by ascending date
+		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
+		mohFetchRestriction = new MohFetchRestriction();
+		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
+
+		// get the encounters
+		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+
+		// pull the first encounter date
+		if (!encounters.isEmpty()) {
+			firstEncounterDate = encounters.get(0).getEncounterDatetime();
+		}
+
 		return new Result(firstEncounterDate);
 	}
 
