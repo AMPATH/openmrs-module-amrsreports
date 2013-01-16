@@ -140,12 +140,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		currentObs.add(obs);
 	}
 
-	/**
-	 * @verifies get the date and reason for ART eligibility
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
+    /**
+     * @verifies return REASON_CLINICAL_CD4ForAdults
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
 		Date dob = makeDate("16 Oct 1975");
 		patient.setBirthdate(dob);
 
@@ -155,12 +155,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		Assert.assertEquals("REASON_CLINICAL_CD4ForAdults tested false", new Result("16-Oct-12 - Clinical + CD4"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
-	/**
-	 * @verifies get the date and reason for ART eligibility
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
+    /**
+     * @verifies return REASON_CLINICALForAdults
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
 
 		Date dob = makeDate("16 Oct 1975");
 		patient.setBirthdate(dob);
@@ -173,12 +173,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 	}
 
-	/**
-	 * @verifies get the date and reason for ART eligibility
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
+    /**
+     * @verifies return REASON_CLINICALForPeds
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2006");
 		patient.setBirthdate(dob);
@@ -191,12 +191,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 	}
 
-	/**
-	 * @verifies get the date and reason for ART eligibility
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
+    /**
+     * @verifies return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2012");
 		patient.setBirthdate(dob);
@@ -211,12 +211,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 	}
 
-	/**
-	 * @verifies get the date and reason for ART eligibility
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
+    /**
+     * @verifies return REASON_CLINICAL_CD4ForPeds
+     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2010");
 		patient.setBirthdate(dob);
@@ -230,4 +230,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 
 	}
+
+
 }

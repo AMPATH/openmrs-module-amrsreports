@@ -61,9 +61,13 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-	 * @should get the date and reason for ART eligibility
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
+     * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
+     * @should return REASON_CLINICAL_CD4ForAdults
+     * @should return REASON_CLINICALForAdults
+     * @should return REASON_CLINICALForPeds
+     * @should return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
+     * @should return REASON_CLINICAL_CD4ForPeds
+	 *
 	 */
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
