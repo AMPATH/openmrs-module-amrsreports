@@ -140,8 +140,12 @@ public interface MohCoreService extends OpenmrsService {
 	List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
 		final MohFetchRestriction mohFetchRestriction) throws APIException;
 
+	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId, final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+	                                                          final MohFetchRestriction mohFetchRestriction) throws APIException;
+
 	@Transactional(readOnly=true)
-	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
+	List<PatientIdentifier> getAllPatientIdentifiers(Patient p);
 
 	public UserReport saveUserReport(UserReport userReport);
 

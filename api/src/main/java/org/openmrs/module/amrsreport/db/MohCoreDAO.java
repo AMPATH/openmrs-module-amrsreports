@@ -47,6 +47,11 @@ public interface MohCoreDAO {
 	List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
 		final MohFetchRestriction mohFetchRestriction) throws DAOException;
 
+	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
+	                                                          final Map<String,Collection<OpenmrsObject>> obsRestrictions,
+	                                                          final Map<String,Collection<OpenmrsObject>> encounterRestrictions,
+	                                                          final MohFetchRestriction mohFetchRestriction);
+
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
 
 	public UserReport saveUserReport(UserReport userReport);

@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,16 +39,14 @@ import java.util.Map;
 @PrepareForTest(Context.class)
 public class DrugStartStopDateRuleTest {
 
-	private static final String START_CONCEPT = "startConcept";
+	private static final String START_CONCEPT = "startConcepts";
 	private static final String STOP_CONCEPT = "stopConcept";
 
 	private static final int PATIENT_ID = 5;
 
 	private ConceptService conceptService;
-	private PatientService patientService;
 	private MohCoreService mohCoreService;
 
-	private Patient patient;
 	private DrugStartStopDateRule rule;
 
 	private List<Obs> currentStartObs;
@@ -56,16 +55,9 @@ public class DrugStartStopDateRuleTest {
 	@Before
 	public void setup() {
 
-		// build the patient
-		patient = new Patient();
-
 		// initialize the current obs
 		currentStartObs = new ArrayList<Obs>();
 		currentStopObs = new ArrayList<Obs>();
-
-		// build the mock patient service
-		patientService = Mockito.mock(PatientService.class);
-		Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
 		// build the concept service
 		int i = 0;
@@ -88,7 +80,6 @@ public class DrugStartStopDateRuleTest {
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
 		Mockito.when(Context.getConceptService()).thenReturn(conceptService);
-		Mockito.when(Context.getPatientService()).thenReturn(patientService);
 		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
 
 		// create a rule instance
@@ -219,13 +210,23 @@ public class DrugStartStopDateRuleTest {
 	private class TestDrugStartStopDateRule extends DrugStartStopDateRule {
 
 		public TestDrugStartStopDateRule() {
-			this.startConcept = MohCacheUtils.getConcept(START_CONCEPT);
-			this.stopConcept = MohCacheUtils.getConcept(STOP_CONCEPT);
+			this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(START_CONCEPT));
+			this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(STOP_CONCEPT));
 		}
 
 		@Override
 		protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
 			return this.getResult(patientId);
+		}
+
+		@Override
+		protected boolean validateStartObs(Obs obs) {
+			return true;
+		}
+
+		@Override
+		protected boolean validateStopObs(Obs obs) {
+			return true;
 		}
 	}
 }
