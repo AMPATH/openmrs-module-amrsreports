@@ -11,6 +11,7 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
@@ -32,7 +33,8 @@ public class MohLostToFollowUpRuleTest {
             LostToFollowUpPatientSnapshot.CONCEPT_DECEASED,
             LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER,
             LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE,
-            LostToFollowUpPatientSnapshot.CONCEPT_AMPATH
+            LostToFollowUpPatientSnapshot.CONCEPT_AMPATH,
+            MohEvaluableNameConstants.RETURN_VISIT_DATE
 
     );
     private String ENCOUNTER_TYPE_ADULT_INITIAL="ADULTINITIAL";
@@ -119,7 +121,6 @@ public class MohLostToFollowUpRuleTest {
         obs.setConcept(conceptService.getConcept(concept));
         obs.setValueCoded(conceptService.getConcept(answer));
         obs.setObsDatetime(makeDate(date));
-        obs.setEncounter(encounter);
         currentObs.add(obs);
     }
 
@@ -161,38 +162,41 @@ public class MohLostToFollowUpRuleTest {
         patient.setDeathDate(deathDate);
 
         Assert.assertTrue("The Patient is alive",patient.getDead());
-
-        Result expectedResult = new Result("DEAD | 20-Dec-2012");
-
-        Assert.assertEquals("Result for DEAD not correct",expectedResult, rule.evaluate(null,PATIENT_ID, null));
-
-
+        Assert.assertEquals("Result for DEAD not correct",new Result("DEAD | 20-Dec-2012"), rule.evaluate(null,PATIENT_ID, null));
 
     }
 
-
-
     @Test
     public void consume_shouldProperlyDetermineTOfromAnObservation() throws Exception {
-        addEncounter(this.ENCOUNTER_TYPE_ADULT_INITIAL,"16 Oct 1975" );
+
         addObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975") ;
 
-        Assert.assertNotNull("A null encounter was encountered", encounter);
-        Assert.assertNotNull("A null Obs was encountered", currentObs);
+        Assert.assertEquals("current Obs size is wrong!", 1, currentObs.size());
 
         Assert.assertEquals("Test for TO is wrong ",new Result("TO | (Ampath) 16-Oct-1975"),rule.evaluate(null,PATIENT_ID,null));
     }
 
     @Test
-    public void consume_shouldProperlyDetermineLTFUfromAnObs() throws Exception {
+    public void consume_shouldProperlyDetermineLTFUfromAnObsUsingCONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE() throws Exception {
 
         addObsValueDateTime(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE,"25 Aug 2012","16 Aug 2012");
 
-        Assert.assertNotNull("A null encounter was encountered", currentObs);
+        Assert.assertNotNull("A null Obs was encountered", currentObs);
+        Assert.assertEquals("Returned wrong number for Obs",1,currentObs.size());
 
-        Result expectedRes = new Result("LTFU | 25-Aug-2012");
+        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative",new Result("LTFU | 25-Aug-2012"),rule.evaluate(null,PATIENT_ID, null));
 
-        Assert.assertEquals("Result for LFTU has tested negative",expectedRes,rule.evaluate(null,PATIENT_ID, null));
+    }
+
+    @Test
+    public void consume_shouldProperlyDetermineLTFUfromAnObsUsingRETURN_VISIT_DATE() throws Exception {
+
+        addObsValueDateTime(MohEvaluableNameConstants.RETURN_VISIT_DATE,"16 Oct 2012","16 Aug 2012");
+
+        Assert.assertNotNull("A null Obs was encountered", currentObs);
+        Assert.assertEquals("Returned wrong number for Obs",1,currentObs.size());
+
+        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative",new Result("LTFU | 16 Oct 2012"),rule.evaluate(null,PATIENT_ID, null));
 
     }
 

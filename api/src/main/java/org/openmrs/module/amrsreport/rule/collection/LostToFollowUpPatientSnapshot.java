@@ -56,28 +56,35 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 		Concept answer = o.getValueCoded();
 
 		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
-			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
+            this.setProperty("why","DEAD");
+            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY))) {
-			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
+            this.setProperty("why","DEAD");
+            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH))) {
-			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
+            this.setProperty("why","DEAD");
+            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DECEASED))) {
-			this.setProperty("reason", "DEAD | " + sdf.format(sdf.format(o.getObsDatetime())));
+            this.setProperty("why","DEAD");
+            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED))) {
-			this.setProperty("reason", "DEAD | " + sdf.format(o.getObsDatetime()));
+
 			return true;
 		}
 
 		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER))) {
-			if (answer == MohCacheUtils.getConcept(CONCEPT_AMPATH))
-				this.setProperty("reason", "TO | (Ampath) " + sdf.format(o.getObsDatetime()));
-			else
-				this.setProperty("reason", "TO | (Non-Ampath) " + sdf.format(o.getObsDatetime()));
-
+			if (answer == MohCacheUtils.getConcept(CONCEPT_AMPATH)){
+                this.setProperty("why","TO | (Ampath) ");
+                this.setProperty("obsDate",sdf.format(o.getObsDatetime()));
+            }
+			else{
+                this.setProperty("why","TO | (Non-Ampath) ");
+                this.setProperty("obsDate",sdf.format(o.getObsDatetime()));
+            }
 			return true;
 		}
 
@@ -86,7 +93,8 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
 				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
 				if (requiredTimeToShowup < todayTimeFromSchedule) {
-					this.setProperty("reason", "LTFU | " + sdf.format(o.getValueDatetime()));
+                    this.setProperty("why","LFTU");
+                    this.setProperty("obsDate",sdf.format(o.getValueDatetime()));
 					return true;
 				}
 			}
@@ -97,7 +105,8 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
 				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
 				if (requiredTimeToShowup < todayTimeFromSchedule) {
-					this.setProperty("reason", "LTFU | " + sdf.format(o.getValueDatetime()));
+                    this.setProperty("why","LFTU");
+                    this.setProperty("obsDate",sdf.format(o.getValueDatetime()));
 					return true;
 				}
 			}
@@ -108,8 +117,26 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
 	@Override
 	public boolean eligible() {
-		// todo put the eligibility requirements in here
-		return true;
+
+        if(this.getProperty("why").equals("DEAD")){
+            this.setProperty("reason", "DEAD | " + this.getProperty("obsDate"));
+            return true;
+        }
+        else if(this.getProperty("why").equals("TO | (Ampath) ")){
+            this.setProperty("reason", "TO | (Ampath) " + this.getProperty("obsDate"));
+            return true;
+        }
+        else if(this.getProperty("why").equals("TO | (Non-Ampath) ")){
+            this.setProperty("reason", "TO | (Non-Ampath) " + this.getProperty("obsDate"));
+            return true;
+        }
+        else if(this.getProperty("why").equals("LTFU")){
+            this.setProperty("reason", "LTFU | " + this.getProperty("obsDate"));
+            return true;
+        }
+
+        return false;
+
 	}
 
 	/**
