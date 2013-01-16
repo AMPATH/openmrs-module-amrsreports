@@ -50,7 +50,8 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 			MohEvaluableNameConstants.WHO_STAGE_PEDS,
 			MohEvaluableNameConstants.HIV_DNA_PCR,
 			MohEvaluableNameConstants.POSITIVE,
-			MohEvaluableNameConstants.CD4_BY_FACS
+			MohEvaluableNameConstants.CD4_BY_FACS,
+            MohEvaluableNameConstants.CD4_PERCENT
 	);
 
 	private static final int PATIENT_ID = 5;
@@ -151,7 +152,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_1_ADULT, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "16 Oct 2012");
 
-		Assert.assertEquals("Result for Adult stage tested false", new Result("16-Oct-12 - Clinical + CD4"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals("REASON_CLINICAL_CD4ForAdults tested false", new Result("16-Oct-12 - Clinical + CD4"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -165,9 +166,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_4_ADULT, "16 Oct 2012");
+        Assert.assertEquals("Current Obs is null", 1, currentObs.size());
 
-		//Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
-		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
+		Assert.assertEquals("REASON_CLINICALForAdults tested false",new Result("16-Oct-12 - Clinical Only"),rule.evaluate(null,PATIENT_ID,null));
+
 
 	}
 
@@ -182,9 +184,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Oct 2012");
+        Assert.assertEquals("Current Obs is null", 1, currentObs.size());
 
-		//Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
-		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
+		Assert.assertEquals("Result for REASON_CLINICALForPeds tested false",new Result("16-Oct-12 - Clinical Only"),rule.evaluate(null,PATIENT_ID,null));
+
 
 	}
 
@@ -202,8 +205,9 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 
-		//Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
-		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+        Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+		Assert.assertEquals("Result for REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds tested false",new Result("16-Oct-12 - Clinical + CD4 + HIV DNA PCR"),rule.evaluate(null,PATIENT_ID,null));
+
 
 	}
 
@@ -214,15 +218,16 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	@Test
 	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
 
-		Date dob = makeDate("16 Oct 1975");
+		Date dob = makeDate("16 Oct 2010");
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_3_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 20d, "16 Oct 2012");
 
-		//Assert.assertEquals("Result for Adult stage tested false",new Result("This is a test"),rule.evaluate(null,PATIENT_ID,null));
-		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+        Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+		Assert.assertEquals("Result for REASON_CLINICAL_CD4ForPeds tested false",new Result("16-Oct-12 - Clinical + CD4"),rule.evaluate(null,PATIENT_ID,null));
+
 
 	}
 }
