@@ -1,22 +1,18 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
-import org.junit.Test;
 import org.junit.Assert;
-import org.openmrs.module.amrsreport.rule.collection.MohIdentifierRule;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.junit.Test;
+import org.openmrs.GlobalProperty;
+import org.openmrs.Location;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.amrsreport.cache.MohCacheUtils;
-import org.openmrs.Location;
-import org.openmrs.api.LocationService;
-import org.openmrs.GlobalProperty;
-import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
-import org.openmrs.logic.result.Result;
 import org.openmrs.api.context.Context;
-import java.util.List;
-import java.lang.Integer;
+import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 /**
  * Test class for MohNamesRule class
