@@ -126,6 +126,7 @@ public interface MohEvaluableNameConstants {
 	public static final String ENCOUNTER_TYPE_ADULT_INITIAL = "ADULTINITIAL";
 	public static final String ENCOUNTER_TYPE_ADULT_RETURN = "ADULTRETURN";
 	public static final String ENCOUNTER_TYPE_ADULT_NONCLINICALMEDICATION = "ADULTNONCLINICALMEDICATION";
+	public static final String ENCOUNTER_TYPE_DEATH_REPORT = "DEATHREPORT";
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_INITIAL = "PEDSINITIAL";
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_RETURN = "PEDSRETURN";
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_NONCLINICALMEDICATION = "PEDSNONCLINICALMEDICATION";
@@ -145,7 +146,7 @@ public interface MohEvaluableNameConstants {
 	public static final String INPATIENT_CARE_OR_HOSPITALIZATION = "INPATIENT CARE OR HOSPITALIZATION";
 	public static final String PROVIDER_INITIATED_TESTING_AND_COUNSELING = "PROVIDER INITIATED TESTING AND COUNSELING";
 	public static final String PEDIATRIC_OUTPATIENT_CLINIC = "PEDIATRIC OUTPATIENT CLINIC";
-	public static final String POINT_OF_HIV_TESTING = "POINT OF HIV TESTING";
+	public static final String POINT_OF_HIV_TESTING = "Point of HIV Testing";
 	
 	//Confirmed HIV date
 	String HIV_ENZYME_IMMUNOASSAY_QUALITATIVE = "HIV ENZYME IMMUNOASSAY, QUALITATIVE";
@@ -306,6 +307,8 @@ public interface MohEvaluableNameConstants {
 	public static final String PED_SCDC_CATEGORY_QUERY = "PEDS CDC CATEGORY QUERY";
 	public static final String PEDS_WHO_SPECIFIC_CONDITION_QUERY = "PEDS WHO SPECIFIC CONDITION QUERY";
 	public static final String DAPSONE = "DAPSONE";
+
+	public static final String UNKNOWN = "Unknown";
 
 	// Age group for use in some rules
 	public static enum AgeGroup {

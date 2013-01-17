@@ -15,14 +15,24 @@ import java.util.Map;
 import java.util.Set;
 
 public class MohGenderRule extends MohEvaluableRule {
-
 	private static final Log log = LogFactory.getLog(MohGenderRule.class);
 
 	public static final String TOKEN = "MOH Gender";
 
+	/**
+	 * @param context
+	 * @param patientId
+	 * @param parameters
+	 * @return
+	 * @throws LogicException
+	 * @should get Gender of a patient
+	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+
 		String gender = "";
+
 		Patient patient = Context.getPatientService().getPatient(patientId);
+
 		if (!StringUtils.isEmpty(patient.getGender()))
 			gender = patient.getGender();
 
