@@ -133,12 +133,12 @@ public class MohLostToFollowUpRuleTest {
 		currentObs.add(obs);
 	}
 
-	/**
-	 * adds a stop observation with the given date as the obs datetime
-	 *
-	 * @param conceptName
-	 * @param date
-	 */
+    /**
+     * adds an Obs with the given value date time
+     * @param concept
+     * @param valueDatetime
+     * @param date
+     */
 	private void addObsValueDateTime(String concept, String valueDatetime, String date) {
 		Obs obs = new Obs();
 		obs.setConcept(conceptService.getConcept(concept));
@@ -161,52 +161,62 @@ public class MohLostToFollowUpRuleTest {
 	}
 
 
-	@Test
-	public void consume_shouldProperlyDetermineDEADfromAnEncounter() throws Exception {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(2012, Calendar.DECEMBER, 20);
 
-		Date deathDate = calendar.getTime();
-		patient.setDead(true);
-		patient.setDeathDate(deathDate);
+    /**
+     * @verifies return DEAD from an Encounter
+     * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnDEADFromAnEncounter() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2012, Calendar.DECEMBER, 20);
 
-		Assert.assertTrue("The Patient is alive", patient.getDead());
-		Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20-Dec-12"), rule.evaluate(null, PATIENT_ID, null));
+        Date deathDate = calendar.getTime();
+        patient.setDead(true);
+        patient.setDeathDate(deathDate);
 
-	}
+        Assert.assertTrue("The Patient is alive", patient.getDead());
+        Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20-Dec-12"), rule.evaluate(null, PATIENT_ID, null));
+    }
 
-	@Test
-	public void consume_shouldProperlyDetermineTOfromAnObservation() throws Exception {
+    /**
+     * @verifies return TO from an observation using CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER
+     * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnTOFromAnObservationUsingCONCEPT_TRANSFER_CARE_TO_OTHER_CENTER() throws Exception {
 
-		addObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975");
+        addObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975");
+        Assert.assertEquals("current Obs size is wrong!", 1, currentObs.size());
+        Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+    }
 
-		Assert.assertEquals("current Obs size is wrong!", 1, currentObs.size());
+    /**
+     * @verifies return LFTU from an observation using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE
+     * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnLFTUFromAnObservationUsingCONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE() throws Exception {
+        addObsValueDateTime(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE, "25 Aug 2012", "16 Aug 2012");
 
-		Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
-	}
+        Assert.assertNotNull("A null Obs was encountered", currentObs);
+        Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-	@Test
-	public void consume_shouldProperlyDetermineLTFUfromAnObsUsingCONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE() throws Exception {
+        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25-Aug-12"), rule.evaluate(null, PATIENT_ID, null));
+    }
 
-		addObsValueDateTime(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE, "25 Aug 2012", "16 Aug 2012");
+    /**
+     * @verifies return LFTU from an observation using RETURN_VISIT_DATE
+     * @see MohLostToFollowUpRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnLFTUFromAnObservationUsingRETURN_VISIT_DATE() throws Exception {
+        addObsValueDateTime(MohEvaluableNameConstants.RETURN_VISIT_DATE, "16 Oct 2012", "16 Aug 2012");
 
-		Assert.assertNotNull("A null Obs was encountered", currentObs);
-		Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
+        Assert.assertNotNull("A null Obs was encountered", currentObs);
+        Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-		Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25-Aug-12"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16-Oct-12"), rule.evaluate(null, PATIENT_ID, null));
 
-	}
-
-	@Test
-	public void consume_shouldProperlyDetermineLTFUfromAnObsUsingRETURN_VISIT_DATE() throws Exception {
-
-		addObsValueDateTime(MohEvaluableNameConstants.RETURN_VISIT_DATE, "16 Oct 2012", "16 Aug 2012");
-
-		Assert.assertNotNull("A null Obs was encountered", currentObs);
-		Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
-
-		Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16-Oct-12"), rule.evaluate(null, PATIENT_ID, null));
-
-	}
-
+    }
 }

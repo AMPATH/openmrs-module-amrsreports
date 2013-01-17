@@ -52,9 +52,12 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-	 * @should get date and reason why a patient was lost
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
+     * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
+	 * @should return DEAD from an Encounter
+     * @should return TO from an observation using CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER
+     * @should return LFTU from an observation using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE
+     * @should return LFTU from an observation using RETURN_VISIT_DATE
+	 *
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
