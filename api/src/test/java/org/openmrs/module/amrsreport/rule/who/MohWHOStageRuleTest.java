@@ -142,7 +142,6 @@ public class MohWHOStageRuleTest {
 		obs.setValueCoded(answer);
 		obs.setObsDatetime(makeDate(date));
 		currentObs.add(obs);
-		System.out.println("obs added: " + concept.getId() + ":" + answer.getId());
 	}
 
 	/**

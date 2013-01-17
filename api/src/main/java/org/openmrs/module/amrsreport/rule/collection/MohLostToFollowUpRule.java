@@ -16,11 +16,17 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Author jmwogi
@@ -43,7 +49,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)
 	});
 
-	private  MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
 	 * @should get date and reason why a patient was lost
@@ -57,7 +63,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
 		if (patient.getDeathDate() != null) {
-			return new Result("DEAD | " + sdf.format(patient.getDeathDate()));
+			return new Result("DEAD | " + MohRuleUtils.formatdates(patient.getDeathDate()));
 		}
 
 		//pull relevant observations then loop while checking concepts

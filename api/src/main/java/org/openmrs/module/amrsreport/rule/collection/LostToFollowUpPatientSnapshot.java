@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -7,13 +8,13 @@ import org.openmrs.Obs;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.observation.PatientSnapshot;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
-
  * Patient snapshot for use with LTFU Rule
  */
 public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
@@ -26,8 +27,6 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	public static final String CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER = "TRANSFER CARE TO OTHER CENTER";
 	public static final String CONCEPT_AMPATH = "AMPATH";
 	public static final String CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE = "RETURN VISIT DATE, EXPRESS CARE NURSE";
-
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
 	private static final EncounterType encTpInit = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
 	private static final EncounterType encTpRet = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
@@ -54,61 +53,52 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
 		Concept concept = o.getConcept();
 		Concept answer = o.getValueCoded();
+		String formattedObsDate = MohRuleUtils.formatdates(o.getObsDatetime());
+		String formattedObsValueDate = MohRuleUtils.formatdates(o.getValueDatetime());
 
 		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
-            this.setProperty("why","DEAD");
-            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
+			this.setProperty("why", "DEAD");
+			this.setProperty("obsDate", formattedObsDate);
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY))) {
-            this.setProperty("why","DEAD");
-            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
+			this.setProperty("why", "DEAD");
+			this.setProperty("obsDate", formattedObsDate);
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH))) {
-            this.setProperty("why","DEAD");
-            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
+			this.setProperty("why", "DEAD");
+			this.setProperty("obsDate", formattedObsDate);
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DECEASED))) {
-            this.setProperty("why","DEAD");
-            this.setProperty("obsDate",sdf.format(sdf.format(o.getObsDatetime())));
+			this.setProperty("why", "DEAD");
+			this.setProperty("obsDate", formattedObsDate);
 			return true;
 		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED))) {
-
 			return true;
 		}
 
 		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER))) {
-			if (answer == MohCacheUtils.getConcept(CONCEPT_AMPATH)){
-                this.setProperty("why","TO | (Ampath) ");
-                this.setProperty("obsDate",sdf.format(o.getObsDatetime()));
-            }
-			else{
-                this.setProperty("why","TO | (Non-Ampath) ");
-                this.setProperty("obsDate",sdf.format(o.getObsDatetime()));
-            }
+			if (answer == MohCacheUtils.getConcept(CONCEPT_AMPATH)) {
+				this.setProperty("why", "TO | (Ampath) ");
+				this.setProperty("obsDate", formattedObsDate);
+			} else {
+				this.setProperty("why", "TO | (Non-Ampath) ");
+				this.setProperty("obsDate", formattedObsDate);
+			}
 			return true;
 		}
 
-		if (concept.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE).getConceptId())) {
-			if (sdf.format(o.getObsDatetime()) != null) {
-				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
-				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
-				if (requiredTimeToShowup < todayTimeFromSchedule) {
-                    this.setProperty("why","LFTU");
-                    this.setProperty("obsDate",sdf.format(o.getValueDatetime()));
-					return true;
-				}
-			}
-		}
+		if (StringUtils.isNotBlank(formattedObsValueDate) &&
+				OpenmrsUtil.isConceptInList(concept, Arrays.asList(
+						MohCacheUtils.getConcept(MohEvaluableNameConstants.RETURN_VISIT_DATE),
+						MohCacheUtils.getConcept(CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)))) {
 
-		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE))) {
-			if (sdf.format(o.getObsDatetime()) != null) {
-				long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
-				long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
-				if (requiredTimeToShowup < todayTimeFromSchedule) {
-                    this.setProperty("why","LFTU");
-                    this.setProperty("obsDate",sdf.format(o.getValueDatetime()));
-					return true;
-				}
+			long requiredTimeToShowup = ((o.getValueDatetime().getTime()) - (o.getObsDatetime().getTime())) + MONTHS_3;
+			long todayTimeFromSchedule = (new Date()).getTime() - (o.getObsDatetime().getTime());
+
+			if (requiredTimeToShowup < todayTimeFromSchedule) {
+				this.setProperty("why", "LTFU");
+				this.setProperty("obsDate", formattedObsValueDate);
+				return true;
 			}
 		}
 
@@ -118,24 +108,21 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 	@Override
 	public boolean eligible() {
 
-        if(this.getProperty("why").equals("DEAD")){
-            this.setProperty("reason", "DEAD | " + this.getProperty("obsDate"));
-            return true;
-        }
-        else if(this.getProperty("why").equals("TO | (Ampath) ")){
-            this.setProperty("reason", "TO | (Ampath) " + this.getProperty("obsDate"));
-            return true;
-        }
-        else if(this.getProperty("why").equals("TO | (Non-Ampath) ")){
-            this.setProperty("reason", "TO | (Non-Ampath) " + this.getProperty("obsDate"));
-            return true;
-        }
-        else if(this.getProperty("why").equals("LTFU")){
-            this.setProperty("reason", "LTFU | " + this.getProperty("obsDate"));
-            return true;
-        }
+		if (this.getProperty("why").equals("DEAD")) {
+			this.setProperty("reason", "DEAD | " + this.getProperty("obsDate"));
+			return true;
+		} else if (this.getProperty("why").equals("TO | (Ampath) ")) {
+			this.setProperty("reason", "TO | (Ampath) " + this.getProperty("obsDate"));
+			return true;
+		} else if (this.getProperty("why").equals("TO | (Non-Ampath) ")) {
+			this.setProperty("reason", "TO | (Non-Ampath) " + this.getProperty("obsDate"));
+			return true;
+		} else if (this.getProperty("why").equals("LTFU")) {
+			this.setProperty("reason", "LTFU | " + this.getProperty("obsDate"));
+			return true;
+		}
 
-        return false;
+		return false;
 
 	}
 
@@ -148,12 +135,14 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 		if (e == null)
 			return false;
 
+		String formattedEncounterDatetime = MohRuleUtils.formatdates(e.getEncounterDatetime());
+
 		if (OpenmrsUtil.nullSafeEquals(encTpDeath, e.getEncounterType())) {
-			this.setProperty("reason", "DEAD | " + sdf.format(e.getEncounterDatetime()));
+			this.setProperty("reason", "DEAD | " + formattedEncounterDatetime);
 			return true;
 		} else if (OpenmrsUtil.nullSafeEquals(encTpInit, e.getEncounterType()) || OpenmrsUtil.nullSafeEquals(encTpRet, e.getEncounterType())) {
 			if (Math.abs(new Date().getTime() - e.getEncounterDatetime().getTime()) < MONTHS_6) {
-				this.setProperty("reason", "LTFU | " + sdf.format(e.getEncounterDatetime()));
+				this.setProperty("reason", "LTFU | " + formattedEncounterDatetime);
 				return true;
 			}
 		}
