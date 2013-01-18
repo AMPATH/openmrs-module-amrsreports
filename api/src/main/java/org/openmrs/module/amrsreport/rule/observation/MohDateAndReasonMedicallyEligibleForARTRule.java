@@ -32,8 +32,6 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.openmrs.util.OpenmrsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,12 +58,16 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT)
 	});
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-	 * @should get the date and reason for ART eligibility
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
+     * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
+     * @should return REASON_CLINICAL_CD4ForAdults
+     * @should return REASON_CLINICALForAdults
+     * @should return REASON_CLINICALForPeds
+     * @should return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
+     * @should return REASON_CLINICAL_CD4ForPeds
+	 *
 	 */
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
@@ -99,6 +101,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		}
 		return new Result();
 	}
+
 
 	@Override
 	protected String getEvaluableToken() {
@@ -134,6 +137,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	}
 
 	private Result formatResult(Date date, String reason) {
-		return new Result(OpenmrsUtil.getDateFormat(Context.getLocale()).format(date) + " - " + reason);
+		return new Result(MohRuleUtils.formatdates(date) + " - " + reason);
 	}
 }
