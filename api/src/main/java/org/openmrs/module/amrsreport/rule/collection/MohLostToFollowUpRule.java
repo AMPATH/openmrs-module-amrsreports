@@ -1,9 +1,9 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
-import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
@@ -16,10 +16,9 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
-import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -32,6 +31,7 @@ import java.util.Set;
 /**
  * Author jmwogi
  */
+
 public class MohLostToFollowUpRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(MohLostToFollowUpRule.class);
@@ -49,12 +49,15 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 			MohCacheUtils.getConcept(LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE)
 	});
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-	 * @should get date and reason why a patient was lost
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
+     * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
+	 * @should return DEAD from an Encounter
+     * @should return TO from an observation using CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER
+     * @should return LFTU from an observation using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE
+     * @should return LFTU from an observation using RETURN_VISIT_DATE
+	 *
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
@@ -63,7 +66,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
 		if (patient.getDeathDate() != null) {
-			return new Result("DEAD | " + sdf.format(patient.getDeathDate()));
+			return new Result("DEAD | " + MohRuleUtils.formatdates(patient.getDeathDate()));
 		}
 
 		//pull relevant observations then loop while checking concepts
@@ -115,5 +118,5 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 	public int getTTL() {
 		return 0;
 	}
-
 }
+
