@@ -1,175 +1,162 @@
 package org.openmrs.module.amrsreport.rule.collection;
 
-import org.junit.Test;
 import org.junit.Assert;
-import org.openmrs.logic.result.Result;
-import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreport.rule.collection.MohConfirmedHivPositiveDateRule;
-import org.openmrs.module.amrsreport.rule.util.MohTestUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.ObsService;
-import org.openmrs.Concept;
-import org.openmrs.ConceptAnswer;
-import org.openmrs.ConceptName;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreport.cache.MohCacheUtils;
+import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.lang.System;
-import java.util.Calendar;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * test file for MohConfirmedHivPositiveDateRule class
  */
-public class MohConfirmedHivPositiveDateRuleTest extends BaseModuleContextSensitiveTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Context.class)
+public class MohConfirmedHivPositiveDateRuleTest {
 
-    ConceptService conceptService = Context.getConceptService();
-    /**
-     * @verifies return the the first date a patient was confirmed HIV positive
-     * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositive() throws Exception {
+    private static final List<String> initConcepts = Arrays.asList(
+            MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE,
+            MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE,
+            MohEvaluableNameConstants.POSITIVE
+            );
 
-        Patient patient = new Patient();
-        patient.setPersonId(2);
-
-        PatientIdentifierType pit = new PatientIdentifierType();
-        pit.setPatientIdentifierTypeId(1);
-
-        PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
-        pi.setPatient(patient);
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(1975,Calendar.JANUARY,1);
+    private static final int PATIENT_ID = 5;
+    private Patient patient;
+    private ConceptService conceptService;
+    private PatientService patientService;
+    private MohCoreService mohCoreService;
+    private List<Obs> currentObs;
+    private List<Encounter> currentEncounters;
+    private MohConfirmedHivPositiveDateRule rule;
 
 
-        Date birthdate = cal.getTime();
-        patient.setBirthdate(birthdate);
+    @Before
+    public void setup() {
 
-        EncounterService service = Context.getEncounterService();
+        // initialize the current obs and Encounters
+        currentObs = new ArrayList<Obs>();
+        currentEncounters = new ArrayList<Encounter>();
 
-       // System.out.println(birthdate.toString());
-        Encounter sampleEncounter = new Encounter();
+        patient = new Patient();
 
-        Calendar encDate = Calendar.getInstance();
-        encDate.set(2012,Calendar.DECEMBER, 10);
-        encDate.set(Calendar.HOUR_OF_DAY, 0);
-        encDate.set(Calendar.MINUTE,0);
-        encDate.set(Calendar.SECOND, 0);
+        //setup PatientService
+        patientService = Mockito.mock(PatientService.class);
+        Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
+        // build the concept service
+        int i = 0;
+        conceptService = Mockito.mock(ConceptService.class);
 
-        Date encounterDate = encDate.getTime();
+        for (String conceptName : initConcepts) {
 
+            Mockito.when(conceptService.getConcept(conceptName)).thenReturn(new Concept(i++));
+        }
+        Mockito.when(conceptService.getConcept((String) null)).thenReturn(null);
 
+        //set up MohCoreService
+        mohCoreService = Mockito.mock(MohCoreService.class);
 
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient);
-        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
+        //return current Observations
+        Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
+        obsRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
+                conceptService.getConcept(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE),
+                conceptService.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE)
 
-        /*ObsService obsService = Context.getObsService();*/
+        ));
+        obsRestrictions.put("valueCoded",Arrays.<OpenmrsObject>asList(conceptService.getConcept(MohEvaluableNameConstants.POSITIVE)));
 
-        Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE));
-        obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.POSITIVE));
+        Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
+                Mockito.eq(obsRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
 
-        Calendar obsDate = Calendar.getInstance();
-        obsDate.set(2012,Calendar.DECEMBER, 10);
-        obsDate.set(Calendar.HOUR_OF_DAY, 0);
-        obsDate.set(Calendar.MINUTE,0);
-        obsDate.set(Calendar.SECOND, 0);
+        //return current encounters
+        Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
+                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentEncounters);
 
-        Date obDate = obsDate.getTime();
-        obs.setObsDatetime(obDate);
-        obs.setEncounter(sampleEncounter);
+        // set up Context
+        PowerMockito.mockStatic(Context.class);
+        Mockito.when(Context.getConceptService()).thenReturn(conceptService);
+        Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
+        Mockito.when(Context.getPatientService()).thenReturn(patientService);
 
-        //sampleEncounter.setObs(allObs);
-        Encounter resEncounter = service.saveEncounter(sampleEncounter);
-
-        MohConfirmedHivPositiveDateRule mohConfirmedHivPositiveDateRule = new MohConfirmedHivPositiveDateRule();
-        Result result = mohConfirmedHivPositiveDateRule.evaluate(null,patient.getId(), null);
-
-
-        System.out.println("Obs date is "+obDate.toString());
-        System.out.println("Found result is "+ result.toString());
-
-        Result expectedResult = new Result("10/12/2012");
-
-        Assert.assertEquals("Obs date comparison was not successful",expectedResult.toString(), result.toString());
+        rule = new MohConfirmedHivPositiveDateRule();
 
     }
 
-    @Test
-    public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_RAPID_TEST_QUALITATIVE() throws Exception {
+    /**
+     * generate a date from a string
+     *
+     * @param date
+     * @return
+     */
+    private Date makeDate(String date) {
+        try {
+            return new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).parse(date);
+        } catch (Exception e) {
+            // pass
+        }
+        return new Date();
+    }
 
-
-        Patient patient = new Patient();
-        patient.setPersonId(2);
-
-        PatientIdentifierType pit = new PatientIdentifierType();
-        pit.setPatientIdentifierTypeId(1);
-
-        PatientIdentifier pi = new PatientIdentifier("23452", pit, null);
-        pi.setPatient(patient);
-
-        Calendar cal = Calendar.getInstance();
-        cal.set(1975,Calendar.JANUARY,1);
-
-
-        Date birthdate = cal.getTime();
-        patient.setBirthdate(birthdate);
-
-        EncounterService service = Context.getEncounterService();
-
-        Encounter sampleEncounter = new Encounter();
-
-        Calendar encDate = Calendar.getInstance();
-        encDate.set(2012,Calendar.DECEMBER, 10);
-        encDate.set(Calendar.HOUR_OF_DAY, 0);
-        encDate.set(Calendar.MINUTE,0);
-        encDate.set(Calendar.SECOND, 0);
-
-
-        Date encounterDate = encDate.getTime();
-
-        sampleEncounter.setEncounterDatetime(encounterDate);
-        sampleEncounter.setPatient(patient);
-        sampleEncounter.setEncounterType(service.getEncounterType("ADULTINITIAL"));
-
-        /*ObsService obsService = Context.getObsService();*/
-
+    /**
+     * adds an observation with the given date as the obs datetime
+     *
+     * @param concept
+     * @param date
+     */
+    private void addObs(String concept, String answer, String date) {
         Obs obs = new Obs();
-        obs.setConcept(conceptService.getConceptByName(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE));
-        obs.setValueCoded(conceptService.getConceptByName(MohEvaluableNameConstants.POSITIVE));
-
-        Calendar obsDate = Calendar.getInstance();
-        obsDate.set(2012,Calendar.DECEMBER, 10);
-        obsDate.set(Calendar.HOUR_OF_DAY, 0);
-        obsDate.set(Calendar.MINUTE,0);
-        obsDate.set(Calendar.SECOND, 0);
-
-        Date obDate = obsDate.getTime();
-        obs.setObsDatetime(obDate);
-
-        obs.setEncounter(sampleEncounter);
-
-        //sampleEncounter.setObs(allObs);
-        Encounter resEncounter = service.saveEncounter(sampleEncounter);
-        Context.flushSession();
+        obs.setConcept(conceptService.getConcept(concept));
+        obs.setValueCoded(conceptService.getConcept(answer));
+        obs.setObsDatetime(makeDate(date));
+        currentObs.add(obs);
+    }
 
 
-        MohConfirmedHivPositiveDateRule mohConfirmedHivPositiveDateRule = new MohConfirmedHivPositiveDateRule();
-        Result result = mohConfirmedHivPositiveDateRule.evaluate(null,patient.getId(), null);
-        Result expectedResult = new Result("10/12/2012");
+    /**
+     * @verifies return the the first date a patient was confirmed HIV positive using HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test
+     * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_ENZYME_IMMUNOASSAY_QUALITATIVETest() throws Exception {
+        addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
 
-        Assert.assertEquals("The date fetched is incorrect",expectedResult.toString(), result.toString());
+        Assert.assertEquals("The size of current Obs in HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test is wrong!",1,currentObs.size());
+        Assert.assertEquals("HIV_ENZYME_IMMUNOASSAY_QUALITATIVETest tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
 
+    }
+
+    /**
+     * @verifies return the first date a patient was confirmed HIV Positive using HIV_RAPID_TEST_QUALITATIVE test
+     * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_RAPID_TEST_QUALITATIVETest() throws Exception {
+        addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
+        Assert.assertEquals("The size of current Obs in HIV_RAPID_TEST_QUALITATIVE test is wrong!",1,currentObs.size());
+        Assert.assertEquals("HIV_RAPID_TEST_QUALITATIVE tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
+    }
+
+    /**
+     * @verifies return result for a patient who is HIV negative
+     * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnResultForAPatientWhoIsHIVNegative() throws Exception {
+        Assert.assertEquals("Test for HIV Negative patient has tested negative",new Result(),rule.evaluate(null,PATIENT_ID,null));
     }
 }
