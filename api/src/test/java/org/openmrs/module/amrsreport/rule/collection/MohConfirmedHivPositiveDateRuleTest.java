@@ -36,7 +36,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
             );
 
     private static final int PATIENT_ID = 5;
-    private Patient patient;
+   // private Patient patient;
     private ConceptService conceptService;
     private PatientService patientService;
     private MohCoreService mohCoreService;
@@ -52,11 +52,11 @@ public class MohConfirmedHivPositiveDateRuleTest {
         currentObs = new ArrayList<Obs>();
         currentEncounters = new ArrayList<Encounter>();
 
-        patient = new Patient();
+       // patient = new Patient();
 
         //setup PatientService
-        patientService = Mockito.mock(PatientService.class);
-        Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
+       // patientService = Mockito.mock(PatientService.class);
+        //Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
         // build the concept service
         int i = 0;
@@ -72,19 +72,12 @@ public class MohConfirmedHivPositiveDateRuleTest {
         mohCoreService = Mockito.mock(MohCoreService.class);
 
         //return current Observations
-        Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
-        obsRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
-                conceptService.getConcept(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE),
-                conceptService.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE)
-
-        ));
-        obsRestrictions.put("valueCoded",Arrays.<OpenmrsObject>asList(conceptService.getConcept(MohEvaluableNameConstants.POSITIVE)));
 
         Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
-                Mockito.eq(obsRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
 
         //return current encounters
-        Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
+        Mockito.when(mohCoreService.getPatientEncounters(Mockito.anyInt(),
                 Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentEncounters);
 
         // set up Context
@@ -126,6 +119,14 @@ public class MohConfirmedHivPositiveDateRuleTest {
         currentObs.add(obs);
     }
 
+    private void addEncounter(String date){
+        Encounter encounter = new Encounter();
+        encounter.setDateCreated(makeDate(date));
+        encounter.setEncounterDatetime(makeDate(date));
+
+        currentEncounters.add(encounter);
+    }
+
 
     /**
      * @verifies return the the first date a patient was confirmed HIV positive using HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test
@@ -134,8 +135,8 @@ public class MohConfirmedHivPositiveDateRuleTest {
     @Test
     public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_ENZYME_IMMUNOASSAY_QUALITATIVETest() throws Exception {
         addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
-
-        Assert.assertEquals("The size of current Obs in HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test is wrong!",1,currentObs.size());
+        addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "19 Oct 2012");
+        Assert.assertEquals("The size of current Obs in HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test is wrong!",2,currentObs.size());
         Assert.assertEquals("HIV_ENZYME_IMMUNOASSAY_QUALITATIVETest tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
 
     }
@@ -147,8 +148,10 @@ public class MohConfirmedHivPositiveDateRuleTest {
     @Test
     public void evaluate_shouldReturnTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_RAPID_TEST_QUALITATIVETest() throws Exception {
         addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
-        Assert.assertEquals("The size of current Obs in HIV_RAPID_TEST_QUALITATIVE test is wrong!",1,currentObs.size());
+        addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "19 Oct 2012");
+        Assert.assertEquals("The size of current Obs in HIV_RAPID_TEST_QUALITATIVE test is wrong!",2,currentObs.size());
         Assert.assertEquals("HIV_RAPID_TEST_QUALITATIVE tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
+
     }
 
     /**
@@ -158,5 +161,23 @@ public class MohConfirmedHivPositiveDateRuleTest {
     @Test
     public void evaluate_shouldReturnResultForAPatientWhoIsHIVNegative() throws Exception {
         Assert.assertEquals("Test for HIV Negative patient has tested negative",new Result(),rule.evaluate(null,PATIENT_ID,null));
+
+    }
+
+    /**
+     * @verifies return the date for the first encounter
+     * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+     */
+    @Test
+    public void evaluate_shouldReturnTheDateForTheFirstEncounter() throws Exception {
+       addEncounter("16 Oct 2012");
+       addEncounter("17 Oct 2012");
+       addEncounter("18 Oct 2012");
+
+       Assert.assertEquals("Test for the size of encounters is wrong!",3,currentEncounters.size());
+
+       Assert.assertEquals("Encounter test turned false",new Result("16/10/2012"),rule.evaluate(null,5,null));
+
+
     }
 }
