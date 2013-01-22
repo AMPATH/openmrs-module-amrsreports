@@ -36,7 +36,6 @@ public class MohConfirmedHivPositiveDateRuleTest {
             );
 
     private static final int PATIENT_ID = 5;
-   // private Patient patient;
     private ConceptService conceptService;
     private PatientService patientService;
     private MohCoreService mohCoreService;
@@ -51,12 +50,6 @@ public class MohConfirmedHivPositiveDateRuleTest {
         // initialize the current obs and Encounters
         currentObs = new ArrayList<Obs>();
         currentEncounters = new ArrayList<Encounter>();
-
-       // patient = new Patient();
-
-        //setup PatientService
-       // patientService = Mockito.mock(PatientService.class);
-        //Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
         // build the concept service
         int i = 0;
@@ -77,14 +70,14 @@ public class MohConfirmedHivPositiveDateRuleTest {
                 Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
 
         //return current encounters
-        Mockito.when(mohCoreService.getPatientEncounters(Mockito.anyInt(),
+
+        Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
                 Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentEncounters);
 
         // set up Context
         PowerMockito.mockStatic(Context.class);
         Mockito.when(Context.getConceptService()).thenReturn(conceptService);
         Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
-        Mockito.when(Context.getPatientService()).thenReturn(patientService);
 
         rule = new MohConfirmedHivPositiveDateRule();
 
@@ -119,6 +112,10 @@ public class MohConfirmedHivPositiveDateRuleTest {
         currentObs.add(obs);
     }
 
+    /**
+     * adds an encounter
+     * @param date
+     */
     private void addEncounter(String date){
         Encounter encounter = new Encounter();
         encounter.setDateCreated(makeDate(date));
@@ -126,6 +123,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 
         currentEncounters.add(encounter);
     }
+
 
 
     /**
@@ -137,6 +135,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
         addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
         addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "19 Oct 2012");
         Assert.assertEquals("The size of current Obs in HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test is wrong!",2,currentObs.size());
+
         Assert.assertEquals("HIV_ENZYME_IMMUNOASSAY_QUALITATIVETest tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
 
     }
@@ -152,6 +151,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
         Assert.assertEquals("The size of current Obs in HIV_RAPID_TEST_QUALITATIVE test is wrong!",2,currentObs.size());
         Assert.assertEquals("HIV_RAPID_TEST_QUALITATIVE tested negative",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
 
+
     }
 
     /**
@@ -161,6 +161,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
     @Test
     public void evaluate_shouldReturnResultForAPatientWhoIsHIVNegative() throws Exception {
         Assert.assertEquals("Test for HIV Negative patient has tested negative",new Result(),rule.evaluate(null,PATIENT_ID,null));
+
 
     }
 
@@ -176,8 +177,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 
        Assert.assertEquals("Test for the size of encounters is wrong!",3,currentEncounters.size());
 
-       Assert.assertEquals("Encounter test turned false",new Result("16/10/2012"),rule.evaluate(null,5,null));
-
+       Assert.assertEquals("Encounter test turned false",new Result("16/10/2012"),rule.evaluate(null,PATIENT_ID,null));
 
     }
 }
