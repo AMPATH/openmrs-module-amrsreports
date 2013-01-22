@@ -15,14 +15,21 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Author jmwogi
+ * Determines Confirmed HIV+ Date
  */
 public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 
@@ -34,14 +41,13 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	private static final Concept CONCEPT_RAPID = MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE);
 	private static final Concept CONCEPT_POSITIVE = MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE);
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-     * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
-     * @should return the the first date a patient was confirmed HIV positive using HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test
-     * @should return the first date a patient was confirmed HIV Positive using HIV_RAPID_TEST_QUALITATIVE test
-     * @should return result for a patient who is HIV negative
-	 *
+	 * @should return the the first date a patient was confirmed HIV positive using HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test
+	 * @should return the first date a patient was confirmed HIV Positive using HIV_RAPID_TEST_QUALITATIVE test
+	 * @should return result for a patient who is HIV negative
+	 * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
@@ -51,12 +57,14 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 		obsRestrictions.put("valueCoded", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_POSITIVE}));
 
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
+		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
+		mohFetchRestriction.setSize(1);
 
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
 
+		// return the first observation found
 		if (!observations.isEmpty()) {
-			Obs obs = observations.get(0);
-			return new Result(obs.getObsDatetime());
+			return new Result(MohRuleUtils.formatdates(observations.get(0).getObsDatetime()));
 		}
 
 		// return the first encounter date if nothing else is found
@@ -64,18 +72,16 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 
 		// set up query for encounters in order by ascending date
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
-		mohFetchRestriction = new MohFetchRestriction();
-		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
 		// get the encounters
 		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
 
 		// pull the first encounter date
 		if (!encounters.isEmpty()) {
-			firstEncounterDate = encounters.get(0).getEncounterDatetime();
+			return new Result(MohRuleUtils.formatdates(encounters.get(0).getEncounterDatetime()));
 		}
 
-		return new Result(firstEncounterDate);
+		return new Result(MohEvaluableNameConstants.UNKNOWN);
 	}
 
 	protected String getEvaluableToken() {
@@ -107,16 +113,6 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	@Override
 	public int getTTL() {
 		return 0;
-	}
-
-	private static class SortByDateComparator implements Comparator<Encounter> {
-
-		@Override
-		public int compare(Encounter a, Encounter b) {
-			Encounter ao = (Encounter) a;
-			Encounter bo = (Encounter) b;
-			return ao.getDateCreated().compareTo(bo.getDateCreated());
-		}
 	}
 
 }
