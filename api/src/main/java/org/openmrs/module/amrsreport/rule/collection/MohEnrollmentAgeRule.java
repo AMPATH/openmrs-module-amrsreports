@@ -18,106 +18,103 @@ import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Author jmwogi
  */
 public class MohEnrollmentAgeRule extends MohEvaluableRule {
 
-	private static final Log log = LogFactory.getLog(MohEnrollmentAgeRule.class);
-	private static final long ageDivisor = 31557600000L; // 1000 * 60 * 60 * 24 * 30.4375 * 12
-	public static final String TOKEN = "MOH Age At Enrollment";
+    private static final Log log = LogFactory.getLog(MohEnrollmentAgeRule.class);
+    private static final long ageDivisor = 31557600000L; // 1000 * 60 * 60 * 24 * 30.4375 * 12
+    public static final String TOKEN = "MOH Age At Enrollment";
 
-	private static final EncounterType adultInitialType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
-	private static final EncounterType adultReturnType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
+    private static final EncounterType adultInitialType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_INITIAL);
+    private static final EncounterType adultReturnType = MohCacheUtils.getEncounterType(MohEvaluableNameConstants.ENCOUNTER_TYPE_ADULT_RETURN);
 
-	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+    private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
-	/**
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
-	 *      java.util.Map)
-	 */
-	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+    /**
+     * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, org.openmrs.Patient,
+     * java.util.Map)
+     * @should return enrollment age for an adult
+     * @should return enrollment age for a child
+     * @should return UNKNOWN result
+     */
+    public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
-		try {
+        try {
 
-			Patient patient = Context.getPatientService().getPatient(patientId);
+            Patient patient = Context.getPatientService().getPatient(patientId);
 
-			if (patient == null)
-				return null;
+            if (patient == null)
+                return null;
 
-			if (patient.getBirthdate() == null)
-				return new Result(MohEvaluableNameConstants.UNKNOWN);
+            if (patient.getBirthdate() == null)
+                return new Result(MohEvaluableNameConstants.UNKNOWN);
 
-			Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
-			MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-			mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
-			List<Encounter> e = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+            Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
+            MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
+            mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
+            List<Encounter> e = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
 
-			//Iterate though encounters for the patient
-			Date encounterDate = null;
-			Boolean isChild = true;
-			Iterator<Encounter> it = e.iterator();
-			while (it.hasNext() && isChild) {
-				Encounter encounter = it.next();
-				encounterDate = encounter.getEncounterDatetime();
-				if (encounter.getEncounterType().equals(adultInitialType) || encounter.getEncounterType().equals(adultReturnType))
-					isChild = false;
-			}
+//Iterate though encounters for the patient
 
-			//Get age in years
-			if (encounterDate != null) {
-				Double ageInYears = (double) (encounterDate.getTime() - patient.getBirthdate().getTime()) / ageDivisor;
-				if (isChild && ageInYears < 1) {
-					return new Result(((int) Math.floor(ageInYears * 12)) + "m");
-				}
-				return new Result(((int) Math.floor(ageInYears)) + "y");
-			}
-		} catch (Exception e) {
-			// TODO log something here?
-		}
+            Date encounterDate = null;
+            Boolean isChild = true;
+            Iterator<Encounter> it = e.iterator();
+            while (it.hasNext() && isChild) {
+                Encounter encounter = it.next();
+                encounterDate = encounter.getEncounterDatetime();
+                if (encounter.getEncounterType().equals(adultInitialType) || encounter.getEncounterType().equals(adultReturnType))
+                    isChild = false;
+            }
 
-		return new Result("");
-	}
+//Get age in years
+            if (encounterDate != null) {
+                Double ageInYears = (double) (encounterDate.getTime() - patient.getBirthdate().getTime()) / ageDivisor;
+                if (isChild && ageInYears < 1) {
+                    return new Result(((int) Math.floor(ageInYears * 12)) + "m");
+                }
+                return new Result(((int) Math.floor(ageInYears)) + "y");
+            }
+        } catch (Exception e) {
+// TODO log something here?
+        }
 
-	protected String getEvaluableToken() {
-		return TOKEN;
-	}
+        return new Result("");
+    }
 
-	/**
-	 * @see org.openmrs.logic.Rule#getDependencies()
-	 */
-	@Override
-	public String[] getDependencies() {
-		return new String[]{};
-	}
+    protected String getEvaluableToken() {
+        return TOKEN;
+    }
 
-	/**
-	 * Get the definition of each parameter that should be passed to this rule execution
-	 *
-	 * @return all parameter that applicable for each rule execution
-	 */
-	@Override
-	public Datatype getDefaultDatatype() {
-		return Datatype.TEXT;
-	}
+    /**
+     * @see org.openmrs.logic.Rule#getDependencies()
+     */
+    @Override
+    public String[] getDependencies() {
+        return new String[]{};
+    }
 
-	public Set<RuleParameterInfo> getParameterList() {
-		return null;
-	}
+    /**
+     * Get the definition of each parameter that should be passed to this rule execution
+     *
+     * @return all parameter that applicable for each rule execution
+     */
+    @Override
+    public Datatype getDefaultDatatype() {
+        return Datatype.TEXT;
+    }
 
-	@Override
-	public int getTTL() {
-		return 0;
-	}
+    public Set<RuleParameterInfo> getParameterList() {
+        return null;
+    }
+
+    @Override
+    public int getTTL() {
+        return 0;
+    }
 
 }
