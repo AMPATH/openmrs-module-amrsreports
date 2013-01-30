@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreport.web.dwr;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
@@ -9,7 +10,11 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.util.OpenmrsUtil;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -225,5 +230,31 @@ public class DWRAmrsReportService {
 		return "A total of  " + myList.size() + " privileges have been processed";
 	}
 
+	/**
+	 * helper method for determining cohort size per location and report date
+	 *
+	 * @param locationId id of the location to be evaluated
+	 * @param evaluationDate evaluation date
+	 * @return an integer indicating the cohort size; -1 for null and -1000 for error
+	 */
+	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) {
+		Location location = Context.getLocationService().getLocation(locationId);
+		if (location == null)
+			return -1;
 
+		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+		definition.addLocation(location);
+
+		EvaluationContext context = new EvaluationContext();
+		context.setEvaluationDate(evaluationDate);
+
+		try {
+			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
+			return cohort.getSize();
+		} catch (EvaluationException e) {
+			log.error(e);
+		}
+
+		return -1000;
+	}
 }

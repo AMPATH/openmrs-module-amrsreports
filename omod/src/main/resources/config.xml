@@ -69,6 +69,7 @@
 				<include method="purgeUserLocation"/>
 				<include method="saveUserLoc"/>
 				<include method="purgeMultiplePrivileges"/>
+                <include method="getCohortCountForLocation"/>
 				<convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
 				<convert match="org.openmrs.Location" converter="bean" />
 				<convert match="org.openmrs.User" converter="bean"/>
@@ -86,6 +87,7 @@
 			DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
 			DWRAmrsReportService.purgeUserLocation(Integer rowid);
 			DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
+        	DWRAmrsReportService.getCohortCountForLocation(Integer locationId,Date evaluationDate);
 			]]>
 		</signatures>	
 	</dwr>
