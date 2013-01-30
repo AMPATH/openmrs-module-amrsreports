@@ -130,6 +130,7 @@ public interface MohEvaluableNameConstants {
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_INITIAL = "PEDSINITIAL";
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_RETURN = "PEDSRETURN";
 	public static final String ENCOUNTER_TYPE_PEDIATRIC_NONCLINICALMEDICATION = "PEDSNONCLINICALMEDICATION";
+	public static final String ENCOUNTER_TYPE_BASELINE_INVESTIGATION = "BASELINEINVESTIGATION";
 	public static final String ECSTABLE = "ECSTABLE";
 	
 	//Additional concepts for cryptococcal rule
