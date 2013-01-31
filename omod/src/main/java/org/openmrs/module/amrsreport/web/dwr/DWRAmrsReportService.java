@@ -247,6 +247,8 @@ public class DWRAmrsReportService {
 
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
+		context.addParameterValue("endDate", evaluationDate);
+		context.addParameterValue("location", location);
 
 		try {
 			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
