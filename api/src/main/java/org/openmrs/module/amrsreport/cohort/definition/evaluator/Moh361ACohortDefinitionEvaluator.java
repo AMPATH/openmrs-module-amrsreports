@@ -75,23 +75,27 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		eligibleByEncounterAndAge.addParameter(new Parameter("location", "Location", Location.class));
 
 		// STEP 2: find all patients with HIV+ observations, regardless of age
-		String positiveQuery = "Select person_id from(" +
-				"    select o.person_id ,o.obs_datetime" +
-				"        from obs o" +
-				"        where (" +
-				"            o.concept_id in(1040,1030,1042) " +
-				"            and o.value_coded=703) " +
-				"            and o.obs_datetime<=:endDate " +
-				"            and location_id=:location" +
-				"        group by person_id " +
-				"        order by person_id, obs_datetime) pos" +
-				"    join encounter e" +
-				"        on e.patient_id = pos.person_id" +
-				"    where " +
-				"        e.encounter_type in(1,2,3,4,13) " +
-				"        and e.voided=0" +
-				"    group by person_id " +
-				"    order by person_id, obs_datetime";
+		String positiveQuery = "select ob.person_id " +
+				"from (" +
+				"	(select person_id, min(obs_datetime) as pos_date, location_id" +
+				"		from obs o" +
+				"		where" +
+				"			(o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
+				"			and o.obs_datetime <= :endDate" +
+				"		group by person_id) ob" +
+				"	left join (" +
+				"		select person_id, max(obs_datetime) as neg_date" +
+				"		from obs o" +
+				"		where (" +
+				"			o.concept_id in (1040, 1030, 1042)" +
+				"			and o.value_coded = 664" +
+				"			and o.obs_datetime <= :endDate)" +
+				"		group by person_id) as ab" +
+				"	on ob.person_id = ab.person_id) " +
+				"where" +
+				"	(neg_date is null or pos_date > neg_date)" +
+				"	and ob.location_id = :location";
+
 		SqlCohortDefinition positiveByObservation = new SqlCohortDefinition(positiveQuery);
 		positiveByObservation.addParameter(new Parameter("endDate", "End Date", Date.class));
 		positiveByObservation.addParameter(new Parameter("location", "Location", Location.class));
