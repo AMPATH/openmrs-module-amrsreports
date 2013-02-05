@@ -100,50 +100,42 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		eligibleChild.addParameter(new Parameter("location", "Location", Location.class));
 
 		// 1AMPATH patients with positive non conflicting results
-		String positiveNonConflictingResults = "select ob.person_id " +
-				"from (" +
+		String positiveNonConflictingResults = "select ob.person_id" +
+				" from (" +
 				"	(select person_id, min(obs_datetime) as pos_date, location_id" +
 				"		from obs o" +
+				"		left join encounter e on e.encounter_id = o.encounter_id" +
+				"		inner join person p on p.person_id = o.person_id" +
 				"		where" +
-				"			(o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
+				"			(" +
+				"				(o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
+				"				or" +
+				"				(o.concept_id = 6042 and o.value_coded = 1169)" +
+				"			)" +
+				"			and o.voided = 0" +
+				"			and e.voided = 0" +
+				"			and p.voided = 0" +
 				"			and o.obs_datetime <= :endDate" +
 				"		group by person_id) ob" +
 				"	left join (" +
 				"		select person_id, max(obs_datetime) as neg_date" +
 				"		from obs o" +
-				"		where (" +
-				"			o.concept_id in (1040, 1030, 1042)" +
-				"			and o.value_coded = 664" +
-				"			and o.obs_datetime <= :endDate)" +
+				"		left join encounter e on e.encounter_id = o.encounter_id" +
+				"		inner join person p on p.person_id = o.person_id" +
+				"		where" +
+				"			o.concept_id in (1040, 1030, 1042) and o.value_coded = 664" +
+				"			and o.voided = 0" +
+				"			and e.voided = 0" +
+				"			and p.voided = 0" +
+				"			and o.obs_datetime <= :endDate" +
 				"		group by person_id) as ab" +
-				"	on ob.person_id = ab.person_id) " +
-				"where" +
+				"	on ob.person_id = ab.person_id)" +
+				" where" +
 				"	(neg_date is null or pos_date > neg_date)" +
 				"	and ob.location_id = :location";
 		SqlCohortDefinition positiveNonConflicting = new SqlCohortDefinition(positiveNonConflictingResults);
 		positiveNonConflicting.addParameter(new Parameter("endDate", "End Date", Date.class));
 		positiveNonConflicting.addParameter(new Parameter("location", "Location", Location.class));
-
-		// 1AMPATH patients with Problem added=HIV Infected
-		String positiveByProblemAdded = "SELECT why.person_id" +
-				" FROM (" +
-				"	SELECT o.person_id, o.location_id, o.obs_datetime" +
-				"	FROM obs o" +
-				"	LEFT JOIN encounter e ON e.encounter_id=o.encounter_id" +
-				"	INNER JOIN person p ON p.person_id=o.person_id" +
-				"	WHERE" +
-				"		o.concept_id=6042" +
-				"		AND o.value_coded=1169" +
-				"		AND o.voided=0" +
-				"		AND e.voided=0" +
-				"		AND p.voided=0)" +
-				"	AS why" +
-				" WHERE" +
-				"	why.location_id = :location" +
-				"	and why.obs_datetime <= :endDate";
-		SqlCohortDefinition positiveProblemAdded = new SqlCohortDefinition(positiveByProblemAdded);
-		positiveProblemAdded.addParameter(new Parameter("endDate", "End Date", Date.class));
-		positiveProblemAdded.addParameter(new Parameter("location", "Location", Location.class));
 
 		// exclude fake patients
 		PersonAttributeCohortDefinition fakePatientCohortDefinition = new PersonAttributeCohortDefinition();
@@ -166,19 +158,13 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		mappedPositiveNonConflicting.addParameterMapping("endDate", "${endDate}");
 		mappedPositiveNonConflicting.addParameterMapping("location", "${location}");
 
-		Mapped<CohortDefinition> mappedPositiveProblemAdded = new Mapped<CohortDefinition>();
-		mappedPositiveProblemAdded.setParameterizable(positiveProblemAdded);
-		mappedPositiveProblemAdded.addParameterMapping("endDate", "${endDate}");
-		mappedPositiveProblemAdded.addParameterMapping("location", "${location}");
-
 		// compose the query
 		CompositionCohortDefinition combined = new CompositionCohortDefinition();
 		combined.addSearch("eligibleAdult", mappedEligibleAdult);
 		combined.addSearch("eligibleChild", mappedEligibleChild);
 		combined.addSearch("positiveNonConflicting", mappedPositiveNonConflicting);
-		combined.addSearch("positiveProblemAdded", mappedPositiveProblemAdded);
 		combined.addSearch("fake", fakePatientCohortDefinition, null);
-		combined.setCompositionString("(eligibleAdult OR (eligibleChild AND (positiveNonConflicting OR positiveProblemAdded))) AND NOT fake");
+		combined.setCompositionString("(eligibleAdult OR (eligibleChild AND positiveNonConflicting)) AND NOT fake");
 
 		// link parameters required in sub cohorts
 		combined.addParameter(new Parameter("endDate", "End Date", Date.class));
