@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openmrs.module.amrsreport">
+	<class name="Enrollment" table="amrsreport_enrollment">
+
+        <id column="enrollment_id" name="id" type="int" unsaved-value="0">
+			<generator class="native"/>
+		</id>
+		<discriminator column="enrollment_id" insert="false"/>
+
+        <many-to-one class="org.openmrs.Person" name="person" column="person_id" not-null="true"/>
+		<many-to-one class="org.openmrs.Location" name="location" column="location_id" not-null="true"/>
+
+        <property name="enrollmentDate" type="java.util.Date" column="enrollment_date" length="10" />
+        <property name="enrollmentAge" type="double" column="enrollment_age" length="22" />
+        <property name="enrollmentReason" type="java.lang.String" column="enrollment_reason" length="50"/>
+
+        <property name="lastPositiveDate" type="java.util.Date" column="last_positive_date" length="10" />
+        <property name="lastNegativeDate" type="java.util.Date" column="last_negative_date" length="10" />
+
+        <property length="38" name="uuid" type="java.lang.String" unique="true"/>
+	</class>
+</hibernate-mapping>

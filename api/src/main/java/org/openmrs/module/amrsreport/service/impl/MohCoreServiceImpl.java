@@ -31,6 +31,7 @@ import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.amrsreport.Enrollment;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.rule.observation.ARVPatientSnapshot;
@@ -184,6 +185,16 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	@Override
 	public Boolean hasLocationPrivilege(User user, Location location) {
 		return mohCoreDAO.hasLocationPrivilege(user, location);
+	}
+
+	@Override
+	public void clearEnrollments() {
+		mohCoreDAO.clearEnrollments();
+	}
+
+	@Override
+	public Enrollment saveEnrollment(Enrollment enrollment) {
+		return mohCoreDAO.saveEnrollment(enrollment);
 	}
 
 }

@@ -20,6 +20,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.module.amrsreport.Enrollment;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
@@ -195,4 +196,9 @@ public interface MohCoreService extends OpenmrsService {
 
     public Boolean hasLocationPrivilege(User user,Location location);
 
+	@Transactional
+	public void clearEnrollments();
+
+	@Transactional
+	public Enrollment saveEnrollment(Enrollment enrollment);
 }

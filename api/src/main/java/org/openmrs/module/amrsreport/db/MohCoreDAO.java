@@ -26,6 +26,7 @@ import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.amrsreport.Enrollment;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -77,5 +78,7 @@ public interface MohCoreDAO {
 
 	public List<UserReport> getUserReportsForUser(User user);
 
+	public void clearEnrollments();
 
+	public Enrollment saveEnrollment(Enrollment enrollment);
 }
