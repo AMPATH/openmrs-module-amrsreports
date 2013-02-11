@@ -9,6 +9,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.enrollment.EnrollmentManager;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.service.MohCoreService;
@@ -19,15 +20,23 @@ import org.openmrs.util.OpenmrsUtil;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Nicholas Ingosi magaja
- * Date: 6/6/12
- * Time: 8:55 AM
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Nicholas Ingosi magaja Date: 6/6/12 Time: 8:55 AM To change this template use File
+ * | Settings | File Templates.
  */
 public class DWRAmrsReportService {
 	private static final Log log = LogFactory.getLog(DWRAmrsReportService.class);
@@ -233,7 +242,7 @@ public class DWRAmrsReportService {
 	/**
 	 * helper method for determining cohort size per location and report date
 	 *
-	 * @param locationId id of the location to be evaluated
+	 * @param locationId     id of the location to be evaluated
 	 * @param evaluationDate evaluation date
 	 * @return an integer indicating the cohort size; -1 for null and -1000 for error
 	 */
@@ -259,4 +268,30 @@ public class DWRAmrsReportService {
 
 		return -1000;
 	}
+
+	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
+		EvaluationContext context = new EvaluationContext();
+		context.setEvaluationDate(evaluationDate);
+		context.addParameterValue("endDate", evaluationDate);
+
+		Location location = Context.getLocationService().getLocation(locationId);
+		context.addParameterValue("location", location);
+
+		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+		definition.addLocation(location);
+
+		try {
+			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
+			return cohort.getMemberIds();
+		} catch (EvaluationException e) {
+			log.error(e);
+		}
+
+		return null;
+	}
+
+	public String rebuildEnrollment() {
+		EnrollmentManager.getInstance().rebuildAll();
+		return "done";
+	};
 }
