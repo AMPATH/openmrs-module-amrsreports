@@ -2,10 +2,15 @@
     <li class="first">
         <a href="${pageContext.request.contextPath}/admin"><spring:message code="admin.title.short"/></a>
     </li>
-<openmrs:hasPrivilege privilege="Run Reports">
+    <openmrs:hasPrivilege privilege="Run Reports">
         <li <c:if test='<%= request.getRequestURI().contains("mohRender") %>'>class="active"</c:if>>
             <a href="${pageContext.request.contextPath}/module/amrsreport/mohRender.form">
                 Run AMRS Reports
+            </a>
+        </li>
+        <li <c:if test='<%= request.getRequestURI().contains("cohortCounts") %>'>class="active"</c:if>>
+            <a href="${pageContext.request.contextPath}/module/amrsreport/cohortCounts.list">
+                View Cohort Counts
             </a>
         </li>
     </openmrs:hasPrivilege>
@@ -17,8 +22,8 @@
         </li>
     </openmrs:hasPrivilege>
     <li <c:if test='<%= request.getRequestURI().contains("locationPrivileges") %>'>class="active"</c:if>>
-    <a href="${pageContext.request.contextPath}/module/amrsreport/locationPrivileges.form">
-        Location Privileges
-    </a>
+        <a href="${pageContext.request.contextPath}/module/amrsreport/locationPrivileges.form">
+            Location Privileges
+        </a>
     </li>
 </ul>

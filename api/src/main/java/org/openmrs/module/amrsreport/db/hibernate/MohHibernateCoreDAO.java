@@ -17,6 +17,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
@@ -34,6 +35,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
+import org.openmrs.module.amrsreport.HIVCareEnrollment;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
@@ -417,4 +419,16 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return (List<UserReport>) crit.list();
 	}
 
+	@Override
+	public void clearEnrollments() {
+		String sql = String.format("truncate table amrsreport_enrollment");
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.executeUpdate();
+	}
+
+	@Override
+	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment) {
+		sessionFactory.getCurrentSession().saveOrUpdate(HIVCareEnrollment);
+		return HIVCareEnrollment;
+	}
 }

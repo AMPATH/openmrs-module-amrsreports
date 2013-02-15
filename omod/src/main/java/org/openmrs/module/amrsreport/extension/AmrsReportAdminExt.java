@@ -38,14 +38,16 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 		
 		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
 			map.put("module/amrsreport/mohRender.form", "Run AMRS Reports");
-            map.put("module/amrsreport/locationPrivileges.form", "Location Privileges");
+			map.put("/module/amrsreport/cohortCounts.list", "View Cohort Counts");
 		}
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_VIEW_REPORTS)) {
 			map.put("module/amrsreport/mohHistory.form", "View AMRS Reports");
 		}
 
-
+		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
+			map.put("module/amrsreport/locationPrivileges.form", "Location Privileges");
+		}
 
 		return map;
 	}

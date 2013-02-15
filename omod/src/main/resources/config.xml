@@ -20,8 +20,8 @@
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.AmrsReportModuleActivator</activator>
 	
 	<require_modules>
-		<require_module version="0.7.0">org.openmrs.module.reporting</require_module>
-	</require_modules>
+        <require_module version="0.7.0">org.openmrs.module.reporting</require_module>
+    </require_modules>
 	<require_version>1.8.0</require_version>
 	
 	<!-- Extensions -->
@@ -34,6 +34,7 @@
 	<mappingFiles>
 		UserLocation.hbm.xml
 		UserReport.hbm.xml
+        HIVCareEnrollment.hbm.xml
 	</mappingFiles>
 	
 	<!-- Required Privileges -->
@@ -69,7 +70,10 @@
 				<include method="purgeUserLocation"/>
 				<include method="saveUserLoc"/>
 				<include method="purgeMultiplePrivileges"/>
-				<convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
+                <include method="getCohortCountForLocation"/>
+                <include method="getCohort"/>
+                <include method="rebuildEnrollment"/>
+                <convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
 				<convert match="org.openmrs.Location" converter="bean" />
 				<convert match="org.openmrs.User" converter="bean"/>
 			</create>
@@ -86,6 +90,9 @@
 			DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
 			DWRAmrsReportService.purgeUserLocation(Integer rowid);
 			DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
+        	DWRAmrsReportService.getCohortCountForLocation(Integer locationId,Date evaluationDate);
+            DWRAmrsReportService.getCohort(Integer locationId,Date evaluationDate);
+            DWRAmrsReportService.rebuildEnrollment();
 			]]>
 		</signatures>	
 	</dwr>

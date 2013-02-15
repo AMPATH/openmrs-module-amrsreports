@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreport.web.dwr;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
@@ -9,20 +10,33 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.task.UpdateHIVCareEnrollmentTask;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.util.OpenmrsUtil;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Nicholas Ingosi magaja
- * Date: 6/6/12
- * Time: 8:55 AM
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: Nicholas Ingosi magaja Date: 6/6/12 Time: 8:55 AM To change this template use File
+ * | Settings | File Templates.
  */
 public class DWRAmrsReportService {
 	private static final Log log = LogFactory.getLog(DWRAmrsReportService.class);
@@ -225,5 +239,42 @@ public class DWRAmrsReportService {
 		return "A total of  " + myList.size() + " privileges have been processed";
 	}
 
+	/**
+	 * helper method for determining cohort size per location and report date
+	 */
+	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) throws Exception {
+		Set<Integer> cohort = this.getCohort(locationId, evaluationDate);
+		return cohort.size();
+	}
 
+	/**
+	 * provide the list of patients in the MOH361A cohort for a given location and evaluation date
+	 */
+	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
+		EvaluationContext context = new EvaluationContext();
+		context.setEvaluationDate(evaluationDate);
+		context.addParameterValue("endDate", evaluationDate);
+
+		Location location = Context.getLocationService().getLocation(locationId);
+		context.addParameterValue("locationList", location);
+
+		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+
+		try {
+			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
+			return cohort.getMemberIds();
+		} catch (EvaluationException e) {
+			log.error(e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * kick off the enrollment update task
+	 */
+	public String rebuildEnrollment() {
+		new UpdateHIVCareEnrollmentTask().execute();
+		return "done";
+	};
 }

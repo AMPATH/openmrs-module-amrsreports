@@ -103,5 +103,153 @@
 			<column name="uuid" />
 		</createIndex>
 	</changeSet>
-		
+
+    <changeSet id="amrsreport-2013-02-06-a" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="amrsreport_hiv_care_enrollment"/>
+            </not>
+        </preConditions>
+        <comment>
+            Creating the amrsreport_hiv_care_enrollment table
+        </comment>
+        <createTable tableName="amrsreport_hiv_care_enrollment">
+            <column name="enrollment_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="person_id" type="int"/>
+            <column name="enrollment_date" type="datetime"/>
+            <column name="enrollment_location_id" type="int"/>
+            <column name="enrollment_age" type="double"/>
+            <column name="enrollment_reason" type="varchar(50)"/>
+            <column name="first_hiv_encounter_id" type="int"/>
+            <column name="first_hiv_encounter_location_id" type="int"/>
+            <column name="first_hiv_encounter_age" type="double"/>
+            <column name="first_hiv_encounter_date" type="datetime"/>
+            <column name="first_positive_obs_location_id" type="int"/>
+            <column name="first_positive_obs_date" type="datetime"/>
+            <column name="last_positive_obs_date" type="datetime"/>
+            <column name="last_negative_obs_date" type="datetime"/>
+            <column name="last_who_stage" type="int" defaultValueNumeric="0" />
+            <column name="last_who_stage_date" type="datetime"/>
+            <column name="first_arv_date" type="datetime"/>
+            <column name="last_discontinue_date" type="datetime"/>
+            <column name="transferred_in" type="tinyint" defaultValueNumeric="0" />
+            <column name="transferred_in_date" type="datetime"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="uuid">
+            <column name="uuid" />
+        </createIndex>
+
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_age">
+            <column name="enrollment_age" />
+        </createIndex>
+
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="first_hiv_encounter_age">
+            <column name="first_hiv_encounter_age" />
+        </createIndex>
+
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_date">
+            <column name="enrollment_date" />
+        </createIndex>
+
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_reason">
+            <column name="enrollment_reason" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="amrsreport-2013-02-06-b" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_person_ref"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding HIV care HIVCareEnrollment foreign-key constraint on person_id column
+        </comment>
+        <addForeignKeyConstraint
+                constraintName="amrsreport_hiv_care_enrollment_person_ref"
+                baseTableName="amrsreport_hiv_care_enrollment"
+                baseColumnNames="person_id"
+                referencedTableName="person"
+                referencedColumnNames="person_id"
+                />
+    </changeSet>
+
+    <changeSet id="amrsreport-2013-02-06-c" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_enrollment_location_ref"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding HIV care HIVCareEnrollment foreign-key constraint on enrollment_location_id column
+        </comment>
+        <addForeignKeyConstraint
+                constraintName="amrsreport_hiv_care_enrollment_enrollment_location_ref"
+                baseTableName="amrsreport_hiv_care_enrollment"
+                baseColumnNames="enrollment_location_id"
+                referencedTableName="location"
+                referencedColumnNames="location_id"
+                />
+    </changeSet>
+
+    <changeSet id="amrsreport-2013-02-06-d" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_hiv_encounter_location_ref"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding HIV care HIVCareEnrollment foreign-key constraint on first_hiv_encounter_location_id column
+        </comment>
+        <addForeignKeyConstraint
+                constraintName="amrsreport_hiv_care_enrollment_first_hiv_encounter_location_ref"
+                baseTableName="amrsreport_hiv_care_enrollment"
+                baseColumnNames="first_hiv_encounter_location_id"
+                referencedTableName="location"
+                referencedColumnNames="location_id"
+                />
+    </changeSet>
+
+    <changeSet id="amrsreport-2013-02-06-e" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_positive_obs_location_ref"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding HIV care HIVCareEnrollment foreign-key constraint on first_positive_obs_location_id column
+        </comment>
+        <addForeignKeyConstraint
+                constraintName="amrsreport_hiv_care_enrollment_first_positive_obs_location_ref"
+                baseTableName="amrsreport_hiv_care_enrollment"
+                baseColumnNames="first_positive_obs_location_id"
+                referencedTableName="location"
+                referencedColumnNames="location_id"
+                />
+    </changeSet>
+
+    <changeSet id="amrsreport-2013-02-06-f" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_encounter_ref"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding HIV care HIVCareEnrollment foreign-key constraint on first_hiv_encounter_id column
+        </comment>
+        <addForeignKeyConstraint
+                constraintName="amrsreport_hiv_care_enrollment_first_hiv_encounter_ref"
+                baseTableName="amrsreport_hiv_care_enrollment"
+                baseColumnNames="first_hiv_encounter_id"
+                referencedTableName="encounter"
+                referencedColumnNames="encounter_id"
+                />
+    </changeSet>
+
 </databaseChangeLog>
