@@ -7,17 +7,13 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.PersonAttributeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinitionEvaluator;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -25,7 +21,6 @@ import java.util.Date;
  */
 @Handler(supports = {Moh361ACohortDefinition.class})
 public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluator {
-
 
 	@Override
 	public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
@@ -35,142 +30,21 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		if (definition == null)
 			return null;
 
-		// 1AMPATH HIV positive patients 2yrs and above
-		String eligibleAdultsByEncounter = "Select person_id from(" +
-				"    (Select " +
-				"        p.person_id, " +
-				"        fir.encounter_datetime," +
-				"        p.birthdate, " +
-				"        floor(datediff(fir.encounter_datetime,p.birthdate) /365.25) as age " +
-				"    from" +
-				"        (Select " +
-				"            patient_id, " +
-				"            encounter_datetime, " +
-				"            location_id," +
-				"            encounter_type " +
-				"        from encounter" +
-				"        where " +
-				"            voided=0 " +
-				"            and encounter_type in(1,2,3,4,13)" +
-				"            group by patient_id" +
-				"            order by patient_id, encounter_datetime ) fir" +
-				"        join person p" +
-				"            on p.person_id=fir.patient_id" +
-				"    where " +
-				"        location_id = :location " +
-				"        and p.voided=0)" +
-				"     as al)" +
-				"where " +
-				"    al.age>=2 " +
-				"    and al.encounter_datetime<=:endDate";
-		SqlCohortDefinition eligibleAdults = new SqlCohortDefinition(eligibleAdultsByEncounter);
-		eligibleAdults.addParameter(new Parameter("endDate", "End Date", Date.class));
-		eligibleAdults.addParameter(new Parameter("location", "Location", Location.class));
+		String sql =
+				"select person_id" +
+						" from amrsreport_hiv_care_enrollment " +
+						" where " +
+						"  enrollment_reason <> \"INVALID\" " +
+						"  and transferred_in = 0" +
+						"  and enrollment_date is not null " +
+						"  and enrollment_date <= :endDate" +
+						"  and enrollment_location_id in (:locationList)";
 
-		// 1AMPATH HIV exposed Infants(<2yrs) at first visit
-		String eligibleChildrenByEncounter = "Select person_id from(" +
-				"    (Select " +
-				"        p.person_id, " +
-				"        fir.encounter_datetime," +
-				"        p.birthdate, " +
-				"        floor(datediff(fir.encounter_datetime,p.birthdate) /365.25) as age " +
-				"    from" +
-				"        (Select " +
-				"            patient_id, " +
-				"            encounter_datetime, " +
-				"            location_id," +
-				"            encounter_type " +
-				"        from encounter" +
-				"        where " +
-				"            voided=0 " +
-				"            and encounter_type in(1,2,3,4,13)" +
-				"            group by patient_id" +
-				"            order by patient_id, encounter_datetime ) fir" +
-				"        join person p" +
-				"            on p.person_id=fir.patient_id" +
-				"    where " +
-				"        location_id = :location " +
-				"        and p.voided=0)" +
-				"     as al)" +
-				"where " +
-				"    al.age < 2 " +
-				"    and al.encounter_datetime<=:endDate";
-		SqlCohortDefinition eligibleChild = new SqlCohortDefinition(eligibleChildrenByEncounter);
-		eligibleChild.addParameter(new Parameter("endDate", "End Date", Date.class));
-		eligibleChild.addParameter(new Parameter("location", "Location", Location.class));
+		SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql);
+//		sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+//		sqlCohortDefinition.addParameter(new Parameter("locationList", "Locations", Location.class));
 
-		// 1AMPATH patients with positive non conflicting results
-		String positiveNonConflictingResults = "select ob.person_id" +
-				" from (" +
-				"	(select person_id, min(obs_datetime) as pos_date, location_id" +
-				"		from obs o" +
-				"		left join encounter e on e.encounter_id = o.encounter_id" +
-				"		inner join person p on p.person_id = o.person_id" +
-				"		where" +
-				"			(" +
-				"				(o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
-				"				or" +
-				"				(o.concept_id = 6042 and o.value_coded = 1169)" +
-				"			)" +
-				"			and o.voided = 0" +
-				"			and e.voided = 0" +
-				"			and p.voided = 0" +
-				"			and o.obs_datetime <= :endDate" +
-				"		group by person_id) ob" +
-				"	left join (" +
-				"		select person_id, max(obs_datetime) as neg_date" +
-				"		from obs o" +
-				"		left join encounter e on e.encounter_id = o.encounter_id" +
-				"		inner join person p on p.person_id = o.person_id" +
-				"		where" +
-				"			o.concept_id in (1040, 1030, 1042) and o.value_coded = 664" +
-				"			and o.voided = 0" +
-				"			and e.voided = 0" +
-				"			and p.voided = 0" +
-				"			and o.obs_datetime <= :endDate" +
-				"		group by person_id) as ab" +
-				"	on ob.person_id = ab.person_id)" +
-				" where" +
-				"	(neg_date is null or pos_date > neg_date)" +
-				"	and ob.location_id = :location";
-		SqlCohortDefinition positiveNonConflicting = new SqlCohortDefinition(positiveNonConflictingResults);
-		positiveNonConflicting.addParameter(new Parameter("endDate", "End Date", Date.class));
-		positiveNonConflicting.addParameter(new Parameter("location", "Location", Location.class));
-
-		// exclude fake patients
-		PersonAttributeCohortDefinition fakePatientCohortDefinition = new PersonAttributeCohortDefinition();
-		fakePatientCohortDefinition.setAttributeType(Context.getPersonService().getPersonAttributeType(28));
-		fakePatientCohortDefinition.setValues(Collections.singletonList("true"));
-
-		// build mapped cohorts for use in composition
-		Mapped<CohortDefinition> mappedEligibleAdult = new Mapped<CohortDefinition>();
-		mappedEligibleAdult.setParameterizable(eligibleAdults);
-		mappedEligibleAdult.addParameterMapping("endDate", "${endDate}");
-		mappedEligibleAdult.addParameterMapping("location", "${location}");
-
-		Mapped<CohortDefinition> mappedEligibleChild = new Mapped<CohortDefinition>();
-		mappedEligibleChild.setParameterizable(eligibleChild);
-		mappedEligibleChild.addParameterMapping("endDate", "${endDate}");
-		mappedEligibleChild.addParameterMapping("location", "${location}");
-
-		Mapped<CohortDefinition> mappedPositiveNonConflicting = new Mapped<CohortDefinition>();
-		mappedPositiveNonConflicting.setParameterizable(positiveNonConflicting);
-		mappedPositiveNonConflicting.addParameterMapping("endDate", "${endDate}");
-		mappedPositiveNonConflicting.addParameterMapping("location", "${location}");
-
-		// compose the query
-		CompositionCohortDefinition combined = new CompositionCohortDefinition();
-		combined.addSearch("eligibleAdult", mappedEligibleAdult);
-		combined.addSearch("eligibleChild", mappedEligibleChild);
-		combined.addSearch("positiveNonConflicting", mappedPositiveNonConflicting);
-		combined.addSearch("fake", fakePatientCohortDefinition, null);
-		combined.setCompositionString("(eligibleAdult OR (eligibleChild AND positiveNonConflicting)) AND NOT fake");
-
-		// link parameters required in sub cohorts
-		combined.addParameter(new Parameter("endDate", "End Date", Date.class));
-		combined.addParameter(new Parameter("location", "Location", Location.class));
-
-		Cohort results = Context.getService(CohortDefinitionService.class).evaluate(combined, context);
-		return new EvaluatedCohort(results, cohortDefinition, context);
+		Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);
+		return new EvaluatedCohort(results, sqlCohortDefinition, context);
 	}
 }
