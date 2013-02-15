@@ -9,10 +9,10 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreport.enrollment.EnrollmentManager;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.service.MohCoreService;
+import org.openmrs.module.amrsreport.task.UpdateHIVCareEnrollmentTask;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -246,27 +246,9 @@ public class DWRAmrsReportService {
 	 * @param evaluationDate evaluation date
 	 * @return an integer indicating the cohort size; -1 for null and -1000 for error
 	 */
-	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) {
-		Location location = Context.getLocationService().getLocation(locationId);
-		if (location == null)
-			return -1;
-
-		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
-		definition.addLocation(location);
-
-		EvaluationContext context = new EvaluationContext();
-		context.setEvaluationDate(evaluationDate);
-		context.addParameterValue("endDate", evaluationDate);
-		context.addParameterValue("location", location);
-
-		try {
-			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
-			return cohort.getSize();
-		} catch (EvaluationException e) {
-			log.error(e);
-		}
-
-		return -1000;
+	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) throws Exception {
+		Set<Integer> cohort = this.getCohort(locationId, evaluationDate);
+		return cohort.size();
 	}
 
 	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
@@ -275,10 +257,9 @@ public class DWRAmrsReportService {
 		context.addParameterValue("endDate", evaluationDate);
 
 		Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("location", location);
+		context.addParameterValue("locationList", location);
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
-		definition.addLocation(location);
 
 		try {
 			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
@@ -291,7 +272,7 @@ public class DWRAmrsReportService {
 	}
 
 	public String rebuildEnrollment() {
-		EnrollmentManager.getInstance().rebuildAll();
+		new UpdateHIVCareEnrollmentTask().execute();
 		return "done";
 	};
 }
