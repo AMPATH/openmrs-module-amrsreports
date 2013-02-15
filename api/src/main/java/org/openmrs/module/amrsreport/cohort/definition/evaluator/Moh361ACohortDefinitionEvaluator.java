@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreport.cohort.definition.evaluator;
 
 import org.openmrs.Cohort;
-import org.openmrs.Location;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
@@ -12,9 +11,6 @@ import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinition
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-
-import java.util.Date;
 
 /**
  * Evaluator for MOH 361A Cohort Definition
@@ -41,8 +37,6 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						"  and enrollment_location_id in (:locationList)";
 
 		SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql);
-//		sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-//		sqlCohortDefinition.addParameter(new Parameter("locationList", "Locations", Location.class));
 
 		Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);
 		return new EvaluatedCohort(results, sqlCohortDefinition, context);

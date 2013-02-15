@@ -241,16 +241,15 @@ public class DWRAmrsReportService {
 
 	/**
 	 * helper method for determining cohort size per location and report date
-	 *
-	 * @param locationId     id of the location to be evaluated
-	 * @param evaluationDate evaluation date
-	 * @return an integer indicating the cohort size; -1 for null and -1000 for error
 	 */
 	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) throws Exception {
 		Set<Integer> cohort = this.getCohort(locationId, evaluationDate);
 		return cohort.size();
 	}
 
+	/**
+	 * provide the list of patients in the MOH361A cohort for a given location and evaluation date
+	 */
 	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
@@ -271,6 +270,9 @@ public class DWRAmrsReportService {
 		return null;
 	}
 
+	/**
+	 * kick off the enrollment update task
+	 */
 	public String rebuildEnrollment() {
 		new UpdateHIVCareEnrollmentTask().execute();
 		return "done";
