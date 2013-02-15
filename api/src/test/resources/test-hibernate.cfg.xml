@@ -5,6 +5,7 @@
 
 <hibernate-configuration>
 	<session-factory>
+        <mapping resource="HIVCareEnrollment.hbm.xml"/>
 		<mapping resource="UserLocation.hbm.xml"/>
 		<mapping resource="UserReport.hbm.xml"/>
 	</session-factory>

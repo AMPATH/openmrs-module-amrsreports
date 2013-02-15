@@ -34,7 +34,7 @@
 	<mappingFiles>
 		UserLocation.hbm.xml
 		UserReport.hbm.xml
-        Enrollment.hbm.xml
+        HIVCareEnrollment.hbm.xml
 	</mappingFiles>
 	
 	<!-- Required Privileges -->

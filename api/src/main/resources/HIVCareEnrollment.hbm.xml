@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openmrs.module.amrsreport">
+	<class name="org.openmrs.module.amrsreport.HIVCareEnrollment" table="amrsreport_hiv_care_enrollment">
+
+        <id column="enrollment_id" name="id" type="int" unsaved-value="0">
+			<generator class="native"/>
+		</id>
+		<discriminator column="enrollment_id" insert="false"/>
+
+        <many-to-one class="org.openmrs.Person" name="person" column="person_id" not-null="true"/>
+
+        <property name="enrollmentDate" type="java.util.Date" column="enrollment_date" length="10" />
+        <many-to-one class="org.openmrs.Location" name="enrollmentLocation" column="enrollment_location_id"/>
+        <property name="enrollmentAge" type="double" column="enrollment_age" length="22" />
+        <property name="enrollmentReason" type="java.lang.String" column="enrollment_reason" length="50"/>
+
+        <many-to-one class="org.openmrs.Encounter" name="firstHIVEncounter" column="first_hiv_encounter_id"/>
+        <property name="firstHIVEncounterDate" type="java.util.Date" column="first_hiv_encounter_date" length="10" />
+        <many-to-one class="org.openmrs.Location" name="firstHIVEncounterLocation" column="first_hiv_encounter_location_id"/>
+        <property name="firstHIVEncounterAge" type="double" column="first_hiv_encounter_age" length="22" />
+
+        <property name="firstPositiveObsDate" type="java.util.Date" column="first_positive_obs_date" length="10" />
+        <many-to-one class="org.openmrs.Location" name="firstPositiveObsLocation" column="first_positive_obs_location_id"/>
+
+        <property name="lastPositiveObsDate" type="java.util.Date" column="last_positive_obs_date" length="10" />
+        <property name="lastNegativeObsDate" type="java.util.Date" column="last_negative_obs_date" length="10" />
+
+        <property name="lastWHOStage" type="java.lang.Integer" column="last_who_stage" />
+        <property name="lastWHOStageDate" type="java.util.Date" column="last_who_stage_date" length="10" />
+
+        <property name="firstARVDate" type="java.util.Date" column="first_arv_date" length="10" />
+
+        <property name="lastDiscontinueDate" type="java.util.Date" column="last_discontinue_date" length="10" />
+
+        <property name="transferredIn" type="java.lang.Boolean" column="transferred_id" />
+        <property name="transferredInDate" type="java.util.Date" column="transferred_in_date" length="10" />
+
+        <property length="38" name="uuid" type="java.lang.String" unique="true"/>
+	</class>
+</hibernate-mapping>

@@ -35,7 +35,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.amrsreport.Enrollment;
+import org.openmrs.module.amrsreport.HIVCareEnrollment;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
@@ -427,8 +427,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	@Override
-	public Enrollment saveEnrollment(Enrollment enrollment) {
-		sessionFactory.getCurrentSession().saveOrUpdate(enrollment);
-		return enrollment;
+	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment) {
+		sessionFactory.getCurrentSession().saveOrUpdate(HIVCareEnrollment);
+		return HIVCareEnrollment;
 	}
 }

@@ -20,7 +20,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
-import org.openmrs.module.amrsreport.Enrollment;
+import org.openmrs.module.amrsreport.HIVCareEnrollment;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
@@ -30,13 +30,11 @@ import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.amrsreport.rule.observation.ARVPatientSnapshot;
 
 /**
  * Service contract for the core layer of OpenMRS
@@ -200,5 +198,5 @@ public interface MohCoreService extends OpenmrsService {
 	public void clearEnrollments();
 
 	@Transactional
-	public Enrollment saveEnrollment(Enrollment enrollment);
+	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
 }
