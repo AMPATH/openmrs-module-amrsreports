@@ -58,60 +58,69 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"       patient_id, " +
 					"       encounter_id," +
 					"       encounter_datetime, " +
-					"       location_id," +
-					"       encounter_type " +
-					"   from encounter" +
-					"   where " +
-					"       voided=0 " +
-					"       and encounter_type in(1,2,3,4,13)" +
-					"       group by patient_id" +
-					"       order by patient_id, encounter_datetime) fir" +
+					"       location_id" +
+					"   from (" +
+					"   	   select " +
+					"   	      patient_id, encounter_id, encounter_datetime, location_id " +
+					"   	      from encounter " +
+					"          join person p" +
+					"          on p.person_id = encounter.patient_id and p.voided = 0" +
+					"   	      where " +
+					"   	          encounter_type in (1, 2, 3, 4, 13) " +
+					"   	          and encounter.voided=0 " +
+					"   	      order by encounter_datetime asc" +
+					"   ) e" +
+					"   group by patient_id) fir" +
 					" join person p" +
-					"   on p.person_id=fir.patient_id" +
-					" where p.voided=0";
+					"   on p.person_id=fir.patient_id";
 
 	private static final String QUERY_UPDATE_LAST_POSITIVE =
-			"update " +
-					"  amrsreport_hiv_care_enrollment ae" +
+			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
-					"    select " +
-					"      o.person_id, o.obs_datetime" +
-					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id and ae.enrollment_age < 2" +
-					"    where" +
-					"      o.voided = 0" +
-					"      and (" +
-					"        (o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
-					"        or" +
-					"        (o.concept_id = 6042 and o.value_coded = 1169)" +
-					"      )" +
-					"    group by o.person_id" +
-					"    order by obs_datetime desc" +
+					"  	select person_id, obs_datetime" +
+					"   from (" +
+					"	    select " +
+					"	      o.person_id, o.obs_datetime" +
+					"	    from " +
+					"	      obs o" +
+					"           join amrsreport_hiv_care_enrollment ae" +
+					"           on o.person_id = ae.person_id and ae.enrollment_age < 2" +
+					"	    where" +
+					"	      o.voided = 0" +
+					"	      and (" +
+					"	        (o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
+					"	        or" +
+					"	        (o.concept_id = 6042 and o.value_coded = 1169)" +
+					"	      )" +
+					"	    order by obs_datetime desc" +
+					"	) ordered" +
+					"    group by person_id" +
 					"  ) last" +
 					"  on ae.person_id = last.person_id" +
 					" set" +
 					"  ae.last_positive_obs_date = last.obs_datetime";
 
 	private static final String QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE =
-			"update " +
-					"  amrsreport_hiv_care_enrollment ae" +
+			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
-					"    select " +
-					"      o.person_id, " +
-					"      o.obs_datetime," +
-					"      if(o.value_coded in (1220,1204), 1, " +
-					"        if(o.value_coded in(1221,1205), 2, " +
-					"          if(o.value_coded in(1222,1206), 3, " +
-					"            if(o.value_coded in(1223,1207),4,0)))) as stage" +
-					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
-					"    where " +
-					"      o.voided = 0" +
-					"      and o.concept_id in (1224, 5356)" +
-					"    group by o.person_id" +
-					"    order by o.obs_datetime desc" +
+					"  	select person_id, obs_datetime, stage from (" +
+					"	    select " +
+					"	      o.person_id, " +
+					"	      o.obs_datetime," +
+					"	      if(o.value_coded in (1220,1204), 1, " +
+					"	        if(o.value_coded in(1221,1205), 2, " +
+					"	          if(o.value_coded in(1222,1206), 3, " +
+					"	            if(o.value_coded in(1223,1207),4,0)))) as stage" +
+					"	    from " +
+					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
+					"	    where " +
+					"	      o.voided = 0" +
+					"	      and o.concept_id in (1224, 5356)" +
+					"	    order by o.obs_datetime desc" +
+					"	) ordered" +
+					"    group by person_id" +
 					"  ) who" +
 					"  on who.person_id = ae.person_id" +
 					" set" +
@@ -119,38 +128,41 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  ae.last_who_stage_date = who.obs_datetime";
 
 	private static final String QUERY_UPDATE_FIRST_ARV_DATE =
-			"update " +
-					"  amrsreport_hiv_care_enrollment ae" +
+			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
-					"    select " +
-					"      o.person_id, " +
-					"      o.obs_datetime" +
-					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
-					"    where " +
-					"      o.voided = 0" +
-					"      and (" +
-					"        o.concept_id in (996, 1085, 1086, 1088, 1147, 1176, 1187, 1250)" +
-					"        or (" +
-					"          o.concept_id = 1193 " +
-					"          and o.value_coded in (630, 792, 6180, 628, 797, 625, 633, 814, 794, 796, 802, 749, 6156)" +
-					"        ) or (" +
-					"          o.concept_id = 1895" +
-					"          and o.value_coded in (select concept_id from concept_set where concept_set=1085)" +
-					"        ) or (" +
-					"          o.concept_id in (2157, 2154) " +
-					"          and o.value_coded not in (1065, 1066)" +
-					"        )" +
-					"      )" +
+					"  	select person_id, obs_datetime, location_id from (" +
+					"	    select " +
+					"	      o.person_id, " +
+					"	      o.obs_datetime," +
+					"	      o.location_id" +
+					"	    from " +
+					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
+					"	    where " +
+					"	      o.voided = 0" +
+					"	      and (" +
+					"	        o.concept_id in (996, 1085, 1086, 1088, 1147, 1176, 1187, 1250)" +
+					"	        or (" +
+					"	          o.concept_id = 1193 " +
+					"	          and o.value_coded in (630, 792, 6180, 628, 797, 625, 633, 814, 794, 796, 802, 749, 6156)" +
+					"	        ) or (" +
+					"	          o.concept_id = 1895" +
+					"	          and o.value_coded in (select concept_id from concept_set where concept_set=1085)" +
+					"	        ) or (" +
+					"	          o.concept_id in (2157, 2154) " +
+					"	          and o.value_coded not in (1065, 1066)" +
+					"	        )" +
+					"	      )" +
+					"	    order by o.obs_datetime asc" +
+					"	) ordered" +
 					"    group by o.person_id" +
-					"    order by o.obs_datetime asc" +
-					"  ) art" +
-					"  on art.person_id = ae.person_id" +
+					"  ) arv" +
+					"  on arv.person_id = ae.person_id" +
 					" set" +
-					"  ae.first_arv_date = art.obs_datetime";
+					"  ae.first_arv_date = arv.obs_datetime," +
+					"  ae.first_arv_location_id = arv.location_id";
 
-	private static final String QUERY_INVALIDATE_WITH_NO_POSITIVE_OBS =
+	private static final String QUERY_INVALIDATE_PATIENTS_MISSING_POSITIVE_OBS_OR_FIRST_ARV_DATE =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
 					"   enrollment_date = NULL," +
@@ -159,23 +171,26 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   enrollment_reason = \"INVALID\"" +
 					" where" +
 					"   enrollment_age < 2" +
-					"   and last_positive_obs_date is null";
+					"   and last_positive_obs_date is null" +
+					"   and first_arv_date is null";
 
 	private static final String QUERY_UPDATE_LAST_NEGATIVE =
 			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
-					"    select " +
-					"      o.person_id, o.obs_datetime" +
-					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae" +
-					"        on o.person_id = ae.person_id" +
-					"        and ae.enrollment_age < 2 and ae.enrollment_reason <> \"INVALID\"" +
-					"    where" +
-					"      o.voided = 0" +
-					"      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
+					"  	select person_id, obs_datetime from (" +
+					"	    select " +
+					"	      o.person_id, o.obs_datetime" +
+					"	    from " +
+					"	      obs o join amrsreport_hiv_care_enrollment ae" +
+					"	        on o.person_id = ae.person_id" +
+					"	        and ae.enrollment_age < 2 and ae.enrollment_reason <> \"INVALID\"" +
+					"	    where" +
+					"	      o.voided = 0" +
+					"	      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
+					"	    order by obs_datetime desc" +
+					"    ) ordered" +
 					"    group by o.person_id" +
-					"    order by obs_datetime desc" +
 					"  ) last" +
 					"  on ae.person_id = last.person_id" +
 					" set" +
@@ -190,7 +205,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  enrollment_reason = \"INVALID\"" +
 					" where" +
 					"  enrollment_age < 2" +
-					"  and last_who_stage is null" +
 					"  and first_arv_date is null" +
 					"  and last_negative_obs_date is not null" +
 					"  and last_positive_obs_date is not null" +
@@ -202,22 +216,24 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  join person p on p.person_id = ae.person_id" +
 					"  join" +
 					"  (" +
-					"    select " +
-					"      o.person_id, o.obs_datetime, o.location_id" +
-					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae" +
-					"        on o.person_id = ae.person_id" +
-					"        and ae.enrollment_age < 2" +
-					"        and ae.enrollment_reason <> \"INVALID\"" +
-					"    where" +
-					"      o.voided = 0" +
-					"      and (" +
-					"        (o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
-					"        or" +
-					"        (o.concept_id = 6042 and o.value_coded = 1169)" +
-					"      )" +
+					"  	select person_id, obs_datetime, location_id from (" +
+					"	    select " +
+					"	      o.person_id, o.obs_datetime, o.location_id" +
+					"	    from " +
+					"	      obs o join amrsreport_hiv_care_enrollment ae" +
+					"	        on o.person_id = ae.person_id" +
+					"	        and ae.enrollment_age < 2" +
+					"	        and ae.enrollment_reason <> \"INVALID\"" +
+					"	    where" +
+					"	      o.voided = 0" +
+					"	      and (" +
+					"	        (o.concept_id in (1040, 1030, 1042) and o.value_coded = 703)" +
+					"	        or" +
+					"	        (o.concept_id = 6042 and o.value_coded = 1169)" +
+					"	      )" +
+					"	    order by obs_datetime asc" +
+					"    ) ordered" +
 					"    group by o.person_id" +
-					"    order by obs_datetime asc" +
 					"  ) first" +
 					"  on ae.person_id = first.person_id" +
 					" set" +
@@ -227,6 +243,19 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  ae.first_positive_obs_location_id = first.location_id," +
 					"  ae.first_positive_obs_date = first.obs_datetime," +
 					"  ae.enrollment_reason = \"OBSERVATION\"";
+
+	private static final String QUERY_UPDATE_ENROLLMENT_FOR_ART_ONLY =
+			"update amrsreport_hiv_care_enrollment" +
+					" set" +
+					"  enrollment_date = first_arv_date," +
+					"  enrollment_age = datediff(first_arv_date, p.birthdate) / 365.25," +
+					"  enrollment_location_id = first_arv_location_id," +
+					"  enrollment_reason = \"ARV\"" +
+					" where" +
+					"  enrollment_age < 2" +
+					"  and last_positive_obs_date is null" +
+					"  and first_arv_date is not null";
+
 
 	private static final String QUERY_UPDATE_TRANSFER_INS =
 			"update" +
@@ -273,7 +302,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_ARV_DATE, false);
 
 		// mark peds with no positive observations as invalid
-		administrationService.executeSQL(QUERY_INVALIDATE_WITH_NO_POSITIVE_OBS, false);
+		administrationService.executeSQL(QUERY_INVALIDATE_PATIENTS_MISSING_POSITIVE_OBS_OR_FIRST_ARV_DATE, false);
 
 		// update peds with latest negative obs
 		administrationService.executeSQL(QUERY_UPDATE_LAST_NEGATIVE, false);
@@ -283,6 +312,9 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 
 		// update remaining peds with first positive obs and location
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_POSITIVE, false);
+
+		// if peds do not have positive obs, use first ARV information for enrollment
+		administrationService.executeSQL(QUERY_UPDATE_ENROLLMENT_FOR_ART_ONLY, false);
 
 		// update everyone with transfer in status
 		administrationService.executeSQL(QUERY_UPDATE_TRANSFER_INS, false);
