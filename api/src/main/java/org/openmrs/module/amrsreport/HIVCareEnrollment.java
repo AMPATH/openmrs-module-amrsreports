@@ -35,6 +35,7 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 	Date lastWHOStageDate;
 
 	Date firstARVDate;
+	Location firstARVLocation;
 
 	Date lastDiscontinueDate;
 
@@ -188,6 +189,14 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 
 	public void setFirstARVDate(Date firstARVDate) {
 		this.firstARVDate = firstARVDate;
+	}
+
+	public Location getFirstARVLocation() {
+		return firstARVLocation;
+	}
+
+	public void setFirstARVLocation(Location firstARVLocation) {
+		this.firstARVLocation = firstARVLocation;
 	}
 
 	public Date getLastDiscontinueDate() {
