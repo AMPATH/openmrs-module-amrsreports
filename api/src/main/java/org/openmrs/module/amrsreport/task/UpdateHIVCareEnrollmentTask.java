@@ -27,7 +27,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   where" +
 					"     pa.person_attribute_type_id = 28" +
 					"     and pa.voided = 0" +
-					"     and pa.value =\"true\")";
+					"     and pa.value ='true')";
 
 	private static final String QUERY_INSERT_FROM_ENCOUNTERS =
 			"insert into amrsreport_hiv_care_enrollment (" +
@@ -51,7 +51,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   fir.location_id," +
 					"   fir.encounter_datetime," +
 					"   datediff(fir.encounter_datetime, p.birthdate) / 365.25," +
-					"   \"ENCOUNTER\"," +
+					"   'ENCOUNTER'," +
 					"   UUID()" +
 					" from" +
 					"   (select " +
@@ -168,7 +168,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   enrollment_date = NULL," +
 					"   enrollment_location_id = NULL," +
 					"   enrollment_age = NULL," +
-					"   enrollment_reason = \"INVALID\"" +
+					"   enrollment_reason = 'INVALID' " +
 					" where" +
 					"   enrollment_age < 2" +
 					"   and last_positive_obs_date is null" +
@@ -184,7 +184,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
-					"	        and ae.enrollment_age < 2 and ae.enrollment_reason <> \"INVALID\"" +
+					"	        and ae.enrollment_age < 2" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
@@ -196,20 +196,28 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					" set" +
 					"  ae.last_negative_obs_date = last.obs_datetime";
 
-	private static final String QUERY_INVALIDATE_CONFLICTING_PEDS =
+	private static final String QUERY_INVALIDATE_PEDS_WITH_NO_WHO_STAGE_OR_ARV_DATE_AND_CONFLICTING_RESULTS =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
 					"  enrollment_date = NULL," +
 					"  enrollment_location_id = NULL," +
 					"  enrollment_age = NULL," +
-					"  enrollment_reason = \"INVALID\"" +
+					"  enrollment_reason = 'INVALID' " +
 					" where" +
 					"  enrollment_age < 2" +
-					"  and first_arv_date is null" +
-					"  and last_negative_obs_date is not null" +
-					"  and last_positive_obs_date is not null" +
-					"  and last_negative_obs_date >= last_positive_obs_date";
-
+					"  and (" +
+					"    first_arv_date is null" +
+					"    or last_who_stage_date is null" +
+					"  )" +
+					"  and (" +
+					"    (" +
+					"      last_negative_obs_date is not null" +
+					"      and last_positive_obs_date is not null" +
+					"      and last_negative_obs_date >= last_positive_obs_date" +
+					"    ) or (" +
+					"      last_positive_obs_date is null" +
+					"    )" +
+					"  )";
 
 	private static final String QUERY_UPDATE_FIRST_POSITIVE =
 			"update amrsreport_hiv_care_enrollment ae" +
@@ -223,7 +231,8 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
 					"	        and ae.enrollment_age < 2" +
-					"	        and ae.enrollment_reason <> \"INVALID\"" +
+					"           and ae.last_positive_date is not null" +
+					"	        and ae.enrollment_reason <> 'INVALID' " +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (" +
@@ -250,12 +259,11 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  enrollment_date = first_arv_date," +
 					"  enrollment_age = datediff(first_arv_date, p.birthdate) / 365.25," +
 					"  enrollment_location_id = first_arv_location_id," +
-					"  enrollment_reason = \"ARV\"" +
+					"  enrollment_reason = 'ARV' " +
 					" where" +
 					"  enrollment_age < 2" +
 					"  and last_positive_obs_date is null" +
 					"  and first_arv_date is not null";
-
 
 	private static final String QUERY_UPDATE_TRANSFER_INS =
 			"update" +
@@ -295,6 +303,9 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		// update peds with latest positive obs
 		administrationService.executeSQL(QUERY_UPDATE_LAST_POSITIVE, false);
 
+		// update peds with latest negative obs
+		administrationService.executeSQL(QUERY_UPDATE_LAST_NEGATIVE, false);
+
 		// update everyone with latest WHO stage
 		administrationService.executeSQL(QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE, false);
 
@@ -304,11 +315,8 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		// mark peds with no positive observations as invalid
 		administrationService.executeSQL(QUERY_INVALIDATE_PATIENTS_MISSING_POSITIVE_OBS_OR_FIRST_ARV_DATE, false);
 
-		// update peds with latest negative obs
-		administrationService.executeSQL(QUERY_UPDATE_LAST_NEGATIVE, false);
-
 		// mark peds with negative > positive obs as invalid
-		administrationService.executeSQL(QUERY_INVALIDATE_CONFLICTING_PEDS, false);
+		administrationService.executeSQL(QUERY_INVALIDATE_PEDS_WITH_NO_WHO_STAGE_OR_ARV_DATE_AND_CONFLICTING_RESULTS, false);
 
 		// update remaining peds with first positive obs and location
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_POSITIVE, false);

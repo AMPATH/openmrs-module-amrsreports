@@ -30,7 +30,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 				"select person_id" +
 						" from amrsreport_hiv_care_enrollment " +
 						" where " +
-						"  enrollment_reason <> \"INVALID\" " +
+						"  enrollment_reason <> 'INVALID' " +
 						"  and transferred_in = 0" +
 						"  and enrollment_date is not null " +
 						"  and enrollment_date <= :endDate" +
