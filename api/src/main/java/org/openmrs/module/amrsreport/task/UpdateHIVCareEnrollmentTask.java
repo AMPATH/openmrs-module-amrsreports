@@ -155,7 +155,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      )" +
 					"	    order by o.obs_datetime asc" +
 					"	) ordered" +
-					"    group by o.person_id" +
+					"    group by person_id" +
 					"  ) arv" +
 					"  on arv.person_id = ae.person_id" +
 					" set" +
@@ -190,7 +190,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
 					"	    order by obs_datetime desc" +
 					"    ) ordered" +
-					"    group by o.person_id" +
+					"    group by person_id" +
 					"  ) last" +
 					"  on ae.person_id = last.person_id" +
 					" set" +
@@ -242,7 +242,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      )" +
 					"	    order by obs_datetime asc" +
 					"    ) ordered" +
-					"    group by o.person_id" +
+					"    group by person_id" +
 					"  ) first" +
 					"  on ae.person_id = first.person_id" +
 					" set" +
