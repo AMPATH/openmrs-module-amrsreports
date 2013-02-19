@@ -231,7 +231,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
 					"	        and ae.enrollment_age < 2" +
-					"           and ae.last_positive_date is not null" +
+					"           and ae.last_positive_obs_date is not null" +
 					"	        and ae.enrollment_reason <> 'INVALID' " +
 					"	    where" +
 					"	      o.voided = 0" +
