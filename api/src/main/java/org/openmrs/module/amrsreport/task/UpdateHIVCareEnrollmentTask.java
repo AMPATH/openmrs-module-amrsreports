@@ -32,26 +32,18 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 	private static final String QUERY_INSERT_FROM_ENCOUNTERS =
 			"insert into amrsreport_hiv_care_enrollment (" +
 					"   person_id, " +
-					"   enrollment_location_id," +
-					"   enrollment_date," +
-					"   enrollment_age," +
 					"   first_hiv_encounter_id," +
 					"   first_hiv_encounter_location_id, " +
 					"   first_hiv_encounter_date, " +
 					"   first_hiv_encounter_age, " +
-					"   enrollment_reason, " +
 					"   uuid" +
 					" )" +
 					" select " +
 					"   p.person_id, " +
-					"   fir.location_id," +
-					"   fir.encounter_datetime," +
-					"   datediff(fir.encounter_datetime, p.birthdate) / 365.25," +
 					"   fir.encounter_id," +
 					"   fir.location_id," +
 					"   fir.encounter_datetime," +
 					"   datediff(fir.encounter_datetime, p.birthdate) / 365.25," +
-					"   'ENCOUNTER'," +
 					"   UUID()" +
 					" from" +
 					"   (select " +
@@ -85,7 +77,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    from " +
 					"	      obs o" +
 					"           join amrsreport_hiv_care_enrollment ae" +
-					"           on o.person_id = ae.person_id and ae.enrollment_age < 2" +
+					"           on o.person_id = ae.person_id and ae.enrollment_reason is NULL" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (" +
@@ -162,18 +154,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  ae.first_arv_date = arv.obs_datetime," +
 					"  ae.first_arv_location_id = arv.location_id";
 
-	private static final String QUERY_INVALIDATE_PATIENTS_MISSING_POSITIVE_OBS_OR_FIRST_ARV_DATE =
-			"update amrsreport_hiv_care_enrollment" +
-					" set" +
-					"   enrollment_date = NULL," +
-					"   enrollment_location_id = NULL," +
-					"   enrollment_age = NULL," +
-					"   enrollment_reason = 'INVALID' " +
-					" where" +
-					"   enrollment_age < 2" +
-					"   and last_positive_obs_date is null" +
-					"   and first_arv_date is null";
-
 	private static final String QUERY_UPDATE_LAST_NEGATIVE =
 			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
@@ -183,8 +163,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      o.person_id, o.obs_datetime" +
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
-					"	        on o.person_id = ae.person_id" +
-					"	        and ae.enrollment_age < 2" +
+					"	        on o.person_id = ae.person_id and ae.enrollment_reason is NULL" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
@@ -195,29 +174,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  on ae.person_id = last.person_id" +
 					" set" +
 					"  ae.last_negative_obs_date = last.obs_datetime";
-
-	private static final String QUERY_INVALIDATE_PEDS_WITH_NO_WHO_STAGE_OR_ARV_DATE_AND_CONFLICTING_RESULTS =
-			"update amrsreport_hiv_care_enrollment" +
-					" set" +
-					"  enrollment_date = NULL," +
-					"  enrollment_location_id = NULL," +
-					"  enrollment_age = NULL," +
-					"  enrollment_reason = 'INVALID' " +
-					" where" +
-					"  enrollment_age < 2" +
-					"  and (" +
-					"    first_arv_date is null" +
-					"    or last_who_stage_date is null" +
-					"  )" +
-					"  and (" +
-					"    (" +
-					"      last_negative_obs_date is not null" +
-					"      and last_positive_obs_date is not null" +
-					"      and last_negative_obs_date >= last_positive_obs_date" +
-					"    ) or (" +
-					"      last_positive_obs_date is null" +
-					"    )" +
-					"  )";
 
 	private static final String QUERY_UPDATE_FIRST_POSITIVE =
 			"update amrsreport_hiv_care_enrollment ae" +
@@ -230,9 +186,8 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
-					"	        and ae.enrollment_age < 2" +
-					"           and ae.last_positive_obs_date is not null" +
-					"	        and ae.enrollment_reason <> 'INVALID' " +
+					"           and ae.last_positive_obs_date is not NULL" +
+					"	        and ae.enrollment_reason is NULL" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (" +
@@ -250,20 +205,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  ae.enrollment_date = first.obs_datetime," +
 					"  ae.enrollment_age = datediff(first.obs_datetime, p.birthdate) / 365.25," +
 					"  ae.first_positive_obs_location_id = first.location_id," +
-					"  ae.first_positive_obs_date = first.obs_datetime," +
-					"  ae.enrollment_reason = \"OBSERVATION\"";
-
-	private static final String QUERY_UPDATE_ENROLLMENT_FOR_ART_ONLY =
-			"update amrsreport_hiv_care_enrollment" +
-					" set" +
-					"  enrollment_date = first_arv_date," +
-					"  enrollment_age = datediff(first_arv_date, p.birthdate) / 365.25," +
-					"  enrollment_location_id = first_arv_location_id," +
-					"  enrollment_reason = 'ARV' " +
-					" where" +
-					"  enrollment_age < 2" +
-					"  and last_positive_obs_date is null" +
-					"  and first_arv_date is not null";
+					"  ae.first_positive_obs_date = first.obs_datetime";
 
 	private static final String QUERY_UPDATE_TRANSFER_INS =
 			"update" +
@@ -283,6 +225,52 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   transferred_in = t.transfer," +
 					"   transferred_in_date = t.obs_datetime";
 
+	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER =
+			"update amrsreport_hiv_care_enrollment" +
+					" set" +
+					"  enrollment_date = first_hiv_encounter_date," +
+					"  enrollment_age = first_hiv_encounter_age," +
+					"  enrollment_location_id = first_hiv_encounter_location_id," +
+					"  enrollment_reason = 'ENCOUNTER'" +
+					" where" +
+					"  first_hiv_encounter_age >= 2";
+
+	private static final String QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS =
+			"update amrsreport_hiv_care_enrollment" +
+					" set" +
+					"  enrollment_reason = 'OBSERVATION'" +
+					" where" +
+					"  enrollment_reason is NULL" +
+					"  and last_positive_obs_date is not NULL" +
+					"  and last_negative_obs_date is not NULL" +
+					"  and last_negative_obs_date < last_positive_obs_date";
+
+	private static final String QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS =
+			"update amrsreport_hiv_care_enrollment" +
+					" set" +
+					"  enrollment_reason = 'VERIFIED'" +
+					" where" +
+					"  enrollment_reason is NULL" +
+					"  and last_positive_obs_date is not NULL" +
+					"  and last_negative_obs_date is not NULL" +
+					"  and last_negative_obs_date >= last_positive_obs_date" +
+					"  and last_who_stage_date is not NULL" +
+					"  and first_arv_date is not NULL";
+
+	private static final String QUERY_FILL_ENROLLMENT_FOR_ARV_ONLY =
+			"update amrsreport_hiv_care_enrollment ae" +
+					"  join person p on p.person_id = ae.person_id" +
+					" set" +
+					"  ae.enrollment_date = ae.first_arv_date," +
+					"  ae.enrollment_age = datediff(ae.first_arv_date, p.birthdate) / 365.25," +
+					"  ae.enrollment_location_id = ae.first_arv_location_id," +
+					"  ae.enrollment_reason = 'ARV'" +
+					" where" +
+					"  ae.enrollment_reason is NULL" +
+					"  and ae.last_positive_obs_date is NULL" +
+					"  and ae.last_negative_obs_date is NULL" +
+					"  and ae.first_arv_date is not NULL";
+
 	@Override
 	public void execute() {
 		AdministrationService administrationService = Context.getAdministrationService();
@@ -300,29 +288,33 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		// remove fake patients
 		administrationService.executeSQL(QUERY_DELETE_FAKE_PATIENTS, false);
 
-		// update peds with latest positive obs
-		administrationService.executeSQL(QUERY_UPDATE_LAST_POSITIVE, false);
-
-		// update peds with latest negative obs
-		administrationService.executeSQL(QUERY_UPDATE_LAST_NEGATIVE, false);
-
 		// update everyone with latest WHO stage
 		administrationService.executeSQL(QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE, false);
 
 		// update everyone with first ARV date
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_ARV_DATE, false);
 
-		// mark peds with no positive observations as invalid
-		administrationService.executeSQL(QUERY_INVALIDATE_PATIENTS_MISSING_POSITIVE_OBS_OR_FIRST_ARV_DATE, false);
+		// fill out enrollment info for patients >= 2 years old at first encounter (Group A)
+		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER, false);
 
-		// mark peds with negative > positive obs as invalid
-		administrationService.executeSQL(QUERY_INVALIDATE_PEDS_WITH_NO_WHO_STAGE_OR_ARV_DATE_AND_CONFLICTING_RESULTS, false);
+		// update remaining with latest positive obs
+		administrationService.executeSQL(QUERY_UPDATE_LAST_POSITIVE, false);
 
-		// update remaining peds with first positive obs and location
+		// update remaining with latest negative obs
+		administrationService.executeSQL(QUERY_UPDATE_LAST_NEGATIVE, false);
+
+		// update remaining with first positive obs and location
+		// NOTE: this fills out enrollment data but leaves reason blank
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_POSITIVE, false);
 
-		// if peds do not have positive obs, use first ARV information for enrollment
-		administrationService.executeSQL(QUERY_UPDATE_ENROLLMENT_FOR_ART_ONLY, false);
+		// fill out enrollment info for remaining with non-conflicting observations (Group B)
+		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS, false);
+
+		// fill out enrollment info for conflicting observations with WHO Stage and on ARVs (Group C)
+		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS, false);
+
+		// fill out enrollment info for no observation but with ARVs (Group D)
+		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FOR_ARV_ONLY, false);
 
 		// update everyone with transfer in status
 		administrationService.executeSQL(QUERY_UPDATE_TRANSFER_INS, false);
