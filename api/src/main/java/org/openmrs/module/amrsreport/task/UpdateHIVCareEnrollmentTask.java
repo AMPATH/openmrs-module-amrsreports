@@ -225,6 +225,53 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   transferred_in = t.transfer," +
 					"   transferred_in_date = t.obs_datetime";
 
+	private static final String QUERY_UPDATE_DISCONTINUES =
+			"update" +
+					"	amrsreport_hiv_care_enrollment ae" +
+					"	join (" +
+					"		select" +
+					"			patient_id, encounter_datetime as last_encounter_date" +
+					"		from (" +
+					"			select" +
+					"				patient_id, encounter_datetime" +
+					"			from " +
+					"				encounter" +
+					"				join amrsreport_hiv_care_enrollment ae" +
+					"				on encounter.patient_id = ae.person_id" +
+					"			where" +
+					"				voided = 0" +
+					"				and encounter_type in (1,2,3,4,13,10,11,12,17,18,19,20,21,22,23,25,26,44,46,47,48,67)" +
+					"			order by  encounter_datetime desc" +
+					"		) ordered" +
+					"		group by patient_id" +
+					"	) encounters" +
+					"	on ae.person_id = encounters.patient_id" +
+					"	join (" +
+					"		select" +
+					"			person_id, obs_datetime as last_obs_date, location_id as last_obs_location_id" +
+					"		from (" +
+					"			select" +
+					"				o.person_id, o.obs_datetime, o.location_id" +
+					"			from " +
+					"				obs o" +
+					"				join amrsreport_hiv_care_enrollment ae" +
+					"				on o.person_id = ae.person_id" +
+					"			where" +
+					"				o.voided = 0" +
+					"				and (" +
+					"					(o.concept_id = 1946 and o.value_coded = 1065)" +
+					"					or (o.concept_id = 1596 and o.value_coded = 1946)" +
+					"				)" +
+					"			order by obs_datetime desc" +
+					"		) ordered" +
+					"		group by person_id" +
+					"	) discontinued" +
+					"	on ae.person_id = discontinued.person_id" +
+					" set" +
+					" 	ae.last_discontinue_date = last_obs_date" +
+					" where " +
+					"	last_encounter_date <= last_obs_date";
+
 	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
@@ -235,6 +282,23 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					" where" +
 					"  first_hiv_encounter_age >= 2";
 
+	private static final String QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS =
+			"update amrsreport_hiv_care_enrollment ae" +
+					" set" +
+					"  enrollment_date = first_hiv_encounter_date," +
+					"  enrollment_age = first_hiv_encounter_age," +
+					"  enrollment_location_id = first_hiv_encounter_location_id," +
+					"  enrollment_reason = 'ENCOUNTER'" +
+					" where" +
+					"  enrollment_reason is NULL" +
+					"  and not exists (" +
+					"    select 1" +
+					"    from encounter" +
+					"    where " +
+					"      encounter_type in (3,4)" +
+					"      and patient_id = ae.person_id" +
+					"      and voided =  0)";
+
 	private static final String QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
@@ -242,8 +306,13 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					" where" +
 					"  enrollment_reason is NULL" +
 					"  and last_positive_obs_date is not NULL" +
-					"  and last_negative_obs_date is not NULL" +
-					"  and last_negative_obs_date < last_positive_obs_date";
+					"  and (" +
+					"    last_negative_obs_date is NULL" +
+					"    or (" +
+					"      last_negative_obs_date is not NULL" +
+					"      and last_negative_obs_date < last_positive_obs_date" +
+					"    )" +
+					"  )";
 
 	private static final String QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS =
 			"update amrsreport_hiv_care_enrollment" +
@@ -268,7 +337,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					" where" +
 					"  ae.enrollment_reason is NULL" +
 					"  and ae.last_positive_obs_date is NULL" +
-					"  and ae.last_negative_obs_date is NULL" +
 					"  and ae.first_arv_date is not NULL";
 
 	@Override
@@ -297,6 +365,9 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		// fill out enrollment info for patients >= 2 years old at first encounter (Group A)
 		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER, false);
 
+		// fill out enrollment info for remainin patients with only adult encounters (Group A)
+		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS, false);
+
 		// update remaining with latest positive obs
 		administrationService.executeSQL(QUERY_UPDATE_LAST_POSITIVE, false);
 
@@ -307,17 +378,20 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 		// NOTE: this fills out enrollment data but leaves reason blank
 		administrationService.executeSQL(QUERY_UPDATE_FIRST_POSITIVE, false);
 
-		// fill out enrollment info for remaining with non-conflicting observations (Group B)
+		// fill out enrollment info for remaining with non-conflicting observations (Groups B and C)
 		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS, false);
 
-		// fill out enrollment info for conflicting observations with WHO Stage and on ARVs (Group C)
+		// fill out enrollment info for conflicting observations with WHO Stage and on ARVs (Group D)
 		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS, false);
 
-		// fill out enrollment info for no observation but with ARVs (Group D)
+		// fill out enrollment info for no positive observations but with ARVs (Group E)
 		administrationService.executeSQL(QUERY_FILL_ENROLLMENT_FOR_ARV_ONLY, false);
 
 		// update everyone with transfer in status
 		administrationService.executeSQL(QUERY_UPDATE_TRANSFER_INS, false);
+
+		// update everyone with discontinue status
+		administrationService.executeSQL(QUERY_UPDATE_DISCONTINUES, false);
 
 		Long millis = System.currentTimeMillis() - startTime;
 		String elapsed = String.format("%d min, %d sec",
