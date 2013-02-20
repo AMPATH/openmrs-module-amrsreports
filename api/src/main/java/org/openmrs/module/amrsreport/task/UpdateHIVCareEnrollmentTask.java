@@ -133,13 +133,13 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    where " +
 					"	      o.voided = 0" +
 					"	      and (" +
-					"	        o.concept_id in (996, 1085, 1086, 1088, 1147, 1176, 1187, 1250)" +
+					"	        o.concept_id in (966, 1085, 1086, 1088, 1187, 1250)" +
 					"	        or (" +
 					"	          o.concept_id = 1193 " +
 					"	          and o.value_coded in (630, 792, 6180, 628, 797, 625, 633, 814, 794, 796, 802, 749, 6156)" +
 					"	        ) or (" +
 					"	          o.concept_id = 1895" +
-					"	          and o.value_coded in (select concept_id from concept_set where concept_set=1085)" +
+					"	          and o.value_coded in (select concept_id from concept_set where concept_set = 1085)" +
 					"	        ) or (" +
 					"	          o.concept_id in (2157, 2154) " +
 					"	          and o.value_coded not in (1065, 1066)" +
@@ -278,7 +278,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  enrollment_date = first_hiv_encounter_date," +
 					"  enrollment_age = first_hiv_encounter_age," +
 					"  enrollment_location_id = first_hiv_encounter_location_id," +
-					"  enrollment_reason = 'ENCOUNTER'" +
+					"  enrollment_reason = 'FIRST ENCOUNTER OVER TWO'" +
 					" where" +
 					"  first_hiv_encounter_age >= 2";
 
@@ -288,7 +288,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  enrollment_date = first_hiv_encounter_date," +
 					"  enrollment_age = first_hiv_encounter_age," +
 					"  enrollment_location_id = first_hiv_encounter_location_id," +
-					"  enrollment_reason = 'ENCOUNTER'" +
+					"  enrollment_reason = 'ONLY ADULT ENCOUNTERS'" +
 					" where" +
 					"  enrollment_reason is NULL" +
 					"  and not exists (" +
@@ -302,7 +302,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 	private static final String QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
-					"  enrollment_reason = 'OBSERVATION'" +
+					"  enrollment_reason = 'POSITIVE OBSERVATION'" +
 					" where" +
 					"  enrollment_reason is NULL" +
 					"  and last_positive_obs_date is not NULL" +
@@ -317,7 +317,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 	private static final String QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS =
 			"update amrsreport_hiv_care_enrollment" +
 					" set" +
-					"  enrollment_reason = 'VERIFIED'" +
+					"  enrollment_reason = 'VERIFIED CONFLICTING OBSERVATIONS'" +
 					" where" +
 					"  enrollment_reason is NULL" +
 					"  and last_positive_obs_date is not NULL" +
@@ -333,7 +333,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"  ae.enrollment_date = ae.first_arv_date," +
 					"  ae.enrollment_age = datediff(ae.first_arv_date, p.birthdate) / 365.25," +
 					"  ae.enrollment_location_id = ae.first_arv_location_id," +
-					"  ae.enrollment_reason = 'ARV'" +
+					"  ae.enrollment_reason = 'ARVS'" +
 					" where" +
 					"  ae.enrollment_reason is NULL" +
 					"  and ae.last_positive_obs_date is NULL" +
