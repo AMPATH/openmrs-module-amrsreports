@@ -7,17 +7,12 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Updates HIV Care HIVCareEnrollment table with latest enrollment information
+ * Updates the ARV encounter table with flags for each ARV drug for every related encounter
  */
 public class UpdateARVEncountersTask extends AbstractTask {
 
 	private static final Log log = LogFactory.getLog(UpdateARVEncountersTask.class);
-
-	private static final String QUERY_TRUNCATE_TABLE =
-			"delete from amrsreport_arv_encounter";
 
 	private static final String QUERY_DROP_TABLE =
 			"DROP TABLE IF EXISTS `amrsreport_arv_encounter`";
@@ -84,19 +79,16 @@ public class UpdateARVEncountersTask extends AbstractTask {
 
 	private AdministrationService administrationService;
 
+	/**
+	 * drops, creates and fills out the ARV encounter table
+	 */
 	@Override
 	public void execute() {
-		administrationService = Context.getAdministrationService();
-
-		log.info("Rebuilding HIV Care Enrollment table now");
-
-		Long startTime = System.currentTimeMillis();
-
 		// drop the table
-		administrationService.executeSQL(QUERY_DROP_TABLE, false);
+		getAdministrationService().executeSQL(QUERY_DROP_TABLE, false);
 
 		// recreate the table
-		administrationService.executeSQL(QUERY_CREATE_TABLE, false);
+		getAdministrationService().executeSQL(QUERY_CREATE_TABLE, false);
 
 		// update all of the ARVs
 		updateARVs("STAVUDINE", 625, 792, 6965);
@@ -118,31 +110,36 @@ public class UpdateARVEncountersTask extends AbstractTask {
 		updateARVs("ATAZANAVIR", 6159);
 		updateARVs("UNK", 5811);
 		updateARVs("OTHER", 5424);
-
-		// insert from enrollment query
-
-		Long millis = System.currentTimeMillis() - startTime;
-		String elapsed = String.format("%d min, %d sec",
-				TimeUnit.MILLISECONDS.toMinutes(millis),
-				TimeUnit.MILLISECONDS.toSeconds(millis) -
-						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
-		);
-
-		log.warn("Finished rebuilding HIV Care Enrollment table, time elapsed = " + elapsed);
 	}
 
+	/**
+	 * updates ARV columns based on the drug and related concept IDs
+	 */
 	private void updateARVs(String drug, Integer... concepts) {
+		// do nothing if no concepts were passed in
 		if (concepts.length == 0)
 			return;
 
+		// determine the condition based on number of concepts
 		String condition;
 		if (concepts.length == 1)
 			condition = "= " + concepts[0];
 		else
 			condition = String.format("in (%s)", StringUtils.join(concepts, ","));
 
+		// modify query with condition and column
 		String query = MACRO_UPDATE_DRUG.replaceAll(":condition", condition).replaceAll(":column", drug);
 
-		administrationService.executeSQL(query, false);
+		// execute the query
+		getAdministrationService().executeSQL(query, false);
+	}
+
+	/**
+	 * getter for administrationService
+	 */
+	public AdministrationService getAdministrationService() {
+		if (administrationService == null)
+			administrationService = Context.getAdministrationService();
+		return administrationService;
 	}
 }
