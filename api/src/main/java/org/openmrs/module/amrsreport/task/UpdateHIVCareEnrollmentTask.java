@@ -79,7 +79,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    from " +
 					"	      obs o" +
 					"           join amrsreport_hiv_care_enrollment ae" +
-					"           on o.person_id = ae.person_id and ae.enrollment_reason is NULL" +
+					"           on o.person_id = ae.person_id" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (" +
@@ -167,7 +167,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      o.person_id, o.obs_datetime" +
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
-					"	        on o.person_id = ae.person_id and ae.enrollment_reason is NULL" +
+					"	        on o.person_id = ae.person_id" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (o.concept_id in (1040, 1030, 1042) and o.value_coded = 664)" +
@@ -191,7 +191,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	      obs o join amrsreport_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
 					"           and ae.last_positive_obs_date is not NULL" +
-					"	        and ae.enrollment_reason is NULL" +
 					"	    where" +
 					"	      o.voided = 0" +
 					"	      and (" +
@@ -246,7 +245,7 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"		group by patient_id" +
 					"	) encounters" +
 					"	on ae.person_id = encounters.patient_id" +
-					"	join (" +
+					"	left join (" +
 					"		select" +
 					"			person_id, obs_datetime as last_obs_date, value_coded as last_reason" +
 					"		from (" +
