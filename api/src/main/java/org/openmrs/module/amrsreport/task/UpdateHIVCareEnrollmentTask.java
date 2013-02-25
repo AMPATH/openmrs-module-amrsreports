@@ -103,10 +103,14 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    select " +
 					"	      o.person_id, " +
 					"	      o.obs_datetime," +
-					"	      if(o.value_coded in (1220,1204), 1, " +
-					"	        if(o.value_coded in(1221,1205), 2, " +
-					"	          if(o.value_coded in(1222,1206), 3, " +
-					"	            if(o.value_coded in(1223,1207),4,0)))) as stage" +
+					"         if(o.value_coded in (1204), 'A1'," +
+					"           if(o.value_coded in (1220), 'P1'," +
+					"             if(o.value_coded in(1205), 'A2'," +
+					"               if(o.value_coded in(1221), 'P2'," +
+					"                 if(o.value_coded in(1206), 'A3'," +
+					"                   if(o.value_coded in(1222), 'P3'," +
+					"                     if(o.value_coded in(1207), 'A4'," +
+					"                       if(o.value_coded in(1223), 'P4', NULL)))))))) as stage" +
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
 					"	    where " +
