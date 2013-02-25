@@ -34,7 +34,7 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 	Date lastPositiveObsDate;
 	Date lastNegativeObsDate;
 
-	Integer lastWHOStage;
+	String lastWHOStage;
 	Date lastWHOStageDate;
 
 	Date firstARVDate;
@@ -183,11 +183,11 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.lastNegativeObsDate = lastNegativeObsDate;
 	}
 
-	public Integer getLastWHOStage() {
+	public String getLastWHOStage() {
 		return lastWHOStage;
 	}
 
-	public void setLastWHOStage(Integer lastWHOStage) {
+	public void setLastWHOStage(String lastWHOStage) {
 		this.lastWHOStage = lastWHOStage;
 	}
 

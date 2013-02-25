@@ -29,7 +29,7 @@
         <property name="lastPositiveObsDate" type="java.util.Date" column="last_positive_obs_date" length="10" />
         <property name="lastNegativeObsDate" type="java.util.Date" column="last_negative_obs_date" length="10" />
 
-        <property name="lastWHOStage" type="java.lang.Integer" column="last_who_stage" />
+        <property name="lastWHOStage" type="java.lang.String" column="last_who_stage" length="50"/>
         <property name="lastWHOStageDate" type="java.util.Date" column="last_who_stage_date" length="10" />
 
         <property name="firstARVDate" type="java.util.Date" column="first_arv_date" length="10" />

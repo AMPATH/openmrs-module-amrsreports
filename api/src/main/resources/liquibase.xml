@@ -132,7 +132,7 @@
             <column name="first_positive_obs_date" type="datetime"/>
             <column name="last_positive_obs_date" type="datetime"/>
             <column name="last_negative_obs_date" type="datetime"/>
-            <column name="last_who_stage" type="int" defaultValueNumeric="0" />
+            <column name="last_who_stage" type="varchar(50)"/>
             <column name="last_who_stage_date" type="datetime"/>
             <column name="first_arv_date" type="datetime"/>
             <column name="first_arv_location_id" type="int"/>
