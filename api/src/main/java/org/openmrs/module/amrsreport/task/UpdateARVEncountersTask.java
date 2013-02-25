@@ -1,8 +1,6 @@
 package org.openmrs.module.amrsreport.task;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.scheduler.tasks.AbstractTask;
@@ -12,17 +10,17 @@ import org.openmrs.scheduler.tasks.AbstractTask;
  */
 public class UpdateARVEncountersTask extends AbstractTask {
 
-	private static final Log log = LogFactory.getLog(UpdateARVEncountersTask.class);
+	private static final String MACRO_DROP_TABLE =
+			"DROP TABLE IF EXISTS `:table`";
 
-	private static final String QUERY_DROP_TABLE =
-			"DROP TABLE IF EXISTS `amrsreport_arv_encounter`";
-
-	private static final String QUERY_CREATE_TABLE =
-			"CREATE TABLE `amrsreport_arv_encounter` (" +
-					"  `arv_encounter_id` int(11) NOT NULL AUTO_INCREMENT," +
+	private static final String MACRO_CREATE_TABLE =
+			"CREATE TABLE `:table` (" +
+					"  `:table_id` int(11) NOT NULL AUTO_INCREMENT," +
 					"  `patient_id` int(11) DEFAULT NULL," +
 					"  `encounter_id` int(11) DEFAULT NULL," +
+					"  `location_id` int(11) DEFAULT NULL," +
 					"  `encounter_date` datetime DEFAULT NULL," +
+					"  `on_ART` int(1) DEFAULT 0," +
 					"  `STAVUDINE` int(1) DEFAULT 0," +
 					"  `LAMIVUDINE` int(1) DEFAULT 0," +
 					"  `AZT` int(1) DEFAULT 0," +
@@ -42,22 +40,25 @@ public class UpdateARVEncountersTask extends AbstractTask {
 					"  `ATAZANAVIR` int(1) DEFAULT 0," +
 					"  `UNK` int(1) DEFAULT 0," +
 					"  `OTHER` int(1) DEFAULT 0," +
-					"  PRIMARY KEY (`arv_encounter_id`)," +
-					"  KEY `amrsreport_arv_encounter_encounter_ref` (`encounter_id`)," +
-					"  CONSTRAINT `amrsreport_unique_encounter_id` UNIQUE (encounter_id)," +
-					"  CONSTRAINT `amrsreport_arv_encounter_patient_ref` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`)," +
-					"  CONSTRAINT `amrsreport_arv_encounter_encounter_ref` FOREIGN KEY (`encounter_id`) REFERENCES `encounter` (`encounter_id`)" +
+					"  PRIMARY KEY (`:table_id`)," +
+					"  KEY `:table_encounter_ref` (`encounter_id`)," +
+					"  INDEX `:table_on_ART_idx` (`on_ART`)," +
+					"  CONSTRAINT `:table_unique_encounter_id` UNIQUE (encounter_id)," +
+					"  CONSTRAINT `:table_patient_ref` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`)," +
+					"  CONSTRAINT `:table_encounter_ref` FOREIGN KEY (`encounter_id`) REFERENCES `encounter` (`encounter_id`)," +
+					"  CONSTRAINT `:table_location_ref` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`)" +
 					") ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
 	private static String MACRO_UPDATE_DRUG =
-			"insert into amrsreport_arv_encounter (" +
-					"  encounter_id, " +
-					"  patient_id, " +
-					"  encounter_date, " +
+			"insert into :table (" +
+					"  encounter_id," +
+					"  location_id," +
+					"  patient_id," +
+					"  encounter_date," +
 					"  :column" +
 					" )" +
 					"  select " +
-					"    e.encounter_id, e.patient_id, e.encounter_datetime, 1" +
+					"    e.encounter_id, e.location_id, e.patient_id, e.encounter_datetime, 1" +
 					"  from " +
 					"    obs o" +
 					"    join encounter e" +
@@ -68,7 +69,7 @@ public class UpdateARVEncountersTask extends AbstractTask {
 					"      on e.patient_id = pt.patient_id and pt.voided = 0" +
 					"  where " +
 					"    o.voided = 0" +
-					"    and o.concept_id in (1255,1250,1895)" +
+					"    and o.concept_id in (:questions)" +
 					"    and o.value_coded :condition" +
 					"  group by" +
 					"    e.encounter_id" +
@@ -77,6 +78,35 @@ public class UpdateARVEncountersTask extends AbstractTask {
 					" ON DUPLICATE KEY UPDATE" +
 					"  :column = 1";
 
+	private static String MACRO_UPDATE_ON_ART =
+			"update :table" +
+					" set on_ART=1" +
+					" where" +
+					"   STAVUDINE + " +
+					"   LAMIVUDINE + " +
+					"   AZT + " +
+					"   NEVIRAPINE + " +
+					"   EFAVIRENZ + " +
+					"   NELFINAVIR + " +
+					"   INDINAVIR + " +
+					"   EMTRICITABINE + " +
+					"   LOPINAVIR + " +
+					"   RITONAVIR + " +
+					"   DIDANOSINE + " +
+					"   TENOFOVIR + " +
+					"   ABACAVIR + " +
+					"   RALTEGRAVIR + " +
+					"   DARUNAVIR + " +
+					"   ETRAVIRINE + " +
+					"   ATAZANAVIR" +
+					"   >= 3";
+
+	private static String TABLE_CURRENT = "amrsreport_arv_current";
+	private static String QUESTIONS_CURRENT = "966, 1088, 1250, 1895, 2154";
+
+	private static String TABLE_PREVIOUS = "amrsreport_arv_previous";
+	private static String QUESTIONS_PREVIOUS = "1086, 1087, 2157";
+
 	private AdministrationService administrationService;
 
 	/**
@@ -84,11 +114,13 @@ public class UpdateARVEncountersTask extends AbstractTask {
 	 */
 	@Override
 	public void execute() {
-		// drop the table
-		getAdministrationService().executeSQL(QUERY_DROP_TABLE, false);
 
-		// recreate the table
-		getAdministrationService().executeSQL(QUERY_CREATE_TABLE, false);
+		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
+			// drop the table
+			getAdministrationService().executeSQL(MACRO_DROP_TABLE.replaceAll(":table", table), false);
+			// recreate the table
+			getAdministrationService().executeSQL(MACRO_CREATE_TABLE.replaceAll(":table", table), false);
+		}
 
 		// update all of the ARVs
 		updateARVs("STAVUDINE", 625, 792, 6965);
@@ -110,6 +142,11 @@ public class UpdateARVEncountersTask extends AbstractTask {
 		updateARVs("ATAZANAVIR", 6159);
 		updateARVs("UNK", 5811);
 		updateARVs("OTHER", 5424);
+
+		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
+			// update on_ART column
+			getAdministrationService().executeSQL(MACRO_UPDATE_ON_ART.replaceAll(":table", table), false);
+		}
 	}
 
 	/**
@@ -127,10 +164,14 @@ public class UpdateARVEncountersTask extends AbstractTask {
 		else
 			condition = String.format("in (%s)", StringUtils.join(concepts, ","));
 
-		// modify query with condition and column
-		String query = MACRO_UPDATE_DRUG.replaceAll(":condition", condition).replaceAll(":column", drug);
+		String baseQuery = MACRO_UPDATE_DRUG.replaceAll(":condition", condition).replaceAll(":column", drug);
 
-		// execute the query
+		// run query with for current questions
+		String query = baseQuery.replaceAll(":table", TABLE_CURRENT).replaceAll(":questions", QUESTIONS_CURRENT);
+		getAdministrationService().executeSQL(query, false);
+
+		// run query with for historical questions
+		query = baseQuery.replaceAll(":table", TABLE_PREVIOUS).replaceAll(":questions", QUESTIONS_PREVIOUS);
 		getAdministrationService().executeSQL(query, false);
 	}
 
