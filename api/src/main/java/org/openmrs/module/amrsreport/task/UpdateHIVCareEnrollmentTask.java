@@ -261,8 +261,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"   ae.last_hiv_encounter_location_id = last_encounter_location," +
 					" 	ae.last_discontinue_date = last_obs_date," +
 					"   ae.last_discontinue_reason = last_reason";
-//					" where " +
-//					"	last_encounter_date <= last_obs_date";
 
 	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER =
 			"update amrsreport_hiv_care_enrollment" +

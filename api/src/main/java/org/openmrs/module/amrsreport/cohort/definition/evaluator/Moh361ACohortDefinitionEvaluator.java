@@ -32,6 +32,10 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						" where " +
 						"  enrollment_reason is not NULL" +
 						"  and transferred_in_date is NULL" +
+						"  and (" +
+						"    last_discontinue_date is NULL" +
+						"    or last_hiv_encounter_date > last_discontinue_date" +
+						"  )" +
 						"  and enrollment_date <= :endDate" +
 						"  and enrollment_location_id in (:locationList)";
 
