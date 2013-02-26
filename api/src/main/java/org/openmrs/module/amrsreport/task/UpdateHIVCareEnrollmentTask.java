@@ -103,14 +103,14 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 					"	    select " +
 					"	      o.person_id, " +
 					"	      o.obs_datetime," +
-					"         if(o.value_coded in (1204), 'A1'," +
-					"           if(o.value_coded in (1220), 'P1'," +
-					"             if(o.value_coded in(1205), 'A2'," +
-					"               if(o.value_coded in(1221), 'P2'," +
-					"                 if(o.value_coded in(1206), 'A3'," +
-					"                   if(o.value_coded in(1222), 'P3'," +
-					"                     if(o.value_coded in(1207), 'A4'," +
-					"                       if(o.value_coded in(1223), 'P4', NULL)))))))) as stage" +
+					"         if(o.value_coded=1204, 'A1'," +
+					"           if(o.value_coded=1220, 'P1'," +
+					"             if(o.value_coded=1205, 'A2'," +
+					"               if(o.value_coded=1221, 'P2'," +
+					"                 if(o.value_coded=1206, 'A3'," +
+					"                   if(o.value_coded=1222, 'P3'," +
+					"                     if(o.value_coded=1207, 'A4'," +
+					"                       if(o.value_coded=1223, 'P4', NULL)))))))) as stage" +
 					"	    from " +
 					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
 					"	    where " +
@@ -129,37 +129,23 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 			"update amrsreport_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
-					"  	select person_id, obs_datetime, location_id from (" +
-					"	    select" +
-					"	      o.person_id," +
-					"         o.obs_id," +
-					"	      o.obs_datetime," +
-					"	      o.location_id" +
-					"	    from" +
-					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
-					"	    where" +
-					"	      o.voided = 0" +
-					"	      and (" +
-					"	        o.concept_id in (966, 1085, 1086, 1088, 1187, 1250)" +
-					"	        or (" +
-					"	          o.concept_id = 1193" +
-					"	          and o.value_coded in (630, 792, 6180, 628, 797, 625, 633, 814, 794, 796, 802, 749, 6156)" +
-					"	        ) or (" +
-					"	          o.concept_id = 1895" +
-					"	          and o.value_coded in (select concept_id from concept_set where concept_set = 1085)" +
-					"	        ) or (" +
-					"	          o.concept_id in (2157, 2154)" +
-					"	          and o.value_coded not in (1065, 1066)" +
-					"	        )" +
-					"	      )" +
-					"	    order by o.obs_datetime asc" +
-					"	) ordered" +
-					"    group by person_id" +
-					"    having count(obs_id) > 1" +
+					"    select patient_id, encounter_date, location_id from (" +
+					"      select" +
+					"        ac.patient_id," +
+					"        ac.encounter_date," +
+					"        ac.location_id" +
+					"      from" +
+					"        amrsreport_arv_current ac join amrsreport_hiv_care_enrollment ae" +
+					"          on ac.patient_id = ae.person_id" +
+					"      where" +
+					"        ac.on_ART=1" +
+					"      order by ac.encounter_date asc" +
+					"    ) ordered" +
+					"    group by patient_id" +
 					"  ) arv" +
-					"  on arv.person_id = ae.person_id" +
+					"  on arv.patient_id = ae.person_id" +
 					" set" +
-					"  ae.first_arv_date = arv.obs_datetime," +
+					"  ae.first_arv_date = arv.encounter_date," +
 					"  ae.first_arv_location_id = arv.location_id";
 
 	private static final String QUERY_UPDATE_LAST_NEGATIVE =
