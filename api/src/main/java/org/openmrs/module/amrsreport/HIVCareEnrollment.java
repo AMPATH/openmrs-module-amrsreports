@@ -25,24 +25,25 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 	Location firstHIVEncounterLocation;
 	Double firstHIVEncounterAge;
 
+	Date lastHIVEncounterDate;
+	Location lastHIVEncounterLocation;
+
 	Date firstPositiveObsDate;
 	Location firstPositiveObsLocation;
 
 	Date lastPositiveObsDate;
 	Date lastNegativeObsDate;
 
-	Integer lastWHOStage;
+	String lastWHOStage;
 	Date lastWHOStageDate;
 
 	Date firstARVDate;
+	Location firstARVLocation;
 
 	Date lastDiscontinueDate;
+	String lastDiscontinueReason;
 
-	Boolean transferredIn;
 	Date transferredInDate;
-
-	public static final String REASON_ENCOUNTER = "ENCOUNTER";
-	public static final String REASON_OBSERVATION = "OBSERVATION";
 
 	@Override
 	public Integer getId() {
@@ -134,6 +135,22 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.firstHIVEncounterAge = firstHIVEncounterAge;
 	}
 
+	public Date getLastHIVEncounterDate() {
+		return lastHIVEncounterDate;
+	}
+
+	public void setLastHIVEncounterDate(Date lastHIVEncounterDate) {
+		this.lastHIVEncounterDate = lastHIVEncounterDate;
+	}
+
+	public Location getLastHIVEncounterLocation() {
+		return lastHIVEncounterLocation;
+	}
+
+	public void setLastHIVEncounterLocation(Location lastHIVEncounterLocation) {
+		this.lastHIVEncounterLocation = lastHIVEncounterLocation;
+	}
+
 	public Date getFirstPositiveObsDate() {
 		return firstPositiveObsDate;
 	}
@@ -166,11 +183,11 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.lastNegativeObsDate = lastNegativeObsDate;
 	}
 
-	public Integer getLastWHOStage() {
+	public String getLastWHOStage() {
 		return lastWHOStage;
 	}
 
-	public void setLastWHOStage(Integer lastWHOStage) {
+	public void setLastWHOStage(String lastWHOStage) {
 		this.lastWHOStage = lastWHOStage;
 	}
 
@@ -190,6 +207,14 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.firstARVDate = firstARVDate;
 	}
 
+	public Location getFirstARVLocation() {
+		return firstARVLocation;
+	}
+
+	public void setFirstARVLocation(Location firstARVLocation) {
+		this.firstARVLocation = firstARVLocation;
+	}
+
 	public Date getLastDiscontinueDate() {
 		return lastDiscontinueDate;
 	}
@@ -198,12 +223,12 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.lastDiscontinueDate = lastDiscontinueDate;
 	}
 
-	public Boolean getTransferredIn() {
-		return transferredIn;
+	public String getLastDiscontinueReason() {
+		return lastDiscontinueReason;
 	}
 
-	public void setTransferredIn(Boolean transferredIn) {
-		this.transferredIn = transferredIn;
+	public void setLastDiscontinueReason(String lastDiscontinueReason) {
+		this.lastDiscontinueReason = lastDiscontinueReason;
 	}
 
 	public Date getTransferredInDate() {

@@ -20,20 +20,24 @@
         <many-to-one class="org.openmrs.Location" name="firstHIVEncounterLocation" column="first_hiv_encounter_location_id"/>
         <property name="firstHIVEncounterAge" type="double" column="first_hiv_encounter_age" length="22" />
 
+        <property name="lastHIVEncounterDate" type="java.util.Date" column="last_hiv_encounter_date" length="10" />
+        <many-to-one class="org.openmrs.Location" name="lastHIVEncounterLocation" column="last_hiv_encounter_location_id"/>
+
         <property name="firstPositiveObsDate" type="java.util.Date" column="first_positive_obs_date" length="10" />
         <many-to-one class="org.openmrs.Location" name="firstPositiveObsLocation" column="first_positive_obs_location_id"/>
 
         <property name="lastPositiveObsDate" type="java.util.Date" column="last_positive_obs_date" length="10" />
         <property name="lastNegativeObsDate" type="java.util.Date" column="last_negative_obs_date" length="10" />
 
-        <property name="lastWHOStage" type="java.lang.Integer" column="last_who_stage" />
+        <property name="lastWHOStage" type="java.lang.String" column="last_who_stage" length="50"/>
         <property name="lastWHOStageDate" type="java.util.Date" column="last_who_stage_date" length="10" />
 
         <property name="firstARVDate" type="java.util.Date" column="first_arv_date" length="10" />
+        <many-to-one class="org.openmrs.Location" name="firstARVLocation" column="first_arv_location_id"/>
 
         <property name="lastDiscontinueDate" type="java.util.Date" column="last_discontinue_date" length="10" />
+        <property name="lastDiscontinueReason" type="java.lang.String" column="last_discontinue_reason" length="255" />
 
-        <property name="transferredIn" type="java.lang.Boolean" column="transferred_id" />
         <property name="transferredInDate" type="java.util.Date" column="transferred_in_date" length="10" />
 
         <property length="38" name="uuid" type="java.lang.String" unique="true"/>
