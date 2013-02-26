@@ -25,17 +25,22 @@ import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreport.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 
@@ -45,35 +50,35 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 
 	public static final String ESTIMATED_DATE_OF_CONFINEMENT = "ESTIMATED DATE OF CONFINEMENT";
 	public static final String ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND = "ESTIMATED DATE OF CONFINEMENT, ULTRASOUND";
-	public static final String CURRENT_PREGNANT = "CURRENT PREGNANT";
-	public static final String NO_OF_WEEK_OF_PREGNANCY = "NO OF WEEK OF PREGNANCY";
-	public static final String FUNDAL_LENGTH = "FUNDAL LENGTH";
-	public static final String PREGNANCY_URINE_TEST = "PREGNANCY URINE TEST";
-	public static final String URGENT_MEDICAL_ISSUES = "URGENT MEDICAL ISSUES";
-	public static final String PROBLEM_ADDED = "PROBLEM ADDED";
-	public static final String FOETAL_MOVEMENT = "FOETAL MOVEMENT";
-	public static final String REASON_FOR_CURRENT_VISIT = "REASON FOR CURRENT VISIT";
-	public static final String REASON_FOR_NEXT_VISIT = "REASON FOR NEXT VISIT";
-	public static final String YES = "YES";
-	public static final String MONTH_OF_CURRENT_GESTATION = "MONTH OF CURRENT GESTATION";
-	public static final String POSITIVE = "POSITIVE";
-	public static final String PREGNANCY = "PREGNANCY";
-	public static final String PREGNANCY_ECTOPIC = "PREGNANCY, ECTOPIC";
-	public static final String ANTENATAL_CARE = "ANTENATAL CARE";
+//	public static final String CURRENT_PREGNANT = "CURRENT PREGNANT";
+//	public static final String NO_OF_WEEK_OF_PREGNANCY = "NO OF WEEK OF PREGNANCY";
+//	public static final String FUNDAL_LENGTH = "FUNDAL LENGTH";
+//	public static final String PREGNANCY_URINE_TEST = "PREGNANCY URINE TEST";
+//	public static final String URGENT_MEDICAL_ISSUES = "URGENT MEDICAL ISSUES";
+//	public static final String PROBLEM_ADDED = "PROBLEM ADDED";
+//	public static final String FOETAL_MOVEMENT = "FOETAL MOVEMENT";
+//	public static final String REASON_FOR_CURRENT_VISIT = "REASON FOR CURRENT VISIT";
+//	public static final String REASON_FOR_NEXT_VISIT = "REASON FOR NEXT VISIT";
+//	public static final String YES = "YES";
+//	public static final String MONTH_OF_CURRENT_GESTATION = "MONTH OF CURRENT GESTATION";
+//	public static final String POSITIVE = "POSITIVE";
+//	public static final String PREGNANCY = "PREGNANCY";
+//	public static final String PREGNANCY_ECTOPIC = "PREGNANCY, ECTOPIC";
+//	public static final String ANTENATAL_CARE = "ANTENATAL CARE";
 
 	private static final Collection<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
 			MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),
-			MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND),
-			MohCacheUtils.getConcept(CURRENT_PREGNANT),
-			MohCacheUtils.getConcept(NO_OF_WEEK_OF_PREGNANCY),
-			MohCacheUtils.getConcept(MONTH_OF_CURRENT_GESTATION),
-			MohCacheUtils.getConcept(FUNDAL_LENGTH),
-			MohCacheUtils.getConcept(PREGNANCY_URINE_TEST),
-			MohCacheUtils.getConcept(URGENT_MEDICAL_ISSUES),
-			MohCacheUtils.getConcept(PROBLEM_ADDED),
-			MohCacheUtils.getConcept(FOETAL_MOVEMENT),
-			MohCacheUtils.getConcept(REASON_FOR_CURRENT_VISIT),
-			MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT)
+			MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)
+//			MohCacheUtils.getConcept(CURRENT_PREGNANT),
+//			MohCacheUtils.getConcept(NO_OF_WEEK_OF_PREGNANCY),
+//			MohCacheUtils.getConcept(MONTH_OF_CURRENT_GESTATION),
+//			MohCacheUtils.getConcept(FUNDAL_LENGTH),
+//			MohCacheUtils.getConcept(PREGNANCY_URINE_TEST),
+//			MohCacheUtils.getConcept(URGENT_MEDICAL_ISSUES),
+//			MohCacheUtils.getConcept(PROBLEM_ADDED),
+//			MohCacheUtils.getConcept(FOETAL_MOVEMENT),
+//			MohCacheUtils.getConcept(REASON_FOR_CURRENT_VISIT),
+//			MohCacheUtils.getConcept(REASON_FOR_NEXT_VISIT)
 	});
 
 	private static final MohCoreService mohCoreService = Context.getService(MohCoreService.class);
@@ -98,27 +103,22 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		// get the observations
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		// instantiate a patient snapshot
-		MohPregnancyPMTCReferralRuleSnapshot snapshot = new MohPregnancyPMTCReferralRuleSnapshot();
+		if (observations == null || observations.isEmpty())
+			return null;
 
-		// set up the result
-		Result result = new Result();
+		List<Concept> questionList = Arrays.asList(
+				MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),
+				MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)
+		);
+
+		Set<String> dueDates = new LinkedHashSet<String>();
 
 		for (Obs observation : observations) {
-			Date dueDate = null;
-
-			if (observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT)))
-				dueDate = observation.getValueDatetime();
-			else if (observation.getConcept().equals(MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)))
-				dueDate = observation.getValueDatetime();
-
-			if (snapshot.consume(observation))
-				result.add(new Result(new Date(), Result.Datatype.DATETIME, Boolean.TRUE, null, dueDate, null, "PMTCT", null));
-			else
-				result.add(new Result(new Date(), Result.Datatype.DATETIME, Boolean.FALSE, null, null, null, StringUtils.EMPTY, null));
+			if (OpenmrsUtil.isConceptInList(observation.getConcept(), questionList))
+				dueDates.add(MohRuleUtils.formatdates(observation.getValueDatetime()) + " | PMTCT");
 		}
 
-		return result;
+		return new Result(StringUtils.join(dueDates, ";"));
 	}
 
 	/**
