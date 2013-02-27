@@ -21,25 +21,25 @@ public class UpdateARVEncountersTask extends AbstractTask {
 					"  `location_id` int(11) DEFAULT NULL," +
 					"  `encounter_date` datetime DEFAULT NULL," +
 					"  `on_ART` int(1) DEFAULT 0," +
-					"  `STAVUDINE` int(1) DEFAULT 0," +
-					"  `LAMIVUDINE` int(1) DEFAULT 0," +
-					"  `AZT` int(1) DEFAULT 0," +
-					"  `NEVIRAPINE` int(1) DEFAULT 0," +
-					"  `EFAVIRENZ` int(1) DEFAULT 0," +
-					"  `NELFINAVIR` int(1) DEFAULT 0," +
-					"  `INDINAVIR` int(1) DEFAULT 0," +
-					"  `EMTRICITABINE` int(1) DEFAULT 0," +
-					"  `LOPINAVIR` int(1) DEFAULT 0," +
-					"  `RITONAVIR` int(1) DEFAULT 0," +
-					"  `DIDANOSINE` int(1) DEFAULT 0," +
-					"  `TENOFOVIR` int(1) DEFAULT 0," +
 					"  `ABACAVIR` int(1) DEFAULT 0," +
-					"  `RALTEGRAVIR` int(1) DEFAULT 0," +
-					"  `DARUNAVIR` int(1) DEFAULT 0," +
-					"  `ETRAVIRINE` int(1) DEFAULT 0," +
 					"  `ATAZANAVIR` int(1) DEFAULT 0," +
-					"  `UNK` int(1) DEFAULT 0," +
+					"  `DARUNAVIR` int(1) DEFAULT 0," +
+					"  `DIDANOSINE` int(1) DEFAULT 0," +
+					"  `EFAVIRENZ` int(1) DEFAULT 0," +
+					"  `EMTRICITABINE` int(1) DEFAULT 0," +
+					"  `ETRAVIRINE` int(1) DEFAULT 0," +
+					"  `INDINAVIR` int(1) DEFAULT 0," +
+					"  `LAMIVUDINE` int(1) DEFAULT 0," +
+					"  `LOPINAVIR` int(1) DEFAULT 0," +
+					"  `NELFINAVIR` int(1) DEFAULT 0," +
+					"  `NEVIRAPINE` int(1) DEFAULT 0," +
+					"  `RALTEGRAVIR` int(1) DEFAULT 0," +
+					"  `RITONAVIR` int(1) DEFAULT 0," +
+					"  `STAVUDINE` int(1) DEFAULT 0," +
+					"  `TENOFOVIR` int(1) DEFAULT 0," +
+					"  `ZIDOVUDINE` int(1) DEFAULT 0," +
 					"  `OTHER` int(1) DEFAULT 0," +
+					"  `UNKNOWN` int(1) DEFAULT 0," +
 					"  PRIMARY KEY (`:table_id`)," +
 					"  KEY `:table_encounter_ref` (`encounter_id`)," +
 					"  INDEX `:table_on_ART_idx` (`on_ART`)," +
@@ -82,24 +82,25 @@ public class UpdateARVEncountersTask extends AbstractTask {
 			"update :table" +
 					" set on_ART=1" +
 					" where" +
-					"   STAVUDINE + " +
-					"   LAMIVUDINE + " +
-					"   AZT + " +
-					"   NEVIRAPINE + " +
-					"   EFAVIRENZ + " +
-					"   NELFINAVIR + " +
-					"   INDINAVIR + " +
-					"   EMTRICITABINE + " +
-					"   LOPINAVIR + " +
-					"   RITONAVIR + " +
-					"   DIDANOSINE + " +
-					"   TENOFOVIR + " +
-					"   ABACAVIR + " +
-					"   RALTEGRAVIR + " +
-					"   DARUNAVIR + " +
-					"   ETRAVIRINE + " +
-					"   ATAZANAVIR" +
-					"   >= 3";
+					"   ABACAVIR +" +
+					"   ATAZANAVIR +" +
+					"   DARUNAVIR +" +
+					"   DIDANOSINE +" +
+					"   EFAVIRENZ +" +
+					"   EMTRICITABINE +" +
+					"   ETRAVIRINE +" +
+					"   INDINAVIR +" +
+					"   LAMIVUDINE +" +
+					"   LOPINAVIR +" +
+					"   NELFINAVIR +" +
+					"   NEVIRAPINE +" +
+					"   RALTEGRAVIR +" +
+					"   RITONAVIR +" +
+					"   STAVUDINE +" +
+					"   TENOFOVIR +" +
+					"   ZIDOVUDINE +" +
+					"   OTHER +" +
+					"   UNKNOWN >= 3";
 
 	private static String TABLE_CURRENT = "amrsreport_arv_current";
 	private static String QUESTIONS_CURRENT = "966, 1088, 1250, 1895, 2154";
@@ -123,24 +124,24 @@ public class UpdateARVEncountersTask extends AbstractTask {
 		}
 
 		// update all of the ARVs
-		updateARVs("STAVUDINE", 625, 792, 6965);
-		updateARVs("LAMIVUDINE", 628, 792, 630, 1400, 6467, 6679, 6964, 6965);
-		updateARVs("AZT", 797, 6467, 630);
-		updateARVs("NEVIRAPINE", 631, 6467, 792);
-		updateARVs("EFAVIRENZ", 633, 6964);
-		updateARVs("NELFINAVIR", 635);
-		updateARVs("INDINAVIR", 749);
-		updateARVs("EMTRICITABINE", 791, 6180);
-		updateARVs("LOPINAVIR", 794);
-		updateARVs("RITONAVIR", 794, 6160, 795);
-		updateARVs("DIDANOSINE", 796);
-		updateARVs("TENOFOVIR", 802, 6180, 1400, 6964);
-		updateARVs("ABACAVIR", 814, 6679);
-		updateARVs("RALTEGRAVIR", 6156);
+		updateARVs("ABACAVIR", 814, 817, 6679);
+		updateARVs("ATAZANAVIR", 6159, 6160);
 		updateARVs("DARUNAVIR", 6157);
+		updateARVs("DIDANOSINE", 796);
+		updateARVs("EFAVIRENZ", 633, 6964);
+		updateARVs("EMTRICITABINE", 791, 6180);
 		updateARVs("ETRAVIRINE", 6158);
-		updateARVs("ATAZANAVIR", 6159);
-		updateARVs("UNK", 5811);
+		updateARVs("INDINAVIR", 749);
+		updateARVs("LAMIVUDINE", 628, 630, 792, 817, 1400, 6467, 6679, 6964, 6965);
+		updateARVs("LOPINAVIR", 794);
+		updateARVs("NELFINAVIR", 635);
+		updateARVs("NEVIRAPINE", 631, 792, 6467);
+		updateARVs("RALTEGRAVIR", 6156);
+		updateARVs("RITONAVIR", 794, 795, 6160);
+		updateARVs("STAVUDINE", 625, 792, 6965);
+		updateARVs("TENOFOVIR", 802, 1400, 6180, 6964);
+		updateARVs("ZIDOVUDINE", 630, 797, 817, 6467);
+		updateARVs("UNKNOWN", 5811);
 		updateARVs("OTHER", 5424);
 
 		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
