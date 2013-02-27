@@ -80,4 +80,6 @@ public interface MohCoreDAO {
 	public void clearEnrollments();
 
 	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
+
+	public List<Date> getAllEnrollmentReportDates();
 }
