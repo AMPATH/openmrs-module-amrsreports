@@ -13,6 +13,7 @@ import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.task.UpdateHIVCareEnrollmentTask;
+import org.openmrs.module.amrsreport.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -273,8 +274,8 @@ public class DWRAmrsReportService {
 	/**
 	 * kick off the enrollment update task
 	 */
-	public String rebuildEnrollment() {
-		new UpdateHIVCareEnrollmentTask().execute();
+	public String rebuildEnrollment(Date reportDate) {
+		HIVCareEnrollmentBuilder.execute(reportDate);
 		return "done";
 	};
 }

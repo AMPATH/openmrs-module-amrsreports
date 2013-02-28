@@ -8,6 +8,7 @@
 		</id>
 		<discriminator column="enrollment_id" insert="false"/>
 
+        <property name="reportDate" type="java.util.Date" column="report_date" length="10" />
         <many-to-one class="org.openmrs.Person" name="person" column="person_id" not-null="true"/>
 
         <property name="enrollmentDate" type="java.util.Date" column="enrollment_date" length="10" />

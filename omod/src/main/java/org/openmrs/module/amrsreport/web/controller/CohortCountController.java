@@ -4,6 +4,7 @@ import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -25,6 +26,11 @@ import java.util.List;
  */
 @Controller
 public class CohortCountController {
+
+	@ModelAttribute("reportDates")
+	public List<Date> getReportDates() {
+		return Context.getService(MohCoreService.class).getAllEnrollmentReportDates();
+	}
 
 	@ModelAttribute("locations")
 	public List<Location> getLocations() {

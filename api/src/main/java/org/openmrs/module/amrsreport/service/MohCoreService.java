@@ -199,4 +199,6 @@ public interface MohCoreService extends OpenmrsService {
 
 	@Transactional
 	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
+
+	public List<Date> getAllEnrollmentReportDates();
 }

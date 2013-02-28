@@ -431,4 +431,13 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		sessionFactory.getCurrentSession().saveOrUpdate(HIVCareEnrollment);
 		return HIVCareEnrollment;
 	}
+
+	@Override
+	public List<Date> getAllEnrollmentReportDates() {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
+				.setProjection(Projections.distinct(Projections.property("reportDate")))
+				.addOrder(Order.asc("reportDate"));
+
+		return (List<Date>) crit.list();
+	}
 }

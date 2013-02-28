@@ -117,6 +117,7 @@
             <column name="enrollment_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="report_date" type="datetime"/>
             <column name="person_id" type="int"/>
             <column name="enrollment_date" type="datetime"/>
             <column name="enrollment_location_id" type="int"/>
@@ -148,12 +149,8 @@
             <column name="uuid" />
         </createIndex>
 
-        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_age">
-            <column name="enrollment_age" />
-        </createIndex>
-
-        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="first_hiv_encounter_age">
-            <column name="first_hiv_encounter_age" />
+        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="report_date">
+            <column name="report_date" />
         </createIndex>
 
         <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_date">

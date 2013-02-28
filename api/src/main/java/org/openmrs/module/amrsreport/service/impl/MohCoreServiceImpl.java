@@ -195,4 +195,9 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		return mohCoreDAO.saveEnrollment(HIVCareEnrollment);
 	}
 
+	@Override
+	public List<Date> getAllEnrollmentReportDates() {
+		return mohCoreDAO.getAllEnrollmentReportDates();
+	}
+
 }
