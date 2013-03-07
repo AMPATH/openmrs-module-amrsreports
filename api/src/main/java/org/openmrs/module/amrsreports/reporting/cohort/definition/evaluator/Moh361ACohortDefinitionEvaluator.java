@@ -1,9 +1,9 @@
-package org.openmrs.module.amrsreports.cohort.definition.evaluator;
+package org.openmrs.module.amrsreports.reporting.cohort.definition.evaluator;
 
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;

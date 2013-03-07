@@ -9,7 +9,7 @@
  *
  * Copyright (C) OpenMRS, LLC. All Rights Reserved.
  */
-package org.openmrs.module.amrsreports.cohort.definition.evaluator;
+package org.openmrs.module.amrsreports.reporting.cohort.definition.evaluator;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientSetService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.cohort.definition.MohCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.MohCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;

@@ -25,7 +25,7 @@ import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.render.AmrReportRender;
 import org.openmrs.module.amrsreports.reporting.MOH361AReport;
 import org.openmrs.module.amrsreports.service.MohCoreService;

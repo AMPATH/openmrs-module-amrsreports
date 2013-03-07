@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.amrsreports.cohort.definition;
+package org.openmrs.module.amrsreports.reporting.cohort.definition;
 import java.util.ArrayList;
 import java.util.List;
 

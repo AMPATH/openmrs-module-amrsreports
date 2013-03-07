@@ -10,7 +10,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.UserLocation;
-import org.openmrs.module.amrsreports.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
