@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +25,9 @@ import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreport.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreport.render.AmrReportRender;
+import org.openmrs.module.amrsreport.reporting.MOH361AReport;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -38,6 +40,7 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,90 +53,77 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MohRenderController {
 
 	private static final Log log = LogFactory.getLog(MohRenderController.class);
-	List<String> cohortdfnList = null;
+
+	@ModelAttribute("reportDates")
+	public List<Date> getReportDates() {
+		return Context.getService(MohCoreService.class).getAllEnrollmentReportDates();
+	}
+
+	@ModelAttribute("locations")
+	public List<Location> getLocations() {
+		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+		User currUser = Context.getAuthenticatedUser();
+		return mohCoreService.getAllowedLocationsForUser(currUser);
+	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreport/mohRender.form")
-	public void preparePage(ModelMap map, @RequestParam(required = false, value = "includeRetired") Boolean includeRetired) {
-
-		CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
-        MohCoreService userlocservice=Context.getService(MohCoreService.class);
-		// Get list of existing reports
-		boolean includeRet = (includeRetired == Boolean.TRUE);
-		List<ReportDefinition> reportDefinitions = Context.getService(ReportDefinitionService.class).getAllDefinitions(includeRet);
-
-		map.addAttribute("reportDefinitions", reportDefinitions);
-
-		List<CohortDefinition> listOfCohorts = cohortDefinitionService.getAllDefinitions(false);
-
-		//get a list of all the locations
-        User currUser = Context.getAuthenticatedUser();
-		List<Location> locationList =  userlocservice.getAllowedLocationsForUser(currUser);
-
-		//log.info("all cohorts listed "+listOfCohorts.size()+"All definition "+reportDefinitions.size());
-		map.addAttribute("cohortdefinitions", listOfCohorts);
-		map.addAttribute("location", locationList);
+	public void preparePage() {
+		// pass
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreport/mohRender.form")
 	public void processForm(ModelMap map, HttpServletRequest request,
-		@RequestParam(required = false, value = "definition") String definitionuuid,
-		@RequestParam(required = true, value = "cohortdef") String cohortdefuuid,
-		@RequestParam(required = true, value = "location") Integer location) {
+	                        @RequestParam(required = false, value = "definition") String definitionuuid,
+	                        @RequestParam(required = false, value = "cohortdef") String cohortdefuuid,
+	                        @RequestParam("reportDate") Date reportDate,
+	                        @RequestParam("location") Integer location,
+	                        @RequestParam("hardcoded") String hardcoded) {
 
 		HttpSession httpSession = request.getSession();
 		Integer httpSessionvalue = httpSession.getMaxInactiveInterval();
 		httpSession.setMaxInactiveInterval(-1);
 
-		log.info("The sesion value is " + httpSessionvalue);
-
+		// find the specified values
 		Location loc = Context.getLocationService().getLocation(location);
 		ReportDefinition reportDefinition = Context.getService(ReportDefinitionService.class).getDefinitionByUuid(definitionuuid);
 		CohortDefinition cohortDefinition = Context.getService(CohortDefinitionService.class).getDefinitionByUuid(cohortdefuuid);
 
-		//here to allow the reloading of the screen
-		List<CohortDefinition> listOfCohorts = Context.getService(CohortDefinitionService.class).getAllDefinitions(false);
-		List<ReportDefinition> reportDefinitions = Context.getService(ReportDefinitionService.class).getAllDefinitions(true);
-		List<Location> locationList = Context.getLocationService().getAllLocations();
+		// use a hardcoded report if indicated
+		if (StringUtils.isNotBlank(hardcoded)) {
+			cohortDefinition = new Moh361ACohortDefinition();
+			reportDefinition = MOH361AReport.getReportDefinition();
+		}
 
-		//create a flat file here for storing our report data
-		map.addAttribute("reportDefinitions", reportDefinitions);
-		map.addAttribute("cohortdefinitions", listOfCohorts);
-		map.addAttribute("location", locationList);
-
+		// try the rendering
 		try {
 			EvaluationContext evaluationContext = new EvaluationContext();
 
-			//add loctation to be displayed here
+			// set up evaluation context values
 			evaluationContext.addParameterValue("locationList", Arrays.asList(loc));
+			evaluationContext.setEvaluationDate(reportDate);
+
+			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
-
-			//evaluation
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
-
 			evaluationContext.setBaseCohort(cohort);
 
 			Date d = Calendar.getInstance().getTime();
-			String TIME;
-
-			Format formatter = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss a");
-
-			TIME = formatter.format(d);
+			String TIME = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss a").format(d);
 
 			AdministrationService as = Context.getAdministrationService();
 			String folderName = as.getGlobalProperty("amrsreport.file_dir");
 
-			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-
 			ReportDefinitionService reportDefinitionService = Context.getService(ReportDefinitionService.class);
-
 			ReportData reportData = reportDefinitionService.evaluate(reportDefinition, evaluationContext);
+
+			//create a flat file here for storing our report data
 
 			AmrReportRender amrReportRender = new AmrReportRender();
 			String fileURL = loc.getName() + "-" + TIME + "-MOH-Register-361A.csv";
+			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 			File amrsreport = new File(loaddir, fileURL);
 			log.info("This is the file " + fileURL);
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
-
 			amrReportRender.render(reportData, "Report information ", outputStream);
 
 			//normal file operations to follow here
@@ -190,7 +180,15 @@ public class MohRenderController {
 		} finally {
 			httpSession.setMaxInactiveInterval(httpSessionvalue);
 		}
+
+		// populate model for reloading of screen
+
+//		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
+//		User currUser = Context.getAuthenticatedUser();
+//		List<Location> locationList = mohCoreService.getAllowedLocationsForUser(currUser);
+//		map.addAttribute("locations", locationList);
 	}
+
 
 	static String stripLeadingAndTrailingQuotes(String str) {
 		if (str.startsWith("\"")) {
@@ -204,7 +202,7 @@ public class MohRenderController {
 
 	@RequestMapping(value = "/module/amrsreport/downloadcsvR")
 	public void downloadCSV(HttpServletResponse response,
-		@RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
+	                        @RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
 
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty("amrsreport.file_dir");

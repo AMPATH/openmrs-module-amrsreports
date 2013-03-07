@@ -74,7 +74,7 @@
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form>
         <div id="actions">
-            <label>Evaluation Date:</label> <br/>
+            <label>Report Date (as of):</label> <br/>
             <c:forEach items="${reportDates}" var="reportDate">
                  <input type="radio" name="reportDate" value='<openmrs:formatDate date="${reportDate}" type="milliseconds"/>'>
                  <openmrs:formatDate date="${reportDate}" type="textbox"/> <br/>

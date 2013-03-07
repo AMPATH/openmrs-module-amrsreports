@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
@@ -30,6 +31,7 @@ import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.amrsreport.model.WHOStageAndDate;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
@@ -199,6 +201,12 @@ public interface MohCoreService extends OpenmrsService {
 
 	@Transactional
 	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
+
+	@Transactional
+	public Map<Integer,Date> getEnrollmentDateMap(Set<Integer> cohort);
+
+	@Transactional
+	public Map<Integer,WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
 
 	public List<Date> getAllEnrollmentReportDates();
 }

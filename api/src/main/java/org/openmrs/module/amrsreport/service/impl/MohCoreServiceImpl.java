@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +34,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreport.HIVCareEnrollment;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
+import org.openmrs.module.amrsreport.model.WHOStageAndDate;
 import org.openmrs.module.amrsreport.service.MohCoreService;
 import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -195,6 +197,16 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		return mohCoreDAO.saveEnrollment(HIVCareEnrollment);
 	}
 
+	@Override
+	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
+		return mohCoreDAO.getEnrollmentDateMap(cohort);
+	}
+	
+	@Override
+	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
+		return mohCoreDAO.getWHOStageAndDateMap(cohort);
+	}
+	
 	@Override
 	public List<Date> getAllEnrollmentReportDates() {
 		return mohCoreDAO.getAllEnrollmentReportDates();

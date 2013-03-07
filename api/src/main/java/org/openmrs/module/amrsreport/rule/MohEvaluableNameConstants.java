@@ -158,16 +158,16 @@ public interface MohEvaluableNameConstants {
 	public static final String CHANGE_FORMULATION = "CHANGE FORMULATION";
 	public static final String CHANGE_REGIMEN = "CHANGE REGIMEN";
 	public static final String NOT_REFILLED = "NOT REFILLED";
-	public static final String DRUG_SUBSTITUTION = " DRUG SUBSTITUTION";
-	public static final String REASON_ANTIRETROVIRALS_STARTED = "REASON ANTIRETROVIRALS STARTED ";
-	public static final String TOTAL_MATERNAL_TO_CHILD_TRANSMISSION_PROPHYLAXIS = " TOTAL MATERNAL TO CHILD TRANSMISSION PROPHYLAXIS";
+	public static final String DRUG_SUBSTITUTION = "DRUG SUBSTITUTION";
+	public static final String REASON_ANTIRETROVIRALS_STARTED = "REASON ANTIRETROVIRALS STARTED";
+	public static final String TOTAL_MATERNAL_TO_CHILD_TRANSMISSION_PROPHYLAXIS = "TOTAL MATERNAL TO CHILD TRANSMISSION PROPHYLAXIS";
 	public static final String PATIENT_REPORTED_REASON_FOR_CURRENT_ANTIRETROVIRALS_STARTED = "PATIENT REPORTED REASON FOR CURRENT ANTIRETROVIRALS STARTED";
 	public static final String NEWBORN_ANTIRETROVIRAL_USE = "NEWBORN ANTIRETROVIRAL USE";
 	public static final String STAVUDINE = "STAVUDINE";
 	public static final String LAMIVUDINE = "LAMIVUDINE";
 	public static final String NELFINAVIR = "NELFINAVIR";
 	public static final String LOPINAVIR = "LOPINAVIR";
-	public static final String ZIDOVUDINE = " ZIDOVUDINE";
+	public static final String ZIDOVUDINE = "ZIDOVUDINE";
 	public static final String NEWBORN_PROPHYLACTIC_ANTIRETROVIRAL_USE = "NEWBORN PROPHYLACTIC ANTIRETROVIRAL USE";
 	public static final String YES = "YES";
 	//End of  Additional Concepts for ART Treatment start date rule

@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
@@ -28,6 +29,7 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreport.HIVCareEnrollment;
 import org.openmrs.module.amrsreport.UserLocation;
+import org.openmrs.module.amrsreport.model.WHOStageAndDate;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
 import org.openmrs.module.amrsreport.UserReport;
 
@@ -81,5 +83,8 @@ public interface MohCoreDAO {
 
 	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
 
+	public Map<Integer,Date> getEnrollmentDateMap(Set<Integer> cohort);
+	
+	public Map<Integer,WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
 	public List<Date> getAllEnrollmentReportDates();
 }

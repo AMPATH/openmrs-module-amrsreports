@@ -46,7 +46,8 @@
 	</modules>
 
 	<properties>
-        <reportingVersion>0.7.0</reportingVersion>
+        <calculationVersion>1.0</calculationVersion>
+        <reportingVersion>0.7.5</reportingVersion>
         <serializationVersion>0.2.7</serializationVersion>
         <htmlWidgetsVersion>1.6.0</htmlWidgetsVersion>
         <logicVersion>0.5.1</logicVersion>
@@ -66,7 +67,7 @@
 
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
-				<artifactId>reporting</artifactId>
+				<artifactId>reporting-api</artifactId>
 				<version>${reportingVersion}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -92,8 +93,16 @@
 				<version>${htmlWidgetsVersion}</version>
 				<scope>provided</scope>
 			</dependency>
-			
-			<!-- End External dependencies -->
+
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>calculation-api</artifactId>
+                <version>${calculationVersion}</version>
+                <type>jar</type>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- End External dependencies -->
 
 			<!-- Begin OpenMRS core -->
 			

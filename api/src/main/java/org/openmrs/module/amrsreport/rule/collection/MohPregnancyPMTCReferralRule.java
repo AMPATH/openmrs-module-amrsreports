@@ -103,9 +103,6 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		// get the observations
 		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction);
 
-		if (observations == null || observations.isEmpty())
-			return null;
-
 		List<Concept> questionList = Arrays.asList(
 				MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),
 				MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT_ULTRASOUND)

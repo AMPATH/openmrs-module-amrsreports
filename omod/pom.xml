@@ -33,7 +33,7 @@
 
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>reporting</artifactId>
+			<artifactId>reporting-api</artifactId>
 		</dependency>
 
 		<dependency>

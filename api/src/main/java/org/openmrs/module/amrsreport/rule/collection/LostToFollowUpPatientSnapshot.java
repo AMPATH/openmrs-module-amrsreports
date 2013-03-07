@@ -107,6 +107,9 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 
 	@Override
 	public boolean eligible() {
+		if (this.getProperty("why") == null) {
+			return false;
+		}
 
 		if (this.getProperty("why").equals("DEAD")) {
 			this.setProperty("reason", "DEAD | " + this.getProperty("obsDate"));

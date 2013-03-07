@@ -23,7 +23,9 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.PropertyProjection;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
@@ -40,6 +42,7 @@ import org.openmrs.module.amrsreport.UserLocation;
 import org.openmrs.module.amrsreport.UserReport;
 import org.openmrs.module.amrsreport.cache.MohCacheUtils;
 import org.openmrs.module.amrsreport.db.MohCoreDAO;
+import org.openmrs.module.amrsreport.model.WHOStageAndDate;
 import org.openmrs.module.amrsreport.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreport.util.MohFetchOrdering;
 import org.openmrs.module.amrsreport.util.MohFetchRestriction;
@@ -48,8 +51,11 @@ import org.openmrs.util.OpenmrsUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -430,6 +436,41 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment) {
 		sessionFactory.getCurrentSession().saveOrUpdate(HIVCareEnrollment);
 		return HIVCareEnrollment;
+	}
+
+	@Override
+	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
+				.add(Restrictions.in("person.personId", cohort))
+				.setProjection(Projections.projectionList()
+						.add(Projections.property("person.personId"))
+						.add(Projections.property("enrollmentDate")));
+
+		Map<Integer, Date> ret = new LinkedHashMap<Integer, Date>();
+		Iterator<Object[]> it = crit.list().iterator();
+		while (it.hasNext()) {
+			Object[] row = it.next();
+			ret.put((Integer)row[0], (Date)row[1]);
+		}
+		return ret;
+	}
+
+	@Override
+	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
+				.add(Restrictions.in("person.personId", cohort))
+				.setProjection(Projections.projectionList()
+						.add(Projections.property("person.personId"))
+						.add(Projections.property("lastWHOStage"))
+						.add(Projections.property("lastWHOStageDate")));
+
+		Map<Integer, WHOStageAndDate> ret = new LinkedHashMap<Integer, WHOStageAndDate>();
+		Iterator<Object[]> it = crit.list().iterator();
+		while (it.hasNext()) {
+			Object[] row = it.next();
+			ret.put((Integer)row[0], new WHOStageAndDate((String)row[1], (Date)row[2]));
+		}
+		return ret;
 	}
 
 	@Override

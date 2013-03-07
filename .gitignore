@@ -6,6 +6,8 @@ target/
 *.ipr
 *.iws
 .idea/
+api/*.iml
+omod/*.iml
 
 # Netbeans ignores
 nbproject/private/
