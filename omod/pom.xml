@@ -4,11 +4,11 @@
 
 	<parent>
 		<groupId>org.openmrs.module</groupId>
-		<artifactId>amrsreport</artifactId>
+		<artifactId>amrsreports</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>amrsreport-omod</artifactId>
+	<artifactId>amrsreports-omod</artifactId>
 	<packaging>jar</packaging>
 	<name>AMRS Report Module OMOD</name>
 	<description>OMOD project for AMRS Report Module</description>

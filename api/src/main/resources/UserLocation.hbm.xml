@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<hibernate-mapping package="org.openmrs.module.amrsreport">
+<hibernate-mapping package="org.openmrs.module.amrsreports">
 	<class name="UserLocation" table="amrsreport_userlocation">
 		<id column="amrsreport_userlocation_id" name="id" type="int" unsaved-value="0">
 			<generator class="native"/>

@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.openmrs.module</groupId>
-	<artifactId>amrsreport</artifactId>
+	<artifactId>amrsreports</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>AMRS Report Module</name>
+	<name>AMRS Reports Module</name>
 	<description>Provides easy acess to AMPATH reports, limits access and adds logic rules and cohort definitions for MOH reports.</description>
 
 	<url>http://wiki.ampath.or.ke/display/data/Comprehensive+Care+Clinic+Pre+ART+Register+MOH+361A</url>

@@ -30,13 +30,13 @@
 <bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
-				<value>org.openmrs.module.amrsreport.service.MohCoreService</value>
+				<value>org.openmrs.module.amrsreports.service.MohCoreService</value>
 				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 					<property name="transactionManager" ref="transactionManager"/>
 					<property name="target">
-						<bean class="org.openmrs.module.amrsreport.service.impl.MohCoreServiceImpl">
+						<bean class="org.openmrs.module.amrsreports.service.impl.MohCoreServiceImpl">
 							<property name="coreDAO">
-								<bean class="org.openmrs.module.amrsreport.db.hibernate.MohHibernateCoreDAO">
+								<bean class="org.openmrs.module.amrsreports.db.hibernate.MohHibernateCoreDAO">
 									<property name="sessionFactory" ref="sessionFactory"/>
 								</bean>
 							</property>

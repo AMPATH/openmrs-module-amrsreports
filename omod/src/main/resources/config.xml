@@ -73,7 +73,7 @@
                 <include method="getCohortCountForLocation"/>
                 <include method="getCohort"/>
                 <include method="rebuildEnrollment"/>
-                <convert match="org.openmrs.module.amrsreport.UserLocation" converter="bean" />
+                <convert match="org.openmrs.module.amrsreports.UserLocation" converter="bean" />
 				<convert match="org.openmrs.Location" converter="bean" />
 				<convert match="org.openmrs.User" converter="bean"/>
 			</create>

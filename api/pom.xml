@@ -1,13 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+
+    <modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.openmrs.module</groupId>
-		<artifactId>amrsreport</artifactId>
+		<artifactId>amrsreports</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>amrsreport-api</artifactId>
+	<artifactId>amrsreports-api</artifactId>
 	<packaging>jar</packaging>
 	<name>AMRS Report Module API</name>
 	<description>API project for Reporting Module</description>
@@ -18,7 +20,12 @@
 			<artifactId>reporting-api</artifactId>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>calculation-api</artifactId>
+        </dependency>
+
+        <dependency>
 			<groupId>org.openmrs.module</groupId>
 			<artifactId>htmlwidgets</artifactId>
 		</dependency>
