@@ -144,7 +144,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnPCP_PROPHYLAXIS_STARTEDWithNotNullAnswer() throws Exception {
 		addStartObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, MohEvaluableNameConstants.NONE, "16 Oct 1975");
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNotNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED, MohEvaluableNameConstants.NONE, "18 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 18-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNotNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, MohEvaluableNameConstants.NONE, "20 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 20-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 20/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**

@@ -137,21 +137,21 @@ public class LostToFollowUpPatientSnapshotTest {
 		setObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975");
 		rule.consume(currentObs);
 		assertThat(rule.getProperty("why").toString(), is("TO | (Ampath) "));
-		assertThat(rule.getProperty("obsDate").toString(), is("16-Oct-75"));
+		assertThat(rule.getProperty("obsDate").toString(), is("16/10/1975"));
 	}
 
 	@Test
 	public void consume_shouldProperlyDetermineDEADfromAnEncounter() throws Exception {
 		setEncounter(this.ENCOUNTER_TYPE_DEATH_REPORT, "16 Oct 1975");
 		rule.consume(encounter);
-		assertThat(rule.getProperty("reason").toString(), is("DEAD | 16-Oct-75"));
+		assertThat(rule.getProperty("reason").toString(), is("DEAD | 16/10/1975"));
 	}
 
 	@Test
 	public void consume_shouldProperlyDetermineLTFUfromAnEncounter() throws Exception {
 		setEncounter(this.ENCOUNTER_TYPE_ADULT_INITIAL, "16 Oct 2012");
 		rule.consume(encounter);
-		assertThat(rule.getProperty("reason").toString(), is("LTFU | 16-Oct-12"));
+		assertThat(rule.getProperty("reason").toString(), is("LTFU | 16/10/2012"));
 	}
 
 

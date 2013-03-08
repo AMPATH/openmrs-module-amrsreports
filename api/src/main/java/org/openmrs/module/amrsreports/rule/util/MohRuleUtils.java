@@ -39,7 +39,7 @@ import java.util.Date;
 public class MohRuleUtils {
 
 	private static final Log log = LogFactory.getLog(MohRuleUtils.class);
-	public static final String DATE_FORMAT = "dd-MMM-yy";
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
 
 	/**
 	 * Check whether an object is a valid collection object. Valid here means it's not null, assignable to Collection class and not empty

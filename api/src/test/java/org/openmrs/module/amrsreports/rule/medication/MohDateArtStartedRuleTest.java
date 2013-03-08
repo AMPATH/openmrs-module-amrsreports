@@ -180,47 +180,47 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldReturnFirstObsDateForANTIRETROVIRAL_PLANInAllowedAnswers() throws Exception {
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CONTINUE_REGIMEN, "17 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CHANGE_FORMULATION, "18 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CHANGE_REGIMEN, "19 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("19-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("19/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.REFILLED, "20 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("20-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("20/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.NOT_REFILLED, "21 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("21-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("21/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DRUG_SUBSTITUTION, "22 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("22-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("22/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DRUG_RESTART, "23 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("23-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("23/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DOSING_CHANGE, "24 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("24-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("24/10/1975")));
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldReturnFirstValueDateForANTIRETROVIRAL_DRUG_TREATMENT_START_DATE() throws Exception {
 		addDateObs(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE, "17 Oct 1975", "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class MohDateArtStartedRuleTest {
 	public void evaluate_shouldReturnFirstDateForMixedValidObservations() throws Exception {
 		addDateObs(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE, "17 Oct 1975", "16 Oct 1975");
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "18 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17-Oct-75")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
 	}
 
 	/**

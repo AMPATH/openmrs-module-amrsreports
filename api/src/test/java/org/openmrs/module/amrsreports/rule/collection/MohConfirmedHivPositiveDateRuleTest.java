@@ -131,7 +131,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_ENZYME_IMMUNOASSAY_QUALITATIVETest() throws Exception {
 		addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16-Oct-12")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16/10/2012")));
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_RAPID_TEST_QUALITATIVETest() throws Exception {
 		addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "17 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17-Oct-12")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/2012")));
 	}
 
 	/**
@@ -160,6 +160,6 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheDateForTheFirstEncounter() throws Exception {
 		addEncounter("18 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18-Oct-12")));
+		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18/10/2012")));
 	}
 }

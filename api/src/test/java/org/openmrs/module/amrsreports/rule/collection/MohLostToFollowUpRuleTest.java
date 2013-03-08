@@ -176,7 +176,7 @@ public class MohLostToFollowUpRuleTest {
         patient.setDeathDate(deathDate);
 
         Assert.assertTrue("The Patient is alive", patient.getDead());
-        Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20-Dec-12"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20/12/2012"), rule.evaluate(null, PATIENT_ID, null));
     }
 
     /**
@@ -188,7 +188,7 @@ public class MohLostToFollowUpRuleTest {
 
         addObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975");
         Assert.assertEquals("current Obs size is wrong!", 1, currentObs.size());
-        Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16/10/1975"), rule.evaluate(null, PATIENT_ID, null));
     }
 
     /**
@@ -202,7 +202,7 @@ public class MohLostToFollowUpRuleTest {
         Assert.assertNotNull("A null Obs was encountered", currentObs);
         Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25-Aug-12"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25/08/2012"), rule.evaluate(null, PATIENT_ID, null));
     }
 
     /**
@@ -216,7 +216,7 @@ public class MohLostToFollowUpRuleTest {
         Assert.assertNotNull("A null Obs was encountered", currentObs);
         Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16-Oct-12"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16/10/2012"), rule.evaluate(null, PATIENT_ID, null));
 
     }
 }

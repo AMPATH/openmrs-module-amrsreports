@@ -14,6 +14,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -147,7 +148,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnCRYPTOCOCCAL_TREATMENT_PLANIsSTART_DRUGS() throws Exception {
 		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnCRYPTOCOSSUS_TREATMENT_STARTEDIsFLUCONAZOLE() throws Exception {
 		addStartObs(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED, MohEvaluableNameConstants.FLUCONAZOLE, "17 Oct 1975");
-		Assert.assertEquals(new Result("17-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("17/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -167,7 +168,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnCRYPTOCOCCAL_TREATMENT_PLANIsSTOP_ALL() throws Exception {
 		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "18 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 18-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -188,6 +189,11 @@ public class MohFluconazoleStartStopDateRuleTest {
 		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "18 Oct 1975");
 		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "19 Oct 1975");
 
-		Assert.assertEquals(new Result("16-Oct-75 - 17-Oct-75;18-Oct-75 - 19-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"16/10/1975 - 17/10/1975",
+				"18/10/1975 - 19/10/1975"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(null, PATIENT_ID, null));
 	}
 }

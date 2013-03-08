@@ -1,5 +1,7 @@
 package org.openmrs.module.amrsreports.rule.medication;
 
+import org.apache.commons.lang.StringUtils;
+import org.databene.commons.StringUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +14,10 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -141,7 +145,7 @@ public class DrugStartStopDateRuleTest {
 	@Test
 	public void getResult_shouldProperlyFormatASingleStartDate() throws Exception {
 		addStartObs("16 Oct 1975");
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -151,7 +155,7 @@ public class DrugStartStopDateRuleTest {
 	@Test
 	public void getResult_shouldProperlyFormatASingleStopDate() throws Exception {
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 16-Oct-75"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("Unknown - 16/10/1975"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -162,7 +166,7 @@ public class DrugStartStopDateRuleTest {
 	public void getResult_shouldProperlyFormatAStartAndStopDate() throws Exception {
 		addStartObs("12 Oct 1975");
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("12-Oct-75 - 16-Oct-75"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("12/10/1975 - 16/10/1975"), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -174,7 +178,12 @@ public class DrugStartStopDateRuleTest {
 		addStartObs("12 Oct 1975");
 		addStartObs("14 Oct 1975");
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("12-Oct-75 - Unknown;14-Oct-75 - 16-Oct-75"), rule.getResult(PATIENT_ID));
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"12/10/1975 - Unknown",
+				"14/10/1975 - 16/10/1975");
+
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -186,7 +195,12 @@ public class DrugStartStopDateRuleTest {
 		addStartObs("12 Oct 1975");
 		addStopObs("14 Oct 1975");
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;Unknown - 16-Oct-75"), rule.getResult(PATIENT_ID));
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"12/10/1975 - 14/10/1975",
+				"Unknown - 16/10/1975");
+
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
 	}
 
 	/**
@@ -199,7 +213,12 @@ public class DrugStartStopDateRuleTest {
 		addStopObs("14 Oct 1975");
 		addStartObs("16 Oct 1975");
 		addStopObs("18 Oct 1975");
-		Assert.assertEquals(new Result("12-Oct-75 - 14-Oct-75;16-Oct-75 - 18-Oct-75"), rule.getResult(PATIENT_ID));
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"12/10/1975 - 14/10/1975",
+				"16/10/1975 - 18/10/1975");
+
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
 	}
 
 	/**

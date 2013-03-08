@@ -126,7 +126,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStartOnANTIRETROVIRALTHERAPYSTATUSOfONANTIRETROVIRALTHERAPY() throws Exception {
 		addObs(MohPEPStartStopDateRule.ANTIRETROVIRAL_THERAPY_STATUS, MohPEPStartStopDateRule.ON_ANTIRETROVIRAL_THERAPY, "16 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("16-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStartOnARVsRECOMMENDEDFORPEPIsZIDOVUDINEANDLAMIVUDINE() throws Exception {
 		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.ZIDOVUDINE_AND_LAMIVUDINE, "17 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("17-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("17/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStartOnARVsRECOMMENDEDFORPEPIsLOPINAVIRANDRITONAVIR() throws Exception {
 		addObs(MohPEPStartStopDateRule.ARVs_RECOMMENDED_FOR_PEP, MohPEPStartStopDateRule.LOPINAVIR_AND_RITONAVIR, "18 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("18-Oct-75 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("18/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStopOnREASONANTIRETROVIRALSSTOPPEDIsPATIENTREFUSAL() throws Exception {
 		addObs(MohPEPStartStopDateRule.REASON_ANTIRETROVIRALS_STOPPED, MohPEPStartStopDateRule.PATIENT_REFUSAL, "19 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("Unknown - 19-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 19/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStopOnREASONANTIRETROVIRALSSTOPPEDIsCOMPLETED() throws Exception {
 		addObs(MohPEPStartStopDateRule.REASON_ANTIRETROVIRALS_STOPPED, MohPEPStartStopDateRule.COMPLETED, "20 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("Unknown - 20-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 20/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStopOnAnyValueForDAYSONPOSTEXPOSUREPROPHYLAXISBEFORESTOPPINGDUETONONADHERENCEANTIRETROVIRALS() throws Exception {
 		addObs(MohPEPStartStopDateRule.DAYS_ON_PEP_MEDS1, null, "21 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("Unknown - 21-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 21/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class MohPEPStartStopDateRuleTest {
 	public void evaluate_shouldStopOnAnyValueForDAYSONPOSTEXPOSUREPROPHYLAXISBEFORESTOPPINGDUETOSIDEEFFECTSANTIRETROVIRALS() throws Exception {
 		addObs(MohPEPStartStopDateRule.DAYS_ON_PEP_MEDS2, null, "22 Oct 1975");
 		Assert.assertEquals(1, currentObs.size());
-		Assert.assertEquals(new Result("Unknown - 22-Oct-75"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 22/10/1975"), rule.evaluate(null, PATIENT_ID, null));
 	}
 
 }
