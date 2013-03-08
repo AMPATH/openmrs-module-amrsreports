@@ -1,9 +1,11 @@
 package org.openmrs.module.amrsreports.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -65,5 +67,13 @@ public class MOHReportUtil {
 		reportData.setContext(evaluationContext);
 		// reportData.setDataSets(dataSets);
 		return reportData;
+	}
+
+	public static String joinAsSingleCell(List<String> entries) {
+		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
+	}
+
+	public static String joinAsSingleCell(String... entries) {
+		return joinAsSingleCell(Arrays.asList(entries));
 	}
 }

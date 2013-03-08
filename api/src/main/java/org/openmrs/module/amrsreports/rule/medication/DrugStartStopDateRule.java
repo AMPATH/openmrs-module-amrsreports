@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.rule.medication;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Obs;
@@ -9,9 +10,11 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.result.Result.Datatype;
 import org.openmrs.logic.rule.RuleParameterInfo;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchOrdering;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
@@ -144,21 +147,12 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 		}
 
 		// build the response
-		StringBuilder sb = new StringBuilder();
-		boolean first = true;
+		List<String> results = new ArrayList<String>();
 		for (Date[] range : ranges) {
-			if (first) {
-				first = false;
-			} else {
-				sb.append(";");
-			}
-
-			sb.append(MohRuleUtils.formatdates(range[0]));
-			sb.append(" - ");
-			sb.append(MohRuleUtils.formatdates(range[1]));
+			results.add(MohRuleUtils.formatdates(range[0]) + " - " + MohRuleUtils.formatdates(range[1]));
 		}
 
-		return new Result(sb.toString());
+		return new Result(MOHReportUtil.joinAsSingleCell(results));
 	}
 
 	/**
