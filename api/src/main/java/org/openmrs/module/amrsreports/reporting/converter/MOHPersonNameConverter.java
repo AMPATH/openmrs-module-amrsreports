@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.openmrs.PersonName;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 /**
@@ -13,7 +14,10 @@ public class MOHPersonNameConverter implements DataConverter {
 		if (personName == null)
 			return "";
 
-		return String.format("%s;%s", personName.getGivenName(), personName.getFamilyName());
+		return String.format("%s%s%s",
+				personName.getGivenName(),
+				AmrsReportsConstants.INTER_CELL_SEPARATOR,
+				personName.getFamilyName());
 	}
 
 	@Override

@@ -199,7 +199,7 @@
         <c:forEach var="row" items="${records}">
             <tr>
                 <td><img
-                        src="${pageContext.request.contextPath}/moduleResources/amrsreport/images/format-indent-more.png"
+                        src="${pageContext.request.contextPath}/moduleResources/amrsreports/images/format-indent-more.png"
                         id="imgrender"/></td>
                 <c:forEach var="cell" items="${row}">
                     <td>${cell}</td>

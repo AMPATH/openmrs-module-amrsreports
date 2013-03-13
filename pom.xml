@@ -51,6 +51,7 @@
         <serializationVersion>0.2.7</serializationVersion>
         <htmlWidgetsVersion>1.6.0</htmlWidgetsVersion>
         <logicVersion>0.5.1</logicVersion>
+        <openCSVVersion>2.3</openCSVVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
         <MODULE_NAME>${project.parent.name}</MODULE_NAME>
@@ -100,6 +101,12 @@
                 <version>${calculationVersion}</version>
                 <type>jar</type>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sf.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${openCSVVersion}</version>
             </dependency>
 
             <!-- End External dependencies -->

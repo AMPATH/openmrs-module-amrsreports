@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -36,7 +38,7 @@ public class MohHistoryController {
 	public void preparePage(ModelMap map) {
 
 		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty("amrsreport.file_dir");
+		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 
@@ -56,7 +58,7 @@ public class MohHistoryController {
 		List<String> filenames = new ArrayList<String>();
 
 		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty("amrsreport.file_dir");
+		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		String[] children = fileDir.list();
@@ -68,46 +70,15 @@ public class MohHistoryController {
 		map.addAttribute("reportHistory", filenames);
 
 		///end of interface population after submitting
-		List<List<String>> records = new ArrayList<List<String>>();
-		List<String> columnHeaders = new ArrayList<String>();
-		String[] linedata;
 		try {
 			File amrsFile = new File(fileDir, history);
 			FileInputStream fstream = new FileInputStream(amrsFile);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String line;
-
-			//get the columns to be used here
-			String lineColumn = br.readLine();
-			String[] lineColumnArray = lineColumn.split(",");
-
-			log.info("This the file to be displayed " + amrsFile);
-
-			for (int p = 0; p < lineColumnArray.length; p++) {
-				columnHeaders.add(StringUtils.defaultString(stripLeadingAndTrailingQuotes(lineColumnArray[p])));
-			}
-
-			map.addAttribute("columnHeaders", columnHeaders);
-
-			while ((line = br.readLine()) != null) {
-				List<String> intlist = new ArrayList<String>();
-				linedata = line.split(",");// values of every row in an array
-
-				/////////////////////////////////////////////////////////////////////////////////////////
-				for (int pp = 0; pp < linedata.length; pp++) {
-					intlist.add(StringUtils.defaultString(stripLeadingAndTrailingQuotes(linedata[pp])));
-				}
-				records.add(intlist);
-			}
-			//process for downloading the csv
-
-			map.addAttribute("records", records);
+			Map<String, Object> csv = MOHReportUtil.renderDataSetFromCSV(fstream);
 			fstream.close();
-			in.close();
-			br.close();
-			// bw.flush();
-			//bw.close();
+
+			map.addAttribute("columnHeaders", csv.get("columnHeaders"));
+			map.addAttribute("records", csv.get("records"));
+
 			map.addAttribute("historyURL", history);
 			map.addAttribute("filetodownload", amrsFile);
 
@@ -139,7 +110,7 @@ public class MohHistoryController {
 		@RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
 
 		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty("amrsreport.file_dir");
+		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		File amrsFileToDownload = new File(fileDir, fileToImportToCSV);
@@ -155,7 +126,7 @@ public class MohHistoryController {
 	public void downloadPDF(HttpServletResponse response,
 		@RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
 		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty("amrsreport.file_dir");
+		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		File amrsFileToDownload = new File(fileDir, fileToImportToCSV);

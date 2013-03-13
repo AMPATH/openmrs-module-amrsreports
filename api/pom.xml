@@ -41,7 +41,12 @@
 			<artifactId>serialization.xstream-api</artifactId>
 		</dependency>
 
-		<!-- Begin OpenMRS core -->
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+        </dependency>
+
+        <!-- Begin OpenMRS core -->
 		
 		<dependency>
 			<groupId>org.openmrs.api</groupId>

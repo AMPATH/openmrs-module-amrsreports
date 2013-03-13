@@ -54,8 +54,8 @@
 	</globalProperty>
 	<globalProperty>
 		<property>${project.parent.artifactId}.file_dir</property>
-		<defaultValue>amrsreport/files</defaultValue>
-		<description>Directory for storing file temporarily for processing</description>
+		<defaultValue>${project.parent.artifactId}</defaultValue>
+		<description>Directory for storing rendered reports</description>
 	</globalProperty>
 	<!-- /Required Global Properties -->
 	

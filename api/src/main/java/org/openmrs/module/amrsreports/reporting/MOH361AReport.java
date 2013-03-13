@@ -13,6 +13,7 @@ import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
+import org.openmrs.module.reporting.data.converter.StringConverter;
 import org.openmrs.module.reporting.data.patient.definition.LogicDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
@@ -58,7 +59,7 @@ public class MOH361AReport {
 		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString, commonDateConverter);
 
 		// c. Unique Patient Number
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new StringConverter(null, ""));
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString, new MOHPersonNameConverter());
