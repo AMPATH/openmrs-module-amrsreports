@@ -273,8 +273,8 @@ public class DWRAmrsReportService {
 	/**
 	 * kick off the enrollment update task
 	 */
-	public String rebuildEnrollment(Date reportDate) {
-		HIVCareEnrollmentBuilder.execute(reportDate);
+	public String rebuildEnrollment() {
+		HIVCareEnrollmentBuilder.execute();
 		return "done";
 	};
 }

@@ -4,6 +4,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.NASCOP771CohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -15,10 +16,10 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import java.text.SimpleDateFormat;
 
 /**
- * Evaluator for MOH 361A Cohort Definition
+ * Evaluator for NASCOP 771 Cohort Definition
  */
-@Handler(supports = {Moh361ACohortDefinition.class})
-public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluator {
+@Handler(supports = {NASCOP771CohortDefinition.class})
+public class NASCOP771CohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -38,6 +39,11 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						" where " +
 						"  enrollment_date is not NULL" +
 						"  and enrollment_date <= ':reportDate'" +
+						"  and transferred_in_date is NULL" +
+						"  and (" +
+						"    last_discontinue_date is NULL" +
+						"    or last_hiv_encounter_date > last_discontinue_date" +
+						"  )" +
 						"  and enrollment_location_id in (:locationList)";
 
 		SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));

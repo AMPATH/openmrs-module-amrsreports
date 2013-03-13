@@ -8,6 +8,8 @@
 
 <script type="text/javascript">
 
+    var reportDate;
+
     $j(document).ready(function () {
 
 //        $j("#download").click(function(event){
@@ -28,10 +30,9 @@
 
         $j("#update").click(function(event){
             event.preventDefault();
-            var reportDate = getReportDate();
             $j("[name=location]:checked").each(function(){
                 var locationId = $j(this).val();
-                getLocationCount(locationId, reportDate, function(){
+                getLocationCount(locationId, reportDate.getDate(), function(){
                     $j("[name=location][location=" + locationId + "]").removeAttr("checked");
                 });
             });
@@ -51,12 +52,9 @@
             });
         });
 
+        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
+        reportDate.setDate(new Date());
     });
-
-    function getReportDate() {
-        var selection = $j("input[name=reportDate]:checked").val();
-        return new Date(parseInt(selection));
-    }
 
     function getLocationCount(locationId, reportDate, callback) {
         $j(".size[location=" + locationId + "]").html("Calculating ...");
@@ -75,11 +73,8 @@
     <form>
         <div id="actions">
             <label>Report Date (as of):</label> <br/>
-            <c:forEach items="${reportDates}" var="reportDate">
-                 <input type="radio" name="reportDate" value='<openmrs:formatDate date="${reportDate}" type="milliseconds"/>'>
-                 <openmrs:formatDate date="${reportDate}" type="textbox"/> <br/>
-            </c:forEach>
-            <button id="update">Update Size for Selected Date and Location(s)</button>
+            <input type="text" name="reportDate" id="reportDate"/>
+            <button id="update">Update</button>
             <!--
             <button id="download">Download Cohort List for Selected Location(s)</button>
             -->

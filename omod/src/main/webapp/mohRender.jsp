@@ -43,6 +43,8 @@
 
 <script type="text/javascript">
 
+    var reportDate;
+
     $j(document).ready(function () {
 
         var ty = $j('#tblMain').dataTable({
@@ -95,15 +97,11 @@
             return false;
         });
 
-        // trim all date values to 10 characters .. ugh.
-        $j("input[name=reportDate]").each(function () {
-            $j(this).val($j(this).val().substring(0, 10));
-        });
-
+        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
+        reportDate.setDate(new Date());
     });
 
     function clearDataTable() {
-        //alert("on change has to take effect");
         var hidepic = document.getElementById("maindetails");
         var titleheader = document.getElementById("titleheader");
         hidepic.style.display = 'none';
@@ -162,10 +160,7 @@
     <form method="POST" name="amrsreportrenderer" action="mohRender.form">
         <fieldset class="visualPadding oneThird">
             <legend>Report Date (as of)</legend>
-            <c:forEach items="${reportDates}" var="reportDate">
-                <input type="radio" name="reportDate" value='<openmrs:formatDate date="${reportDate}" type="textbox"/>'>
-                <openmrs:formatDate date="${reportDate}" type="textbox"/> <br/>
-            </c:forEach>
+                <input type="text" name="reportDate" id="reportDate"/>
         </fieldset>
         <fieldset class="visualPadding oneThird">
             <legend>Location</legend>
@@ -175,7 +170,7 @@
         </fieldset>
         <fieldset class="visualPadding oneThird">
             <legend>Reports</legend>
-            <input type="radio" name="hardcoded" value="ack"/> MOH 361A <br/>
+            <input type="radio" name="hardcoded" value="ack" checked="checked"/> MOH 361A <br/>
         </fieldset>
         <input id="submitButton" class="visualPadding newline" type="submit" value="View"/>
     </form>

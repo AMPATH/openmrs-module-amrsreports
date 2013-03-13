@@ -13,7 +13,6 @@ import java.util.Date;
 public class HIVCareEnrollment extends BaseOpenmrsData {
 
 	Integer enrollmentId;
-	Date reportDate;
 	Person person;
 
 	Date enrollmentDate;
@@ -62,14 +61,6 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 
 	public void setEnrollmentId(Integer enrollmentId) {
 		this.enrollmentId = enrollmentId;
-	}
-
-	public Date getReportDate() {
-		return reportDate;
-	}
-
-	public void setReportDate(Date reportDate) {
-		this.reportDate = reportDate;
 	}
 
 	public Person getPerson() {

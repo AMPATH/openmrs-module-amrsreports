@@ -207,6 +207,4 @@ public interface MohCoreService extends OpenmrsService {
 
 	@Transactional
 	public Map<Integer,WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
-
-	public List<Date> getAllEnrollmentReportDates();
 }

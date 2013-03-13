@@ -54,11 +54,6 @@ public class MohRenderController {
 
 	private static final Log log = LogFactory.getLog(MohRenderController.class);
 
-	@ModelAttribute("reportDates")
-	public List<Date> getReportDates() {
-		return Context.getService(MohCoreService.class).getAllEnrollmentReportDates();
-	}
-
 	@ModelAttribute("locations")
 	public List<Location> getLocations() {
 		MohCoreService mohCoreService = Context.getService(MohCoreService.class);

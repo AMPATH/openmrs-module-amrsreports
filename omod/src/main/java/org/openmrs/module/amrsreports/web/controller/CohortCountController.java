@@ -27,11 +27,6 @@ import java.util.List;
 @Controller
 public class CohortCountController {
 
-	@ModelAttribute("reportDates")
-	public List<Date> getReportDates() {
-		return Context.getService(MohCoreService.class).getAllEnrollmentReportDates();
-	}
-
 	@ModelAttribute("locations")
 	public List<Location> getLocations() {
 		return Context.getLocationService().getAllLocations();
@@ -59,7 +54,6 @@ public class CohortCountController {
 
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
-		context.addParameterValue("endDate", evaluationDate);
 
 		for (Integer locationId : locations) {
 			Location location = Context.getLocationService().getLocation(locationId);

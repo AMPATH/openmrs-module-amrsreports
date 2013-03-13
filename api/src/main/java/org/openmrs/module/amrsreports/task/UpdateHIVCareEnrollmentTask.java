@@ -16,6 +16,6 @@ public class UpdateHIVCareEnrollmentTask extends AbstractTask {
 
 	@Override
 	public void execute() {
-		HIVCareEnrollmentBuilder.execute(new Date());
+		HIVCareEnrollmentBuilder.execute();
 	}
 }

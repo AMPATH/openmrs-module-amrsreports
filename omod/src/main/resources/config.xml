@@ -92,7 +92,7 @@
 			DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
         	DWRAmrsReportService.getCohortCountForLocation(Integer locationId,Date evaluationDate);
             DWRAmrsReportService.getCohort(Integer locationId,Date evaluationDate);
-            DWRAmrsReportService.rebuildEnrollment(Date reportDate);
+            DWRAmrsReportService.rebuildEnrollment();
 			]]>
 		</signatures>	
 	</dwr>
