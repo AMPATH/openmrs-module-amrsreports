@@ -83,7 +83,7 @@ public class MOH361AReport {
 		// g. Entry point: From where?
 		// TODO add a StringConverter here
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
-		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString);
+		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new StringConverter(null, ""));
 
 		// h. Confirmed HIV+ Date
 		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString, commonDateConverter);
