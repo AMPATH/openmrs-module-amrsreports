@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 
+	public static final String TOKEN = "MOH CTX Start-Stop Date";
+
 	public MOHCTXStartStopDateRule() {
 		this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED));
 
@@ -26,8 +28,6 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 				MohCacheUtils.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED),
 				MohCacheUtils.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
 		);
-
-		this.TOKEN = "MOH CTX Start-Stop Date";
 	}
 
 	/**
@@ -56,5 +56,10 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 						||
 						MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
 		);
+	}
+
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
 	}
 }

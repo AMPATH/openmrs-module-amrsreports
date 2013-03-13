@@ -226,6 +226,8 @@ public class DrugStartStopDateRuleTest {
 	 */
 	private class TestDrugStartStopDateRule extends DrugStartStopDateRule {
 
+		public String TOKEN = "ACK";
+
 		public TestDrugStartStopDateRule() {
 			this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(START_CONCEPT));
 			this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(STOP_CONCEPT));
@@ -244,6 +246,11 @@ public class DrugStartStopDateRuleTest {
 		@Override
 		protected boolean validateStopObs(Obs obs) {
 			return true;
+		}
+
+		@Override
+		protected String getEvaluableToken() {
+			return TOKEN;
 		}
 	}
 }

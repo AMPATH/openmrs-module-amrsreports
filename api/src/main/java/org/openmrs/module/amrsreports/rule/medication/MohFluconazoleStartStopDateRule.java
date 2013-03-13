@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 
+	public static final String TOKEN = "MOH Fluconazole Start-Stop Date";
+
 	public MohFluconazoleStartStopDateRule() {
 
 		this.startConcepts = Arrays.<OpenmrsObject>asList(
@@ -22,9 +24,8 @@ public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 				MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED)
 		);
 
-		this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN));
-
-		this.TOKEN = "MOH Fluconazole Start-Stop Date";
+		this.stopConcepts = Collections.singletonList(
+				(OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN));
 	}
 
 	/**
@@ -58,6 +59,11 @@ public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 	protected boolean validateStopObs(Obs obs) {
 		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN) &&
 				MohRuleUtils.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.STOP_ALL);
+	}
+
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
 	}
 
 }

@@ -32,12 +32,13 @@ import java.util.Map;
  */
 public class MohTBStartStopDateRule extends DrugStartStopDateRule {
 
+	public static final String TOKEN = "MOH TB Start-Stop Date";
+
 	private static final Log log = LogFactory.getLog(MohTBStartStopDateRule.class);
 
 	public MohTBStartStopDateRule() {
 		this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED));
 		this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_COMPLETED_DATE));
-		this.TOKEN = "MOH TB Start-Stop Date";
 	}
 
 	/**
@@ -55,5 +56,10 @@ public class MohTBStartStopDateRule extends DrugStartStopDateRule {
 	@Override
 	protected boolean validateStopObs(Obs obs) {
 		return true;
+	}
+
+	@Override
+	protected String getEvaluableToken() {
+		return TOKEN;
 	}
 }

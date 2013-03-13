@@ -33,8 +33,6 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(DrugStartStopDateRule.class);
 
-	public static String TOKEN;
-
 	// Lists of concepts and possible answers to be used in comparison as for start and stop dates
 	protected List<OpenmrsObject> startConcepts = null;
 	protected List<OpenmrsObject> stopConcepts = null;
@@ -176,9 +174,7 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	}
 
 	//return the tokens
-	protected String getEvaluableToken() {
-		return TOKEN;
-	}
+	protected abstract String getEvaluableToken();
 
 	/**
 	 * @see org.openmrs.logic.Rule#getDependencies()
