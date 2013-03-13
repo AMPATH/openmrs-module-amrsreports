@@ -31,7 +31,7 @@ public class LocationPrivilegesController {
 	@Autowired
 	UserService userService;
 
-	@RequestMapping(value = "module/amrsreport/locationPrivileges.form", method = RequestMethod.GET)
+	@RequestMapping(value = "module/amrsreports/locationPrivileges.form", method = RequestMethod.GET)
 	public void populateModel(ModelMap model) {
 		List<Location> locations = locationService.getAllLocations(true);
 

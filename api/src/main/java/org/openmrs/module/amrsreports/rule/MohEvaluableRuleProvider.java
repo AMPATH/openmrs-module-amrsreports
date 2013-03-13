@@ -37,9 +37,9 @@ public class MohEvaluableRuleProvider extends ClassRuleProvider {
 
 	private static final Log log = LogFactory.getLog(MohEvaluableRuleProvider.class);
 
-	private static final String AMRS_REPORT_MODULE = "amrsreport";
+	private static final String AMRS_REPORT_MODULE = "amrsreports";
 
-	private static final String AMRS_REPORT_MODULE_API = "amrsreport-api";
+	private static final String AMRS_REPORT_MODULE_API = "amrsreports-api";
 
 	private static final String RULE_CLASS_SUFFIX = "Rule";
 

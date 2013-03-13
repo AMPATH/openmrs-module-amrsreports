@@ -37,12 +37,12 @@ public class CohortCountController {
 		return Context.getLocationService().getAllLocations();
 	}
 
-	@RequestMapping(value = "module/amrsreport/cohortCounts", method = RequestMethod.GET)
+	@RequestMapping(value = "module/amrsreports/cohortCounts", method = RequestMethod.GET)
 	public void setup() {
 		// do nothing
 	}
 
-	@RequestMapping(value = "/module/amrsreport/downloadCohortCounts.htm")
+	@RequestMapping(value = "/module/amrsreports/downloadCohortCounts.htm")
 	public void download(HttpServletResponse response,
 	                     @RequestParam(required = true, value = "locations") List<Integer> locations,
 	                     @RequestParam(required = true, value = "evaluationDate") Date evaluationDate) throws IOException {

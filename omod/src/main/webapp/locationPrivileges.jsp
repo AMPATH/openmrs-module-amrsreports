@@ -5,9 +5,9 @@
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.dataTables.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/jquery.tools.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreport/css/dataTables_jui.css" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.dataTables.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.tools.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css" />
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 <script type="text/javascript">

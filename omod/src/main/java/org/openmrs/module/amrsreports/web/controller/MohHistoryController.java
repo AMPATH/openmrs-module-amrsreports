@@ -32,7 +32,7 @@ public class MohHistoryController {
 
 	private static final Log log = LogFactory.getLog(MohHistoryController.class);
 
-	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreport/mohHistory.form")
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/mohHistory.form")
 	public void preparePage(ModelMap map) {
 
 		AdministrationService as = Context.getAdministrationService();
@@ -47,7 +47,7 @@ public class MohHistoryController {
 		map.addAttribute("reportHistory", filenames);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreport/mohHistory.form")
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/mohHistory.form")
 	public void processForm(ModelMap map, @RequestParam(required = true, value = "history") String history) {
 
 		map.addAttribute("historyToCSV", history);
@@ -134,7 +134,7 @@ public class MohHistoryController {
 		return str;
 	}
 
-	@RequestMapping(value = "/module/amrsreport/downloadcsv")
+	@RequestMapping(value = "/module/amrsreports/downloadcsv")
 	public void downloadCSV(HttpServletResponse response,
 		@RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
 
@@ -151,7 +151,7 @@ public class MohHistoryController {
 		FileCopyUtils.copy(new FileInputStream(amrsFileToDownload), response.getOutputStream());
 	}
 
-	@RequestMapping(value = "/module/amrsreport/downloadpdf")
+	@RequestMapping(value = "/module/amrsreports/downloadpdf")
 	public void downloadPDF(HttpServletResponse response,
 		@RequestParam(required = true, value = "fileToImportToCSV") String fileToImportToCSV) throws IOException {
 		AdministrationService as = Context.getAdministrationService();

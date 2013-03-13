@@ -37,16 +37,16 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		
 		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
-			map.put("module/amrsreport/mohRender.form", "Run AMRS Reports");
-			map.put("/module/amrsreport/cohortCounts.list", "View Cohort Counts");
+			map.put("module/amrsreports/mohRender.form", "Run AMRS Reports");
+			map.put("/module/amrsreports/cohortCounts.list", "View Cohort Counts");
 		}
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_VIEW_REPORTS)) {
-			map.put("module/amrsreport/mohHistory.form", "View AMRS Reports");
+			map.put("module/amrsreports/mohHistory.form", "View AMRS Reports");
 		}
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
-			map.put("module/amrsreport/locationPrivileges.form", "Location Privileges");
+			map.put("module/amrsreports/locationPrivileges.form", "Location Privileges");
 		}
 
 		return map;

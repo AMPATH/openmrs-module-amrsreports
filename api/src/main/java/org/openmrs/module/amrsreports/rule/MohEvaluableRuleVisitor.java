@@ -29,7 +29,7 @@ public class MohEvaluableRuleVisitor implements ClassVisitor {
 
 	private static final Log log = LogFactory.getLog(MohEvaluableRuleVisitor.class);
 
-	private static final String RULE_PACKAGE_NAME = "org.openmrs.module.amrsreport.rule";
+	private static final String RULE_PACKAGE_NAME = "org.openmrs.module.amrsreports.rule";
 
 	private static final String TOKEN_FIELD_NAME = "TOKEN";
 
@@ -51,7 +51,7 @@ public class MohEvaluableRuleVisitor implements ClassVisitor {
 
 	public void visit(final int version, final int access, final String name, final String signature,
 	                  final String superName, final String[] interfaces) {
-		// only proccess rule that subclass of abstract rule or abstract post processor rule
+		// only process rule that subclass of abstract rule or abstract post processor rule
 		if (StringUtils.contains(convert(superName), RULE_PACKAGE_NAME))
 			this.name = convert(name);
 	}
