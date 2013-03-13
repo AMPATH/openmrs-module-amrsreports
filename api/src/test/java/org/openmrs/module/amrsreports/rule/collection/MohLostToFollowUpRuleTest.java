@@ -15,6 +15,7 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
@@ -39,17 +40,19 @@ public class MohLostToFollowUpRuleTest {
 
 	private static final List<String> initConcepts = Arrays.asList(
 			LostToFollowUpPatientSnapshot.CONCEPT_DATE_OF_DEATH,
+			LostToFollowUpPatientSnapshot.CONCEPT_DEATH_REPORTED_BY,
+			LostToFollowUpPatientSnapshot.CONCEPT_CAUSE_FOR_DEATH,
 			LostToFollowUpPatientSnapshot.CONCEPT_DECEASED,
+			LostToFollowUpPatientSnapshot.CONCEPT_PATIENT_DIED,
 			LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER,
 			LostToFollowUpPatientSnapshot.CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE,
 			LostToFollowUpPatientSnapshot.CONCEPT_AMPATH,
 			MohEvaluableNameConstants.RETURN_VISIT_DATE
+		);
 
-	);
 	private String ENCOUNTER_TYPE_ADULT_INITIAL = "ADULTINITIAL";
 	private String ENCOUNTER_TYPE_ADULT_RETURN = "ADULTRETURN";
 	private String ENCOUNTER_TYPE_DEATH_REPORT = "DEATHREPORT";
-
 
 	private static final int PATIENT_ID = 5;
 	private Patient patient;

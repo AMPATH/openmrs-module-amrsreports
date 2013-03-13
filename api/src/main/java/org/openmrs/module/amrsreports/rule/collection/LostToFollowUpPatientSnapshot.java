@@ -56,23 +56,14 @@ public class LostToFollowUpPatientSnapshot extends PatientSnapshot {
 		String formattedObsDate = MohRuleUtils.formatdates(o.getObsDatetime());
 		String formattedObsValueDate = MohRuleUtils.formatdates(o.getValueDatetime());
 
-		if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH))) {
+		if (OpenmrsUtil.isConceptInList(concept, Arrays.asList(
+				MohCacheUtils.getConcept(CONCEPT_DATE_OF_DEATH),
+				MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY),
+				MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH),
+				MohCacheUtils.getConcept(CONCEPT_DECEASED),
+				MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED)))) {
 			this.setProperty("why", "DEAD");
 			this.setProperty("obsDate", formattedObsDate);
-			return true;
-		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DEATH_REPORTED_BY))) {
-			this.setProperty("why", "DEAD");
-			this.setProperty("obsDate", formattedObsDate);
-			return true;
-		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_CAUSE_FOR_DEATH))) {
-			this.setProperty("why", "DEAD");
-			this.setProperty("obsDate", formattedObsDate);
-			return true;
-		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_DECEASED))) {
-			this.setProperty("why", "DEAD");
-			this.setProperty("obsDate", formattedObsDate);
-			return true;
-		} else if (concept.equals(MohCacheUtils.getConcept(CONCEPT_PATIENT_DIED))) {
 			return true;
 		}
 
