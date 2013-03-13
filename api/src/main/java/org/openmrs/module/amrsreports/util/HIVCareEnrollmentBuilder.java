@@ -284,7 +284,27 @@ public class HIVCareEnrollmentBuilder {
 					"      and patient_id = ae.person_id" +
 					"      and voided =  0)";
 
-	private static final String QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS =
+//	private static final String QUERY_MARK_CONFLICTING_OBS =
+//			"update amrsreport_hiv_care_enrollment ae" +
+//					"  join person p on p.person_id = ae.person_id" +
+//					" set" +
+//					"  ae.enrollment_location_id = ae.first_positive_obs_location_id," +
+//					"  ae.enrollment_date = ae.first_positive_obs_date," +
+//					"  ae.enrollment_age = datediff(ae.first_positive_obs_date, p.birthdate) / 365.25," +
+//					"  ae.enrollment_reason = 'POSITIVE OBSERVATION'" +
+//					" where" +
+//					"  ae.report_date = ':reportDate'" +
+//					"  and ae.enrollment_reason is NULL" +
+//					"  and ae.last_positive_obs_date is not NULL" +
+//					"  and (" +
+//					"    ae.last_negative_obs_date is NULL" +
+//					"    or (" +
+//					"      ae.last_negative_obs_date is not NULL" +
+//					"      and ae.last_negative_obs_date < ae.last_positive_obs_date" +
+//					"    )" +
+//					"  )";
+
+	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS =
 			"update amrsreport_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
 					" set" +
@@ -294,32 +314,9 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.enrollment_reason = 'POSITIVE OBSERVATION'" +
 					" where" +
 					"  ae.enrollment_reason is NULL" +
-					"  and ae.last_positive_obs_date is not NULL" +
-					"  and (" +
-					"    ae.last_negative_obs_date is NULL" +
-					"    or (" +
-					"      ae.last_negative_obs_date is not NULL" +
-					"      and ae.last_negative_obs_date < ae.last_positive_obs_date" +
-					"    )" +
-					"  )";
+					"  and ae.last_positive_obs_date is not NULL";
 
-	private static final String QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS =
-			"update amrsreport_hiv_care_enrollment ae" +
-					"  join person p on p.person_id = ae.person_id" +
-					" set" +
-					"  ae.enrollment_location_id = ae.first_positive_obs_location_id," +
-					"  ae.enrollment_date = ae.first_positive_obs_date," +
-					"  ae.enrollment_age = datediff(ae.first_positive_obs_date, p.birthdate) / 365.25," +
-					"  ae.enrollment_reason = 'VERIFIED CONFLICTING OBSERVATIONS'" +
-					" where" +
-					"  ae.enrollment_reason is NULL" +
-					"  and ae.last_positive_obs_date is not NULL" +
-					"  and ae.last_negative_obs_date is not NULL" +
-					"  and ae.last_negative_obs_date >= ae.last_positive_obs_date" +
-					"  and ae.last_who_stage_date is not NULL" +
-					"  and ae.first_arv_date is not NULL";
-
-	private static final String QUERY_FILL_ENROLLMENT_FOR_ARV_ONLY =
+	private static final String QUERY_FILL_ENROLLMENT_FROM_ARVS =
 			"update amrsreport_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
 					" set" +
@@ -328,8 +325,14 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.enrollment_location_id = ae.first_arv_location_id," +
 					"  ae.enrollment_reason = 'ARVS'" +
 					" where" +
-					"  ae.enrollment_reason is NULL" +
-					"  and ae.last_positive_obs_date is NULL" +
+					"  (" +
+					"    ae.enrollment_reason is NULL" +
+					"    or (" +
+					"      ae.enrollment_reason = 'POSITIVE OBSERVATION'" +
+					"      and ae.enrollment_date > ae.first_arv_date" +
+					"    )" +
+					"  )" +
+					"  and ae.last_who_stage_date is not NULL" +
 					"  and ae.first_arv_date is not NULL";
 
 	public static void execute() {
@@ -363,14 +366,11 @@ public class HIVCareEnrollmentBuilder {
 		// fill out enrollment info for remainin patients with only adult encounters (Group A)
 		runQueryForDate(QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS);
 
-		// fill out enrollment info for remaining with non-conflicting observations (Groups B and C)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_NON_CONFLICTING_OBS);
+		// fill out enrollment info for remaining with any positive observation (Groups B and C)
+		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS);
 
-		// fill out enrollment info for conflicting observations with WHO Stage and on ARVs (Group D)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_CONFLICTING_OBS_WITH_WHO_AND_ARVS);
-
-		// fill out enrollment info for no positive observations but with ARVs (Group E)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FOR_ARV_ONLY);
+		// fill out enrollment info for patients taking ARVs if not found yet or if earlier than first positive obs (Group E)
+		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_ARVS);
 
 		// update everyone with transfer in status
 		runQueryForDate(QUERY_UPDATE_TRANSFER_INS);
