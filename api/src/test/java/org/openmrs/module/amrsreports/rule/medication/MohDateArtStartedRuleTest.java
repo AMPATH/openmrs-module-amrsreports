@@ -104,12 +104,12 @@ public class MohDateArtStartedRuleTest {
 		Map<String, Collection<OpenmrsObject>> exclusions = new HashMap<String, Collection<OpenmrsObject>>();
 		exclusions.put("concept", MohDateArtStartedRule.excludeQuestions);
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(exclusions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(exclusionObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(exclusionObs);
 
 		Map<String, Collection<OpenmrsObject>> questions = new HashMap<String, Collection<OpenmrsObject>>();
 		questions.put("concept", MohDateArtStartedRule.questionConcepts);
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(questions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(inclusionObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(inclusionObs);
 
 		// set up question concepts
 		questionConcepts = Arrays.<Concept>asList(

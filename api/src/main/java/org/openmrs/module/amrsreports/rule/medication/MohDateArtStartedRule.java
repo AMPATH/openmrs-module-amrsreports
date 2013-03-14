@@ -22,6 +22,7 @@ import org.openmrs.util.OpenmrsUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,9 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// ensure the patient qualifies for evaluation
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		restrictions.put("concept", excludeQuestions);
@@ -93,7 +97,7 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
 		// get the observations
-		List<Obs> observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+		List<Obs> observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction, evaluationDate);
 
 		// check them for reasons to exclude
 		for (Obs obs : observations) {
@@ -124,7 +128,7 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 		restrictions.put("concept", questionConcepts);
 
 		// get the observations
-		observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+		observations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction, evaluationDate);
 
 		// find the first qualifying observation
 		for (Obs obs : observations) {

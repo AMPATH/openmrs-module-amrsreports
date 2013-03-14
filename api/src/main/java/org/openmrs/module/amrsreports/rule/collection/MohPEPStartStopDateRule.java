@@ -11,6 +11,7 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.rule.MohEvaluableParameter;
 import org.openmrs.module.amrsreports.rule.medication.DrugStartStopDateRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -21,7 +22,9 @@ import org.openmrs.util.OpenmrsUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,6 +121,9 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
@@ -128,7 +134,7 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
 		List<Obs> observations = mohCoreService.getPatientObservationsWithEncounterRestrictions(
-				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
+				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction, evaluationDate);
 
 		List<Obs> startObs = new ArrayList<Obs>();
 		List<Obs> stopObs = new ArrayList<Obs>();
@@ -191,7 +197,9 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 	}
 
 	public Set<RuleParameterInfo> getParameterList() {
-		return null;
+		Set<RuleParameterInfo> parameterList = new HashSet<RuleParameterInfo>();
+		parameterList.add(new RuleParameterInfo(Date.class, true, new Date()));
+		return parameterList;
 	}
 
 	@Override

@@ -71,6 +71,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	 */
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		Patient patient = Context.getPatientService().getPatient(patientId);
 
 		try {
@@ -80,7 +84,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 			Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 			obsRestrictions.put("concept", questionConcepts);
 			MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-			List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+			List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 			// iterate through observations, flip flags and evaluate them as we go
 			for (Obs o : observations) {

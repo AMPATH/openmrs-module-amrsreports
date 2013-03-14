@@ -67,7 +67,7 @@ public class MohEnrollmentAgeRuleTest {
         // build the MOH Core service
         mohCoreService = Mockito.mock(MohCoreService.class);
         Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
-                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(encounters);
+                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(encounters);
 
         // set up Context
         PowerMockito.mockStatic(Context.class);

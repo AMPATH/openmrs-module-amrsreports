@@ -33,6 +33,7 @@ import org.openmrs.util.OpenmrsUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -91,6 +92,9 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 	@Override
 	protected Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// set up fetching of observations
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		restrictions.put("concept", questionConcepts);
@@ -98,7 +102,7 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
 		// get the observations
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, fetchRestriction, evaluationDate);
 
 		List<Concept> questionList = Arrays.asList(
 				MohCacheUtils.getConcept(ESTIMATED_DATE_OF_CONFINEMENT),

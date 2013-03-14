@@ -96,9 +96,11 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
-	public List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                            final MohFetchRestriction mohFetchRestriction) throws APIException {
-		return mohCoreDAO.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+	public List<Encounter> getPatientEncounters(final Integer patientId,
+	                                            final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                            final MohFetchRestriction mohFetchRestriction,
+	                                            final Date evaluationDate) throws APIException {
+		return mohCoreDAO.getPatientEncounters(patientId, restrictions, mohFetchRestriction, evaluationDate);
 	}
 
 	/**
@@ -106,14 +108,22 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
-	public List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                        final MohFetchRestriction mohFetchRestriction) throws APIException {
-		return mohCoreDAO.getPatientObservations(patientId, restrictions, mohFetchRestriction);
+	public List<Obs> getPatientObservations(final Integer patientId,
+	                                        final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                        final MohFetchRestriction mohFetchRestriction,
+	                                        final Date evaluationDate) throws APIException {
+		return mohCoreDAO.getPatientObservations(patientId, restrictions, mohFetchRestriction, evaluationDate);
 	}
 
 	@Override
-	public List<Obs> getPatientObservationsWithEncounterRestrictions(Integer patientId, Map<String, Collection<OpenmrsObject>> obsRestrictions, Map<String, Collection<OpenmrsObject>> encounterRestrictions, MohFetchRestriction mohFetchRestriction) throws APIException {
-		return mohCoreDAO.getPatientObservationsWithEncounterRestrictions(patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
+	public List<Obs> getPatientObservationsWithEncounterRestrictions(
+			Integer patientId,
+			Map<String, Collection<OpenmrsObject>> obsRestrictions,
+			Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+			MohFetchRestriction mohFetchRestriction,
+			Date evaluationDate) throws APIException {
+		return mohCoreDAO.getPatientObservationsWithEncounterRestrictions(
+				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction, evaluationDate);
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class MohPEPStartStopDateRuleTest {
 		// build the MOH Core service
 		mohCoreService = Mockito.mock(MohCoreService.class);
 		Mockito.when(mohCoreService.getPatientObservationsWithEncounterRestrictions(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);

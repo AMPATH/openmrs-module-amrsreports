@@ -85,7 +85,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		mohCoreService = Mockito.mock(MohCoreService.class);
 
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentObs);
 
 
 		// set up Context

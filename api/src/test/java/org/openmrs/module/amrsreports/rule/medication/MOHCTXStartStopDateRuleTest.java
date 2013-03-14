@@ -81,9 +81,9 @@ public class MOHCTXStartStopDateRuleTest {
 		));
 
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(currentStartObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStartObs);
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(currentStopObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStopObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);

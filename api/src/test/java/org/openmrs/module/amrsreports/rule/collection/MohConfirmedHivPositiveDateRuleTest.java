@@ -68,11 +68,11 @@ public class MohConfirmedHivPositiveDateRuleTest {
 
 		//return current Observations
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentObs);
 
 		//return current encounters
 		Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentEncounters);
+				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentEncounters);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);

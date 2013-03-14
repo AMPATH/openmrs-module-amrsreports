@@ -44,7 +44,10 @@ public class MohEnrollmentAgeRule extends MohEvaluableRule {
      */
     public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
-        try {
+	    // get evaluation date from logic context
+	    Date evaluationDate = context.getIndexDate();
+
+	    try {
 
             Patient patient = Context.getPatientService().getPatient(patientId);
 
@@ -57,7 +60,7 @@ public class MohEnrollmentAgeRule extends MohEvaluableRule {
             Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
             MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
             mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
-            List<Encounter> e = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+            List<Encounter> e = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
 //Iterate though encounters for the patient
 

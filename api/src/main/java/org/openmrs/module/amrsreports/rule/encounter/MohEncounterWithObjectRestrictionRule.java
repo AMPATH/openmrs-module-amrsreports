@@ -59,6 +59,9 @@ public class MohEncounterWithObjectRestrictionRule extends MohEncounterWithRestr
 	@SuppressWarnings("unchecked")
 	protected Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// this rule can process the following parameters:
 		// - list of encounter type (map key: EvaluableConstants.ENCOUNTER_TYPE)
 		// - list of location (map key: EvaluableConstants.LOCATION)
@@ -96,7 +99,7 @@ public class MohEncounterWithObjectRestrictionRule extends MohEncounterWithRestr
 		// call the core service to search for the matching encounters
 		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 		// pass the patient id, restrictions map and the fetch restriction in the service call
-		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
 		if (log.isDebugEnabled())
 			log.debug("Patient: " + patientId + ", encounters size:" + CollectionUtils.size(encounters));

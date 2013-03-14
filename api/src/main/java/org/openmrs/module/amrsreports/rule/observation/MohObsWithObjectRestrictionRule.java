@@ -15,6 +15,7 @@
 package org.openmrs.module.amrsreports.rule.observation;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,9 @@ public class MohObsWithObjectRestrictionRule extends MohObsWithRestrictionRule {
 	@SuppressWarnings("unchecked")
 	protected Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		Result result = new Result();
 
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
@@ -83,7 +87,7 @@ public class MohObsWithObjectRestrictionRule extends MohObsWithRestrictionRule {
 			mohFetchRestriction.setFetchOrdering(orderObject.toString());
 
 		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, mohFetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
 		for (Obs observation : observations)
 			result.add(new Result(observation));
