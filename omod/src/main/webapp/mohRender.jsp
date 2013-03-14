@@ -18,15 +18,6 @@
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
 <style type="text/css">
-    .tblformat tr:nth-child(odd) {
-        background-color: #009d8e;
-        color: #FFFFFF;
-    }
-
-    .tblformat tr:nth-child(even) {
-        background-color: #d3d3d3;
-        color: #000000;
-    }
 
     .visualPadding {
         margin: 1em;
@@ -44,23 +35,52 @@
 <script type="text/javascript">
 
     var reportDate;
+    var dateScheduled;
 
     $j(document).ready(function () {
         reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
         reportDate.setDate(new Date());
+
+        dateScheduled = new DatePicker("<openmrs:datePattern/>", "dateScheduled", { defaultDate: new Date() });
+        dateScheduled.setDate(new Date());
+
+        $j("#immediately").click(function(){
+            if ($j("#immediately").is(":checked")) {
+                $j("#dateScheduled").attr("disabled", "disabled");
+            } else {
+                $j("#dateScheduled").removeAttr("disabled");
+            }
+        });
     });
 
 </script>
 
 <%@ include file="localHeader.jsp" %>
 
+<c:if test="${not empty queuedReports}">
+
+    <b class="boxHeader">Queued Reports</b>
+    <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
+        <c:forEach var="r" items="${queuedReports}">
+            ${r.reportName} for ${r.location} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+                (run on ${r.dateScheduled}) <br/>
+        </c:forEach>
+    </div>
+    <br />
+</c:if>
+
 <b class="boxHeader">Run AMRS Reports</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form method="POST" name="amrsreportrenderer" action="mohRender.form">
         <fieldset class="visualPadding oneThird">
-            <legend>Report Date (as of)</legend>
-                <input type="text" name="reportDate" id="reportDate"/>
+            <legend>Dates</legend>
+                <label for="reportDate">Report Date (as of):</label>
+                <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
+                <label for="dateScheduled">Schedule Date (run at midnight on):</label>
+                <input type="text" name="dateScheduled" id="dateScheduled"/>
+                    <em>or</em>
+                <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
         </fieldset>
         <fieldset class="visualPadding oneThird">
             <legend>Location</legend>

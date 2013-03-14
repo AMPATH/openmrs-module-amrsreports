@@ -45,6 +45,8 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 
 	@Override
 	public List<QueuedReport> getAllQueuedReports() {
-		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class).list();
+		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
+				.addOrder(Order.asc("dateScheduled"))
+				.list();
 	}
 }
