@@ -41,6 +41,11 @@ public class MohRenderController {
 
 	private static final String SUCCESS_VIEW = "redirect:mohHistory.form";
 
+	@ModelAttribute("queuedReports")
+	public List<QueuedReport> getQueuedReports() {
+		return Context.getService(QueuedReportService.class).getAllQueuedReports();
+	}
+
 	@ModelAttribute("locations")
 	public List<Location> getLocations() {
 		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
@@ -59,27 +64,35 @@ public class MohRenderController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/mohRender.form")
-	public String processForm(HttpServletRequest request,
+	public void processForm(HttpServletRequest request,
+	                        @RequestParam(value = "immediate", required = false) Boolean immediate,
 	                        @RequestParam("reportDate") Date reportDate,
+	                        @RequestParam("dateScheduled") Date dateScheduled,
 	                        @RequestParam("location") Integer location,
 	                        @RequestParam("reportName") String reportName) throws Exception {
 
-		// find the specified values
+		// find the location
 		Location loc = Context.getLocationService().getLocation(location);
 
+		// create a queued report
 		QueuedReport queuedReport = new QueuedReport();
 		queuedReport.setLocation(loc);
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
-		queuedReport.setDateScheduled(new Date());
+		if (immediate == null)
+			queuedReport.setDateScheduled(dateScheduled);
+		else
+			queuedReport.setDateScheduled(new Date());
 
+		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
 		queuedReportService.saveQueuedReport(queuedReport);
 
+		// kindly respond
 		HttpSession httpSession = request.getSession();
-		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for immediate processing.");
+		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for processing.");
 
-		return SUCCESS_VIEW;
+//		return SUCCESS_VIEW;
 	}
 
 }
