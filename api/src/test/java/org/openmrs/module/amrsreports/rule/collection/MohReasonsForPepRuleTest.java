@@ -11,6 +11,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -52,6 +53,7 @@ public class MohReasonsForPepRuleTest {
 	private MohCoreService mohCoreService;
 
 	private MohReasonsForPepRule rule;
+	private LogicContext logicContext;
 
 	private List<Obs> currentObs;
 
@@ -78,7 +80,7 @@ public class MohReasonsForPepRuleTest {
 		// build the MOH Core service
 		mohCoreService = Mockito.mock(MohCoreService.class);
 		Mockito.when(mohCoreService.getPatientObservationsWithEncounterRestrictions(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -88,6 +90,11 @@ public class MohReasonsForPepRuleTest {
 
 		// create a rule instance
 		rule = new MohReasonsForPepRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
+
 	}
 
 	/**
@@ -126,7 +133,7 @@ public class MohReasonsForPepRuleTest {
 	@Test
 	public void evaluate_shouldRecognizeSEXUAL_ASSAULT() throws Exception {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.SEXUAL_ASSAULT, "16 Oct 1975");
-		Assert.assertEquals(new Result("SEXUAL ASSAULT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("SEXUAL ASSAULT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -136,7 +143,7 @@ public class MohReasonsForPepRuleTest {
 	@Test
 	public void evaluate_shouldRecognizeSPOUSES_PARTNER_SUSPECTED_HIV() throws Exception {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.SPOUSES_PARTNER_SUSPECTED_HIV, "16 Oct 1975");
-		Assert.assertEquals(new Result("SPOUSES PARTNER SUSPECTED HIV+"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("SPOUSES PARTNER SUSPECTED HIV+"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -146,7 +153,7 @@ public class MohReasonsForPepRuleTest {
 	@Test
 	public void evaluate_shouldRecognizePHYSICAL_ASSAULT() throws Exception {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.PHYSICAL_ASSAULT, "16 Oct 1975");
-		Assert.assertEquals(new Result("PHYSICAL ASSAULT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("PHYSICAL ASSAULT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -156,7 +163,7 @@ public class MohReasonsForPepRuleTest {
 	@Test
 	public void evaluate_shouldRecognizeOCCUPATIONAL_EXPOSURE() throws Exception {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.OCCUPATIONAL_EXPOSURE, "16 Oct 1975");
-		Assert.assertEquals(new Result("OCCUPATIONAL EXPOSURE"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("OCCUPATIONAL EXPOSURE"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -166,7 +173,7 @@ public class MohReasonsForPepRuleTest {
 	@Test
 	public void evaluate_shouldRecognizeOTHER_NON_CODED() throws Exception {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.OTHER_NON_CODED, "16 Oct 1975");
-		Assert.assertEquals(new Result("OTHER NON-CODED"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("OTHER NON-CODED"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -180,7 +187,7 @@ public class MohReasonsForPepRuleTest {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.PHYSICAL_ASSAULT, "19 Oct 1975");
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.SPOUSES_PARTNER_SUSPECTED_HIV, "20 Oct 1975");
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.SEXUAL_ASSAULT, "21 Oct 1975");
-		Assert.assertEquals(new Result("OTHER NON-CODED;OCCUPATIONAL EXPOSURE;PHYSICAL ASSAULT;SPOUSES PARTNER SUSPECTED HIV+;SEXUAL ASSAULT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("OTHER NON-CODED;OCCUPATIONAL EXPOSURE;PHYSICAL ASSAULT;SPOUSES PARTNER SUSPECTED HIV+;SEXUAL ASSAULT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -194,6 +201,6 @@ public class MohReasonsForPepRuleTest {
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.PHYSICAL_ASSAULT, "19 Oct 1975");
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohEvaluableNameConstants.NONE, "20 Oct 1975");
 		addObs(MohReasonsForPepRule.METHOD_OF_HIV_EXPOSURE, MohReasonsForPepRule.SEXUAL_ASSAULT, "21 Oct 1975");
-		Assert.assertEquals(new Result("OCCUPATIONAL EXPOSURE;PHYSICAL ASSAULT;SEXUAL ASSAULT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("OCCUPATIONAL EXPOSURE;PHYSICAL ASSAULT;SEXUAL ASSAULT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }

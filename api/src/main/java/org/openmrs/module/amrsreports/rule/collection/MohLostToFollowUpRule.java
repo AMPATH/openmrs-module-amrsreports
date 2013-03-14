@@ -23,6 +23,7 @@ import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,9 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		Patient patient = Context.getPatientService().getPatient(patientId);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
@@ -73,7 +77,7 @@ public class MohLostToFollowUpRule extends MohEvaluableRule {
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 		LostToFollowUpPatientSnapshot lostToFollowUpPatientSnapshot = new LostToFollowUpPatientSnapshot();
 

@@ -51,7 +51,7 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	 * @should properly format one start followed by two stops
 	 * @should properly format two start and stop periods
 	 */
-	protected Result getResult(final Integer patientId) throws LogicException {
+	protected Result getResult(final Integer patientId, Date evaluationDate) throws LogicException {
 
 		// set up query for observations in order by ascending date
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
@@ -60,11 +60,11 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 		fetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 
 		// get the start observations
-		List<Obs> startObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+		List<Obs> startObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction, evaluationDate);
 
 		// get the stop observations
 		restrictions.put("concept", stopConcepts);
-		List<Obs> stopObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction);
+		List<Obs> stopObservations = Context.getService(MohCoreService.class).getPatientObservations(patientId, restrictions, fetchRestriction, evaluationDate);
 
 		return buildResultFromObservations(startObservations, stopObservations);
 	}

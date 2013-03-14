@@ -12,11 +12,14 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.Date;
 
 /**
  * test class for MohEntryPointRule
@@ -33,6 +36,7 @@ public class MohEntryPointRuleTest {
 	private Patient patient;
 	private MohEntryPointRule rule;
 	private PersonAttributeType personAttributeType;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -72,6 +76,10 @@ public class MohEntryPointRuleTest {
 
 		// create a rule instance
 		rule = new MohEntryPointRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -96,7 +104,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnMVCTForMobileVoluntaryCounselingAndTesting() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.MOBILE_VOLUNTARY_COUNSELING_AND_TESTING);
-		Assert.assertEquals(new Result("MVCT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("MVCT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -106,7 +114,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnMCHForMaternalChildHealthProgram() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.MATERNAL_CHILD_HEALTH_PROGRAM);
-		Assert.assertEquals(new Result("MCH"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("MCH"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -116,7 +124,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnPMTCTForPreventionOfMotherToChildTransmissionOfHIV() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV);
-		Assert.assertEquals(new Result("PMTCT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("PMTCT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -126,7 +134,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnVCTForVoluntaryCounselingAndTestingCenter() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.VOLUNTARY_COUNSELING_AND_TESTING_CENTER);
-		Assert.assertEquals(new Result("VCT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("VCT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -136,7 +144,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnTBForTuberculosis() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.TUBERCULOSIS);
-		Assert.assertEquals(new Result("TB"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("TB"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -146,7 +154,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnHCTForHomeBasedTestingProgram() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.HOME_BASED_TESTING_PROGRAM);
-		Assert.assertEquals(new Result("HCT"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("HCT"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -156,7 +164,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnIPDForInpatientCareOrHospitalization() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.INPATIENT_CARE_OR_HOSPITALIZATION);
-		Assert.assertEquals(new Result("IPD"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("IPD"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -166,7 +174,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnPITCForProviderInitiatedTestingAndCounseling() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.PROVIDER_INITIATED_TESTING_AND_COUNSELING);
-		Assert.assertEquals(new Result("PITC"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("PITC"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -176,7 +184,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnPOCForPediatricOutpatientClinic() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.PEDIATRIC_OUTPATIENT_CLINIC);
-		Assert.assertEquals(new Result("POC"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("POC"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -186,7 +194,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnOtherForOtherNonCoded() throws Exception {
 		setPatientEntryPoint(MohEvaluableNameConstants.OTHER_NON_CODED);
-		Assert.assertEquals(new Result("Other"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Other"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -196,7 +204,7 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnOtherIfNoPointOfHIVTestingExists() throws Exception {
 		setPatientEntryPoint(null);
-		Assert.assertEquals(new Result("Other"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Other"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -206,6 +214,6 @@ public class MohEntryPointRuleTest {
 	@Test
 	public void evaluate_shouldReturnOtherIfPointOfHIVTestingIsNotRecognized() throws Exception {
 		setPatientEntryPoint("fake");
-		Assert.assertEquals(new Result("Other"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Other"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }

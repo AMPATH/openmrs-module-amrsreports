@@ -78,10 +78,12 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
-	public List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                        final MohFetchRestriction mohFetchRestriction) throws DAOException {
+	public List<Obs> getPatientObservations(final Integer patientId,
+	                                        final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                        final MohFetchRestriction mohFetchRestriction,
+	                                        final Date evaluationDate) throws DAOException {
 		// build the criteria
-		Criteria criteria = buildPatientObservationsCriteria(patientId, restrictions, mohFetchRestriction);
+		Criteria criteria = buildPatientObservationsCriteria(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
 		// process the observations
 		List<Obs> observations = processObs(criteria, mohFetchRestriction);
@@ -96,10 +98,11 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	public List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
 	                                                                 final Map<String, Collection<OpenmrsObject>> obsRestrictions,
 	                                                                 final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
-	                                                                 final MohFetchRestriction mohFetchRestriction) {
+	                                                                 final MohFetchRestriction mohFetchRestriction,
+	                                                                 final Date evaluationDate) {
 
 		// build the criteria
-		Criteria criteria = buildPatientObservationsCriteria(patientId, obsRestrictions, mohFetchRestriction);
+		Criteria criteria = buildPatientObservationsCriteria(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 		// add encounter criteria subquery
 		Encounter encounter = new Encounter();
@@ -163,7 +166,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	 */
 	private Criteria buildPatientObservationsCriteria(final Integer patientId,
 	                                                  final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                                  final MohFetchRestriction mohFetchRestriction) {
+	                                                  final MohFetchRestriction mohFetchRestriction,
+	                                                  final Date evaluationDate) {
 
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.eq("personId", patientId));
@@ -195,6 +199,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
 
+		criteria.add(Restrictions.le("obsDatetime", evaluationDate));
+
 		return criteria;
 	}
 
@@ -203,8 +209,10 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
-	public List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                            final MohFetchRestriction mohFetchRestriction) throws DAOException {
+	public List<Encounter> getPatientEncounters(final Integer patientId,
+	                                            final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                            final MohFetchRestriction mohFetchRestriction,
+	                                            final Date evaluationDate) throws DAOException {
 		// create a hibernate criteria on the encounter object
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Encounter.class);
 		// restrict the encounter that will be returned to specific patient only
@@ -218,6 +226,9 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		}
 		// add the ordering object to the criteria
 		criteria.addOrder(order);
+
+		// make sure we don't go past the evaluationDate
+		criteria.add(Restrictions.le("encounterDatetime", evaluationDate));
 
 		// always get from the first result
 		criteria.setFirstResult(0);

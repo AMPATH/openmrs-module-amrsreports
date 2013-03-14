@@ -16,6 +16,7 @@ import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,10 @@ public class MohLocationRule extends MohEvaluableRule {
 
 	@Override
 	protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
+
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		Result result = new Result();
 
 		//pull relevant observations then loop while checking concepts
@@ -53,7 +58,7 @@ public class MohLocationRule extends MohEvaluableRule {
 		obsRestrictions.put("concept", questionConcepts);
 		obsRestrictions.put("valueCoded", valueConcepts);
 		MohFetchRestriction mohFetchRestriction = new MohFetchRestriction();
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 		boolean foundEntry = false;
 

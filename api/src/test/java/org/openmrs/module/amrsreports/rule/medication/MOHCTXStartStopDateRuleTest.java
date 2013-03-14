@@ -10,6 +10,7 @@ import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -48,6 +49,7 @@ public class MOHCTXStartStopDateRuleTest {
 	private MohCoreService mohCoreService;
 
 	private MOHCTXStartStopDateRule rule;
+	private LogicContext logicContext;
 
 	private List<Obs> currentStartObs;
 	private List<Obs> currentStopObs;
@@ -81,9 +83,9 @@ public class MOHCTXStartStopDateRuleTest {
 		));
 
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(currentStartObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStartObs);
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions),
-				Mockito.any(MohFetchRestriction.class))).thenReturn(currentStopObs);
+				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStopObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -92,6 +94,10 @@ public class MOHCTXStartStopDateRuleTest {
 
 		// create a rule instance
 		rule = new MOHCTXStartStopDateRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -144,7 +150,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnPCP_PROPHYLAXIS_STARTEDWithNotNullAnswer() throws Exception {
 		addStartObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, MohEvaluableNameConstants.NONE, "16 Oct 1975");
-		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -154,7 +160,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldNotStartOnPCP_PROPHYLAXIS_STARTEDWithNullAnswer() throws Exception {
 		addStartObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, null, "17 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result(""), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -164,7 +170,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNotNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED, MohEvaluableNameConstants.NONE, "18 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -174,7 +180,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED, null, "19 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result(""), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -184,7 +190,7 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNotNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, MohEvaluableNameConstants.NONE, "20 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 20/10/1975"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 20/10/1975"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -194,6 +200,6 @@ public class MOHCTXStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNullAnswer() throws Exception {
 		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, null, "21 Oct 1975");
-		Assert.assertEquals(new Result(""), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result(""), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }

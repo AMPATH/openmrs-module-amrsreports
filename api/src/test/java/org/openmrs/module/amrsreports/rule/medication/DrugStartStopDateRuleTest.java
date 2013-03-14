@@ -76,8 +76,13 @@ public class DrugStartStopDateRuleTest {
 		Map<String, Collection<OpenmrsObject>> stopRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		stopRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{conceptService.getConcept(STOP_CONCEPT)}));
 
-		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentStartObs);
-		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions), Mockito.any(MohFetchRestriction.class))).thenReturn(currentStopObs);
+		Mockito.when(mohCoreService.getPatientObservations(
+				Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions), Mockito.any(MohFetchRestriction.class),
+				Mockito.any(Date.class))).thenReturn(currentStartObs);
+
+		Mockito.when(mohCoreService.getPatientObservations(
+				Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions), Mockito.any(MohFetchRestriction.class),
+				Mockito.any(Date.class))).thenReturn(currentStopObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -135,7 +140,7 @@ public class DrugStartStopDateRuleTest {
 	 */
 	@Test
 	public void getResult_shouldReturnBlankResultForNoDatesFound() throws Exception {
-		Assert.assertEquals(new Result(""), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result(""), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -145,7 +150,7 @@ public class DrugStartStopDateRuleTest {
 	@Test
 	public void getResult_shouldProperlyFormatASingleStartDate() throws Exception {
 		addStartObs("16 Oct 1975");
-		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -155,7 +160,7 @@ public class DrugStartStopDateRuleTest {
 	@Test
 	public void getResult_shouldProperlyFormatASingleStopDate() throws Exception {
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 16/10/1975"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("Unknown - 16/10/1975"), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -166,7 +171,7 @@ public class DrugStartStopDateRuleTest {
 	public void getResult_shouldProperlyFormatAStartAndStopDate() throws Exception {
 		addStartObs("12 Oct 1975");
 		addStopObs("16 Oct 1975");
-		Assert.assertEquals(new Result("12/10/1975 - 16/10/1975"), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result("12/10/1975 - 16/10/1975"), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -183,7 +188,7 @@ public class DrugStartStopDateRuleTest {
 				"12/10/1975 - Unknown",
 				"14/10/1975 - 16/10/1975");
 
-		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -200,7 +205,7 @@ public class DrugStartStopDateRuleTest {
 				"12/10/1975 - 14/10/1975",
 				"Unknown - 16/10/1975");
 
-		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -218,7 +223,7 @@ public class DrugStartStopDateRuleTest {
 				"12/10/1975 - 14/10/1975",
 				"16/10/1975 - 18/10/1975");
 
-		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID));
+		Assert.assertEquals(new Result(expected), rule.getResult(PATIENT_ID, new Date()));
 	}
 
 	/**
@@ -235,7 +240,7 @@ public class DrugStartStopDateRuleTest {
 
 		@Override
 		protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
-			return this.getResult(patientId);
+			return this.getResult(patientId, new Date());
 		}
 
 		@Override

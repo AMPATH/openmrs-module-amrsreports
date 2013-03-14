@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,9 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
@@ -90,7 +94,7 @@ public class MohReasonsForPepRule extends MohEvaluableRule {
 
 		// get the observations
 		List<Obs> observations = mohCoreService.getPatientObservationsWithEncounterRestrictions(
-				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction);
+				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction, evaluationDate);
 
 		// create the list of reasons
 		List<String> pepReasons = new ArrayList<String>();

@@ -8,10 +8,13 @@ import org.openmrs.Patient;
 import org.openmrs.PersonName;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.Date;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -24,12 +27,10 @@ import static org.junit.Assert.assertThat;
 public class MohNamesRuleTest {
 
 	private static final int PATIENT_ID = 5;
-
 	private Patient patient = new Patient();
-
 	private PatientService patientService;
-
 	private MohNamesRule rule;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -44,6 +45,10 @@ public class MohNamesRuleTest {
 
 		// create a rule instance
 		rule = new MohNamesRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -54,7 +59,7 @@ public class MohNamesRuleTest {
 	public void evaluate_shouldReturnTheFullNameOfAPatient() throws Exception {
 		PersonName personName = new PersonName("Frederick", "Robert", "Banks");
 		patient.addName(personName);
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Frederick Robert Banks")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Frederick Robert Banks")));
 	}
 
 }

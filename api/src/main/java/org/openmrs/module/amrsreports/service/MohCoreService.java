@@ -119,8 +119,11 @@ public interface MohCoreService extends OpenmrsService {
 	 */
 	@Transactional(readOnly=true)
 	@Authorized({PrivilegeConstants.VIEW_ENCOUNTERS})
-	List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws APIException;
+	List<Encounter> getPatientEncounters(
+			final Integer patientId,
+			final Map<String, Collection<OpenmrsObject>> restrictions,
+			final MohFetchRestriction mohFetchRestriction,
+			final Date evaluationDate) throws APIException;
 
 	/**
 	 * Get all patient observations that match the encounter , locations ,
@@ -139,12 +142,19 @@ public interface MohCoreService extends OpenmrsService {
 	 */
 	@Transactional(readOnly=true)
 	@Authorized({PrivilegeConstants.VIEW_OBS})
-	List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws APIException;
+	List<Obs> getPatientObservations(
+			final Integer patientId,
+			final Map<String, Collection<OpenmrsObject>> restrictions,
+			final MohFetchRestriction mohFetchRestriction,
+			final Date evaluationDate) throws APIException;
 
-	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId, final Map<String, Collection<OpenmrsObject>> obsRestrictions,
-	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
-	                                                          final MohFetchRestriction mohFetchRestriction) throws APIException;
+	@Transactional(readOnly=true)
+	List<Obs> getPatientObservationsWithEncounterRestrictions(
+			final Integer patientId,
+			final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+			final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+			final MohFetchRestriction mohFetchRestriction,
+			final Date evaluationDate) throws APIException;
 
 	@Transactional(readOnly=true)
 	List<PatientIdentifier> getAllPatientIdentifiers(Patient p);

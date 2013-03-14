@@ -11,6 +11,7 @@ import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -40,7 +41,11 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	public Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
-		return this.getResult(patientId);
+
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
+		return this.getResult(patientId, evaluationDate);
 	}
 
 	@Override

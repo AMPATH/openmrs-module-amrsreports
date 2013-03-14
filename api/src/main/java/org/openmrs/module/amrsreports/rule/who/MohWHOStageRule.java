@@ -22,6 +22,7 @@ import org.openmrs.util.OpenmrsUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,9 @@ public class MohWHOStageRule extends MohEvaluableRule {
 	@Override
 	protected Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		// pull relevant observations
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
@@ -93,7 +97,7 @@ public class MohWHOStageRule extends MohEvaluableRule {
 		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 		mohFetchRestriction.setSize(1);
 
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 		for (Obs WHOObs : observations) {
 			Concept value = WHOObs.getValueCoded();

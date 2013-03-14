@@ -51,6 +51,9 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 	 */
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
 
+		// get evaluation date from logic context
+		Date evaluationDate = context.getIndexDate();
+
 		//pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", Arrays.<OpenmrsObject>asList(new Concept[]{CONCEPT_ENZYME, CONCEPT_RAPID}));
@@ -60,7 +63,7 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 		mohFetchRestriction.setFetchOrdering(MohFetchOrdering.ORDER_ASCENDING);
 		mohFetchRestriction.setSize(1);
 
-		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction);
+		List<Obs> observations = mohCoreService.getPatientObservations(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
 
 		// return the first observation found
 		if (!observations.isEmpty()) {
@@ -74,7 +77,7 @@ public class MohConfirmedHivPositiveDateRule extends MohEvaluableRule {
 		Map<String, Collection<OpenmrsObject>> restrictions = new HashMap<String, Collection<OpenmrsObject>>();
 
 		// get the encounters
-		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction);
+		List<Encounter> encounters = mohCoreService.getPatientEncounters(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
 		// pull the first encounter date
 		if (!encounters.isEmpty()) {

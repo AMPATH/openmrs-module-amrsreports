@@ -14,6 +14,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
@@ -63,6 +64,7 @@ public class MohLostToFollowUpRuleTest {
 	private MohLostToFollowUpRule rule;
 	private List<Obs> currentObs;
 	private Encounter encounter;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -92,7 +94,7 @@ public class MohLostToFollowUpRuleTest {
 		// build the MOH Core service
 		mohCoreService = Mockito.mock(MohCoreService.class);
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID),
-				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class))).thenReturn(currentObs);
+				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentObs);
 
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
@@ -104,7 +106,9 @@ public class MohLostToFollowUpRuleTest {
 		// create a rule instance
 		rule = new MohLostToFollowUpRule();
 
-
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -179,7 +183,7 @@ public class MohLostToFollowUpRuleTest {
         patient.setDeathDate(deathDate);
 
         Assert.assertTrue("The Patient is alive", patient.getDead());
-        Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20/12/2012"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for DEAD not correct", new Result("DEAD | 20/12/2012"), rule.evaluate(logicContext, PATIENT_ID, null));
     }
 
     /**
@@ -191,7 +195,7 @@ public class MohLostToFollowUpRuleTest {
 
         addObs(LostToFollowUpPatientSnapshot.CONCEPT_TRANSFER_CARE_TO_OTHER_CENTER, LostToFollowUpPatientSnapshot.CONCEPT_AMPATH, "16 Oct 1975");
         Assert.assertEquals("current Obs size is wrong!", 1, currentObs.size());
-        Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16/10/1975"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Test for TO is wrong ", new Result("TO | (Ampath) 16/10/1975"), rule.evaluate(logicContext, PATIENT_ID, null));
     }
 
     /**
@@ -205,7 +209,7 @@ public class MohLostToFollowUpRuleTest {
         Assert.assertNotNull("A null Obs was encountered", currentObs);
         Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25/08/2012"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for LFTU using CONCEPT_RETURN_VISIT_DATE_EXP_CARE_NURSE tested negative", new Result("LTFU | 25/08/2012"), rule.evaluate(logicContext, PATIENT_ID, null));
     }
 
     /**
@@ -219,7 +223,7 @@ public class MohLostToFollowUpRuleTest {
         Assert.assertNotNull("A null Obs was encountered", currentObs);
         Assert.assertEquals("Returned wrong number for Obs", 1, currentObs.size());
 
-        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16/10/2012"), rule.evaluate(null, PATIENT_ID, null));
+        Assert.assertEquals("Result for LFTU using RETURN_VISIT_DATE tested negative", new Result("LTFU | 16/10/2012"), rule.evaluate(logicContext, PATIENT_ID, null));
 
     }
 }

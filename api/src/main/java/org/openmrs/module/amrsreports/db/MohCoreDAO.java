@@ -43,16 +43,21 @@ public interface MohCoreDAO {
 
 	Cohort getObservationCohort(List<Concept> concepts, Date startDate, Date endDate) throws DAOException;
 
-	List<Encounter> getPatientEncounters(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws DAOException;
+	List<Encounter> getPatientEncounters(final Integer patientId,
+	                                     final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                     final MohFetchRestriction mohFetchRestriction,
+	                                     final Date evaluationDate) throws DAOException;
 
-	List<Obs> getPatientObservations(final Integer patientId, final Map<String, Collection<OpenmrsObject>> restrictions,
-		final MohFetchRestriction mohFetchRestriction) throws DAOException;
+	List<Obs> getPatientObservations(final Integer patientId,
+	                                 final Map<String, Collection<OpenmrsObject>> restrictions,
+	                                 final MohFetchRestriction mohFetchRestriction,
+	                                 final Date evaluationDate) throws DAOException;
 
 	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
 	                                                          final Map<String,Collection<OpenmrsObject>> obsRestrictions,
 	                                                          final Map<String,Collection<OpenmrsObject>> encounterRestrictions,
-	                                                          final MohFetchRestriction mohFetchRestriction);
+	                                                          final MohFetchRestriction mohFetchRestriction,
+	                                                          final Date evaluationDate);
 
 	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
 
