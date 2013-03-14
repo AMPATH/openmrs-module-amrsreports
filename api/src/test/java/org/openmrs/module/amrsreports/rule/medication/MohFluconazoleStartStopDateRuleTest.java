@@ -11,6 +11,7 @@ import org.openmrs.OpenmrsObject;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -50,8 +51,8 @@ public class MohFluconazoleStartStopDateRuleTest {
 	private ConceptService conceptService;
 	private MohCoreService mohCoreService;
 
-	private Patient patient;
 	private MohFluconazoleStartStopDateRule rule;
+	private LogicContext logicContext;
 
 	private List<Obs> currentStartObs;
 	private List<Obs> currentStopObs;
@@ -96,6 +97,10 @@ public class MohFluconazoleStartStopDateRuleTest {
 
 		// create a rule instance
 		rule = new MohFluconazoleStartStopDateRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -148,7 +153,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnCRYPTOCOCCAL_TREATMENT_PLANIsSTART_DRUGS() throws Exception {
 		addStartObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
-		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("16/10/1975 - Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -158,7 +163,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStartOnCRYPTOCOSSUS_TREATMENT_STARTEDIsFLUCONAZOLE() throws Exception {
 		addStartObs(MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED, MohEvaluableNameConstants.FLUCONAZOLE, "17 Oct 1975");
-		Assert.assertEquals(new Result("17/10/1975 - Unknown"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("17/10/1975 - Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -168,7 +173,7 @@ public class MohFluconazoleStartStopDateRuleTest {
 	@Test
 	public void evaluate_shouldStopOnCRYPTOCOCCAL_TREATMENT_PLANIsSTOP_ALL() throws Exception {
 		addStopObs(MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL, "18 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result("Unknown - 18/10/1975"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
@@ -194,6 +199,6 @@ public class MohFluconazoleStartStopDateRuleTest {
 				"18/10/1975 - 19/10/1975"
 		);
 
-		Assert.assertEquals(new Result(expected), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }

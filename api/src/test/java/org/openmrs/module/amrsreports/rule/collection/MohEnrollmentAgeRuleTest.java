@@ -11,6 +11,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
@@ -31,121 +32,123 @@ import java.util.Locale;
 @PrepareForTest(Context.class)
 public class MohEnrollmentAgeRuleTest {
 
-    private String ENCOUNTER_TYPE_ADULT_INITIAL = "ADULTINITIAL";
-    private String ENCOUNTER_TYPE_ADULT_RETURN = "ADULTRETURN";
-    public String ENCOUNTER_TYPE_PEDIATRIC_INITIAL = "PEDSINITIAL";
-    private static final int PATIENT_ID = 11;
-    private Patient patient;
-    private PatientService patientService;
-    private MohCoreService mohCoreService;
-    private EncounterService encounterService;
+	private String ENCOUNTER_TYPE_ADULT_INITIAL = "ADULTINITIAL";
+	private String ENCOUNTER_TYPE_ADULT_RETURN = "ADULTRETURN";
+	public String ENCOUNTER_TYPE_PEDIATRIC_INITIAL = "PEDSINITIAL";
+	private static final int PATIENT_ID = 11;
+	private Patient patient;
+	private PatientService patientService;
+	private MohCoreService mohCoreService;
+	private EncounterService encounterService;
 
-    private MohEnrollmentAgeRule rule;
-    private List<Encounter> encounters;
+	private MohEnrollmentAgeRule rule;
+	private List<Encounter> encounters;
 
+	private LogicContext logicContext;
 
-    @Before
-    public void setup() {
+	@Before
+	public void setup() {
 
-        encounters = new ArrayList<Encounter>();
-        // build the patient
-        patient = new Patient();
+		encounters = new ArrayList<Encounter>();
+		// build the patient
+		patient = new Patient();
 
-        // build the mock patient service
-        patientService = Mockito.mock(PatientService.class);
-        Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
-
-
-        // build the mock services
-        encounterService = Mockito.mock(EncounterService.class);
-
-        Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_ADULT_INITIAL)).thenReturn(new EncounterType(0));
-        Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_ADULT_RETURN)).thenReturn(new EncounterType(1));
-        Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL)).thenReturn(new EncounterType(2));
+		// build the mock patient service
+		patientService = Mockito.mock(PatientService.class);
+		Mockito.when(patientService.getPatient(PATIENT_ID)).thenReturn(patient);
 
 
-        // build the MOH Core service
-        mohCoreService = Mockito.mock(MohCoreService.class);
-        Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
-                Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(encounters);
+		// build the mock services
+		encounterService = Mockito.mock(EncounterService.class);
 
-        // set up Context
-        PowerMockito.mockStatic(Context.class);
-        Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
-        Mockito.when(Context.getPatientService()).thenReturn(patientService);
-        Mockito.when(Context.getEncounterService()).thenReturn(encounterService);
-
-        // create a rule instance
-        rule = new MohEnrollmentAgeRule();
+		Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_ADULT_INITIAL)).thenReturn(new EncounterType(0));
+		Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_ADULT_RETURN)).thenReturn(new EncounterType(1));
+		Mockito.when(encounterService.getEncounterType(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL)).thenReturn(new EncounterType(2));
 
 
-    }
+		// build the MOH Core service
+		mohCoreService = Mockito.mock(MohCoreService.class);
+		Mockito.when(mohCoreService.getPatientEncounters(Mockito.eq(PATIENT_ID),
+				Mockito.anyMap(), Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(encounters);
 
-    /**
-     * generate a date from a string
-     *
-     * @param date
-     * @return
-     */
-    private Date makeDate(String date) {
-        try {
-            return new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).parse(date);
-        } catch (Exception e) {
-            // pass
-        }
-        return new Date();
-    }
+		// set up Context
+		PowerMockito.mockStatic(Context.class);
+		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
+		Mockito.when(Context.getPatientService()).thenReturn(patientService);
+		Mockito.when(Context.getEncounterService()).thenReturn(encounterService);
 
-    /**
-     * adds an encounter with the given type and date as the encounter datetime
-     *
-     * @param encounterType
-     * @param date
-     */
-    private void addEncounter(String encounterType, String date) {
-        Encounter encounter = new Encounter();
-        encounter.setEncounterType(encounterService.getEncounterType(encounterType));
-        encounter.setEncounterDatetime(makeDate(date));
-        encounters.add(encounter);
+		// create a rule instance
+		rule = new MohEnrollmentAgeRule();
 
-    }
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
+	}
 
+	/**
+	 * generate a date from a string
+	 *
+	 * @param date
+	 * @return
+	 */
+	private Date makeDate(String date) {
+		try {
+			return new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH).parse(date);
+		} catch (Exception e) {
+			// pass
+		}
+		return new Date();
+	}
 
-    /**
-     * @verifies return enrollment age for an adult
-     * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnEnrollmentAgeForAnAdult() throws Exception {
-        patient.setBirthdate(makeDate("16 Oct 1980"));
-        addEncounter(this.ENCOUNTER_TYPE_ADULT_INITIAL,"16 Oct 2010");
-        Assert.assertEquals("Test for adult tested false",new Result("29y"),rule.evaluate(null,PATIENT_ID,null));
+	/**
+	 * adds an encounter with the given type and date as the encounter datetime
+	 *
+	 * @param encounterType
+	 * @param date
+	 */
+	private void addEncounter(String encounterType, String date) {
+		Encounter encounter = new Encounter();
+		encounter.setEncounterType(encounterService.getEncounterType(encounterType));
+		encounter.setEncounterDatetime(makeDate(date));
+		encounters.add(encounter);
 
-    }
+	}
 
-    /**
-     * @verifies return enrollment age for a child
-     * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnEnrollmentAgeForAChild() throws Exception {
-        patient.setBirthdate(makeDate("16 Feb 2012"));
-        addEncounter(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL,"20 Dec 2012");
+	/**
+	 * @verifies return enrollment age for an adult
+	 * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnEnrollmentAgeForAnAdult() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 1980"));
+		addEncounter(this.ENCOUNTER_TYPE_ADULT_INITIAL, "16 Oct 2010");
+		Assert.assertEquals("Test for adult tested false", new Result("29y"), rule.evaluate(logicContext, PATIENT_ID, null));
 
-        Assert.assertEquals("Test for child tested false",new Result("10m"),rule.evaluate(null,PATIENT_ID,null));
-    }
+	}
 
-    /**
-     * @verifies return UNKNOWN result
-     * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnUNKNOWNResult() throws Exception {
+	/**
+	 * @verifies return enrollment age for a child
+	 * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnEnrollmentAgeForAChild() throws Exception {
+		patient.setBirthdate(makeDate("16 Feb 2012"));
+		addEncounter(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL, "20 Dec 2012");
 
-        addEncounter(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL,"20 Dec 2012");
+		Assert.assertEquals("Test for child tested false", new Result("10m"), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
 
-        Assert.assertEquals("Test with a null birthdate has tested false",new Result("Unknown"),rule.evaluate(null,PATIENT_ID,null));
-    }
+	/**
+	 * @verifies return UNKNOWN result
+	 * @see MohEnrollmentAgeRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnUNKNOWNResult() throws Exception {
+
+		addEncounter(this.ENCOUNTER_TYPE_PEDIATRIC_INITIAL, "20 Dec 2012");
+
+		Assert.assertEquals("Test with a null birthdate has tested false", new Result("Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
 
 
 }

@@ -9,6 +9,7 @@ import org.openmrs.ConceptSet;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -58,6 +59,7 @@ public class MohWHOStageRuleTest {
 	private MohCoreService mohCoreService;
 
 	private MohWHOStageRule rule;
+	private LogicContext logicContext;
 
 	private List<Obs> currentObs;
 
@@ -91,6 +93,10 @@ public class MohWHOStageRuleTest {
 
 		// create a rule instance
 		rule = new MohWHOStageRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -161,7 +167,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 1 ADULT - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 1 ADULT - 16/10/1975")));
 		}
 	}
 
@@ -175,7 +181,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 2 ADULT - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 2 ADULT - 16/10/1975")));
 		}
 	}
 
@@ -189,7 +195,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_ADULT).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 3 ADULT - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 3 ADULT - 16/10/1975")));
 		}
 	}
 
@@ -203,7 +209,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_ADULT).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 4 ADULT - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 4 ADULT - 16/10/1975")));
 		}
 	}
 
@@ -217,7 +223,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_PEDS).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 1 PEDS - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 1 PEDS - 16/10/1975")));
 		}
 	}
 
@@ -231,7 +237,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_PEDS).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 2 PEDS - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 2 PEDS - 16/10/1975")));
 		}
 	}
 
@@ -245,7 +251,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_PEDS).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 3 PEDS - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 3 PEDS - 16/10/1975")));
 		}
 	}
 
@@ -259,7 +265,7 @@ public class MohWHOStageRuleTest {
 		for (Concept value : conceptService.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_PEDS).getSetMembers()) {
 			resetObs();
 			addObs(question, value, "16 Oct 1975");
-			assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("WHO STAGE 4 PEDS - 16/10/1975")));
+			assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("WHO STAGE 4 PEDS - 16/10/1975")));
 		}
 	}
 
@@ -272,6 +278,6 @@ public class MohWHOStageRuleTest {
 		Concept question = conceptService.getConcept(MohEvaluableNameConstants.PEDS_WHO_SPECIFIC_CONDITION_QUERY);
 		resetObs();
 		addObs(question, conceptService.getConcept(MohEvaluableNameConstants.NONE), "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Unknown")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Unknown")));
 	}
 }

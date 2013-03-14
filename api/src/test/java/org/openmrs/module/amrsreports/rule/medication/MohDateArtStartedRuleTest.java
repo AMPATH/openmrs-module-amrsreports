@@ -9,6 +9,7 @@ import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -74,6 +75,7 @@ public class MohDateArtStartedRuleTest {
 	private MohCoreService mohCoreService;
 
 	private MohDateArtStartedRule rule;
+	private LogicContext logicContext;
 
 	private List<Obs> exclusionObs;
 	private List<Obs> inclusionObs;
@@ -119,6 +121,10 @@ public class MohDateArtStartedRuleTest {
 
 		// create a rule instance
 		rule = new MohDateArtStartedRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -180,47 +186,47 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldReturnFirstObsDateForANTIRETROVIRAL_PLANInAllowedAnswers() throws Exception {
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("16/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CONTINUE_REGIMEN, "17 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("17/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CHANGE_FORMULATION, "18 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("18/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.CHANGE_REGIMEN, "19 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("19/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("19/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.REFILLED, "20 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("20/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("20/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.NOT_REFILLED, "21 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("21/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("21/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DRUG_SUBSTITUTION, "22 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("22/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("22/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DRUG_RESTART, "23 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("23/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("23/10/1975")));
 
 		inclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.DOSING_CHANGE, "24 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("24/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("24/10/1975")));
 	}
 
 	/**
@@ -230,7 +236,7 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldReturnFirstValueDateForANTIRETROVIRAL_DRUG_TREATMENT_START_DATE() throws Exception {
 		addDateObs(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE, "17 Oct 1975", "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("17/10/1975")));
 	}
 
 	/**
@@ -241,7 +247,7 @@ public class MohDateArtStartedRuleTest {
 	public void evaluate_shouldReturnFirstDateForMixedValidObservations() throws Exception {
 		addDateObs(MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE, "17 Oct 1975", "16 Oct 1975");
 		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "18 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/1975")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("17/10/1975")));
 	}
 
 	/**
@@ -252,13 +258,13 @@ public class MohDateArtStartedRuleTest {
 	public void evaluate_shouldExcludeIfREASON_ANTIRETROVIRALS_STARTEDIsInExcludedReasons() throws Exception {
 		addObs(MohEvaluableNameConstants.REASON_ANTIRETROVIRALS_STARTED,
 				MohEvaluableNameConstants.TOTAL_MATERNAL_TO_CHILD_TRANSMISSION_PROPHYLAXIS, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.REASON_ANTIRETROVIRALS_STARTED,
 				MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 	}
 
@@ -270,7 +276,7 @@ public class MohDateArtStartedRuleTest {
 	public void evaluate_shouldExcludeIfPATIENT_REPORTED_REASON_FOR_CURRENT_ANTIRETROVIRALS_STARTEDIsPREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV() throws Exception {
 		addObs(MohEvaluableNameConstants.PATIENT_REPORTED_REASON_FOR_CURRENT_ANTIRETROVIRALS_STARTED,
 				MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 	}
 
 	/**
@@ -280,7 +286,7 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldExcludeIfNEWBORN_PROPHYLACTIC_ANTIRETROVIRAL_USEIsTRUE() throws Exception {
 		addObs(MohEvaluableNameConstants.NEWBORN_PROPHYLACTIC_ANTIRETROVIRAL_USE, "TRUE", "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 	}
 
 	/**
@@ -290,36 +296,36 @@ public class MohDateArtStartedRuleTest {
 	@Test
 	public void evaluate_shouldExcludeIfNEWBORN_ANTIRETROVIRAL_USEIsInExcludedNewbornARVs() throws Exception {
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.STAVUDINE, "16 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.LAMIVUDINE, "17 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.NEVIRAPINE, "18 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.NELFINAVIR, "19 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, "LOPINAVIR AND RITONAVIR", "20 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.ZIDOVUDINE, "21 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 
 		exclusionObs.clear();
 
 		addObs(MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE, MohEvaluableNameConstants.OTHER_NON_CODED, "22 Oct 1975");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("Excluded")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("Excluded")));
 	}
 }

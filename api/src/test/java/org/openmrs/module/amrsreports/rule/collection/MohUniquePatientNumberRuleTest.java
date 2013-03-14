@@ -12,10 +12,13 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.Date;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -39,6 +42,7 @@ public class MohUniquePatientNumberRuleTest {
 	private AdministrationService administrationService;
 
 	private MohUniquePatientNumberRule rule;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -73,6 +77,10 @@ public class MohUniquePatientNumberRuleTest {
 
 		// create a rule instance
 		rule = new MohUniquePatientNumberRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	private void addCCCNumber(String cccNumber) {
@@ -86,7 +94,7 @@ public class MohUniquePatientNumberRuleTest {
 	 */
 	@Test
 	public void evaluate_shouldReturnNotFoundIfNoUniquePatientNumberExists() throws Exception {
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("not found")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("not found")));
 	}
 
 	/**
@@ -96,6 +104,6 @@ public class MohUniquePatientNumberRuleTest {
 	@Test
 	public void evaluate_shouldReturnAUniquePatientNumber() throws Exception {
 		addCCCNumber("11740-00001");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("11740-00001")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("11740-00001")));
 	}
 }

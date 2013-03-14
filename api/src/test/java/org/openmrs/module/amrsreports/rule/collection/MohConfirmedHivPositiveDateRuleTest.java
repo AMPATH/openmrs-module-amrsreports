@@ -9,6 +9,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -46,6 +47,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	private List<Obs> currentObs;
 	private List<Encounter> currentEncounters;
 	private MohConfirmedHivPositiveDateRule rule;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -80,6 +82,10 @@ public class MohConfirmedHivPositiveDateRuleTest {
 		Mockito.when(Context.getService(MohCoreService.class)).thenReturn(mohCoreService);
 
 		rule = new MohConfirmedHivPositiveDateRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -123,7 +129,6 @@ public class MohConfirmedHivPositiveDateRuleTest {
 		currentEncounters.add(encounter);
 	}
 
-
 	/**
 	 * @verifies return the the first date a patient was confirmed HIV positive using HIV_ENZYME_IMMUNOASSAY_QUALITATIVE test
 	 * @see MohConfirmedHivPositiveDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
@@ -131,7 +136,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_ENZYME_IMMUNOASSAY_QUALITATIVETest() throws Exception {
 		addObs(MohEvaluableNameConstants.HIV_ENZYME_IMMUNOASSAY_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("16/10/2012")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("16/10/2012")));
 	}
 
 	/**
@@ -141,7 +146,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheFirstDateAPatientWasConfirmedHIVPositiveUsingHIV_RAPID_TEST_QUALITATIVETest() throws Exception {
 		addObs(MohEvaluableNameConstants.HIV_RAPID_TEST_QUALITATIVE, MohEvaluableNameConstants.POSITIVE, "17 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("17/10/2012")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("17/10/2012")));
 	}
 
 	/**
@@ -150,7 +155,7 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	 */
 	@Test
 	public void evaluate_shouldReturnResultForAPatientWhoIsHIVNegative() throws Exception {
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result(MohEvaluableNameConstants.UNKNOWN)));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result(MohEvaluableNameConstants.UNKNOWN)));
 	}
 
 	/**
@@ -160,6 +165,6 @@ public class MohConfirmedHivPositiveDateRuleTest {
 	@Test
 	public void evaluate_shouldReturnTheDateForTheFirstEncounter() throws Exception {
 		addEncounter("18 Oct 2012");
-		assertThat(rule.evaluate(null, PATIENT_ID, null), is(new Result("18/10/2012")));
+		assertThat(rule.evaluate(logicContext, PATIENT_ID, null), is(new Result("18/10/2012")));
 	}
 }

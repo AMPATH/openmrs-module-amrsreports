@@ -11,6 +11,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -51,7 +52,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 			MohEvaluableNameConstants.HIV_DNA_PCR,
 			MohEvaluableNameConstants.POSITIVE,
 			MohEvaluableNameConstants.CD4_BY_FACS,
-            MohEvaluableNameConstants.CD4_PERCENT
+			MohEvaluableNameConstants.CD4_PERCENT
 	);
 
 	private static final int PATIENT_ID = 5;
@@ -61,6 +62,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	private MohCoreService mohCoreService;
 	private MohDateAndReasonMedicallyEligibleForARTRule rule;
 	private List<Obs> currentObs;
+	private LogicContext logicContext;
 
 	@Before
 	public void setup() {
@@ -95,6 +97,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		Mockito.when(Context.getPatientService()).thenReturn(patientService);
 
 		rule = new MohDateAndReasonMedicallyEligibleForARTRule();
+
+		// initialize logic context
+		logicContext = Mockito.mock(LogicContext.class);
+		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
 	}
 
 	/**
@@ -140,63 +146,67 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		currentObs.add(obs);
 	}
 
-    /**
-     * @verifies return REASON_CLINICAL_CD4ForAdults
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
+	/**
+	 * @verifies return REASON_CLINICAL_CD4ForAdults
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
+	 *      java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
 		Date dob = makeDate("16 Oct 1975");
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_1_ADULT, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "16 Oct 2012");
 
-		Assert.assertEquals("REASON_CLINICAL_CD4ForAdults tested false", new Result("16/10/2012 - Clinical + CD4"), rule.evaluate(null, PATIENT_ID, null));
+		Assert.assertEquals("REASON_CLINICAL_CD4ForAdults tested false", new Result("16/10/2012 - Clinical + CD4"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
-    /**
-     * @verifies return REASON_CLINICALForAdults
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
+	/**
+	 * @verifies return REASON_CLINICALForAdults
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
+	 *      java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
 
 		Date dob = makeDate("16 Oct 1975");
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_4_ADULT, "16 Oct 2012");
-        Assert.assertEquals("Current Obs is null", 1, currentObs.size());
+		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
 
-		Assert.assertEquals("REASON_CLINICALForAdults tested false",new Result("16/10/2012 - Clinical Only"),rule.evaluate(null,PATIENT_ID,null));
+		Assert.assertEquals("REASON_CLINICALForAdults tested false", new Result("16/10/2012 - Clinical Only"), rule.evaluate(logicContext, PATIENT_ID, null));
 
 
 	}
 
-    /**
-     * @verifies return REASON_CLINICALForPeds
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
+	/**
+	 * @verifies return REASON_CLINICALForPeds
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
+	 *      java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2006");
 		patient.setBirthdate(dob);
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Oct 2012");
-        Assert.assertEquals("Current Obs is null", 1, currentObs.size());
+		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
 
-		Assert.assertEquals("Result for REASON_CLINICALForPeds tested false",new Result("16/10/2012 - Clinical Only"),rule.evaluate(null,PATIENT_ID,null));
+		Assert.assertEquals("Result for REASON_CLINICALForPeds tested false", new Result("16/10/2012 - Clinical Only"), rule.evaluate(logicContext, PATIENT_ID, null));
 
 
 	}
 
-    /**
-     * @verifies return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
+	/**
+	 * @verifies return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
+	 *      java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2012");
 		patient.setBirthdate(dob);
@@ -205,18 +215,19 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 
-        Assert.assertEquals("Current Obs is null", 3, currentObs.size());
-		Assert.assertEquals("Result for REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds tested false",new Result("16/10/2012 - Clinical + CD4 + HIV DNA PCR"),rule.evaluate(null,PATIENT_ID,null));
+		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+		Assert.assertEquals("Result for REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds tested false", new Result("16/10/2012 - Clinical + CD4 + HIV DNA PCR"), rule.evaluate(logicContext, PATIENT_ID, null));
 
 
 	}
 
-    /**
-     * @verifies return REASON_CLINICAL_CD4ForPeds
-     * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
-     */
-    @Test
-    public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
+	/**
+	 * @verifies return REASON_CLINICAL_CD4ForPeds
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
+	 *      java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
 
 		Date dob = makeDate("16 Oct 2010");
 		patient.setBirthdate(dob);
@@ -225,8 +236,8 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 20d, "16 Oct 2012");
 
-        Assert.assertEquals("Current Obs is null", 3, currentObs.size());
-		Assert.assertEquals("Result for REASON_CLINICAL_CD4ForPeds tested false",new Result("16/10/2012 - Clinical + CD4"),rule.evaluate(null,PATIENT_ID,null));
+		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
+		Assert.assertEquals("Result for REASON_CLINICAL_CD4ForPeds tested false", new Result("16/10/2012 - Clinical + CD4"), rule.evaluate(logicContext, PATIENT_ID, null));
 
 
 	}
