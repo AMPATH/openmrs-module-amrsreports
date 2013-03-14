@@ -152,26 +152,28 @@
 
 <%@ include file="localHeader.jsp"%>
 
+<c:if test="${not empty queuedReports}">
+
+    <b class="boxHeader">Queued Reports</b>
+    <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
+            <c:forEach var="r" items="${queuedReports}">
+                ${r.reportName} for ${r.location} as of ${r.evaluationDate} (run on ${r.dateScheduled}) <br/>
+            </c:forEach>
+    </div>
+    <br />
+</c:if>
+
 <b class="boxHeader">View AMRS Reports</b>
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-	<form action="mohHistory.form" method="POST">
-		<table>
-			<tr>
-				<td>Select file For location</td>
-				<td>
-					<select name="history" id="history" onchange="clearDataTable()" >
-						<c:forEach var="rpthistory" items="${reportHistory}">
-							<option  value="${rpthistory}">${rpthistory}</option>
-						</c:forEach>
-					</select>
-				</td>
-				<td>
-					<input type="submit" value="View" id="collectFile">
-				</td>
-			</tr>
-		</table>
-	</form>
+    <form action="mohHistory.form" method="POST">
+        <label>Select file For location</label> <br/>
+        <c:forEach var="rpthistory" items="${reportHistory}">
+            <input type="radio" name="history" value="${rpthistory}"/> ${rpthistory} <br/>
+        </c:forEach>
+        <input type="submit" value="View" id="collectFile">
+    </form>
 </div>
+<br />
 
 <c:if test="${not empty records}">
 	<b class="boxHeader">Report Details</b>

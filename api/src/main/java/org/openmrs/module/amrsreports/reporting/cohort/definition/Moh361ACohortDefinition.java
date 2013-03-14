@@ -14,22 +14,22 @@ import java.util.List;
 @Localized("reporting.MOH361ACohortDefinition")
 public class Moh361ACohortDefinition extends BaseCohortDefinition {
 
-	@ConfigurationProperty(group = "otherGroup")
-	private List<Location> locationList;
-
-	public List<Location> getLocationList() {
-		return locationList;
-	}
-
-	public void setLocationList(final List<Location> locationList) {
-		this.locationList = locationList;
-	}
-
-	public void addLocation(Location location) {
-		if (locationList == null) {
-			locationList = new ArrayList<Location>();
-		}
-		locationList.add(location);
-	}
+//	@ConfigurationProperty(group = "otherGroup")
+//	private List<Location> locationList;
+//
+//	public List<Location> getLocationList() {
+//		return locationList;
+//	}
+//
+//	public void setLocationList(final List<Location> locationList) {
+//		this.locationList = locationList;
+//	}
+//
+//	public void addLocation(Location location) {
+//		if (locationList == null) {
+//			locationList = new ArrayList<Location>();
+//		}
+//		locationList.add(location);
+//	}
 
 }

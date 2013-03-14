@@ -32,6 +32,7 @@ import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
+import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,4 +208,5 @@ public interface MohCoreService extends OpenmrsService {
 
 	@Transactional
 	public Map<Integer,WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
+
 }

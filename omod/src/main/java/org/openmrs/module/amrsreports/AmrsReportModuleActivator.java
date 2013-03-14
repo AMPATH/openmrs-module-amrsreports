@@ -16,6 +16,8 @@ package org.openmrs.module.amrsreports;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.Activator;
+import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider;
+import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -30,6 +32,8 @@ public class AmrsReportModuleActivator implements Activator {
 	 */
 	public void startup() {
 		log.info("Starting AMRS Reporting Module");
+
+		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider());
 	}
 	
 	/**

@@ -1,15 +1,17 @@
-package org.openmrs.module.amrsreports.reporting;
+package org.openmrs.module.amrsreports.reporting.provider;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MOHPersonNameConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MOHSerialNumberConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
@@ -27,11 +29,17 @@ import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefin
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 
 /**
- * Renders the MOH 361A Pre-ART Register
+ * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */
-public class MOH361AReport {
+public class MOH361AReportProvider implements ReportProvider {
 
-	public static ReportDefinition getReportDefinition() {
+	@Override
+	public String getName() {
+		return "MOH 361A";
+	}
+
+	@Override
+	public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
 
@@ -147,6 +155,11 @@ public class MOH361AReport {
 		report.addDataSetDefinition(dsd, null);
 
 		return report;
+	}
+
+	@Override
+	public CohortDefinition getCohortDefinition() {
+		return new Moh361ACohortDefinition();
 	}
 
 }

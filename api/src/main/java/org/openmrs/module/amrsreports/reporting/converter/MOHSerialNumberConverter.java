@@ -10,6 +10,9 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 public class MOHSerialNumberConverter implements DataConverter {
 	@Override
 	public Object convert(Object original) {
+		if (!(original instanceof PatientIdentifier))
+			return "Invalid";
+
 		PatientIdentifier identifier = (PatientIdentifier) original;
 		if (identifier == null)
 			return "";

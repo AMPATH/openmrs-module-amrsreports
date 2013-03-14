@@ -8,16 +8,18 @@
                 Run AMRS Reports
             </a>
         </li>
-        <li <c:if test='<%= request.getRequestURI().contains("cohortCounts") %>'>class="active"</c:if>>
-            <a href="${pageContext.request.contextPath}/module/amrsreports/cohortCounts.list">
-                View Cohort Counts
-            </a>
-        </li>
     </openmrs:hasPrivilege>
     <openmrs:hasPrivilege privilege="View Reports">
         <li <c:if test='<%= request.getRequestURI().contains("mohHistory") %>'>class="active"</c:if>>
             <a href="${pageContext.request.contextPath}/module/amrsreports/mohHistory.form">
                 View AMRS Reports
+            </a>
+        </li>
+    </openmrs:hasPrivilege>
+    <openmrs:hasPrivilege privilege="Run Reports">
+        <li <c:if test='<%= request.getRequestURI().contains("cohortCounts") %>'>class="active"</c:if>>
+            <a href="${pageContext.request.contextPath}/module/amrsreports/cohortCounts.list">
+                View Cohort Counts
             </a>
         </li>
     </openmrs:hasPrivilege>

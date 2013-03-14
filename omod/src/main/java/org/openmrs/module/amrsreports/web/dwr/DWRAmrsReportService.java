@@ -256,7 +256,7 @@ public class DWRAmrsReportService {
 		context.addParameterValue("endDate", evaluationDate);
 
 		Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("locationList", location);
+		context.addParameterValue("location", location);
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
 
