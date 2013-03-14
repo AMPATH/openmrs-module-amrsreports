@@ -38,7 +38,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						" where " +
 						"  enrollment_date is not NULL" +
 						"  and enrollment_date <= ':reportDate'" +
-						"  and enrollment_location_id in (:locationList)";
+						"  and enrollment_location_id = :location";
 
 		SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));
 

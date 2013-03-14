@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openmrs.module.amrsreports">
+	<class name="org.openmrs.module.amrsreports.QueuedReport" table="amrsreports_queued_report">
+
+        <id column="queued_report_id" name="id" type="int" unsaved-value="0">
+			<generator class="native"/>
+		</id>
+		<discriminator column="queued_report_id" insert="false"/>
+
+        <property name="reportName" type="java.lang.String" column="report_name" not-null="true"/>
+        <many-to-one class="org.openmrs.Location" name="location" column="location_id" not-null="true"/>
+        <property name="dateScheduled" type="java.util.Date" column="date_scheduled" not-null="true" length="19" />
+        <property name="evaluationDate" type="java.util.Date" column="evaluation_date" not-null="true" length="19" />
+
+        <property length="38" name="uuid" type="java.lang.String" unique="true"/>
+	</class>
+</hibernate-mapping>

@@ -17,11 +17,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.QueuedReport;
+import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +36,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MohHistoryController {
 
 	private static final Log log = LogFactory.getLog(MohHistoryController.class);
+
+	@ModelAttribute("queuedReports")
+	public List<QueuedReport> getQueuedReports() {
+		return Context.getService(QueuedReportService.class).getAllQueuedReports();
+	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/mohHistory.form")
 	public void preparePage(ModelMap map) {
@@ -83,7 +91,7 @@ public class MohHistoryController {
 			map.addAttribute("filetodownload", amrsFile);
 
 			//add the splitted one per the credentials
-			String[] splitFileLocTime = history.split("-");
+			String[] splitFileLocTime = history.split("_");
 			String loci = splitFileLocTime[0];
 			String time = splitFileLocTime[1];
 
@@ -93,16 +101,6 @@ public class MohHistoryController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	static String stripLeadingAndTrailingQuotes(String str) {
-		if (str.startsWith("\"")) {
-			str = str.substring(1, str.length());
-		}
-		if (str.endsWith("\"")) {
-			str = str.substring(0, str.length() - 1);
-		}
-		return str;
 	}
 
 	@RequestMapping(value = "/module/amrsreports/downloadcsv")

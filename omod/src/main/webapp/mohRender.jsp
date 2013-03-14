@@ -46,111 +46,11 @@
     var reportDate;
 
     $j(document).ready(function () {
-
-        var ty = $j('#tblMain').dataTable({
-            "bJQueryUI":false,
-            "sPaginationType":"full_numbers",
-            "sDom":'T<"clear">lfrtip',
-            "oTableTools":{
-                "sRowSelect":"single",
-                "aButtons":[
-                    "print"
-                ]
-            }
-        });
-
-        $j('#tblMain').delegate('tbody td #imgrender', 'click', function () {
-            var trow = this.parentNode.parentNode;
-            var aData21 = ty.fnGetData(trow);
-            var amrsid1 = aData21[1].trim();
-            DWRAmrsReportService.viewMoreDetailsRender("${fileToManipulate}", amrsid1, processThis);
-
-        });
-
-        $j("#dlgData").dialog({
-            autoOpen:false,
-            modal:true,
-            show:'slide',
-            height:'auto',
-            hide:'slide',
-            width:600,
-            cache:false,
-            position:'top',
-            buttons:{
-                "Exit":function () {
-                    $j(this).dialog("close");
-                }
-            }
-        });
-
-        function processThis(data) {
-            $j("#dlgData").empty();
-            var listSplit = data.split(",");
-
-            maketable(listSplit);
-
-            $j("#dlgData").dialog("open");
-        }
-
-        $j('#csvdownload').click(function () {
-            window.open("downloadcsvR.htm?fileToImportToCSV=${fileToManipulate}", 'Download csv');
-            return false;
-        });
-
         reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
         reportDate.setDate(new Date());
     });
 
-    function clearDataTable() {
-        var hidepic = document.getElementById("maindetails");
-        var titleheader = document.getElementById("titleheader");
-        hidepic.style.display = 'none';
-        titleheader.style.display = 'none';
-    }
-
-    function maketable(info1) {
-        row = new Array();
-        cell = new Array();
-
-        row_num = info1.length; //edit this value to suit
-
-        tab = document.createElement('table');
-        tab.setAttribute('id', 'tblSummary');
-        tab.setAttribute('border', '0');
-        tab.setAttribute('cellspacing', '2');
-        tab.setAttribute('class', 'tblformat');
-
-        tbo = document.createElement('tbody');
-
-        for (c = 0; c < row_num; c++) {
-            var rowElement = info1[c].split(":");
-            row[c] = document.createElement('tr');
-
-            for (k = 0; k < rowElement.length; k++) {
-                cell[k] = document.createElement('td');
-                cont = document.createTextNode(rowElement[k])
-                cell[k].appendChild(cont);
-                row[c].appendChild(cell[k]);
-            }
-            tbo.appendChild(row[c]);
-        }
-        tab.appendChild(tbo);
-        document.getElementById('dlgData').appendChild(tab);
-    }
 </script>
-
-<c:if test="${not empty loci}">
-    <div id="titleheader">
-        <table align="right">
-            <tr>
-                <td><b>History Report for:</b></td>
-                <td><u>${loci}</u></td>
-                <td><b>As at:</b></td>
-                <td><u>${time}</u></td>
-            </tr>
-        </table>
-    </div>
-</c:if>
 
 <%@ include file="localHeader.jsp" %>
 
@@ -170,43 +70,12 @@
         </fieldset>
         <fieldset class="visualPadding oneThird">
             <legend>Reports</legend>
-            <input type="radio" name="hardcoded" value="ack" checked="checked"/> MOH 361A <br/>
+            <c:forEach var="reportName" items="${reportNames}">
+                <input type="radio" name="reportName" value="${reportName}"/> ${reportName} <br/>
+            </c:forEach>
         </fieldset>
-        <input id="submitButton" class="visualPadding newline" type="submit" value="View"/>
+        <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
     </form>
 </div>
-
-<c:if test="${not empty records}">
-    <div id="printbuttons" align="right">
-        <input type="button" id="csvdownload" value="Download CSV Format">
-    </div>
-
-    <table id="tblMain">
-        <thead>
-        <tr>
-            <th>View</th>
-            <c:forEach var="column" items="${columnHeaders}">
-                <th>${column.label}</th>
-            </c:forEach>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach var="row" items="${records}">
-            <tr>
-                <td><img
-                        src="${pageContext.request.contextPath}/moduleResources/amrsreports/images/format-indent-more.png"
-                        id="imgrender"/></td>
-                <c:forEach var="cell" items="${row}">
-                    <td>${cell}</td>
-                </c:forEach>
-            </tr>
-        </c:forEach>
-        </tbody>
-    </table>
-</c:if>
-
-<div id="dlgData" title="Patients More Information"></div>
-
-<input type="hidden" value="${fileToManipulate}" name="fileToImportToCSV">
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

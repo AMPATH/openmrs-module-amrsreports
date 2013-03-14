@@ -60,7 +60,7 @@ public class CohortCountController {
 			if (location != null) {
 
 				Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
-				definition.addLocation(location);
+//				definition.addLocation(location);
 
 				context.addParameterValue("location", location);
 
