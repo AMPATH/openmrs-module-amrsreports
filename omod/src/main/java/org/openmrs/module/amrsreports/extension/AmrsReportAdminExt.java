@@ -6,6 +6,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.Extension;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.web.extension.AdministrationSectionExt;
+import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.PrivilegeConstants;
 
 /**
  * admin page extension
@@ -42,6 +44,10 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_VIEW_REPORTS)) {
 			map.put("module/amrsreports/mohHistory.form", "View AMRS Reports");
+		}
+
+		if (Context.hasPrivilege(PrivilegeConstants.VIEW_LOCATIONS)) {
+			map.put("module/amrsreports/facility.list", "View MOH Facilities");
 		}
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {

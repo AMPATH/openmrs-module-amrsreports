@@ -32,6 +32,7 @@
 	
 	<!-- Maps hibernate files, if present -->
 	<mappingFiles>
+        MOHFacility.hbm.xml
         QueuedReport.hbm.xml
 		UserLocation.hbm.xml
 		UserReport.hbm.xml

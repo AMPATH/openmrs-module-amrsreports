@@ -16,6 +16,13 @@
             </a>
         </li>
     </openmrs:hasPrivilege>
+    <openmrs:hasPrivilege privilege="View Locations">
+        <li <c:if test='<%= request.getRequestURI().contains("facility") %>'>class="active"</c:if>>
+            <a href="${pageContext.request.contextPath}/module/amrsreports/facility.list">
+                View MOH Facilities
+            </a>
+        </li>
+    </openmrs:hasPrivilege>
     <openmrs:hasPrivilege privilege="Run Reports">
         <li <c:if test='<%= request.getRequestURI().contains("cohortCounts") %>'>class="active"</c:if>>
             <a href="${pageContext.request.contextPath}/module/amrsreports/cohortCounts.list">

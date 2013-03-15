@@ -37,7 +37,7 @@ public class CohortCountController {
 		// do nothing
 	}
 
-	@RequestMapping(value = "/module/amrsreports/downloadCohortCounts.htm")
+	@RequestMapping(value = "module/amrsreports/downloadCohortCounts.htm")
 	public void download(HttpServletResponse response,
 	                     @RequestParam(required = true, value = "locations") List<Integer> locations,
 	                     @RequestParam(required = true, value = "evaluationDate") Date evaluationDate) throws IOException {
