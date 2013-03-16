@@ -23,9 +23,6 @@
         margin: 1em;
     }
 
-        /*
-    .oneThird { float: left; width: 30%; min-height: 10em; }
-*/
     .newline {
         clear: both;
         display: block;
@@ -73,7 +70,7 @@
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form method="POST" name="amrsreportrenderer" action="mohRender.form">
-        <fieldset class="visualPadding oneThird">
+        <fieldset class="visualPadding">
             <legend>Dates</legend>
                 <label for="reportDate">Report Date (as of):</label>
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
@@ -82,13 +79,13 @@
                     <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
         </fieldset>
-        <fieldset class="visualPadding oneThird">
+        <fieldset class="visualPadding">
             <legend>Location</legend>
-            <c:forEach var="location" items="${locations}">
-                <input type="radio" name="location" value="${location.locationId}"/> ${location.name} <br/>
+            <c:forEach var="facility" items="${facilities}">
+                <input type="radio" name="facility" value="${facility.facilityId}"/> ${facility.code}) - ${facility.name} <br/>
             </c:forEach>
         </fieldset>
-        <fieldset class="visualPadding oneThird">
+        <fieldset class="visualPadding">
             <legend>Reports</legend>
             <c:forEach var="reportName" items="${reportNames}">
                 <input type="radio" name="reportName" value="${reportName}"/> ${reportName} <br/>

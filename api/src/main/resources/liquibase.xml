@@ -274,7 +274,7 @@
             <column name="report_name" type="varchar(50)">
                 <constraints nullable="false" />
             </column>
-            <column name="location_id" type="int">
+            <column name="facility_id" type="int">
                 <constraints nullable="false" />
             </column>
             <column name="evaluation_date" type="datetime">
@@ -291,6 +291,12 @@
         <createIndex tableName="amrsreports_queued_report" indexName="date_scheduled">
             <column name="date_scheduled" />
         </createIndex>
+
+        <addForeignKeyConstraint constraintName="amrsreports_queued_report_facility"
+                                 baseTableName="amrsreports_queued_report" baseColumnNames="facility_id"
+                                 referencedTableName="amrsreports_facility" referencedColumnNames="facility_id"
+                />
+
     </changeSet>
 
     <changeSet id="amrsreports-2013-03-14-a" author="jkeiper">

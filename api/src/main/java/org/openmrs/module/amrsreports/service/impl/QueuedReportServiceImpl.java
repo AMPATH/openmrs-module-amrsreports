@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreports.service.impl;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Cohort;
+import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.QueuedReport;
@@ -46,6 +47,14 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 	@Override
 	public void processQueuedReport(QueuedReport queuedReport) throws EvaluationException, IOException {
 
+		// validate
+		if (queuedReport.getReportName() == null)
+			throw new APIException("The queued report must reference a report provider by name.");
+
+		if (queuedReport.getFacility() == null)
+			throw new APIException("The queued report must reference a facility.");
+
+		// find the report provider
 		ReportProvider reportProvider = ReportProviderRegistrar.getInstance().getReportProviderByName(queuedReport.getReportName());
 		ReportDefinition reportDefinition = reportProvider.getReportDefinition();
 		CohortDefinition cohortDefinition = reportProvider.getCohortDefinition();
@@ -54,7 +63,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		EvaluationContext evaluationContext = new EvaluationContext();
 
 		// set up evaluation context values
-		evaluationContext.addParameterValue("location", queuedReport.getLocation());
+		evaluationContext.addParameterValue("locationList", queuedReport.getFacility().getLocations());
 		evaluationContext.setEvaluationDate(queuedReport.getEvaluationDate());
 
 		// get the cohort
@@ -74,8 +83,8 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		// create a new file
-		String loc = queuedReport.getLocation().getName();
-		String fileURL = loc.replaceAll(" ", "-") + "_" + formattedStartTime + "_" + queuedReport.getReportName().replaceAll(" ", "-") + ".csv";
+		String facility = queuedReport.getFacility().getCode();
+		String fileURL = facility + "_" + formattedStartTime + "_" + queuedReport.getReportName().replaceAll(" ", "-") + ".csv";
 		File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		File amrsreport = new File(loaddir, fileURL);
 		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));

@@ -12,7 +12,7 @@ public class QueuedReport extends BaseOpenmrsObject {
 
 	private Integer queuedReportId;
 	private String reportName;
-	private Location location;
+	private MOHFacility facility;
 	private Date evaluationDate;
 	private Date dateScheduled;
 
@@ -32,12 +32,12 @@ public class QueuedReport extends BaseOpenmrsObject {
 		this.reportName = reportName;
 	}
 
-	public Location getLocation() {
-		return location;
+	public MOHFacility getFacility() {
+		return facility;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
+	public void setFacility(MOHFacility facility) {
+		this.facility = facility;
 	}
 
 	public Date getEvaluationDate() {
@@ -65,4 +65,5 @@ public class QueuedReport extends BaseOpenmrsObject {
 	public void setId(Integer id) {
 		setQueuedReportId(id);
 	}
+
 }

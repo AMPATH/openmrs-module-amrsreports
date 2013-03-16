@@ -6,7 +6,9 @@ import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
+import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
@@ -46,11 +48,9 @@ public class MohRenderController {
 		return Context.getService(QueuedReportService.class).getAllQueuedReports();
 	}
 
-	@ModelAttribute("locations")
-	public List<Location> getLocations() {
-		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
-		User currUser = Context.getAuthenticatedUser();
-		return mohCoreService.getAllowedLocationsForUser(currUser);
+	@ModelAttribute("facilities")
+	public List<MOHFacility> getFacilities() {
+		return Context.getService(MOHFacilityService.class).getAllFacilities();
 	}
 
 	@ModelAttribute("reportNames")
@@ -68,15 +68,15 @@ public class MohRenderController {
 	                        @RequestParam(value = "immediate", required = false) Boolean immediate,
 	                        @RequestParam("reportDate") Date reportDate,
 	                        @RequestParam("dateScheduled") Date dateScheduled,
-	                        @RequestParam("location") Integer location,
+	                        @RequestParam("facility") Integer facilityId,
 	                        @RequestParam("reportName") String reportName) throws Exception {
 
-		// find the location
-		Location loc = Context.getLocationService().getLocation(location);
+		// find the facility
+		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
 		// create a queued report
 		QueuedReport queuedReport = new QueuedReport();
-		queuedReport.setLocation(loc);
+		queuedReport.setFacility(facility);
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 		if (immediate == null)
