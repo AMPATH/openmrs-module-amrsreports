@@ -54,4 +54,9 @@ public class MOHFacility extends BaseOpenmrsMetadata {
 	public void addLocation(Location location) {
 		this.getLocations().add(location);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s - %s", this.getCode(), this.getName());
+	}
 }

@@ -157,7 +157,7 @@
     <b class="boxHeader">Queued Reports</b>
     <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
             <c:forEach var="r" items="${queuedReports}">
-                ${r.reportName} for ${r.location} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
                 (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>) <br/>
             </c:forEach>
     </div>

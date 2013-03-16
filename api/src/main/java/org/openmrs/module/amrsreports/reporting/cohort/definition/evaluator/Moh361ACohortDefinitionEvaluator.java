@@ -34,7 +34,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 
 		String sql =
 				"select person_id" +
-						" from amrsreport_hiv_care_enrollment " +
+						" from amrsreports_hiv_care_enrollment " +
 						" where " +
 						"  enrollment_date is not NULL" +
 						"  and enrollment_date <= ':reportDate'" +

@@ -59,7 +59,7 @@
     <b class="boxHeader">Queued Reports</b>
     <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
         <c:forEach var="r" items="${queuedReports}">
-            ${r.reportName} for ${r.location} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+            ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
                 (run on ${r.dateScheduled}) <br/>
         </c:forEach>
     </div>
@@ -82,7 +82,7 @@
         <fieldset class="visualPadding">
             <legend>Location</legend>
             <c:forEach var="facility" items="${facilities}">
-                <input type="radio" name="facility" value="${facility.facilityId}"/> ${facility.code}) - ${facility.name} <br/>
+                <input type="radio" name="facility" value="${facility.facilityId}"/> ${facility.code} - ${facility.name} <br/>
             </c:forEach>
         </fieldset>
         <fieldset class="visualPadding">
