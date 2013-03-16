@@ -102,10 +102,10 @@ public class UpdateARVEncountersTask extends AbstractTask {
 					"   OTHER +" +
 					"   UNKNOWN >= 3";
 
-	private static String TABLE_CURRENT = "amrsreport_arv_current";
+	private static String TABLE_CURRENT = "amrsreports_arv_current";
 	private static String QUESTIONS_CURRENT = "966, 1088, 1250, 1895, 2154";
 
-	private static String TABLE_PREVIOUS = "amrsreport_arv_previous";
+	private static String TABLE_PREVIOUS = "amrsreports_arv_previous";
 	private static String QUESTIONS_PREVIOUS = "1086, 1087, 2157";
 
 	private AdministrationService administrationService;

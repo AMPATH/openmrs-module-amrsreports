@@ -21,22 +21,17 @@ import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
-import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
-import org.openmrs.module.amrsreports.UserReport;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 
 /**
@@ -156,17 +151,6 @@ public interface MohCoreService extends OpenmrsService {
 			final MohFetchRestriction mohFetchRestriction,
 			final Date evaluationDate) throws APIException;
 
-	@Transactional(readOnly=true)
-	List<PatientIdentifier> getAllPatientIdentifiers(Patient p);
-
-	public UserReport saveUserReport(UserReport userReport);
-
-	public UserReport getUserReport(Integer userReportId);
-
-	public void purgeUserReport(UserReport userReport);
-
-	public UserReport getUserReportByUuid(String uuid);
-
 	/**
 	 * @should save a UserLocation
 	 * @param userlocation
@@ -197,21 +181,7 @@ public interface MohCoreService extends OpenmrsService {
 	 */
 	public List<Location> getAllowedLocationsForUser(User user);
 
-	/**
-	 * @should only get specified report definitions for user
-	 * @should return empty list if none assigned
-	 * @param user
-	 * @return list of allowed reports
-	 */
-	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user);
-
     public Boolean hasLocationPrivilege(User user,Location location);
-
-	@Transactional
-	public void clearEnrollments();
-
-	@Transactional
-	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
 
 	@Transactional
 	public Map<Integer,Date> getEnrollmentDateMap(Set<Integer> cohort);

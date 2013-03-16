@@ -17,11 +17,9 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -31,13 +29,10 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.UserLocation;
-import org.openmrs.module.amrsreports.UserReport;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
@@ -64,8 +59,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	private SessionFactory sessionFactory;
 
 	/**
-	 * Method that will be called by Spring to inject the Hibernate's
-	 * SessionFactory.
+	 * Method that will be called by Spring to inject the Hibernate's SessionFactory.
 	 *
 	 * @param sessionFactory the session factory to be injected
 	 */
@@ -74,8 +68,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map,
-	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId,
@@ -92,7 +85,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientObservationsWithEncounterRestrictions(Integer, java.util.Map, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientObservationsWithEncounterRestrictions(Integer, java.util.Map, java.util.Map,
+	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
@@ -124,7 +118,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	/**
 	 * post-process a list of observations from a criteria; duplicate data FTL
 	 *
-	 * @param criteria the object with data in it
+	 * @param criteria            the object with data in it
 	 * @param mohFetchRestriction information for limiting fetch, specifically the size
 	 * @return a list of processed (cleaned) observations
 	 */
@@ -159,8 +153,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	/**
 	 * creates a Criteria from restrictions provided
 	 *
-	 * @param patientId the patient connected to the desired observations
-	 * @param restrictions a map of restrictions on the observations
+	 * @param patientId           the patient connected to the desired observations
+	 * @param restrictions        a map of restrictions on the observations
 	 * @param mohFetchRestriction a map of fetch restrictions
 	 * @return a Criteria for use in evaluation
 	 */
@@ -205,8 +199,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map,
-	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId,
@@ -275,8 +268,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location,
-	 *      java.util.Date, java.util.Date)
+	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getDateCreatedCohort(final Location location, final Date startDate, final Date endDate) throws DAOException {
@@ -302,8 +294,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location,
-	 *      java.util.Date, java.util.Date)
+	 * @see MohCoreDAO#getDateCreatedCohort(org.openmrs.Location, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getReturnDateCohort(final Location location, final Date startDate, final Date endDate) throws DAOException {
@@ -330,8 +321,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getObservationCohort(java.util.List, java.util.Date,
-	 *      java.util.Date)
+	 * @see MohCoreDAO#getObservationCohort(java.util.List, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getObservationCohort(final List<Concept> concepts, final Date startDate, final Date endDate) throws DAOException {
@@ -349,40 +339,6 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		criteria.setProjection(Projections.property("person.personId"));
 		criteria.add(Restrictions.eq("voided", Boolean.FALSE));
 		return new Cohort(criteria.list());
-	}
-
-	@Override
-	public List<PatientIdentifier> getAllPatientIdenifiers(Patient p) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(PatientIdentifier.class);
-		criteria.add(Restrictions.eq("patient", p));
-		return criteria.list();
-	}
-
-	/*  Save report user
-	 */
-	@Override
-	public UserReport saveUserReport(UserReport userReport) {
-		sessionFactory.getCurrentSession().saveOrUpdate(userReport);
-
-		return userReport;
-	}
-
-	@Override
-	public UserReport getUserReport(Integer userReportId) {
-		return (UserReport) sessionFactory.getCurrentSession().get(UserReport.class, userReportId);
-	}
-
-	@Override
-	public UserReport getUserReportByUuid(String uuid) {
-		return (UserReport) sessionFactory.getCurrentSession().
-				createCriteria(UserReport.class)
-				.add(Expression.eq("uuid", uuid))
-				.uniqueResult();
-	}
-
-	@Override
-	public void purgeUserReport(UserReport userReport) {
-		sessionFactory.getCurrentSession().delete(userReport);
 	}
 
 	/**
@@ -428,26 +384,6 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	@Override
-	public List<UserReport> getUserReportsForUser(User user) {
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(UserReport.class)
-				.add(Restrictions.eq("amrsReportsUser", user));
-		return (List<UserReport>) crit.list();
-	}
-
-	@Override
-	public void clearEnrollments() {
-		String sql = String.format("truncate table amrsreport_enrollment");
-		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-		query.executeUpdate();
-	}
-
-	@Override
-	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment) {
-		sessionFactory.getCurrentSession().saveOrUpdate(HIVCareEnrollment);
-		return HIVCareEnrollment;
-	}
-
-	@Override
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
 		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
 				.add(Restrictions.in("person.personId", cohort))
@@ -459,7 +395,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		Iterator<Object[]> it = crit.list().iterator();
 		while (it.hasNext()) {
 			Object[] row = it.next();
-			ret.put((Integer)row[0], (Date)row[1]);
+			ret.put((Integer) row[0], (Date) row[1]);
 		}
 		return ret;
 	}
@@ -477,7 +413,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		Iterator<Object[]> it = crit.list().iterator();
 		while (it.hasNext()) {
 			Object[] row = it.next();
-			ret.put((Integer)row[0], new WHOStageAndDate((String)row[1], (Date)row[2]));
+			ret.put((Integer) row[0], new WHOStageAndDate((String) row[1], (Date) row[2]));
 		}
 		return ret;
 	}

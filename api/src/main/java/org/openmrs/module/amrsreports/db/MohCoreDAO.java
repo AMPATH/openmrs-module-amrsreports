@@ -11,27 +11,23 @@
  */
 package org.openmrs.module.amrsreports.db;
 
+import org.openmrs.Cohort;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.Location;
+import org.openmrs.Obs;
+import org.openmrs.OpenmrsObject;
+import org.openmrs.User;
+import org.openmrs.api.db.DAOException;
+import org.openmrs.module.amrsreports.UserLocation;
+import org.openmrs.module.amrsreports.model.WHOStageAndDate;
+import org.openmrs.module.amrsreports.util.MohFetchRestriction;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.openmrs.Cohort;
-import org.openmrs.Concept;
-import org.openmrs.Encounter;
-import org.openmrs.Location;
-import org.openmrs.User;
-import org.openmrs.Obs;
-import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.api.db.DAOException;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
-import org.openmrs.module.amrsreports.UserLocation;
-import org.openmrs.module.amrsreports.model.WHOStageAndDate;
-import org.openmrs.module.amrsreports.util.MohFetchRestriction;
-import org.openmrs.module.amrsreports.UserReport;
 
 /**
  */
@@ -54,20 +50,10 @@ public interface MohCoreDAO {
 	                                 final Date evaluationDate) throws DAOException;
 
 	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
-	                                                          final Map<String,Collection<OpenmrsObject>> obsRestrictions,
-	                                                          final Map<String,Collection<OpenmrsObject>> encounterRestrictions,
+	                                                          final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
 	                                                          final MohFetchRestriction mohFetchRestriction,
 	                                                          final Date evaluationDate);
-
-	List<PatientIdentifier> getAllPatientIdenifiers(Patient p);
-
-	public UserReport saveUserReport(UserReport userReport);
-
-	public UserReport getUserReport(Integer userReportId);
-
-	public void purgeUserReport(UserReport userReport);
-
-	public UserReport getUserReportByUuid(String uuid);
 
 	/*Methods for UserLocation Class*/
 	public UserLocation saveUserLocation(UserLocation userlocation);
@@ -76,19 +62,13 @@ public interface MohCoreDAO {
 
 	public List<UserLocation> getAllUserLocationPrivileges();
 
-    public Boolean hasLocationPrivilege(User user,Location location);
+	public Boolean hasLocationPrivilege(User user, Location location);
 
 	public void deleteUserLocation(UserLocation userlocation);
 
 	public List<UserLocation> getUserLocationsForUser(User user);
 
-	public List<UserReport> getUserReportsForUser(User user);
+	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort);
 
-	public void clearEnrollments();
-
-	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment);
-
-	public Map<Integer,Date> getEnrollmentDateMap(Set<Integer> cohort);
-	
-	public Map<Integer,WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
+	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
 }

@@ -6,7 +6,6 @@ import org.openmrs.Location;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.UserLocation;
-import org.openmrs.module.amrsreports.UserReport;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -18,78 +17,6 @@ import java.util.List;
  * Test file for MohCoreService methods
  */
 public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
-
-	/**
-	 * @verifies save AmrsReportUser
-	 * @see
-	 * org.openmrs.module.amrsreports.service.MohCoreService#saveUserReport(org.openmrs.module.amrsreports.UserReport)
-	 */
-	@Test
-	public void saveUserReport_shouldSaveAmrsReportUser() throws Exception {
-		//TODO auto-generated
-		MohCoreService service = Context.getService(MohCoreService.class);
-
-		//Create a sample User
-		User systemUser = new User();
-		systemUser.setUserId(501);
-
-		//sample user report instance
-		UserReport userrpt = new UserReport();
-		userrpt.setAmrsReportsUser(systemUser);
-		userrpt.setReportDefinitionUuid("testuuid");
-		Assert.assertNotNull(service.saveUserReport(userrpt));
-	}
-
-	/**
-	 * @verifies get userreport by id
-	 * @see org.openmrs.module.amrsreports.service.MohCoreService#getUserReportByUserId(Integer)
-	 */
-	@Test
-	public void getUserReportByUserId_shouldGetUserreportById() throws Exception {
-		//TODO auto-generated
-		//Create an instance of the service object
-
-		MohCoreService service = Context.getService(MohCoreService.class);
-
-		//Create a sample User
-		User systemUser = new User();
-		systemUser.setUserId(501);
-
-		//sample user report instance
-		UserReport userrpt = new UserReport();
-		userrpt.setAmrsReportsUser(systemUser);
-		userrpt.setReportDefinitionUuid("testuuid");
-		userrpt = service.saveUserReport(userrpt);
-
-		Context.flushSession();
-
-		Assert.assertNotNull(service.getUserReport(userrpt.getId()));
-	}
-
-	/**
-	 * @verifies delete user report based on user report uuid
-	 * @see
-	 * org.openmrs.module.amrsreports.service.MohCoreService#purgeUserReport(org.openmrs.module.amrsreports.UserReport)
-	 */
-	@Test
-	public void getUserReportByUserId_shouldPurgeUserReport() throws Exception {
-		//TODO auto-generated
-		//Create an instance of the service object
-
-		MohCoreService service = Context.getService(MohCoreService.class);
-
-		//Create a sample User
-		User systemUser = new User();
-		systemUser.setUserId(501);
-
-		//sample user report instance
-		UserReport userrpt = new UserReport();
-		userrpt.setAmrsReportsUser(systemUser);
-		userrpt.setReportDefinitionUuid("testuuid");
-		UserReport userreport = service.saveUserReport(userrpt);
-		service.purgeUserReport(userreport);
-		Assert.assertNull(service.getUserReportByUuid(userreport.getUuid()));
-	}
 
 	/**
 	 * @see org.openmrs.module.amrsreports.service.MohCoreService#getUserLocation(Integer)
@@ -216,51 +143,6 @@ public class MohCoreServiceTest extends BaseModuleContextSensitiveTest {
 		sysUser.setUserId(501);
 
 		List<Location> actual = cservice.getAllowedLocationsForUser(sysUser);
-		Assert.assertNotNull(actual);
-		Assert.assertEquals(0, actual.size());
-	}
-
-	/**
-	 * @see org.openmrs.module.amrsreports.service.MohCoreService#getAllowedReportDefinitionsForUser(org.openmrs.User)
-	 */
-	@Test
-	@Verifies(value = "should only get specified report definitions for user", method ="getAllowedReportDefinitionsForUser(User)")
-	public void getAllowedReportDefinitionsForUser_shouldOnlyGetSpecifiedReportDefinitionsForUser() throws Exception {
-		MohCoreService cservice = Context.getService(MohCoreService.class);
-
-		User sysUser = new User();
-		sysUser.setUserId(501);
-
-		// create a report definition
-		ReportDefinition rd = new ReportDefinition();
-		rd.setName("foo");
-		Context.getService(ReportDefinitionService.class).saveDefinition(rd);
-		String expectedUuid = rd.getUuid();
-		Assert.assertNotNull(expectedUuid);
-
-		// create a userreport
-		UserReport userreport = new UserReport();
-		userreport.setAmrsReportsUser(sysUser);
-		userreport.setReportDefinitionUuid(expectedUuid);
-		cservice.saveUserReport(userreport);
-
-		List<ReportDefinition> actual = cservice.getAllowedReportDefinitionsForUser(sysUser);
-		Assert.assertEquals(1, actual.size());
-		Assert.assertEquals(expectedUuid, actual.get(0).getUuid());
-	}
-
-	/**
-	 * @see org.openmrs.module.amrsreports.service.MohCoreService#getAllowedReportDefinitionsForUser(org.openmrs.User)
-	 */
-	@Test
-	@Verifies(value = "should return empty list if none assigned", method ="getAllowedReportDefinitionsForUser(User)")
-	public void getAllowedReportDefinitionsForUser_shouldReturnEmptyListIfNoneAssigned() throws Exception {
-		MohCoreService cservice = Context.getService(MohCoreService.class);
-
-		User sysUser = new User();
-		sysUser.setUserId(501);
-
-		List<ReportDefinition> actual = cservice.getAllowedReportDefinitionsForUser(sysUser);
 		Assert.assertNotNull(actual);
 		Assert.assertEquals(0, actual.size());
 	}

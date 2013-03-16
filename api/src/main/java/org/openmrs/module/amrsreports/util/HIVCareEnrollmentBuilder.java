@@ -8,11 +8,11 @@ import org.openmrs.api.context.Context;
 public class HIVCareEnrollmentBuilder {
 
 	private static final String QUERY_CLEAR_RECORDS =
-			"delete from amrsreport_hiv_care_enrollment";
+			"delete from amrsreports_hiv_care_enrollment";
 
 	private static String QUERY_DELETE_FAKE_PATIENTS =
 			"delete" +
-					" from amrsreport_hiv_care_enrollment" +
+					" from amrsreports_hiv_care_enrollment" +
 					" where person_id in (" +
 					"   select person_id" +
 					"   from person_attribute pa" +
@@ -22,7 +22,7 @@ public class HIVCareEnrollmentBuilder {
 					"     and pa.value ='true')";
 
 	private static final String QUERY_INSERT_FROM_ENCOUNTERS =
-			"insert into amrsreport_hiv_care_enrollment (" +
+			"insert into amrsreports_hiv_care_enrollment (" +
 					"   person_id," +
 					"   first_hiv_encounter_id," +
 					"   first_hiv_encounter_location_id," +
@@ -61,7 +61,7 @@ public class HIVCareEnrollmentBuilder {
 					"   on p.person_id=fir.patient_id";
 
 	private static final String QUERY_UPDATE_LAST_POSITIVE =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
 					"  	select person_id, obs_datetime" +
@@ -70,7 +70,7 @@ public class HIVCareEnrollmentBuilder {
 					"	      o.person_id, o.obs_datetime" +
 					"	    from " +
 					"	      obs o" +
-					"           join amrsreport_hiv_care_enrollment ae" +
+					"           join amrsreports_hiv_care_enrollment ae" +
 					"           on o.person_id = ae.person_id" +
 					"	    where" +
 					"	      o.voided = 0" +
@@ -88,7 +88,7 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.last_positive_obs_date = last.obs_datetime";
 
 	private static final String QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
 					"  	select person_id, obs_datetime, stage from (" +
@@ -104,7 +104,7 @@ public class HIVCareEnrollmentBuilder {
 					"                     if(o.value_coded=1207, 'A4'," +
 					"                       if(o.value_coded=1223, 'P4', NULL)))))))) as stage" +
 					"	    from " +
-					"	      obs o join amrsreport_hiv_care_enrollment ae on o.person_id = ae.person_id" +
+					"	      obs o join amrsreports_hiv_care_enrollment ae on o.person_id = ae.person_id" +
 					"	    where " +
 					"	      o.voided = 0" +
 					"	      and o.concept_id in (1224, 5356)" +
@@ -118,7 +118,7 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.last_who_stage_date = who.obs_datetime";
 
 	private static final String QUERY_UPDATE_FIRST_ARV_DATE =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
 					"    select patient_id, encounter_date, location_id from (" +
@@ -127,7 +127,7 @@ public class HIVCareEnrollmentBuilder {
 					"        ac.encounter_date," +
 					"        ac.location_id" +
 					"      from" +
-					"        amrsreport_arv_current ac join amrsreport_hiv_care_enrollment ae" +
+					"        amrsreports_arv_current ac join amrsreports_hiv_care_enrollment ae" +
 					"          on ac.patient_id = ae.person_id" +
 					"      where" +
 					"        ac.on_ART=1" +
@@ -141,14 +141,14 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.first_arv_location_id = arv.location_id";
 
 	private static final String QUERY_UPDATE_LAST_NEGATIVE =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
 					"  	select person_id, obs_datetime from (" +
 					"	    select " +
 					"	      o.person_id, o.obs_datetime" +
 					"	    from " +
-					"	      obs o join amrsreport_hiv_care_enrollment ae" +
+					"	      obs o join amrsreports_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
 					"	    where" +
 					"	      o.voided = 0" +
@@ -162,7 +162,7 @@ public class HIVCareEnrollmentBuilder {
 					"  ae.last_negative_obs_date = last.obs_datetime";
 
 	private static final String QUERY_UPDATE_FIRST_POSITIVE =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
 					"  join" +
 					"  (" +
@@ -170,7 +170,7 @@ public class HIVCareEnrollmentBuilder {
 					"	    select " +
 					"	      o.person_id, o.obs_datetime, o.location_id" +
 					"	    from " +
-					"	      obs o join amrsreport_hiv_care_enrollment ae" +
+					"	      obs o join amrsreports_hiv_care_enrollment ae" +
 					"	        on o.person_id = ae.person_id" +
 					"           and ae.last_positive_obs_date is not NULL" +
 					"	    where" +
@@ -191,13 +191,13 @@ public class HIVCareEnrollmentBuilder {
 
 	private static final String QUERY_UPDATE_TRANSFER_INS =
 			"update" +
-					"  amrsreport_hiv_care_enrollment ae" +
+					"  amrsreports_hiv_care_enrollment ae" +
 					"  join" +
 					"  (" +
 					"    select " +
 					"      o.person_id, o.obs_datetime" +
 					"    from " +
-					"      obs o join amrsreport_hiv_care_enrollment ae" +
+					"      obs o join amrsreports_hiv_care_enrollment ae" +
 					"        on o.encounter_id = ae.first_hiv_encounter_id" +
 					"    where" +
 					"      o.voided = 0" +
@@ -211,7 +211,7 @@ public class HIVCareEnrollmentBuilder {
 
 	private static final String QUERY_UPDATE_DISCONTINUES =
 			"update" +
-					"	amrsreport_hiv_care_enrollment ae" +
+					"	amrsreports_hiv_care_enrollment ae" +
 					"	join (" +
 					"		select" +
 					"			patient_id, encounter_datetime as last_encounter_date, location_id as last_encounter_location" +
@@ -220,7 +220,7 @@ public class HIVCareEnrollmentBuilder {
 					"				patient_id, encounter_datetime, location_id" +
 					"			from " +
 					"				encounter" +
-					"				join amrsreport_hiv_care_enrollment ae" +
+					"				join amrsreports_hiv_care_enrollment ae" +
 					"				  on encounter.patient_id = ae.person_id" +
 					"			where" +
 					"				voided = 0" +
@@ -238,7 +238,7 @@ public class HIVCareEnrollmentBuilder {
 					"				o.person_id, o.obs_datetime, o.value_coded" +
 					"			from " +
 					"				obs o" +
-					"				join amrsreport_hiv_care_enrollment ae" +
+					"				join amrsreports_hiv_care_enrollment ae" +
 					"			      on o.person_id = ae.person_id" +
 					"			where" +
 					"				o.voided = 0" +
@@ -258,7 +258,7 @@ public class HIVCareEnrollmentBuilder {
 					"   ae.last_discontinue_reason = last_reason";
 
 	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER =
-			"update amrsreport_hiv_care_enrollment" +
+			"update amrsreports_hiv_care_enrollment" +
 					" set" +
 					"  enrollment_date = first_hiv_encounter_date," +
 					"  enrollment_age = first_hiv_encounter_age," +
@@ -268,7 +268,7 @@ public class HIVCareEnrollmentBuilder {
 					"  first_hiv_encounter_age >= 2";
 
 	private static final String QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					" set" +
 					"  enrollment_date = first_hiv_encounter_date," +
 					"  enrollment_age = first_hiv_encounter_age," +
@@ -285,7 +285,7 @@ public class HIVCareEnrollmentBuilder {
 					"      and voided =  0)";
 
 //	private static final String QUERY_MARK_CONFLICTING_OBS =
-//			"update amrsreport_hiv_care_enrollment ae" +
+//			"update amrsreports_hiv_care_enrollment ae" +
 //					"  join person p on p.person_id = ae.person_id" +
 //					" set" +
 //					"  ae.enrollment_location_id = ae.first_positive_obs_location_id," +
@@ -305,7 +305,7 @@ public class HIVCareEnrollmentBuilder {
 //					"  )";
 
 	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
 					" set" +
 					"  ae.enrollment_location_id = ae.first_positive_obs_location_id," +
@@ -317,7 +317,7 @@ public class HIVCareEnrollmentBuilder {
 					"  and ae.last_positive_obs_date is not NULL";
 
 	private static final String QUERY_FILL_ENROLLMENT_FROM_ARVS =
-			"update amrsreport_hiv_care_enrollment ae" +
+			"update amrsreports_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
 					" set" +
 					"  ae.enrollment_date = ae.first_arv_date," +

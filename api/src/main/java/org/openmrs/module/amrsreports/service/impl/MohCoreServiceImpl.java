@@ -11,13 +11,6 @@
  */
 package org.openmrs.module.amrsreports.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
@@ -26,21 +19,21 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
+import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.service.MohCoreService;
-import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
-import org.openmrs.module.amrsreports.UserReport;
-import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Actual implementation of the core service contract
@@ -51,8 +44,8 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	private MohCoreDAO mohCoreDAO;
 
 	/**
-	 * Setter for the DAO interface reference that will be called by Spring
-	 * to inject the actual implementation of the DAO layer
+	 * Setter for the DAO interface reference that will be called by Spring to inject the actual implementation of the DAO
+	 * layer
 	 *
 	 * @param mohCoreDAO the coreDAO to be injected
 	 */
@@ -65,8 +58,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getDateCreatedCohort(org.openmrs.Location,
-	 *      java.util.Date, java.util.Date)
+	 * @see MohCoreService#getDateCreatedCohort(org.openmrs.Location, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getDateCreatedCohort(final Location location, final Date startDate, final Date endDate) throws APIException {
@@ -74,8 +66,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getReturnDateCohort(org.openmrs.Location,
-	 *      java.util.Date, java.util.Date)
+	 * @see MohCoreService#getReturnDateCohort(org.openmrs.Location, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getReturnDateCohort(final Location location, final Date startDate, final Date endDate) throws APIException {
@@ -83,8 +74,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getObservationCohort(java.util.List,
-	 *      java.util.Date, java.util.Date)
+	 * @see MohCoreService#getObservationCohort(java.util.List, java.util.Date, java.util.Date)
 	 */
 	@Override
 	public Cohort getObservationCohort(final List<Concept> concepts, final Date startDate, final Date endDate) throws APIException {
@@ -92,8 +82,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getPatientEncounters(Integer, java.util.Map,
-	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreService#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId,
@@ -104,8 +93,7 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getPatientObservations(Integer, java.util.Map,
-	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreService#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId,
@@ -126,28 +114,6 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction, evaluationDate);
 	}
 
-	@Override
-	public List<PatientIdentifier> getAllPatientIdentifiers(Patient p) {
-
-		return mohCoreDAO.getAllPatientIdenifiers(p);
-	}
-
-	@Override
-	public UserReport saveUserReport(UserReport userReport) {
-		return mohCoreDAO.saveUserReport(userReport);
-	}
-
-	@Override
-	public void purgeUserReport(UserReport userReport) {
-		mohCoreDAO.purgeUserReport(userReport);
-	}
-
-	@Override
-	public UserReport getUserReportByUuid(String uuid) {
-		return mohCoreDAO.getUserReportByUuid(uuid);
-
-	}
-
 	public UserLocation saveUserLocation(UserLocation userlocation) {
 		return mohCoreDAO.saveUserLocation(userlocation);
 	}
@@ -166,11 +132,6 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	@Override
-	public UserReport getUserReport(Integer userReportId) {
-		return mohCoreDAO.getUserReport(userReportId);
-	}
-
-	@Override
 	public List<Location> getAllowedLocationsForUser(User user) {
 		List<Location> locations = new ArrayList<Location>();
 		List<UserLocation> userLocations = mohCoreDAO.getUserLocationsForUser(user);
@@ -181,37 +142,15 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	@Override
-	public List<ReportDefinition> getAllowedReportDefinitionsForUser(User user) {
-		ReportDefinitionService rds = Context.getService(ReportDefinitionService.class);
-		List<ReportDefinition> definitions = new ArrayList<ReportDefinition>();
-		List<UserReport> userReports = mohCoreDAO.getUserReportsForUser(user);
-		for (UserReport ur : userReports) {
-			String uuid = ur.getReportDefinitionUuid();
-			definitions.add(rds.getDefinitionByUuid(uuid));
-		}
-		return definitions;
-	}
-
-	@Override
 	public Boolean hasLocationPrivilege(User user, Location location) {
 		return mohCoreDAO.hasLocationPrivilege(user, location);
-	}
-
-	@Override
-	public void clearEnrollments() {
-		mohCoreDAO.clearEnrollments();
-	}
-
-	@Override
-	public HIVCareEnrollment saveEnrollment(HIVCareEnrollment HIVCareEnrollment) {
-		return mohCoreDAO.saveEnrollment(HIVCareEnrollment);
 	}
 
 	@Override
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
 		return mohCoreDAO.getEnrollmentDateMap(cohort);
 	}
-	
+
 	@Override
 	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
 		return mohCoreDAO.getWHOStageAndDateMap(cohort);

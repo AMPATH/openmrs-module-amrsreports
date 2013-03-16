@@ -15,17 +15,17 @@
 
 
 
-	<changeSet id="amrsreport-2012-09-03-15:50" author="AOjwang">
+	<changeSet id="amrsreports-2012-09-03-15:50" author="AOjwang">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<tableExists tableName="amrsreport_userlocation"/>
+				<tableExists tableName="amrsreports_userlocation"/>
 			</not>
 		</preConditions>
 		<comment>
-			Creating the amrsreport_userlocation table
+			Creating the amrsreports_userlocation table
 		</comment>
-		<createTable tableName="amrsreport_userlocation">
-			<column name="amrsreport_userlocation_id" type="int" autoIncrement="true">
+		<createTable tableName="amrsreports_userlocation">
+			<column name="amrsreports_userlocation_id" type="int" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="uuid" type="char(38)">
@@ -39,7 +39,7 @@
 
 	</changeSet>
 
-	<changeSet id="amrsreport-2012-09-03-16:50" author="AOjwang">
+	<changeSet id="amrsreports-2012-09-03-16:50" author="AOjwang">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_user_ref"/>
@@ -51,7 +51,7 @@
 
 		<addForeignKeyConstraint
 			constraintName="amrsreports_userlocation_user_ref"
-			baseTableName="amrsreport_userlocation"
+			baseTableName="amrsreports_userlocation"
 			baseColumnNames="user_id"
 			referencedTableName="users"
 			referencedColumnNames="user_id"
@@ -59,7 +59,7 @@
 
 	</changeSet>
 
-	<changeSet id="amrsreport-2012-09-03-17:50" author="AOjwang">
+	<changeSet id="amrsreports-2012-09-03-17:50" author="AOjwang">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<foreignKeyConstraintExists foreignKeyName="amrsreports_userlocation_location_ref"/>
@@ -71,7 +71,7 @@
 
 		<addForeignKeyConstraint
 			constraintName="amrsreports_userlocation_location_ref"
-			baseTableName="amrsreport_userlocation"
+			baseTableName="amrsreports_userlocation"
 			baseColumnNames="location_id"
 			referencedTableName="location"
 			referencedColumnNames="location_id"
@@ -79,41 +79,16 @@
 
 	</changeSet>
  
-	<changeSet id="create amrsreport_user_report 2012-09-12" author="akwatuha">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="amrsreport_usereport"/>
-			</not>
-		</preConditions>
-		<comment>
-			Creating the amrsreport_userreport table
-		</comment>
-		<createTable tableName="amrsreport_userreport">
-			<column name="amrsreport_userreport_id" type="int" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="user_id" type="int"/>
-			<column name="report_definition_uuid" type="char(38)"/>
-			<column name="uuid" type="char(38)">
-				<constraints nullable="false" />
-			</column>
-		</createTable>
-
-		<createIndex tableName="amrsreport_userreport" indexName="uuid">
-			<column name="uuid" />
-		</createIndex>
-	</changeSet>
-
-    <changeSet id="amrsreport-2013-02-06-a" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-a" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="amrsreport_hiv_care_enrollment"/>
+                <tableExists tableName="amrsreports_hiv_care_enrollment"/>
             </not>
         </preConditions>
         <comment>
-            Creating the amrsreport_hiv_care_enrollment table
+            Creating the amrsreports_hiv_care_enrollment table
         </comment>
-        <createTable tableName="amrsreport_hiv_care_enrollment">
+        <createTable tableName="amrsreports_hiv_care_enrollment">
             <column name="enrollment_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -144,139 +119,139 @@
             </column>
         </createTable>
 
-        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="uuid">
+        <createIndex tableName="amrsreports_hiv_care_enrollment" indexName="uuid">
             <column name="uuid" />
         </createIndex>
 
-        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_date">
+        <createIndex tableName="amrsreports_hiv_care_enrollment" indexName="enrollment_date">
             <column name="enrollment_date" />
         </createIndex>
 
-        <createIndex tableName="amrsreport_hiv_care_enrollment" indexName="enrollment_reason">
+        <createIndex tableName="amrsreports_hiv_care_enrollment" indexName="enrollment_reason">
             <column name="enrollment_reason" />
         </createIndex>
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-b" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-b" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_person_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_person_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on person_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_person_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_person_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="person_id"
                 referencedTableName="person"
                 referencedColumnNames="person_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-c" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-c" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_enrollment_location_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_enrollment_location_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on enrollment_location_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_enrollment_location_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_enrollment_location_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="enrollment_location_id"
                 referencedTableName="location"
                 referencedColumnNames="location_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-d" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-d" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_hiv_encounter_location_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_hiv_encounter_location_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on first_hiv_encounter_location_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_first_hiv_encounter_location_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_first_hiv_encounter_location_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="first_hiv_encounter_location_id"
                 referencedTableName="location"
                 referencedColumnNames="location_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-e" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-e" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_positive_obs_location_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_positive_obs_location_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on first_positive_obs_location_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_first_positive_obs_location_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_first_positive_obs_location_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="first_positive_obs_location_id"
                 referencedTableName="location"
                 referencedColumnNames="location_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-f" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-f" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_arv_location_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_arv_location_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on first_arv_location_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_first_arv_location_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_first_arv_location_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="first_arv_location_id"
                 referencedTableName="location"
                 referencedColumnNames="location_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-g" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-g" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_last_hiv_encounter_location_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_last_hiv_encounter_location_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on last_hiv_encounter_location_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_last_hiv_encounter_location_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_last_hiv_encounter_location_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="last_hiv_encounter_location_id"
                 referencedTableName="location"
                 referencedColumnNames="location_id"
                 />
     </changeSet>
 
-    <changeSet id="amrsreport-2013-02-06-h" author="jkeiper">
+    <changeSet id="amrsreports-2013-02-06-h" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreport_hiv_care_enrollment_first_encounter_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_encounter_ref"/>
             </not>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on first_hiv_encounter_id column
         </comment>
         <addForeignKeyConstraint
-                constraintName="amrsreport_hiv_care_enrollment_first_hiv_encounter_ref"
-                baseTableName="amrsreport_hiv_care_enrollment"
+                constraintName="amrsreports_hiv_care_enrollment_first_hiv_encounter_ref"
+                baseTableName="amrsreports_hiv_care_enrollment"
                 baseColumnNames="first_hiv_encounter_id"
                 referencedTableName="encounter"
                 referencedColumnNames="encounter_id"
