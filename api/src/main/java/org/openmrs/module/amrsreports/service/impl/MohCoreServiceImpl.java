@@ -19,10 +19,14 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.UserLocation;
+import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -152,4 +156,9 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		return mohCoreDAO.getWHOStageAndDateMap(cohort);
 	}
 
+	@Override
+	public PatientIdentifierType getCCCNumberIdentifierType() {
+		String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE);
+		return Context.getPatientService().getPatientIdentifierType(Integer.valueOf(typeId));
+	}
 }

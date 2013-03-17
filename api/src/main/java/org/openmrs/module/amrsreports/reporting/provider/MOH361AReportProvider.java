@@ -12,6 +12,7 @@ import org.openmrs.module.amrsreports.reporting.converter.MOHSerialNumberConvert
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
@@ -43,8 +44,8 @@ public class MOH361AReportProvider implements ReportProvider {
 	public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
-
 		DateConverter commonDateConverter = new DateConverter(MohRuleUtils.DATE_FORMAT);
+		MohCoreService service = Context.getService(MohCoreService.class);
 
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
 		report.setName("MOH 361A Report");
@@ -57,10 +58,8 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		PatientIdentifierType pit = MohCacheUtils.getPatientIdentifierType(
-				Context.getAdministrationService().getGlobalProperty("cccgenerator.CCC"));
+		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-
 		dsd.addColumn("Serial Number", cccColumn, nullString, new MOHSerialNumberConverter());
 
 		// b. date chronic HIV+ care started

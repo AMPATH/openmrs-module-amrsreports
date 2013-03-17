@@ -58,7 +58,12 @@
 		<defaultValue>${project.parent.artifactId}</defaultValue>
 		<description>Directory for storing rendered reports</description>
 	</globalProperty>
-	<!-- /Required Global Properties -->
+    <globalProperty>
+        <property>${project.parent.artifactId}.cccIdentifierType</property>
+        <defaultValue></defaultValue>
+        <description>Identifier type for CCC Number identifiers</description>
+    </globalProperty>
+    <!-- /Required Global Properties -->
 	
 	<dwr>
 		<allow>

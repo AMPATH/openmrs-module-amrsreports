@@ -35,4 +35,9 @@
             Location Privileges
         </a>
     </li>
+    <li <c:if test='<%= request.getRequestURI().contains("settings") %>'>class="active"</c:if>>
+        <a href="${pageContext.request.contextPath}/module/amrsreports/settings.form">
+            Settings
+        </a>
+    </li>
 </ul>

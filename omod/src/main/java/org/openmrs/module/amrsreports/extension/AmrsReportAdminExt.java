@@ -58,6 +58,8 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 			map.put("module/amrsreports/locationPrivileges.form", "Location Privileges");
 		}
 
+		map.put("module/amrsreports/settings.form", "Settings");
+
 		return map;
 	}
 
