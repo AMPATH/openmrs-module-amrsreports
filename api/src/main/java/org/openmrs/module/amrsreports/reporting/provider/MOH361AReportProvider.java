@@ -6,6 +6,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MOHPersonNameConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MOHSerialNumberConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
@@ -89,9 +90,8 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Sex", new GenderDataDefinition(), nullString);
 
 		// g. Entry point: From where?
-		// TODO add a StringConverter here
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
-		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new StringConverter(null, ""));
+		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new EntryPointConverter());
 
 		// h. Confirmed HIV+ Date
 		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString, commonDateConverter);

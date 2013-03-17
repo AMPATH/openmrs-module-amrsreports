@@ -1,31 +1,21 @@
-package org.openmrs.module.amrsreports.rule.collection;
+package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Patient;
 import org.openmrs.PersonAttribute;
-import org.openmrs.api.context.Context;
-import org.openmrs.logic.LogicContext;
-import org.openmrs.logic.result.Result;
-import org.openmrs.logic.result.Result.Datatype;
-import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
+import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
- * Author jmwogi
+ * Converts the Entry Point person attribute into the appropriate acronym
  */
-public class MohEntryPointRule extends MohEvaluableRule {
+public class EntryPointConverter implements DataConverter {
 
-	private static final Log log = LogFactory.getLog(MohEntryPointRule.class);
-
-	public static final String TOKEN = "MOH Point Of Entry";
-
+	private final Log log = LogFactory.getLog(this.getClass());
 	private static Map<String, String> locationMap;
 
 	static {
@@ -41,9 +31,7 @@ public class MohEntryPointRule extends MohEvaluableRule {
 		locationMap.put(getConceptId(MohEvaluableNameConstants.PEDIATRIC_OUTPATIENT_CLINIC), "POC");
 	}
 
-	private static String getConceptId(String conceptName) {
-		return MohCacheUtils.getConcept(conceptName).getConceptId().toString();
-	}
+	public static final String OTHER = "Other";
 
 	/**
 	 * returns the value of the entry point location, based on the point of HIV testing person attribute
@@ -61,15 +49,15 @@ public class MohEntryPointRule extends MohEvaluableRule {
 	 * @should return Other if no point of HIV testing exists
 	 * @should return Other if point of HIV testing is not recognized
 	 */
-	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) {
-		Patient patient = Context.getPatientService().getPatient(patientId);
-		PersonAttribute pa = patient.getAttribute(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
+	@Override
+	public Object convert(Object original) {
+		if (original == null)
+			return OTHER;
 
-		if (log.isDebugEnabled())
-			log.debug("pa value is " + (pa != null ? pa.getValue() : "null (pa is null)"));
+		if (!(original instanceof PersonAttribute))
+			return "Invalid: " + original.toString();
 
-		if (pa == null)
-			return new Result("Other");
+		PersonAttribute pa = (PersonAttribute) original;
 
 		String entryPoint = locationMap.get(pa.getValue());
 
@@ -77,43 +65,23 @@ public class MohEntryPointRule extends MohEvaluableRule {
 			log.debug("entryPoint is " + entryPoint);
 
 		if (entryPoint != null)
-			return new Result(entryPoint);
+			return entryPoint;
 
-		return new Result("Other");
-	}
-
-	/**
-	 * @see org.openmrs.module.amrsreports.rule.MohEvaluableRule#getEvaluableToken()
-	 */
-	protected String getEvaluableToken() {
-		return TOKEN;
-	}
-
-	/**
-	 * @see org.openmrs.logic.Rule#getDependencies()
-	 */
-	@Override
-	public String[] getDependencies() {
-		return new String[]{};
-	}
-
-	/**
-	 * Get the definition of each parameter that should be passed to this rule execution
-	 *
-	 * @return all parameter that applicable for each rule execution
-	 */
-	@Override
-	public Datatype getDefaultDatatype() {
-		return Datatype.TEXT;
-	}
-
-	public Set<RuleParameterInfo> getParameterList() {
-		return null;
+		return OTHER;
 	}
 
 	@Override
-	public int getTTL() {
-		return 0;
+	public Class<?> getInputDataType() {
+		return PersonAttribute.class;
+	}
+
+	@Override
+	public Class<?> getDataType() {
+		return String.class;
+	}
+
+	private static String getConceptId(String conceptName) {
+		return MohCacheUtils.getConcept(conceptName).getConceptId().toString();
 	}
 
 }
