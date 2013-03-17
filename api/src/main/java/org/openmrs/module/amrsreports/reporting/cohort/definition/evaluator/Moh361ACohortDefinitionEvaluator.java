@@ -1,5 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.cohort.definition.evaluator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	private final Log log = LogFactory.getLog(this.getClass());
 
 	@Override
 	public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
@@ -38,7 +41,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						" where " +
 						"  enrollment_date is not NULL" +
 						"  and enrollment_date <= ':reportDate'" +
-						"  and enrollment_location_id in (:locationList)";
+						"  and enrollment_location_id in ( :locationList )";
 
 		SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));
 

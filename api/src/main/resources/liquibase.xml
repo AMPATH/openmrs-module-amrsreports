@@ -258,47 +258,6 @@
                 />
     </changeSet>
 
-    <changeSet id="amrsreports-2013-03-11" author="jkeiper">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="amrsreports_queued_report"/>
-            </not>
-        </preConditions>
-        <comment>
-            Creating the amrsreports_queued_report table
-        </comment>
-        <createTable tableName="amrsreports_queued_report">
-            <column name="queued_report_id" type="int" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="report_name" type="varchar(50)">
-                <constraints nullable="false" />
-            </column>
-            <column name="facility_id" type="int">
-                <constraints nullable="false" />
-            </column>
-            <column name="evaluation_date" type="datetime">
-                <constraints nullable="false" />
-            </column>
-            <column name="date_scheduled" type="datetime">
-                <constraints nullable="false" />
-            </column>
-            <column name="uuid" type="char(38)">
-                <constraints nullable="false" />
-            </column>
-        </createTable>
-
-        <createIndex tableName="amrsreports_queued_report" indexName="date_scheduled">
-            <column name="date_scheduled" />
-        </createIndex>
-
-        <addForeignKeyConstraint constraintName="amrsreports_queued_report_facility"
-                                 baseTableName="amrsreports_queued_report" baseColumnNames="facility_id"
-                                 referencedTableName="amrsreports_facility" referencedColumnNames="facility_id"
-                />
-
-    </changeSet>
-
     <changeSet id="amrsreports-2013-03-14-a" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -379,5 +338,52 @@
                 />
     </changeSet>
 
+    <changeSet id="amrsreports-2013-03-11" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="amrsreports_queued_report"/>
+            </not>
+        </preConditions>
+        <comment>
+            Creating the amrsreports_queued_report table
+        </comment>
+        <createTable tableName="amrsreports_queued_report">
+            <column name="queued_report_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="report_name" type="varchar(50)">
+                <constraints nullable="false" />
+            </column>
+            <column name="facility_id" type="int">
+                <constraints nullable="false" />
+            </column>
+            <column name="evaluation_date" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="date_scheduled" type="datetime">
+                <constraints nullable="false" />
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <createIndex tableName="amrsreports_queued_report" indexName="status">
+            <column name="status" />
+        </createIndex>
+
+        <createIndex tableName="amrsreports_queued_report" indexName="date_scheduled">
+            <column name="date_scheduled" />
+        </createIndex>
+
+        <addForeignKeyConstraint constraintName="amrsreports_queued_report_facility"
+                                 baseTableName="amrsreports_queued_report" baseColumnNames="facility_id"
+                                 referencedTableName="amrsreports_facility" referencedColumnNames="facility_id"
+                />
+
+    </changeSet>
 
 </databaseChangeLog>

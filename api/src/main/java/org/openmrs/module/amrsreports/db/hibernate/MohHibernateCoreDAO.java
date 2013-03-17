@@ -385,17 +385,19 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 
 	@Override
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
-				.add(Restrictions.in("person.personId", cohort))
-				.setProjection(Projections.projectionList()
-						.add(Projections.property("person.personId"))
-						.add(Projections.property("enrollmentDate")));
-
 		Map<Integer, Date> ret = new LinkedHashMap<Integer, Date>();
-		Iterator<Object[]> it = crit.list().iterator();
-		while (it.hasNext()) {
-			Object[] row = it.next();
-			ret.put((Integer) row[0], (Date) row[1]);
+ 		if (cohort != null && cohort.size() > 0) {
+			Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
+					.add(Restrictions.in("person.personId", cohort))
+					.setProjection(Projections.projectionList()
+							.add(Projections.property("person.personId"))
+							.add(Projections.property("enrollmentDate")));
+
+			Iterator<Object[]> it = crit.list().iterator();
+			while (it.hasNext()) {
+				Object[] row = it.next();
+				ret.put((Integer) row[0], (Date) row[1]);
+			}
 		}
 		return ret;
 	}

@@ -1,7 +1,10 @@
 package org.openmrs.module.amrsreports.service.impl;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
+import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,10 +39,12 @@ import java.util.List;
 public class QueuedReportServiceImpl implements QueuedReportService {
 
 	private QueuedReportDAO dao;
+	private final Log log = LogFactory.getLog(this.getClass());
 
 	public void setDao(QueuedReportDAO dao) {
 		this.dao = dao;
 	}
+
 	@Override
 	public QueuedReport getNextQueuedReport() {
 		return dao.getNextQueuedReport(new Date());
@@ -63,7 +69,9 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		EvaluationContext evaluationContext = new EvaluationContext();
 
 		// set up evaluation context values
-		evaluationContext.addParameterValue("locationList", queuedReport.getFacility().getLocations());
+		List<Location> locations = new ArrayList<Location>();
+		locations.addAll(queuedReport.getFacility().getLocations());
+		evaluationContext.addParameterValue("locationList", locations);
 		evaluationContext.setEvaluationDate(queuedReport.getEvaluationDate());
 
 		// get the cohort
@@ -75,29 +83,42 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		Date startTime = Calendar.getInstance().getTime();
 		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
 
-		ReportData reportData = Context.getService(ReportDefinitionService.class)
-				.evaluate(reportDefinition, evaluationContext);
+		try {
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
 
-		// find the directory to put the file in
-		AdministrationService as = Context.getAdministrationService();
-		String folderName = as.getGlobalProperty("amrsreports.file_dir");
+			// find the directory to put the file in
+			AdministrationService as = Context.getAdministrationService();
+			String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
-		// create a new file
-		String facility = queuedReport.getFacility().getCode();
-		String fileURL = facility + "_" + formattedStartTime + "_" + queuedReport.getReportName().replaceAll(" ", "-") + ".csv";
-		File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-		File amrsreport = new File(loaddir, fileURL);
-		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
+			// create a new file
+			String facility = queuedReport.getFacility().getCode();
+			String fileURL = facility + "_" + formattedStartTime + "_" + queuedReport.getReportName().replaceAll(" ", "-") + ".csv";
+			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+			File amrsreport = new File(loaddir, fileURL);
+			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
 
-		// renderCSVFromReportData the CSV
-		MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
-		outputStream.close();
+			// renderCSVFromReportData the CSV
+			MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
+			outputStream.close();
 
-		Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
+			Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
+
+		} catch (Exception ex) {
+			log.error("Error processing queued report request #" + queuedReport.getId(), ex);
+			queuedReport.setStatus(QueuedReport.STATUS_ERROR);
+			Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+		}
 	}
 
 	@Override
 	public QueuedReport saveQueuedReport(QueuedReport queuedReport) {
+		if (queuedReport == null)
+			return queuedReport;
+
+		if (queuedReport.getStatus() == null)
+			queuedReport.setStatus(QueuedReport.STATUS_NEW);
+
 		return dao.saveQueuedReport(queuedReport);
 	}
 

@@ -32,6 +32,7 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
 				.add(Restrictions.le("dateScheduled", date))
+				.add(Restrictions.ne("status", QueuedReport.STATUS_ERROR))
 				.addOrder(Order.asc("dateScheduled"))
 				.setFetchSize(1);
 

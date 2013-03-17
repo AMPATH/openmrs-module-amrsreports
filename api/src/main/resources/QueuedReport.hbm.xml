@@ -12,6 +12,7 @@
         <many-to-one class="MOHFacility" name="facility" column="facility_id" not-null="true"/>
         <property name="dateScheduled" type="java.util.Date" column="date_scheduled" not-null="true" length="19" />
         <property name="evaluationDate" type="java.util.Date" column="evaluation_date" not-null="true" length="19" />
+        <property name="status" type="java.lang.String" column="status" not-null="true"/>
 
         <property length="38" name="uuid" type="java.lang.String" unique="true"/>
 	</class>

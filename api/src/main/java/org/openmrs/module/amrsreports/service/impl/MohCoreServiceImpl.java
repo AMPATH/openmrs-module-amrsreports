@@ -50,10 +50,6 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	 * @param mohCoreDAO the coreDAO to be injected
 	 */
 	public void setCoreDAO(final MohCoreDAO mohCoreDAO) {
-		if (log.isDebugEnabled()) {
-			log.debug("Wiring up CoreDAO with CoreService ...");
-		}
-
 		this.mohCoreDAO = mohCoreDAO;
 	}
 

@@ -15,6 +15,10 @@ public class QueuedReport extends BaseOpenmrsObject {
 	private MOHFacility facility;
 	private Date evaluationDate;
 	private Date dateScheduled;
+	private String status;
+
+	public static final String STATUS_NEW = "NEW";
+	public static final String STATUS_ERROR = "ERROR";
 
 	public Integer getQueuedReportId() {
 		return queuedReportId;
@@ -54,6 +58,14 @@ public class QueuedReport extends BaseOpenmrsObject {
 
 	public void setDateScheduled(Date dateScheduled) {
 		this.dateScheduled = dateScheduled;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	@Override
