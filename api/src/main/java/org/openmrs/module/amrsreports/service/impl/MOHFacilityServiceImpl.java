@@ -1,15 +1,22 @@
 package org.openmrs.module.amrsreports.service.impl;
 
 import org.openmrs.Location;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.util.MetadataComparator;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -84,5 +91,22 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 	@Override
 	public void purgeFacility(MOHFacility facility) {
 		dao.purgeFacility(facility);
+	}
+
+	@Override
+	public Map<Integer, PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility) {
+
+		PatientIdentifierType pat = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		List<PatientIdentifier> patientIdentifiers = Context.getPatientService().getPatientIdentifiers(
+				null, Collections.singletonList(pat), null, null, false);
+
+		Map<Integer, PatientIdentifier> cccMap = new HashMap<Integer, PatientIdentifier>();
+		for (PatientIdentifier pi: patientIdentifiers) {
+			if (pi.getIdentifier().startsWith(facility.getCode()))
+				cccMap.put(pi.getPatient().getPatientId(), pi);
+		}
+
+		return cccMap;
 	}
 }

@@ -72,6 +72,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		List<Location> locations = new ArrayList<Location>();
 		locations.addAll(queuedReport.getFacility().getLocations());
 		evaluationContext.addParameterValue("locationList", locations);
+		evaluationContext.addParameterValue("facility", queuedReport.getFacility());
 		evaluationContext.setEvaluationDate(queuedReport.getEvaluationDate());
 
 		// get the cohort

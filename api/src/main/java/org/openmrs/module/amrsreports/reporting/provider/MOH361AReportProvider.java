@@ -3,13 +3,12 @@ package org.openmrs.module.amrsreports.reporting.provider;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MOHPersonNameConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MOHSerialNumberConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -44,6 +43,7 @@ public class MOH361AReportProvider implements ReportProvider {
 	public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
+		StringConverter nullStringConverter = new StringConverter(null, "");
 		DateConverter commonDateConverter = new DateConverter(MohRuleUtils.DATE_FORMAT);
 		MohCoreService service = Context.getService(MohCoreService.class);
 
@@ -58,16 +58,16 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-		dsd.addColumn("Serial Number", cccColumn, nullString, new MOHSerialNumberConverter());
+		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
 		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString, commonDateConverter);
 
 		// c. Unique Patient Number
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new StringConverter(null, ""));
+		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
+		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString, nullStringConverter);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString, new MOHPersonNameConverter());

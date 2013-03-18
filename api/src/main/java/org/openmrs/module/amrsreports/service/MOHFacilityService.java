@@ -1,10 +1,12 @@
 package org.openmrs.module.amrsreports.service;
 
 import org.openmrs.Location;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,4 +37,7 @@ public interface MOHFacilityService {
 
 	@Transactional
 	void purgeFacility(MOHFacility facility);
+
+	@Transactional
+	public Map<Integer,PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility);
 }
