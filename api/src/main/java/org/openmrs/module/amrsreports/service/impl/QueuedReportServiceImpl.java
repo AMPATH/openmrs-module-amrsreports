@@ -82,7 +82,8 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 		// get the time the report was started (not finished)
 		Date startTime = Calendar.getInstance().getTime();
-		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
+		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd").format(startTime);
+		String formattedEvaluationDate = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
 
 		try {
 			ReportData reportData = Context.getService(ReportDefinitionService.class)
@@ -93,8 +94,17 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 			String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 			// create a new file
-			String facility = queuedReport.getFacility().getCode();
-			String fileURL = facility + "_" + formattedStartTime + "_" + queuedReport.getReportName().replaceAll(" ", "-") + ".csv";
+			String code = queuedReport.getFacility().getCode();
+
+			String fileURL = code
+					+ "_asOf-"
+					+ formattedEvaluationDate
+					+ "_runOn-"
+					+ formattedStartTime
+					+ "_"
+					+ queuedReport.getReportName().replaceAll(" ", "-")
+					+ ".csv";
+
 			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 			File amrsreport = new File(loaddir, fileURL);
 			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
