@@ -201,7 +201,7 @@ public class HIVCareEnrollmentBuilder {
 					"        on o.encounter_id = ae.first_hiv_encounter_id" +
 					"    where" +
 					"      o.voided = 0" +
-					"      and o.concept_id in (7015, 7016)" +
+					"      and o.concept_id = 7015" +
 					"      and o.value_coded = 1287" +
 					"    group by person_id" +
 					"  ) t" +
