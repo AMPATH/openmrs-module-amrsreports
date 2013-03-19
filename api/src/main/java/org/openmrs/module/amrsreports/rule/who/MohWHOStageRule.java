@@ -64,6 +64,7 @@ public class MohWHOStageRule extends MohEvaluableRule {
 
 	private static final List<OpenmrsObject> questionConcepts = Arrays.<OpenmrsObject>asList(new Concept[]{
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.ADULT_WHO_CONDITION_QUERY),
+			MohCacheUtils.getConcept(MohEvaluableNameConstants.PEDS_WHO_CATEGORY_QUERY),
 			MohCacheUtils.getConcept(MohEvaluableNameConstants.PEDS_WHO_SPECIFIC_CONDITION_QUERY)
 	});
 
