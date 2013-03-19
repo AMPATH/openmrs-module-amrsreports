@@ -33,6 +33,9 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 
 	private static final Log log = LogFactory.getLog(DrugStartStopDateRule.class);
 
+	// decides if we should look at values versus obs for datetime
+	private boolean valueBased = false;
+
 	// Lists of concepts and possible answers to be used in comparison as for start and stop dates
 	protected List<OpenmrsObject> startConcepts = null;
 	protected List<OpenmrsObject> stopConcepts = null;
@@ -113,31 +116,52 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 			}
 
 			// set dates
-			currentStartDate = currentStartObs == null ? null : currentStartObs.getObsDatetime();
-			currentStopDate = currentStopObs == null ? null : currentStopObs.getObsDatetime();
+			if (this.isValueBased()) {
+				currentStartDate = currentStartObs == null ? null : currentStartObs.getValueDatetime();
+				currentStopDate = currentStopObs == null ? null : currentStopObs.getValueDatetime();
+			} else {
+				currentStartDate = currentStartObs == null ? null : currentStartObs.getObsDatetime();
+				currentStopDate = currentStopObs == null ? null : currentStopObs.getObsDatetime();
+			}
 
 			// decide where to go next
 			if (currentStopObs != null) {
+
 				// we are dealing with a real stop date
 				if (currentStartObs == null || currentStopDate.before(currentStartDate)) {
+
 					// start date is either empty or after the stop date
 					ranges.add(new Date[]{null, currentStopDate});
 					currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
+
 				} else if (currentStartObs != null) {
+
 					// start date is after start date and is not null
 					Obs nextStartObs = startObs.hasNext() ? startObs.next() : null;
-					Date nextStartDate = nextStartObs == null ? null : nextStartObs.getObsDatetime();
+					Date nextStartDate = null;
+
+					if (this.isValueBased()) {
+						nextStartDate = nextStartObs == null ? null : nextStartObs.getValueDatetime();
+					} else {
+						nextStartDate = nextStartObs == null ? null : nextStartObs.getObsDatetime();
+					}
+
 					if (nextStartDate != null && currentStopDate.after(nextStartDate)) {
+
 						// next start date exists and is after stop date
 						ranges.add(new Date[]{currentStartDate, null});
+
 					} else {
+
 						// current start date and stop date are good
 						ranges.add(new Date[]{currentStartDate, currentStopDate});
 						currentStopObs = stopObs.hasNext() ? stopObs.next() : null;
 					}
+
 					currentStartObs = nextStartObs;
 				}
 			} else if (currentStartObs != null) {
+
 				// no more stop dates
 				ranges.add(new Date[]{currentStartDate, null});
 				currentStartObs = startObs.hasNext() ? startObs.next() : null;
@@ -153,24 +177,12 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 		return new Result(MOHReportUtil.joinAsSingleCell(results));
 	}
 
-	/**
-	 * filters a list of observations by only accepting the first observation for a given date and discarding the rest
-	 *
-	 * @param listObs
-	 * @return
-	 */
-	private List<Obs> popObs(List<Obs> listObs) {
-		Set<Date> uniqueDates = new HashSet<Date>();
-		List<Obs> uniqueObs = new ArrayList<Obs>();
+	public boolean isValueBased() {
+		return valueBased;
+	}
 
-		for (Obs obs : listObs) {
-			if (!uniqueDates.contains(obs.getObsDatetime())) {
-				uniqueDates.add(obs.getObsDatetime());
-				uniqueObs.add(obs);
-			}
-		}
-
-		return uniqueObs;
+	public void setValueBased(boolean valueBased) {
+		this.valueBased = valueBased;
 	}
 
 	//return the tokens

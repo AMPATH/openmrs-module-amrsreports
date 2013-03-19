@@ -40,10 +40,13 @@ public class MohTBStartStopDateRule extends DrugStartStopDateRule {
 	public MohTBStartStopDateRule() {
 		this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED));
 		this.stopConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_COMPLETED_DATE));
+		this.setValueBased(true);
 	}
 
 	/**
 	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 *
+	 * @should look at valueDatetime and not obsDatetime
 	 */
 	public Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
 
