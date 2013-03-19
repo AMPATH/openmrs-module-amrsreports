@@ -33,6 +33,9 @@ public class ReportQueueProcessor {
 		if (log.isDebugEnabled())
 			log.debug("Processing queued report (id=" + queuedReport);
 
+		queuedReport.setStatus(QueuedReport.STATUS_RUNNING);
+		Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+
 		try {
 			Context.getService(QueuedReportService.class).processQueuedReport(queuedReport);
 		} catch (Exception e) {

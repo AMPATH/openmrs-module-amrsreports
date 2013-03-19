@@ -15,19 +15,8 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css"/>
 
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
-<style type="text/css">
-
-    .visualPadding {
-        margin: 1em;
-    }
-
-    .newline {
-        clear: both;
-        display: block;
-    }
-</style>
 
 <script type="text/javascript">
 
@@ -59,8 +48,19 @@
     <b class="boxHeader">Queued Reports</b>
     <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
         <c:forEach var="r" items="${queuedReports}">
-            ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on ${r.dateScheduled}) <br/>
+            <div class="queued">
+                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
+            </div>
+        </c:forEach>
+        <c:if test="${not empty queuedReports and not empty currentReport}">
+            <hr />
+        </c:if>
+        <c:forEach var="r" items="${currentReport}">
+            <div class="running">
+                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
+            </div>
         </c:forEach>
     </div>
     <br />

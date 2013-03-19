@@ -45,7 +45,12 @@ public class MohRenderController {
 
 	@ModelAttribute("queuedReports")
 	public List<QueuedReport> getQueuedReports() {
-		return Context.getService(QueuedReportService.class).getAllQueuedReports();
+		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_NEW);
+	}
+
+	@ModelAttribute("currentReport")
+	public List<QueuedReport> getCurrentReport() {
+		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_RUNNING);
 	}
 
 	@ModelAttribute("facilities")

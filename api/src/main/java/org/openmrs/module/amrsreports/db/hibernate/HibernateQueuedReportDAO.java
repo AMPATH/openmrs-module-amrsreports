@@ -34,7 +34,7 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 				.add(Restrictions.le("dateScheduled", date))
 				.add(Restrictions.ne("status", QueuedReport.STATUS_ERROR))
 				.addOrder(Order.asc("dateScheduled"))
-				.setFetchSize(1);
+				.setMaxResults(1);
 
 		return (QueuedReport) c.uniqueResult();
 	}
@@ -47,6 +47,14 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 	@Override
 	public List<QueuedReport> getAllQueuedReports() {
 		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
+				.addOrder(Order.asc("dateScheduled"))
+				.list();
+	}
+
+	@Override
+	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
+		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
+				.add(Restrictions.eq("status", status))
 				.addOrder(Order.asc("dateScheduled"))
 				.list();
 	}

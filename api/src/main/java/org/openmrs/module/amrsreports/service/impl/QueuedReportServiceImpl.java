@@ -132,4 +132,9 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 	public List<QueuedReport> getAllQueuedReports() {
 		return dao.getAllQueuedReports();
 	}
+
+	@Override
+	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
+		return dao.getQueuedReportsWithStatus(status);
+	}
 }

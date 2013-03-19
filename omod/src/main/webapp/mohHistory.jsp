@@ -15,18 +15,10 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css" />
+
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
-<style type="text/css">
-	.tblformat tr:nth-child(odd) {
-		background-color: #009d8e;
-		color: #FFFFFF;
-	}
-	.tblformat tr:nth-child(even) {
-		background-color: #d3d3d3;
-		color: #000000;
-	}
-</style>
 <script type="text/javascript">
 	$j(document).ready(function(){
 
@@ -156,10 +148,21 @@
 
     <b class="boxHeader">Queued Reports</b>
     <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-            <c:forEach var="r" items="${queuedReports}">
+        <c:forEach var="r" items="${queuedReports}">
+            <div class="queued">
                 ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>) <br/>
-            </c:forEach>
+                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
+            </div>
+        </c:forEach>
+        <c:if test="${not empty queuedReports and not empty currentReport}">
+            <hr />
+        </c:if>
+        <c:forEach var="r" items="${currentReport}">
+            <div class="running">
+                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
+                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
+            </div>
+        </c:forEach>
     </div>
     <br />
 </c:if>

@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreports.db;
 
 import org.openmrs.module.amrsreports.QueuedReport;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -11,15 +10,13 @@ import java.util.List;
  */
 public interface QueuedReportDAO {
 
-	@Transactional
 	public QueuedReport saveQueuedReport(QueuedReport queuedReport);
 
-	@Transactional
 	public QueuedReport getNextQueuedReport(Date date);
 
-	@Transactional
 	public void purgeQueuedReport(QueuedReport queuedReport);
 
-	@Transactional
 	public List<QueuedReport> getAllQueuedReports();
+
+	public List<QueuedReport> getQueuedReportsWithStatus(String status);
 }
