@@ -99,7 +99,7 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 		PatientIdentifierType pat = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
 
 		List<PatientIdentifier> patientIdentifiers = Context.getPatientService().getPatientIdentifiers(
-				null, Collections.singletonList(pat), null, null, false);
+				null, Collections.singletonList(pat), null, null, null);
 
 		Map<Integer, PatientIdentifier> cccMap = new HashMap<Integer, PatientIdentifier>();
 		for (PatientIdentifier pi: patientIdentifiers) {
