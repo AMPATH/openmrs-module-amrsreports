@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreports.db.hibernate;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
@@ -22,6 +23,7 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 	@Override
 	public List<MOHFacility> getAllFacilities(Boolean includeRetired) {
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(MOHFacility.class);
+		c.addOrder(Order.asc("name"));
 		if (!includeRetired)
 			c.add(Restrictions.eq("retired", false));
 		return c.list();
