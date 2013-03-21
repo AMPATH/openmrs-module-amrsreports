@@ -67,7 +67,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString, nullStringConverter);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString, new MOHPersonNameConverter());
