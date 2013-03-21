@@ -58,7 +58,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
+		// dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
@@ -95,15 +95,15 @@ public class MOH361AReportProvider implements ReportProvider {
 		// h. Confirmed HIV+ Date
 		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString, commonDateConverter);
 
-		// i. PEP Start / Stop Date
-		LogicDataDefinition columnI = new LogicDataDefinition();
-		columnI.setLogicQuery("\"MOH PEP Start Stop Date\"");
-		dsd.addColumn("PEP Start / Stop Date", columnI, nullString);
-
-		// j. Reasons for PEP use:
-		LogicDataDefinition columnJ = new LogicDataDefinition();
-		columnJ.setLogicQuery("\"MOH Reasons For PEP\"");
-		dsd.addColumn("Reasons for PEP Use", columnJ, nullString);
+//		// i. PEP Start / Stop Date
+//		LogicDataDefinition columnI = new LogicDataDefinition();
+//		columnI.setLogicQuery("\"MOH PEP Start Stop Date\"");
+//		dsd.addColumn("PEP Start / Stop Date", columnI, nullString);
+//
+//		// j. Reasons for PEP use:
+//		LogicDataDefinition columnJ = new LogicDataDefinition();
+//		columnJ.setLogicQuery("\"MOH Reasons For PEP\"");
+//		dsd.addColumn("Reasons for PEP Use", columnJ, nullString);
 
 		// k. CTX startdate and stopdate:
 		LogicDataDefinition columnK = new LogicDataDefinition();

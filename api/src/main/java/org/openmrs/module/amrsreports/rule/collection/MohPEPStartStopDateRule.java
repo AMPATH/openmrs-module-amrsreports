@@ -37,29 +37,18 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 
 	public static final String POST_EXPOSURE_INITIAL_FORM = "PEPINITIAL";
 	public static final String POST_EXPOSURE_RETURN_FORM = "PEPRETURN";
+
 	public static final String ANTIRETROVIRAL_THERAPY_STATUS = "ANTIRETROVIRAL THERAPY STATUS";
 	public static final String ON_ANTIRETROVIRAL_THERAPY = "ON ANTIRETROVIRAL THERAPY";
+
 	public static final String ARVs_RECOMMENDED_FOR_PEP = "ARVs RECOMMENDED FOR PEP";
 	public static final String ZIDOVUDINE_AND_LAMIVUDINE = "ZIDOVUDINE AND LAMIVUDINE";
 	public static final String LOPINAVIR_AND_RITONAVIR = "LOPINAVIR AND RITONAVIR";
-	public static final String OTHER_ANTIRETROVIRAL_DRUG = "OTHER ANTIRETROVIRAL DRUG";
+
 	public static final String REASON_ANTIRETROVIRALS_STOPPED = "REASON ANTIRETROVIRALS STOPPED";
-	public static final String REGIMEN_FAILURE = "REGIMEN FAILURE";
-	public static final String WEIGHT_CHANGE = "WEIGHT CHANGE";
-	public static final String TOXICITY_DRUG = "TOXICITY, DRUG";
-	public static final String OTHER_NON_CODED = "OTHER NON-CODED";
-	public static final String COMPLETED_TOTAL_PMTCT = "COMPLETED TOTAL PMTCT";
-	public static final String POOR_ADHERENCE_NOS = "POOR ADHERENCE, NOS";
-	public static final String ADD_DRUGS = "ADD DRUG(S)";
-	public static final String FACILITY_STOCKED_OUT_OF_MEDICATION = "FACILITY STOCKED OUT OF MEDICATION";
-	public static final String TUBERCULOSIS = "TUBERCULOSIS";
-	public static final String PREGNANCY_RISK = "PREGNANCY RISK";
 	public static final String PATIENT_REFUSAL = "PATIENT REFUSAL";
 	public static final String COMPLETED = "COMPLETED";
-	public static final String FIRST_TRIMESTER_OF_PREGNANCY = "FIRST TRIMESTER OF PREGNANCY";
-	public static final String NOT_ON_ANTIRETROVIRAL_THERAPY = "NOT ON ANTIRETROVIRAL THERAPY";
-	public static final String INTERRUPTED = "INTERRUPTED";
-	public static final String UNKNOWN = "UNKNOWN";
+
 	public static final String DAYS_ON_PEP_MEDS1 = "DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO NON-ADHERENCE, ANTIRETROVIRALS";
 	public static final String DAYS_ON_PEP_MEDS2 = "DAYS ON POST EXPOSURE PROPHYLAXIS BEFORE STOPPING DUE TO SIDE EFFECTS, ANTIRETROVIRALS";
 
@@ -85,26 +74,11 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 
 	private static final List<Concept> START_CONCEPTS = Arrays.<Concept>asList(
 			MohCacheUtils.getConcept(ON_ANTIRETROVIRAL_THERAPY),
-			//MohCacheUtils.getConcept(NOT_ON_ANTIRETROVIRAL_THERAPY),
-			//MohCacheUtils.getConcept(INTERRUPTED),
-			//MohCacheUtils.getConcept(UNKNOWN),
 			MohCacheUtils.getConcept(ZIDOVUDINE_AND_LAMIVUDINE),
 			MohCacheUtils.getConcept(LOPINAVIR_AND_RITONAVIR)
-			//MohCacheUtils.getConcept(OTHER_ANTIRETROVIRAL_DRUG)
 	);
 
 	private static final List<Concept> STOP_CONCEPTS = Arrays.<Concept>asList(
-			//MohCacheUtils.getConcept(REGIMEN_FAILURE),
-			//MohCacheUtils.getConcept(WEIGHT_CHANGE),
-			//MohCacheUtils.getConcept(TOXICITY_DRUG),
-			//MohCacheUtils.getConcept(OTHER_NON_CODED),
-			//MohCacheUtils.getConcept(COMPLETED_TOTAL_PMTCT),
-			//MohCacheUtils.getConcept(POOR_ADHERENCE_NOS),
-			//MohCacheUtils.getConcept(ADD_DRUGS),
-			//MohCacheUtils.getConcept(FACILITY_STOCKED_OUT_OF_MEDICATION),
-			//MohCacheUtils.getConcept(TUBERCULOSIS),
-			//MohCacheUtils.getConcept(PREGNANCY_RISK),
-			//MohCacheUtils.getConcept(FIRST_TRIMESTER_OF_PREGNANCY),
 			MohCacheUtils.getConcept(PATIENT_REFUSAL),
 			MohCacheUtils.getConcept(COMPLETED)
 	);
@@ -127,6 +101,7 @@ public class MohPEPStartStopDateRule extends DrugStartStopDateRule {
 		// pull relevant observations then loop while checking concepts
 		Map<String, Collection<OpenmrsObject>> obsRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("concept", questionConcepts);
+
 		Map<String, Collection<OpenmrsObject>> encounterRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		obsRestrictions.put("encounterType", encounterTypes);
 
