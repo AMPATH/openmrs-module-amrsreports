@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -251,12 +253,12 @@ public class DWRAmrsReportService {
 	 * provide the list of patients in the MOH361A cohort for a given location and evaluation date
 	 */
 	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
+
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
-		context.addParameterValue("endDate", evaluationDate);
 
 		Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("location", location);
+		context.addParameterValue("locationList", Collections.singletonList(location));
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
 
@@ -267,7 +269,7 @@ public class DWRAmrsReportService {
 			log.error(e);
 		}
 
-		return null;
+		return new HashSet<Integer>();
 	}
 
 	/**
