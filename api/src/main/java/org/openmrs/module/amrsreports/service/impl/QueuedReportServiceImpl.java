@@ -96,13 +96,16 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 			// create a new file
 			String code = queuedReport.getFacility().getCode();
 
-			String fileURL = code
-					+ "_asOf-"
-					+ formattedEvaluationDate
-					+ "_runOn-"
-					+ formattedStartTime
-					+ "_"
+			String fileURL = ""
 					+ queuedReport.getReportName().replaceAll(" ", "-")
+					+ "_"
+					+ code
+					+ "_"
+					+ queuedReport.getFacility().getName().replaceAll(" ", "-")
+					+ "_as-of_"
+					+ formattedEvaluationDate
+					+ "_run-on_"
+					+ formattedStartTime
 					+ ".csv";
 
 			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
