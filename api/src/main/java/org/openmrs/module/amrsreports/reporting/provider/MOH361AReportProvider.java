@@ -6,7 +6,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
+import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
@@ -130,9 +132,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("LTFU / TO / DEAD", columnO, nullString);
 
 		// p. WHO clinical Stage and date
-		LogicDataDefinition columnP = new LogicDataDefinition();
-		columnP.setLogicQuery("\"MOH WHO Stage\"");
-		dsd.addColumn("WHO Clinical Stage", columnP, nullString);
+		dsd.addColumn("WHO Clinical Stage", new FirstWHOStageDataDefinition(), nullString, new WHOStageAndDateConverter());
 
 		// q. Date medically eligible for ART
 		LogicDataDefinition columnQ = new LogicDataDefinition();
