@@ -45,6 +45,6 @@ public class SerialNumberDataEvaluator implements PersonDataEvaluator {
 		if (dashLocation == -1)
 			return identifier.getIdentifier();
 
-		return identifier.getIdentifier().substring(dashLocation);
+		return identifier.getIdentifier().substring(dashLocation + 1);
 	}
 }

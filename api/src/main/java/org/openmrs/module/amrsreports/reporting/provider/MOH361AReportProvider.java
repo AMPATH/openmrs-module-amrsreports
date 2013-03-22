@@ -16,7 +16,7 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
-import org.openmrs.module.reporting.data.converter.StringConverter;
+import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.patient.definition.LogicDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
@@ -43,7 +43,7 @@ public class MOH361AReportProvider implements ReportProvider {
 	public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
-		StringConverter nullStringConverter = new StringConverter(null, "");
+        ObjectFormatter nullStringConverter = new ObjectFormatter();
 		DateConverter commonDateConverter = new DateConverter(MohRuleUtils.DATE_FORMAT);
 		MohCoreService service = Context.getService(MohCoreService.class);
 
@@ -58,7 +58,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		// dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
+		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
@@ -66,7 +66,7 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
+        PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
 		// d. Patient's Name
