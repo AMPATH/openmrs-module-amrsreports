@@ -84,45 +84,37 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		Date startTime = Calendar.getInstance().getTime();
 		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd").format(startTime);
 		String formattedEvaluationDate = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
+		ReportData reportData = Context.getService(ReportDefinitionService.class)
+		        .evaluate(reportDefinition, evaluationContext);
 
-		try {
-			ReportData reportData = Context.getService(ReportDefinitionService.class)
-					.evaluate(reportDefinition, evaluationContext);
+		// find the directory to put the file in
+		AdministrationService as = Context.getAdministrationService();
+		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
-			// find the directory to put the file in
-			AdministrationService as = Context.getAdministrationService();
-			String folderName = as.getGlobalProperty("amrsreports.file_dir");
+		// create a new file
+		String code = queuedReport.getFacility().getCode();
 
-			// create a new file
-			String code = queuedReport.getFacility().getCode();
+		String fileURL = ""
+				+ queuedReport.getReportName().replaceAll(" ", "-")
+				+ "_"
+				+ code
+				+ "_"
+				+ queuedReport.getFacility().getName().replaceAll(" ", "-")
+				+ "_as-of_"
+				+ formattedEvaluationDate
+				+ "_run-on_"
+				+ formattedStartTime
+				+ ".csv";
 
-			String fileURL = ""
-					+ queuedReport.getReportName().replaceAll(" ", "-")
-					+ "_"
-					+ code
-					+ "_"
-					+ queuedReport.getFacility().getName().replaceAll(" ", "-")
-					+ "_as-of_"
-					+ formattedEvaluationDate
-					+ "_run-on_"
-					+ formattedStartTime
-					+ ".csv";
+		File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
+		File amrsreport = new File(loaddir, fileURL);
+		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
 
-			File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-			File amrsreport = new File(loaddir, fileURL);
-			BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
+		// renderCSVFromReportData the CSV
+		MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
+		outputStream.close();
 
-			// renderCSVFromReportData the CSV
-			MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
-			outputStream.close();
-
-			Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
-
-		} catch (Exception ex) {
-			log.error("Error processing queued report request #" + queuedReport.getId(), ex);
-			queuedReport.setStatus(QueuedReport.STATUS_ERROR);
-			Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
-		}
+		Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
 	}
 
 	@Override

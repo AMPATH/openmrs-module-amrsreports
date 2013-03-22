@@ -40,6 +40,8 @@ public class ReportQueueProcessor {
 			Context.getService(QueuedReportService.class).processQueuedReport(queuedReport);
 		} catch (Exception e) {
 			log.error("Unable to process hl7 in queue", e);
+            queuedReport.setStatus(QueuedReport.STATUS_ERROR);
+            Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
 		}
 
 		if (++count > 25) {
