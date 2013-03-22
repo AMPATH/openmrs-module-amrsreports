@@ -168,7 +168,7 @@ public class DWRAmrsReportService {
 
 
 			httpServletResponse.setContentType(mimeType);
-			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + urlToDownLoad);
+			httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + csvFile);
 			//httpServletResponse.setContentType(MimeConstants.MIME_PLAIN);
 			//httpServletResponse.setContentLength((int) urlToDownLoad.length());
 			bw.write(urlToDownLoad);
