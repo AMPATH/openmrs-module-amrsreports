@@ -6,7 +6,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MOHPersonNameConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
@@ -70,7 +69,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
 		// d. Patient's Name
-		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString, new MOHPersonNameConverter());
+		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
 		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MohRuleUtils.DATE_FORMAT));
