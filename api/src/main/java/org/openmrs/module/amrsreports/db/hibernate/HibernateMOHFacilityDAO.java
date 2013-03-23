@@ -2,10 +2,15 @@ package org.openmrs.module.amrsreports.db.hibernate;
 
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 
 import java.util.List;
 
@@ -43,5 +48,17 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 	@Override
 	public void purgeFacility(MOHFacility facility) {
 		sessionFactory.getCurrentSession().delete(facility);
+	}
+
+	@Override
+	public List<PatientIdentifier> getCCCNumbersForFacility(MOHFacility facility) {
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		Criteria c = sessionFactory.getCurrentSession().createCriteria(PatientIdentifier.class)
+				.add(Restrictions.eq("voided", false))
+				.add(Restrictions.eq("identifierType", pit))
+				.add(Restrictions.like("identifier", facility.getCode(), MatchMode.START));
+
+		return c.list();
 	}
 }

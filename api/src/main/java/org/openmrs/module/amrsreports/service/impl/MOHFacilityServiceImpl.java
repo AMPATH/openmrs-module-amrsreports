@@ -96,15 +96,11 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 	@Override
 	public Map<Integer, PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility) {
 
-		PatientIdentifierType pat = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
-
-		List<PatientIdentifier> patientIdentifiers = Context.getPatientService().getPatientIdentifiers(
-				null, Collections.singletonList(pat), null, null, null);
+		List<PatientIdentifier> patientIdentifiers = dao.getCCCNumbersForFacility(facility);
 
 		Map<Integer, PatientIdentifier> cccMap = new HashMap<Integer, PatientIdentifier>();
 		for (PatientIdentifier pi: patientIdentifiers) {
-			if (pi.getIdentifier().startsWith(facility.getCode()))
-				cccMap.put(pi.getPatient().getPatientId(), pi);
+			cccMap.put(pi.getPatient().getPatientId(), pi);
 		}
 
 		return cccMap;

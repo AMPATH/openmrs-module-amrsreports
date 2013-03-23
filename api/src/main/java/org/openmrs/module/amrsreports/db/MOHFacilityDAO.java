@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.db;
 
+import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface MOHFacilityDAO {
 	public MOHFacility saveFacility(MOHFacility facility);
 
 	public void purgeFacility(MOHFacility facility);
+
+	public List<PatientIdentifier> getCCCNumbersForFacility(MOHFacility facility);
 }
