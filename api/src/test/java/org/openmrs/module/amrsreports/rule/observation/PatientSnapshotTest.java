@@ -12,17 +12,17 @@ public class PatientSnapshotTest {
     @Test
     public void testGetProperty() throws Exception {
         ps = new ARVPatientSnapshot();
-        ps.setProperty("reason","Clinical Only");
+        ps.set("reason", "Clinical Only");
 
-        Assert.assertTrue(ps.getProperty("reason").equals("Clinical Only"));
+        Assert.assertTrue(ps.get("reason").equals("Clinical Only"));
 
     }
     @Test
     public void testSetProperty() throws Exception {
         ps = new ARVPatientSnapshot();
-        ps.setProperty("reason","Clinical Only");
+        ps.set("reason", "Clinical Only");
 
-        Assert.assertTrue(ps.getProperty("reason").equals("Clinical Only"));
+        Assert.assertTrue(ps.get("reason").equals("Clinical Only"));
 
     }
 }

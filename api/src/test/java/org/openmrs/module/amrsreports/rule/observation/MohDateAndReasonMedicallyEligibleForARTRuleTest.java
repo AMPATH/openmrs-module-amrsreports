@@ -15,6 +15,7 @@ import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -100,7 +101,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		// initialize logic context
 		logicContext = Mockito.mock(LogicContext.class);
-		Mockito.when(logicContext.getIndexDate()).thenReturn(new Date());
+		Mockito.when(logicContext.getIndexDate()).thenReturn(makeDate("2013-01-01"));
 	}
 
 	/**
@@ -147,100 +148,265 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	}
 
 	/**
-	 * @verifies return REASON_CLINICAL_CD4ForAdults
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
-	 *      java.util.Map)
+	 * clears the currentObs
 	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForAdults() throws Exception {
-		Date dob = makeDate("16 Oct 1975");
-		patient.setBirthdate(dob);
-
-		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_1_ADULT, "16 Oct 2012");
-		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "16 Oct 2012");
-
-		Assert.assertEquals("REASON_CLINICAL_CD4ForAdults tested false", new Result("16/10/2012 - Clinical + CD4"), rule.evaluate(logicContext, PATIENT_ID, null));
+	private void clearObs() {
+		currentObs.clear();
 	}
 
 	/**
-	 * @verifies return REASON_CLINICALForAdults
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
-	 *      java.util.Map)
+	 * @verifies return Clinical and WHO Stage if under 12 and PEDS WHO Stage is 4
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldReturnREASON_CLINICALForAdults() throws Exception {
+	public void evaluate_shouldReturnClinicalAndWHOStageIfUnder12AndPEDSWHOStageIs4() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2012"));
 
-		Date dob = makeDate("16 Oct 1975");
-		patient.setBirthdate(dob);
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Nov 2012");
 
-		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_4_ADULT, "16 Oct 2012");
-		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"16/11/2012",
+				ARVPatientSnapshot.REASON_CLINICAL,
+				"WHO Stage 4"
+		);
 
-		Assert.assertEquals("REASON_CLINICALForAdults tested false", new Result("16/10/2012 - Clinical Only"), rule.evaluate(logicContext, PATIENT_ID, null));
-
-
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
-	 * @verifies return REASON_CLINICALForPeds
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
-	 *      java.util.Map)
+	 * @verifies return CD4 and WHO Stage and CD4 values if under 12 and PEDS WHO Stage is 3 and CD4 is under 500 and CD4
+	 * percentage is under 25
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldReturnREASON_CLINICALForPeds() throws Exception {
-
-		Date dob = makeDate("16 Oct 2006");
-		patient.setBirthdate(dob);
-
-		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Oct 2012");
-		Assert.assertEquals("Current Obs is null", 1, currentObs.size());
-
-		Assert.assertEquals("Result for REASON_CLINICALForPeds tested false", new Result("16/10/2012 - Clinical Only"), rule.evaluate(logicContext, PATIENT_ID, null));
-
-
-	}
-
-	/**
-	 * @verifies return REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
-	 *      java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4_HIV_DNA_PCRForPeds() throws Exception {
-
-		Date dob = makeDate("16 Oct 2012");
-		patient.setBirthdate(dob);
-
-		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
-		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
-		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
-
-		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
-		Assert.assertEquals("Result for REASON_CLINICAL_CD4_HIV_DNA_PCRForPeds tested false", new Result("16/10/2012 - Clinical + CD4 + HIV DNA PCR"), rule.evaluate(logicContext, PATIENT_ID, null));
-
-
-	}
-
-	/**
-	 * @verifies return REASON_CLINICAL_CD4ForPeds
-	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer,
-	 *      java.util.Map)
-	 */
-	@Test
-	public void evaluate_shouldReturnREASON_CLINICAL_CD4ForPeds() throws Exception {
-
-		Date dob = makeDate("16 Oct 2010");
-		patient.setBirthdate(dob);
+	public void evaluate_shouldReturnCD4AndWHOStageAndCD4ValuesIfUnder12AndPEDSWHOStageIs3AndCD4IsUnder500AndCD4PercentageIsUnder25() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2010"));
 
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_3_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 20d, "16 Oct 2012");
 
-		Assert.assertEquals("Current Obs is null", 3, currentObs.size());
-		Assert.assertEquals("Result for REASON_CLINICAL_CD4ForPeds tested false", new Result("16/10/2012 - Clinical + CD4"), rule.evaluate(logicContext, PATIENT_ID, null));
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"16/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 3",
+				"CD4 Count: 340",
+				"CD4 %: 20"
+		);
 
-
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
+	/**
+	 * @verifies return CD4 and HIV DNA PCR and WHO Stage and CD4 and HIV DNA PCR values if under 18 months and PEDS WHO
+	 * Stage is 2 and CD4 is under 500 and HIV DNA PCR is positive
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnCD4AndHIVDNAPCRAndWHOStageAndCD4AndHIVDNAPCRValuesIfUnder18MonthsAndPEDSWHOStageIs2AndCD4IsUnder500AndHIVDNAPCRIsPositive() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2012"));
 
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
+		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"16/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4_HIV_DNA_PCR,
+				"WHO Stage 2",
+				"CD4 Count: 340",
+				"HIV DNA PCR: Positive"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return HIV DNA PCR and WHO Stage and HIV DNA PCR value if under 18 months and PEDS WHO Stage is 1 and HIV
+	 * DNA PCR is positive
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnHIVDNAPCRAndWHOStageAndHIVDNAPCRValueIfUnder18MonthsAndPEDSWHOStageIs1AndHIVDNAPCRIsPositive() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2012"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "17 Oct 2012");
+		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "18 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"18/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_HIV_DNA_PCR,
+				"WHO Stage 1",
+				"HIV DNA PCR: Positive"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return CD4 and WHO Stage and CD4 percentage values if between 18 months and 5 years and PEDS WHO Stage is
+	 * 1 or 2 and CD4 percentage is under 20
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnCD4AndWHOStageAndCD4PercentageValuesIfBetween18MonthsAnd5YearsAndPEDSWHOStageIs1Or2AndCD4PercentageIsUnder20() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2010"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 19d, "18 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"18/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 1",
+				"CD4 %: 19"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 19d, "19 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"19/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 2",
+				"CD4 %: 19"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return CD4 and WHO Stage and CD4 percentage values if between 5 years and 12 years and PEDS WHO Stage is 1
+	 * or 2 and CD4 percentage is under 25
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnCD4AndWHOStageAndCD4PercentageValuesIfBetween5YearsAnd12YearsAndPEDSWHOStageIs1Or2AndCD4PercentageIsUnder25() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2003"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 24d, "18 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"18/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 1",
+				"CD4 %: 24"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 24d, "19 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"19/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 2",
+				"CD4 %: 24"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return Clinical and WHO Stage if over 12 and ADULT WHO Stage is 3 or 4
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnClinicalAndWHOStageIfOver12AndADULTWHOStageIs3Or4() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 1975"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_3_ADULT, "16 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"16/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL,
+				"WHO Stage 3"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_4_ADULT, "17 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"17/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL,
+				"WHO Stage 4"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return CD4 and WHO Stage and CD4 value if over 12 and ADULT or PEDS WHO Stage is 1 or 2 and CD4 is under
+	 * 350
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnCD4AndWHOStageAndCD4ValueIfOver12AndADULTOrPEDSWHOStageIs1Or2AndCD4IsUnder350() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 1975"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_1_ADULT, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "17 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"17/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 1",
+				"CD4 Count: 300"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_2_ADULT, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "18 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"18/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 2",
+				"CD4 Count: 300"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "19 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"19/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 1",
+				"CD4 Count: 300"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+
+		clearObs();
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
+		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "20 Oct 2012");
+
+		expected = MOHReportUtil.joinAsSingleCell(
+				"20/10/2012",
+				ARVPatientSnapshot.REASON_CLINICAL_CD4,
+				"WHO Stage 2",
+				"CD4 Count: 300"
+		);
+
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
 }

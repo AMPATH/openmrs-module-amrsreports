@@ -31,8 +31,10 @@ import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -61,11 +63,14 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	private MohCoreService mohCoreService = Context.getService(MohCoreService.class);
 
 	/**
-	 * @should return REASON_CLINICAL_CD4 for adults
-	 * @should return REASON_CLINICAL for adults
-	 * @should return REASON_CLINICAL for peds
-	 * @should return REASON_CLINICAL_CD4_HIV_DNA_PCR for peds
-	 * @should return REASON_CLINICAL_CD4 for peds
+	 * @should return Clinical and WHO Stage if under 12 and PEDS WHO Stage is 4
+	 * @should return CD4 and WHO Stage and CD4 values if under 12 and PEDS WHO Stage is 3 and CD4 is under 500 and CD4 percentage is under 25
+	 * @should return CD4 and HIV DNA PCR and WHO Stage and CD4 and HIV DNA PCR values if under 18 months and PEDS WHO Stage is 2 and CD4 is under 500 and HIV DNA PCR is positive
+	 * @should return HIV DNA PCR and WHO Stage and HIV DNA PCR value if under 18 months and PEDS WHO Stage is 1 and HIV DNA PCR is positive
+	 * @should return CD4 and WHO Stage and CD4 percentage values if between 18 months and 5 years and PEDS WHO Stage is 1 or 2 and CD4 percentage is under 20
+	 * @should return CD4 and WHO Stage and CD4 percentage values if between 5 years and 12 years and PEDS WHO Stage is 1 or 2 and CD4 percentage is under 25
+	 * @should return Clinical and WHO Stage if over 12 and ADULT WHO Stage is 3 or 4
+	 * @should return CD4 and WHO Stage and CD4 value if over 12 and ADULT or PEDS WHO Stage is 1 or 2 and CD4 is under 350
 	 *
 	 * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
 	 */
@@ -94,7 +99,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 					flags.setAgeGroup(MohRuleUtils.getAgeGroupAtDate(patient.getBirthdate(), o.getObsDatetime()));
 					if (flags.eligible()) // this obs marks the first eligible date; return it
 					{
-						return formatResult(o.getObsDatetime(), (String) flags.getProperty("reason"));
+						return formatResult(o.getObsDatetime(), flags);
 					}
 				}
 			}
@@ -105,7 +110,6 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		}
 		return new Result();
 	}
-
 
 	@Override
 	protected String getEvaluableToken() {
@@ -140,7 +144,14 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		return Datatype.TEXT;
 	}
 
-	private Result formatResult(Date date, String reason) {
-		return new Result(MohRuleUtils.formatdates(date) + " - " + reason);
+	private Result formatResult(Date date, PatientSnapshot flags) {
+		List<String> results = new ArrayList<String>();
+
+		results.add(MohRuleUtils.formatdates(date));
+		results.add((String) flags.get("reason"));
+		if (flags.hasProperty("extras"))
+			results.addAll((List<String>) flags.get("extras"));
+
+		return new Result(MOHReportUtil.joinAsSingleCell(results));
 	}
 }
