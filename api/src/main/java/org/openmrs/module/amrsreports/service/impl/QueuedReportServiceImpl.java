@@ -82,7 +82,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 		// get the time the report was started (not finished)
 		Date startTime = Calendar.getInstance().getTime();
-		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd_at_HH-mm-ss").format(startTime);
+		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(startTime);
 		String formattedEvaluationDate = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
 		ReportData reportData = Context.getService(ReportDefinitionService.class)
 		        .evaluate(reportDefinition, evaluationContext);
