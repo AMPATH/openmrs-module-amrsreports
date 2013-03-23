@@ -140,10 +140,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Date and Reason Medically Eligible for ART", columnQ, nullString);
 
 		// r. Reason Medically Eligible for ART
-// TODO make this into a separate column by using a converter
-//		LogicDataDefinition columnR = new LogicDataDefinition();
-//		columnR.setLogicQuery("\"MOH Date and Reason Medically Eligible For ART\"");
-//		dsd.addColumn("Reason Medically Eligible for ART", columnQ, nullString);
+		// TODO make this into a separate column by using a converter
 
 		// s. Date ART started (Transfer to ART register)
 		LogicDataDefinition columnS = new LogicDataDefinition();
