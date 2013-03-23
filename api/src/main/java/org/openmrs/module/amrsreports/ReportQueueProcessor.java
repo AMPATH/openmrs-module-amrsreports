@@ -39,7 +39,7 @@ public class ReportQueueProcessor {
 		try {
 			Context.getService(QueuedReportService.class).processQueuedReport(queuedReport);
 		} catch (Exception e) {
-			log.error("Unable to process hl7 in queue", e);
+			log.error("Unable to process amrs reports queue!", e);
             queuedReport.setStatus(QueuedReport.STATUS_ERROR);
             Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
 		}

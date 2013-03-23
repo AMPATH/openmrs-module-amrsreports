@@ -29,11 +29,15 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
+import org.openmrs.module.amrsreports.rule.medication.MohDateArtStartedRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,6 +75,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	 * @should return CD4 and WHO Stage and CD4 percentage values if between 5 years and 12 years and PEDS WHO Stage is 1 or 2 and CD4 percentage is under 25
 	 * @should return Clinical and WHO Stage if over 12 and ADULT WHO Stage is 3 or 4
 	 * @should return CD4 and WHO Stage and CD4 value if over 12 and ADULT or PEDS WHO Stage is 1 or 2 and CD4 is under 350
+	 * @should return reason only when ART started before eligibility date
 	 *
 	 * @see {@link MohEvaluableRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)}
 	 */
@@ -99,7 +104,12 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 					flags.setAgeGroup(MohRuleUtils.getAgeGroupAtDate(patient.getBirthdate(), o.getObsDatetime()));
 					if (flags.eligible()) // this obs marks the first eligible date; return it
 					{
-						return formatResult(o.getObsDatetime(), flags);
+						Date obsDatetime = o.getObsDatetime();
+						Date artStarted = getArtStarted(context, patientId, parameters);
+						if (artStarted != null && obsDatetime.after(artStarted))
+							return formatResult(flags);
+						else
+							return formatResult(o.getObsDatetime(), flags);
 					}
 				}
 			}
@@ -109,6 +119,20 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 			throw new LogicException("could not evaluate patient for ART eligibility date.", e);
 		}
 		return new Result();
+	}
+
+	private Date getArtStarted(final LogicContext context, final Integer patientId, Map<String, Object> parameters) {
+		DateFormat dateFormat = new SimpleDateFormat(MohRuleUtils.DATE_FORMAT);
+
+		MohDateArtStartedRule mohDateArtStartedRule = new MohDateArtStartedRule();
+		Result result = mohDateArtStartedRule.eval(context, patientId, parameters);
+		Date artStarted = null;
+		try {
+			artStarted = dateFormat.parse(result.toString());
+		} catch (ParseException e) {
+			log.info("Ignoring non-date value!");
+		}
+		return artStarted;
 	}
 
 	@Override
@@ -144,10 +168,16 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 		return Datatype.TEXT;
 	}
 
+	private Result formatResult(PatientSnapshot flags) {
+		return formatResult(null, flags);
+	}
+
 	private Result formatResult(Date date, PatientSnapshot flags) {
 		List<String> results = new ArrayList<String>();
 
-		results.add(MohRuleUtils.formatdates(date));
+		if (date != null)
+			results.add(MohRuleUtils.formatdates(date));
+
 		results.add((String) flags.get("reason"));
 		if (flags.hasProperty("extras"))
 			results.addAll((List<String>) flags.get("extras"));

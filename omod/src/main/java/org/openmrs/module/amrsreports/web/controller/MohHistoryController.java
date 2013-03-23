@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -12,6 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +59,7 @@ public class MohHistoryController {
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 
-		String[] children = fileDir.list();
+		String[] children = fileDir.list(new WildcardFileFilter("*csv"));
 
 		List<String> filenames = children != null ? Arrays.asList(children) : new ArrayList<String>();
 		Collections.sort(filenames);
@@ -74,7 +78,7 @@ public class MohHistoryController {
 		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-		String[] children = fileDir.list();
+		String[] children = fileDir.list(new WildcardFileFilter("*csv"));
 		if (children != null) {
 			filenames = Arrays.asList(children);
 		}
@@ -116,10 +120,11 @@ public class MohHistoryController {
 		String folderName = as.getGlobalProperty("amrsreports.file_dir");
 
 		File fileDir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-		File amrsFileToDownload = new File(fileDir, fileToImportToCSV);
+		String filename = FilenameUtils.getBaseName(fileToImportToCSV) + ".xls";
+		File amrsFileToDownload = new File(fileDir, filename);
 
 		response.setContentType("application/vnd.ms-excel");
-		response.setHeader("Content-Disposition", "attachment; filename=" + amrsFileToDownload);
+		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 		response.setContentLength((int) amrsFileToDownload.length());
 
 		FileCopyUtils.copy(new FileInputStream(amrsFileToDownload), response.getOutputStream());
