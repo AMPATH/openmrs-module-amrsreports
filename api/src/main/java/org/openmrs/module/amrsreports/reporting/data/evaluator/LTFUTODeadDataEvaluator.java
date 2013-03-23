@@ -71,7 +71,7 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				"		and voided=0" +
 				"		and encounter_type=31" +
 				"		and encounter_datetime <= ':reportDate'" +
-				"	order by enconter_datetime asc" +
+				"	order by encounter_datetime asc" +
 				" ) ordered" +
 				" group by patient_id";
 
