@@ -9,6 +9,7 @@ import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
@@ -127,9 +128,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Pregnancy EDD and Referral", columnN, nullString);
 
 		// o. LTFU / TO / Dead and date when the event occurred
-		LogicDataDefinition columnO = new LogicDataDefinition();
-		columnO.setLogicQuery("\"MOH LTFU-TO-DEAD\"");
-		dsd.addColumn("LTFU / TO / DEAD", columnO, nullString);
+		dsd.addColumn("LTFU / TO / DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
 
 		// p. WHO clinical Stage and date
 		dsd.addColumn("WHO Clinical Stage", new FirstWHOStageDataDefinition(), nullString, new WHOStageAndDateConverter());
