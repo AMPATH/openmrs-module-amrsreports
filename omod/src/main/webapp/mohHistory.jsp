@@ -183,7 +183,7 @@
 	<b class="boxHeader">Report Details</b>
 	<div class="box" id="maindetails" style="width:99%; height:auto;  overflow-x: auto;">
 		<div id="printbuttons" align="right">
-			<input type="button" id="csvdownload" value="Download CSV Format">
+			<input type="button" id="csvdownload" value="Download Excel Format">
 		</div>
 
 		<table id="tablehistory">

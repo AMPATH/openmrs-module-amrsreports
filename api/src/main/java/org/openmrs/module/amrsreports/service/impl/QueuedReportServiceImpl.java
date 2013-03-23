@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.service.impl;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,12 +22,14 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+import org.openmrs.module.reporting.report.renderer.XlsReportRenderer;
 import org.openmrs.util.OpenmrsUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -113,6 +116,13 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		// renderCSVFromReportData the CSV
 		MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
 		outputStream.close();
+
+		String xlsFilename = FilenameUtils.getBaseName(fileURL) + ".xls";
+		File xlsFile = new File(loaddir, xlsFilename);
+		OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+		XlsReportRenderer xlsReportRenderer = new XlsReportRenderer();
+		xlsReportRenderer.render(reportData, queuedReport.getReportName(), stream);
+		stream.close();
 
 		Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
 	}

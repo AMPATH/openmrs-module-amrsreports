@@ -20,6 +20,7 @@ import org.openmrs.Patient;
 import org.openmrs.logic.result.Result;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MohResultCacheInstance {
@@ -45,7 +46,13 @@ public class MohResultCacheInstance {
 	public synchronized void addResult(MohResultCacheKey key, Result results) {
 		Map<MohResultCacheKey, Result> patientResultCache = resultCache.get(key.getPatientId());
 		if (patientResultCache == null) {
-			patientResultCache = new HashMap<MohResultCacheKey, Result>();
+			patientResultCache = new LinkedHashMap<MohResultCacheKey, Result>() {
+                private static final int MAX_ENTRIES = 10;
+
+                protected boolean removeEldestEntry(Map.Entry eldest) {
+                    return size() > MAX_ENTRIES;
+                }
+            };
 			resultCache.put(key.getPatientId(), patientResultCache);
 		}
 		patientResultCache.put(key, results);

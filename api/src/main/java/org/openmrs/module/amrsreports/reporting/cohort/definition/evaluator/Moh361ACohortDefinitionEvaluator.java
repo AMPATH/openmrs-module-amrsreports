@@ -56,7 +56,8 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
                             "        or (person_attribute.voided = 1 and person_attribute.void_reason like 'New value: %'))" +
                             "   and person_attribute.person_attribute_type_id = 7" +
                             "   and person_attribute.value = '" + location.getLocationId() + "'" +
-                            "   and amrsreports_hiv_care_enrollment.enrollment_date is not null";
+                            "   and amrsreports_hiv_care_enrollment.enrollment_date is not null" +
+							"   and amrsreports_hiv_care_enrollment.enrollment_date <= ':reportDate'";
             sql = sql + personAttributeQuery;
         }
 

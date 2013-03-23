@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.rule.medication;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Obs;
@@ -17,6 +18,7 @@ import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchOrdering;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,13 +91,43 @@ public abstract class DrugStartStopDateRule extends MohEvaluableRule {
 	protected abstract boolean validateStopObs(Obs obs);
 
 	/**
+	 * Sanitize observations from duplicate
+	 *
+	 * @param observations list of observations with duplicates.
+	 * @return obs without duplicates.
+	 */
+	private List<Obs> sanitize(final List<Obs> observations) {
+		List<Obs> sanitized = new ArrayList<Obs>();
+		int counter = 0;
+		Obs processedObs = null;
+		while (counter < observations.size()) {
+			Obs obs = observations.get(counter++);
+			if (processedObs != null) {
+				if (this.isValueBased()) {
+					if (DateUtils.isSameDay(processedObs.getValueDatetime(), obs.getValueDatetime()))
+						continue;
+				} else {
+					if (DateUtils.isSameDay(processedObs.getObsDatetime(), obs.getObsDatetime()))
+						continue;
+				}
+			}
+			processedObs = obs;
+			sanitized.add(obs);
+		}
+		return sanitized;
+	}
+
+	/**
 	 * creates a Result from two lists, one with start observations and the second with stop observations.
 	 *
-	 * @param starters
-	 * @param stoppers
+	 * @param inputStarters
+	 * @param inputStoppers
 	 * @return
 	 */
-	protected Result buildResultFromObservations(List<Obs> starters, List<Obs> stoppers) {
+	protected Result buildResultFromObservations(List<Obs> inputStarters, List<Obs> inputStoppers) {
+		List<Obs> starters = sanitize(inputStarters);
+		List<Obs> stoppers = sanitize(inputStoppers);
+
 		Iterator<Obs> startObs = starters.iterator();
 		Iterator<Obs> stopObs = stoppers.iterator();
 		Obs currentStartObs = startObs.hasNext() ? startObs.next() : null;

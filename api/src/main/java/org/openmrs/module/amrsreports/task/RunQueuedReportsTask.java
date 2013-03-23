@@ -35,9 +35,6 @@ public class RunQueuedReportsTask extends AbstractTask {
 		Context.openSession();
 		try {
 			log.debug("Processing AMRS reports queue ... ");
-			if (!Context.isAuthenticated()) {
-				authenticate();
-			}
 			processor.processQueuedReports();
 		} catch (HL7Exception e) {
 			log.error("Error running AMRS reports queue task", e);

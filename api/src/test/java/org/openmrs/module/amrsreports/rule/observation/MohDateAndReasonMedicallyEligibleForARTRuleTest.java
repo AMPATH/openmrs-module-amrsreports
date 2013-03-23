@@ -13,7 +13,9 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.cache.MohCacheInstance;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreports.rule.MohResultCacheInstance;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
@@ -40,6 +42,10 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 			ARVPatientSnapshot.REASON_CLINICAL_CD4,
 			ARVPatientSnapshot.REASON_CLINICAL_CD4_HIV_DNA_PCR,
 			ARVPatientSnapshot.REASON_CLINICAL_HIV_DNA_PCR,
+
+			MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN,
+			MohEvaluableNameConstants.START_DRUGS,
+
 			MohEvaluableNameConstants.WHO_STAGE_1_ADULT,
 			MohEvaluableNameConstants.WHO_STAGE_2_ADULT,
 			MohEvaluableNameConstants.WHO_STAGE_3_ADULT,
@@ -162,6 +168,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnClinicalAndWHOStageIfUnder12AndPEDSWHOStageIs4() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2012"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Nov 2012");
 
 		String expected = MOHReportUtil.joinAsSingleCell(
@@ -182,6 +189,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnCD4AndWHOStageAndCD4ValuesIfUnder12AndPEDSWHOStageIs3AndCD4IsUnder500AndCD4PercentageIsUnder25() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2010"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_3_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 20d, "16 Oct 2012");
@@ -206,6 +214,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnCD4AndHIVDNAPCRAndWHOStageAndCD4AndHIVDNAPCRValuesIfUnder18MonthsAndPEDSWHOStageIs2AndCD4IsUnder500AndHIVDNAPCRIsPositive() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2012"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
 		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 340d, "16 Oct 2012");
@@ -230,6 +239,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnHIVDNAPCRAndWHOStageAndHIVDNAPCRValueIfUnder18MonthsAndPEDSWHOStageIs1AndHIVDNAPCRIsPositive() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2012"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "17 Oct 2012");
 		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "18 Oct 2012");
 
@@ -252,6 +262,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnCD4AndWHOStageAndCD4PercentageValuesIfBetween18MonthsAnd5YearsAndPEDSWHOStageIs1Or2AndCD4PercentageIsUnder20() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2010"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 19d, "18 Oct 2012");
 
@@ -266,6 +277,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 19d, "19 Oct 2012");
 
@@ -288,6 +300,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnCD4AndWHOStageAndCD4PercentageValuesIfBetween5YearsAnd12YearsAndPEDSWHOStageIs1Or2AndCD4PercentageIsUnder25() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 2003"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 24d, "18 Oct 2012");
 
@@ -302,6 +315,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_PERCENT, 24d, "19 Oct 2012");
 
@@ -323,6 +337,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnClinicalAndWHOStageIfOver12AndADULTWHOStageIs3Or4() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 1975"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_3_ADULT, "16 Oct 2012");
 
 		String expected = MOHReportUtil.joinAsSingleCell(
@@ -335,6 +350,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_4_ADULT, "17 Oct 2012");
 
 		expected = MOHReportUtil.joinAsSingleCell(
@@ -355,6 +371,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 	public void evaluate_shouldReturnCD4AndWHOStageAndCD4ValueIfOver12AndADULTOrPEDSWHOStageIs1Or2AndCD4IsUnder350() throws Exception {
 		patient.setBirthdate(makeDate("16 Oct 1975"));
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_1_ADULT, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "17 Oct 2012");
 
@@ -369,6 +386,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_ADULT, MohEvaluableNameConstants.WHO_STAGE_2_ADULT, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "18 Oct 2012");
 
@@ -383,6 +401,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "19 Oct 2012");
 
@@ -397,6 +416,7 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 
 		clearObs();
 
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2013");
 		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_2_PEDS, "16 Oct 2012");
 		addObsValue(MohEvaluableNameConstants.CD4_BY_FACS, 300d, "20 Oct 2012");
 
@@ -407,6 +427,26 @@ public class MohDateAndReasonMedicallyEligibleForARTRuleTest {
 				"CD4 Count: 300"
 		);
 
+		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies return reason only when ART started before eligibility date
+	 * @see MohDateAndReasonMedicallyEligibleForARTRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldReturnReasonOnlyWhenARTStartedBeforeEligibilityDate() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2012"));
+
+		addObs(MohEvaluableNameConstants.ANTIRETROVIRAL_PLAN, MohEvaluableNameConstants.START_DRUGS, "23 Mar 2010");
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_1_PEDS, "17 Oct 2012");
+		addObs(MohEvaluableNameConstants.HIV_DNA_PCR, MohEvaluableNameConstants.POSITIVE, "18 Oct 2012");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				ARVPatientSnapshot.REASON_CLINICAL_HIV_DNA_PCR,
+				"WHO Stage 1",
+				"HIV DNA PCR: Positive"
+		);
 		Assert.assertEquals(new Result(expected), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }
