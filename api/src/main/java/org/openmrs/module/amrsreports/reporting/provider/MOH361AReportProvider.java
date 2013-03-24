@@ -13,6 +13,7 @@ import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinitio
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
@@ -121,9 +122,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("TB Treatment Start / Stop Date", new TbStartStopDataDefinition(), nullString);
 
 		// n. Pregnancy Yes?, Due date, PMTCT refer
-		LogicDataDefinition columnN = new LogicDataDefinition();
-		columnN.setLogicQuery("\"MOH Pregnancy PMTC Referral\"");
-		dsd.addColumn("Pregnancy EDD and Referral", columnN, nullString);
+		dsd.addColumn("Pregnancy EDD and Referral", new PmtctPregnancyDataDefinition(), nullString);
 
 		// o. LTFU / TO / Dead and date when the event occurred
 		dsd.addColumn("LTFU / TO / DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
