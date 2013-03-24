@@ -42,9 +42,9 @@ public class FluconazoleStartStopDataEvaluator extends DrugStartStopDataEvaluato
 		Map<String, String> substitutions = new HashMap<String, String>();
 		Set<Integer> memberIds = context.getBaseCohort().getMemberIds();
 		String personIds = StringUtils.join(memberIds, ",");
-		substitutions.put("personIds", personIds);
+		substitutions.put(":personIds", personIds);
 		String reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
-		substitutions.put("reportDate", reportDate);
+		substitutions.put(":reportDate", reportDate);
 
 		String startQuery =
 				" select person_id, obs_datetime " +
