@@ -55,7 +55,7 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
-						" order by obs_datetime asc";
+						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStartDates = makeDatesMapFromSQL(startQuery, substitutions);
 
 		String stopQuery =
@@ -66,7 +66,7 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
-						" order by obs_datetime asc";
+						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStopDates = makeDatesMapFromSQL(stopQuery, substitutions);
 
 		for (Integer memberId : memberIds) {
@@ -102,13 +102,13 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 		for (List<Object> objects : data) {
 			// there will be two objects per list
 			Integer personId = (Integer) objects.get(0);
-			Date obsDatetime = (Date) objects.get(1);
+			Date dateValue = (Date) objects.get(1);
 			Set<Date> dates = mappedDates.get(personId);
 			if (dates == null) {
 				dates = new LinkedHashSet<Date>();
 				mappedDates.put(personId, dates);
 			}
-			dates.add(obsDatetime);
+			dates.add(dateValue);
 		}
 
 		return mappedDates;

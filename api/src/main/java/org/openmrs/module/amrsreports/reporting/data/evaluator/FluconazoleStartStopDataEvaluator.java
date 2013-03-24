@@ -50,11 +50,11 @@ public class FluconazoleStartStopDataEvaluator extends DrugStartStopDataEvaluato
 				" select person_id, obs_datetime " +
 						" from obs " +
 						" where ((concept_id = 1277 and value_coded = 1256) " +
-						"     and (concept_id = 1278 and value_coded = 747)) " +
+						"     or (concept_id = 1278 and value_coded = 747)) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
-						" order by obs_datetime asc";
+						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStartDates = makeDatesMapFromSQL(startQuery, substitutions);
 
 		String stopQuery =
@@ -64,7 +64,7 @@ public class FluconazoleStartStopDataEvaluator extends DrugStartStopDataEvaluato
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
-						" order by obs_datetime asc";
+						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStopDates = makeDatesMapFromSQL(stopQuery, substitutions);
 
 		for (Integer memberId : memberIds) {
@@ -100,13 +100,13 @@ public class FluconazoleStartStopDataEvaluator extends DrugStartStopDataEvaluato
 		for (List<Object> objects : data) {
 			// there will be two objects per list
 			Integer personId = (Integer) objects.get(0);
-			Date obsDatetime = (Date) objects.get(1);
+			Date dateValue = (Date) objects.get(1);
 			Set<Date> dates = mappedDates.get(personId);
 			if (dates == null) {
 				dates = new LinkedHashSet<Date>();
 				mappedDates.put(personId, dates);
 			}
-			dates.add(obsDatetime);
+			dates.add(dateValue);
 		}
 
 		return mappedDates;

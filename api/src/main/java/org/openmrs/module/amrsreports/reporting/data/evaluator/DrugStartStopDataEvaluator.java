@@ -44,7 +44,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 
 		Date stopDate = safeNext(stopDateIterator);
 		Date startDate = safeNext(startDateIterator);
-		while(startDateIterator.hasNext() || stopDateIterator.hasNext()) {
+		do {
 			if (stopDate != null) {
 				// stop is before start, range is: Unknown - stop date
 				if (stopDate.before(startDate)) {
@@ -69,7 +69,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 					startDate = safeNext(startDateIterator);
 				}
 			}
-		}
+		} while(startDateIterator.hasNext() || stopDateIterator.hasNext());
 
 		// build the response
 		List<String> results = new ArrayList<String>();
