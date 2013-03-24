@@ -18,6 +18,7 @@ import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -35,7 +36,7 @@ import java.util.Set;
 
 /**
  */
-@Handler(supports = FluconazoleStartStopDataDefinition.class, order = 50)
+@Handler(supports = PmtctPregnancyDataDefinition.class, order = 50)
 public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 
 	@Override
