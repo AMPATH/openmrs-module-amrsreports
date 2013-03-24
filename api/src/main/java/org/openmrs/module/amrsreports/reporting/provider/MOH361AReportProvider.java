@@ -8,10 +8,13 @@ import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
+import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -109,19 +112,13 @@ public class MOH361AReportProvider implements ReportProvider {
 //		dsd.addColumn("Reasons for PEP Use", columnJ, nullString);
 
 		// k. CTX startdate and stopdate:
-		LogicDataDefinition columnK = new LogicDataDefinition();
-		columnK.setLogicQuery("\"MOH CTX Start-Stop Date\"");
-		dsd.addColumn("CTX Start / Stop Date", columnK, nullString);
+		dsd.addColumn("CTX Start / Stop Date", new CtxStartStopDataDefinition(), nullString);
 
 		// l. Fluconazole startdate and stopdate
-		LogicDataDefinition columnL = new LogicDataDefinition();
-		columnL.setLogicQuery("\"MOH Fluconazole Start-Stop Date\"");
-		dsd.addColumn("Fluconazole Start / Stop Date", columnL, nullString);
+		dsd.addColumn("Fluconazole Start / Stop Date", new FluconazoleStartStopDataDefinition(), nullString);
 
 		// m. TB treatment startdate and stopdate
-		LogicDataDefinition columnM = new LogicDataDefinition();
-		columnM.setLogicQuery("\"MOH TB Start-Stop Date\"");
-		dsd.addColumn("TB Treatment Start / Stop Date", columnM, nullString);
+		dsd.addColumn("TB Treatment Start / Stop Date", new TbStartStopDataDefinition(), nullString);
 
 		// n. Pregnancy Yes?, Due date, PMTCT refer
 		LogicDataDefinition columnN = new LogicDataDefinition();
