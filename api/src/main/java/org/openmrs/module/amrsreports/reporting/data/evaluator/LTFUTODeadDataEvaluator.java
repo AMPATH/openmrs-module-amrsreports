@@ -188,7 +188,7 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 			// report LTFU if RTC is overdue
 			else if (rtcExpectedDate != null && rtcExpectedDate.before(rtcOverdueDate.getTime())) {
 				Calendar expectedDate = Calendar.getInstance();
-				expectedDate.setTime(rtcDates.get(personId));
+				expectedDate.setTime(rtcExpectedDate);
 				expectedDate.add(Calendar.DAY_OF_MONTH, 93);
 				ret.addData(personId, "LTFU - " + MohRuleUtils.formatdates(expectedDate.getTime()));
 			}
