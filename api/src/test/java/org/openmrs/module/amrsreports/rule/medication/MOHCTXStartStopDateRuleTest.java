@@ -12,6 +12,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
@@ -38,8 +39,9 @@ public class MOHCTXStartStopDateRuleTest {
 
 	private static final List<String> initConcepts = Arrays.asList(
 			MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED,
+			MohEvaluableNameConstants.CURRENT_MEDICATIONS,
+			MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS,
 			MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED,
-			MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED,
 			MohEvaluableNameConstants.NONE
 	);
 
@@ -74,16 +76,19 @@ public class MOHCTXStartStopDateRuleTest {
 
 		Map<String, Collection<OpenmrsObject>> startRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		startRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
-				conceptService.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED)));
+				conceptService.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED),
+				conceptService.getConcept(MohEvaluableNameConstants.CURRENT_MEDICATIONS),
+				conceptService.getConcept(MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS)
+		));
 
 		Map<String, Collection<OpenmrsObject>> stopRestrictions = new HashMap<String, Collection<OpenmrsObject>>();
 		stopRestrictions.put("concept", Arrays.<OpenmrsObject>asList(
-				conceptService.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED),
-				conceptService.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
+				conceptService.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
 		));
 
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(startRestrictions),
 				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStartObs);
+
 		Mockito.when(mohCoreService.getPatientObservations(Mockito.eq(PATIENT_ID), Mockito.eq(stopRestrictions),
 				Mockito.any(MohFetchRestriction.class), Mockito.any(Date.class))).thenReturn(currentStopObs);
 
@@ -184,22 +189,43 @@ public class MOHCTXStartStopDateRuleTest {
 	}
 
 	/**
-	 * @verifies stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with not null answer
+	 * @verifies start on CURRENT_MEDICATIONS equal to TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
 	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNotNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, MohEvaluableNameConstants.NONE, "20 Oct 1975");
-		Assert.assertEquals(new Result("Unknown - 20/10/1975"), rule.evaluate(logicContext, PATIENT_ID, null));
+	public void evaluate_shouldStartOnCURRENT_MEDICATIONSEqualToTRIMETHOPRIM_AND_SULFAMETHOXAZOLE() throws Exception {
+		addStartObs(MohEvaluableNameConstants.CURRENT_MEDICATIONS, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE, "20 Oct 1975");
+		Assert.assertEquals(new Result("20/10/1975 - Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 
 	/**
-	 * @verifies not stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with null answer
+	 * @verifies not start on CURRENT_MEDICATIONS equal to something other than TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
 	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	@Test
-	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPED_DETAILEDWithNullAnswer() throws Exception {
-		addStopObs(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED, null, "21 Oct 1975");
+	public void evaluate_shouldNotStartOnCURRENT_MEDICATIONSEqualToSomethingOtherThanTRIMETHOPRIM_AND_SULFAMETHOXAZOLE() throws Exception {
+		addStartObs(MohEvaluableNameConstants.CURRENT_MEDICATIONS, MohEvaluableNameConstants.NONE, "20 Oct 1975");
+		Assert.assertEquals(new Result(""), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies start on PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS equal to TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
+	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldStartOnPATIENT_REPORTED_CURRENT_PCP_PROPHYLAXISEqualToTRIMETHOPRIM_AND_SULFAMETHOXAZOLE() throws Exception {
+		addStartObs(MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE, "21 Oct 1975");
+		Assert.assertEquals(new Result("21/10/1975 - Unknown"), rule.evaluate(logicContext, PATIENT_ID, null));
+	}
+
+	/**
+	 * @verifies not start on PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS equal to something other than
+	 * TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
+	 * @see MOHCTXStartStopDateRule#evaluate(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 */
+	@Test
+	public void evaluate_shouldNotStartOnPATIENT_REPORTED_CURRENT_PCP_PROPHYLAXISEqualToSomethingOtherThanTRIMETHOPRIM_AND_SULFAMETHOXAZOLE() throws Exception {
+		addStartObs(MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS, MohEvaluableNameConstants.NONE, "21 Oct 1975");
 		Assert.assertEquals(new Result(""), rule.evaluate(logicContext, PATIENT_ID, null));
 	}
 }

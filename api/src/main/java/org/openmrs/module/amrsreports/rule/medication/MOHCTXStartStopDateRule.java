@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.rule.medication;
 
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.logic.LogicContext;
@@ -10,10 +11,8 @@ import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-
 
 /**
  * rule for calculating CTX start and stop dates
@@ -23,22 +22,28 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 	public static final String TOKEN = "MOH CTX Start-Stop Date";
 
 	public MOHCTXStartStopDateRule() {
-		this.startConcepts = Collections.singletonList((OpenmrsObject) MohCacheUtils.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED));
+		this.startConcepts = Arrays.<OpenmrsObject>asList(
+				MohCacheUtils.getConcept(MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED),
+				MohCacheUtils.getConcept(MohEvaluableNameConstants.CURRENT_MEDICATIONS),
+				MohCacheUtils.getConcept(MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS)
+		);
 
 		this.stopConcepts = Arrays.<OpenmrsObject>asList(
-				MohCacheUtils.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED),
-				MohCacheUtils.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
+				MohCacheUtils.getConcept(MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
 		);
 	}
 
 	/**
+	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
+	 *
 	 * @should start on PCP_PROPHYLAXIS_STARTED with not null answer
 	 * @should not start on PCP_PROPHYLAXIS_STARTED with null answer
+	 * @should start on CURRENT_MEDICATIONS equal to TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
+	 * @should not start on CURRENT_MEDICATIONS equal to something other than TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
+	 * @should start on PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS equal to TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
+	 * @should not start on PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS equal to something other than TRIMETHOPRIM_AND_SULFAMETHOXAZOLE
 	 * @should stop on REASON_PCP_PROPHYLAXIS_STOPPED with not null answer
 	 * @should not stop on REASON_PCP_PROPHYLAXIS_STOPPED with null answer
-	 * @should stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with not null answer
-	 * @should not stop on REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED with null answer
-	 * @see org.openmrs.logic.Rule#eval(org.openmrs.logic.LogicContext, Integer, java.util.Map)
 	 */
 	public Result evaluate(final LogicContext context, final Integer patientId, final Map<String, Object> parameters) throws LogicException {
 
@@ -50,17 +55,20 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 
 	@Override
 	protected boolean validateStartObs(Obs obs) {
-		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) &&
-				obs.getValueCoded() != null;
+		Concept c = obs.getConcept();
+		Concept v = obs.getValueCoded();
+
+		return (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) && v != null)
+				|| (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.CURRENT_MEDICATIONS)
+				&& MohRuleUtils.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE))
+				|| (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS)
+				&& MohRuleUtils.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE));
 	}
 
 	@Override
 	protected boolean validateStopObs(Obs obs) {
-		return (obs.getValueCoded() != null) && (
-				MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
-						||
-						MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED_DETAILED)
-		);
+		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
+				&& obs.getValueCoded() != null;
 	}
 
 	@Override
