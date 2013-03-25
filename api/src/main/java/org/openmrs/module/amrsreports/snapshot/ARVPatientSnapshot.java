@@ -1,4 +1,4 @@
-package org.openmrs.module.amrsreports.rule.observation;
+package org.openmrs.module.amrsreports.snapshot;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
@@ -17,7 +17,6 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 	public static final String REASON_CLINICAL_CD4 = "Clinical + CD4";
 	public static final String REASON_CLINICAL_CD4_HIV_DNA_PCR = "Clinical + CD4 + HIV DNA PCR";
 	public static final String REASON_CLINICAL_HIV_DNA_PCR = "Clinical + HIV DNA PCR";
-
 
 	public ARVPatientSnapshot() {
 		this.set("pedsWHOStage", 0);
@@ -38,7 +37,6 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT))) {
 			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT))) {
 				this.set("adultWHOStage", 1);
-
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT))) {
 				this.set("adultWHOStage", 2);
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_ADULT))) {
@@ -46,6 +44,7 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_ADULT))) {
 				this.set("adultWHOStage", 4);
 			}
+			this.set("lastDate", o.getObsDatetime());
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS))) {
@@ -58,20 +57,24 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_PEDS))) {
 				this.set("pedsWHOStage", 4);
 			}
+			this.set("lastDate", o.getObsDatetime());
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_DNA_PCR))) {
 			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE))) {
 				this.set("HIVDNAPCRPositive", true);
+				this.set("lastDate", o.getObsDatetime());
 				return true;
 			}
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_BY_FACS))) {
 			this.set("cd4ByFacs", value);
+			this.set("lastDate", o.getObsDatetime());
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_PERCENT))) {
 			this.set("cd4PercentByFacs", value);
+			this.set("lastDate", o.getObsDatetime());
 			return true;
 		}
 		return false;

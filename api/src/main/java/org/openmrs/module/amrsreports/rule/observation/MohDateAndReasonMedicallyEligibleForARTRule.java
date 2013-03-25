@@ -32,6 +32,8 @@ import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreports.rule.medication.MohDateArtStartedRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
+import org.openmrs.module.amrsreports.snapshot.PatientSnapshot;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
@@ -81,6 +83,8 @@ public class MohDateAndReasonMedicallyEligibleForARTRule extends MohEvaluableRul
 	 */
 	@Override
 	public Result evaluate(LogicContext context, Integer patientId, Map<String, Object> parameters) throws LogicException {
+
+		log.warn("Processing Date and Reason for ART for Patient #" + patientId);
 
 		// get evaluation date from logic context
 		Date evaluationDate = context.getIndexDate();

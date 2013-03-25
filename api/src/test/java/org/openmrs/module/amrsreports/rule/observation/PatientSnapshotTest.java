@@ -2,6 +2,8 @@ package org.openmrs.module.amrsreports.rule.observation;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
+import org.openmrs.module.amrsreports.snapshot.PatientSnapshot;
 
 /**
  * A test class for set and get property methods in PatientSnapshot class

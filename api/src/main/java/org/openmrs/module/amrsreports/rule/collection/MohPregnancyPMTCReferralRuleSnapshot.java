@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.rule.observation.PatientSnapshot;
+import org.openmrs.module.amrsreports.snapshot.PatientSnapshot;
 
 import java.util.Calendar;
 import java.util.Date;

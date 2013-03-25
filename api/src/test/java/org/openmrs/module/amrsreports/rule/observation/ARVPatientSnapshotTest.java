@@ -5,9 +5,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
 import org.openmrs.module.amrsreports.rule.util.MohTestUtils;
 
 /**
@@ -20,7 +19,7 @@ public class ARVPatientSnapshotTest {
 
 	/**
 	 * @verifies recognize and set WHO stage from an obs or specify peds WHO
-	 * @see PatientSnapshot#consume(org.openmrs.Obs)
+	 * @see org.openmrs.module.amrsreports.snapshot.PatientSnapshot#consume(org.openmrs.Obs)
 	 */
 	@Test
 	@Ignore
@@ -74,7 +73,7 @@ public class ARVPatientSnapshotTest {
 
 	/**
 	 * @verifies determine eligibility based on age group and flags
-	 * @see PatientSnapshot#eligible()
+	 * @see org.openmrs.module.amrsreports.snapshot.PatientSnapshot#eligible()
 	 */
 	@Test
 	@Ignore
