@@ -63,6 +63,7 @@ public class FluconazoleStartStopDataEvaluator extends DrugStartStopDataEvaluato
 						" where (concept_id = 1277 and value_coded = 1260) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStopDates = makeDatesMapFromSQL(stopQuery, substitutions);

@@ -53,6 +53,7 @@ public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 						" where (concept_id = 6743 or concept_id = 5596) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<String>> mappedValueDates = makeDatesMapFromSQL(startQuery, substitutions);
