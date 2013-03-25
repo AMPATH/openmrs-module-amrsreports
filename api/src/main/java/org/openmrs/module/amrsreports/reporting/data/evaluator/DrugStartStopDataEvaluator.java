@@ -44,8 +44,11 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 
 		Date stopDate = safeNext(stopDateIterator);
 		Date startDate = safeNext(startDateIterator);
+
 		// TODO: for tomorrow, we will display the first date only!
-		ranges.add(new Date[]{startDate, stopDate});
+		if (startDate != null || stopDate != null)
+			ranges.add(new Date[]{ startDate, stopDate });
+
 		/*
 		do {
 			if (stopDate != null) {
@@ -76,6 +79,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 		*/
 
 		// build the response
+
 		List<String> results = new ArrayList<String>();
 		for (Date[] range : ranges) {
 			results.add(MohRuleUtils.formatdates(range[0]) + " - " + MohRuleUtils.formatdates(range[1]));
