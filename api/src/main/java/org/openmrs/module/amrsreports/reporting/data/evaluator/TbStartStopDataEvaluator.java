@@ -54,6 +54,7 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						"     and value_datetime is not null " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStartDates = makeDatesMapFromSQL(startQuery, substitutions);
@@ -65,6 +66,7 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						"     and value_datetime is not null " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStopDates = makeDatesMapFromSQL(stopQuery, substitutions);
