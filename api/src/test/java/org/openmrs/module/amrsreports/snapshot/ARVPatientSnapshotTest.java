@@ -1,4 +1,4 @@
-package org.openmrs.module.amrsreports.rule.observation;
+package org.openmrs.module.amrsreports.snapshot;
 
 import org.junit.Assert;
 import org.junit.Ignore;
