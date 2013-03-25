@@ -39,8 +39,6 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 			return c;
 		}
 
-		String reportDate = sdf.format(context.getEvaluationDate());
-
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
 		StringBuilder hql = new StringBuilder();
