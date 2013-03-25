@@ -3,6 +3,8 @@ package org.openmrs.module.amrsreports.reporting.data;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 
+import java.util.Date;
+
 /**
  * determines ARV patient snapshots for patients
  */
@@ -10,7 +12,7 @@ public class DateARTStartedDataDefinition extends BaseDataDefinition implements 
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return Date.class;
 	}
 
 }

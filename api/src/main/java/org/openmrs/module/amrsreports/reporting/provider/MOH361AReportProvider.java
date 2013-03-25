@@ -154,7 +154,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Reason Medically Eligible for ART", eligibility, nullString, new ARVPatientSnapshotReasonConverter());
 
 		// s. Date ART started (Transfer to ART register)
-		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString, nullStringConverter);
+		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString);
 
 		// additional columns for troubleshooting
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
