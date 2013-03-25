@@ -4,13 +4,17 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MOHEncounterDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
+import org.openmrs.module.amrsreports.reporting.converter.MOHEncounterDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
@@ -28,7 +32,6 @@ import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.patient.definition.LogicDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
@@ -54,7 +57,7 @@ public class MOH361AReportProvider implements ReportProvider {
 	public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
-        ObjectFormatter nullStringConverter = new ObjectFormatter();
+		ObjectFormatter nullStringConverter = new ObjectFormatter();
 		DateConverter commonDateConverter = new DateConverter(MohRuleUtils.DATE_FORMAT);
 		MohCoreService service = Context.getService(MohCoreService.class);
 
@@ -83,7 +86,7 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-        PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
+		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
 
 		// d. Patient's Name
@@ -141,17 +144,14 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("WHO Clinical Stage", new FirstWHOStageDataDefinition(), nullString, new WHOStageAndDateConverter());
 
 		// q. Date medically eligible for ART
-		LogicDataDefinition columnQ = new LogicDataDefinition();
-		columnQ.setLogicQuery("\"MOH Date and Reason Medically Eligible For ART\"");
-		dsd.addColumn("Date and Reason Medically Eligible for ART", columnQ, nullString);
+		EligibilityForARTDataDefinition eligibility = new EligibilityForARTDataDefinition();
+		dsd.addColumn("Date Medically Eligible for ART", eligibility, nullString, new ARVPatientSnapshotDateConverter());
 
 		// r. Reason Medically Eligible for ART
-		// TODO make this into a separate column by using a converter
+		dsd.addColumn("Reason Medically Eligible for ART", eligibility, nullString, new ARVPatientSnapshotReasonConverter());
 
 		// s. Date ART started (Transfer to ART register)
-		LogicDataDefinition columnS = new LogicDataDefinition();
-		columnS.setLogicQuery("\"MOH Date ART Started\"");
-		dsd.addColumn("Date ART Started", columnS, nullString);
+		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString, nullStringConverter);
 
 		// additional columns for troubleshooting
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();

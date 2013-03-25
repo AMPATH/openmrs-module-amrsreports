@@ -12,4 +12,6 @@ public class AmrsReportsConstants {
 	public static final char DEFAULT_CSV_DELIMITER = ',';
 
 	public static final String GP_CCC_NUMBER_IDENTIFIER_TYPE = "amrsreports.cccIdentifierType";
+
+	public static final String EXCLUDED = "Excluded";
 }
