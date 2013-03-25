@@ -55,6 +55,7 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						"     or (concept_id = 1109 and value_coded = 916)) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStartDates = makeDatesMapFromSQL(startQuery, substitutions);
@@ -65,6 +66,7 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						" where (concept_id = 1262 and value_coded is not null) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
+						"     and obs_datetime >= '2001-01-01'" +
 						"     and voided = 0 " +
 						" order by person_id asc, obs_datetime asc";
 		Map<Integer, Set<Date>> mappedStopDates = makeDatesMapFromSQL(stopQuery, substitutions);

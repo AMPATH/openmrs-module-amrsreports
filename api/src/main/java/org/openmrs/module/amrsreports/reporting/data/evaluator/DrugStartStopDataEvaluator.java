@@ -13,6 +13,10 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.Obs;
+import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 
@@ -41,12 +45,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 
 		Date stopDate = safeNext(stopDateIterator);
 		Date startDate = safeNext(startDateIterator);
-
-		// TODO: for tomorrow, we will display the first date only!
 		if (startDate != null || stopDate != null)
-			ranges.add(new Date[]{ startDate, stopDate });
-
-		/*
 		do {
 			if (stopDate != null) {
 				// stop is before start, range is: Unknown - stop date
@@ -54,16 +53,13 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 					ranges.add(new Date[]{null, stopDate});
 					stopDate = safeNext(stopDateIterator);
 				} else {
-					// see if the following start date is still before stop date
-					Date nextStartDate = safeNext(startDateIterator);
-					if (nextStartDate != null && stopDate.after(nextStartDate)) {
-						ranges.add(new Date[]{startDate, null});
-						startDate = nextStartDate;
-					} else {
-						ranges.add(new Date[]{startDate, stopDate});
-						startDate = nextStartDate;
-						stopDate = safeNext(stopDateIterator);
+					// we will take this start date (earliest) and pair it with the stop
+					ranges.add(new Date[]{startDate, stopDate});
+					// start ignoring all other start in between the above start and stop pair.
+					while(startDateIterator.hasNext() && stopDate.after(startDate)) {
+						startDate = safeNext(startDateIterator);
 					}
+					stopDate = safeNext(stopDateIterator);
 				}
 			} else {
 				if (startDate != null) {
@@ -73,13 +69,15 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 				}
 			}
 		} while(startDateIterator.hasNext() || stopDateIterator.hasNext());
-		*/
 
 		// build the response
-
 		List<String> results = new ArrayList<String>();
 		for (Date[] range : ranges) {
-			results.add(MOHReportUtil.formatdates(range[0]) + " - " + MOHReportUtil.formatdates(range[1]));
+			String startDateString = MOHReportUtil.formatdates(range[0]);
+			String stopDateString = StringUtils.EMPTY;
+			if (range[1] != null)
+				stopDateString = MOHReportUtil.formatdates(range[1]);
+			results.add(startDateString + " - " + stopDateString);
 		}
 
 		return MOHReportUtil.joinAsSingleCell(results);
