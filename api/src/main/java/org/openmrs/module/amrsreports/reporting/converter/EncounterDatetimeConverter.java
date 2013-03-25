@@ -4,18 +4,20 @@ import org.openmrs.Encounter;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
+import java.util.Date;
+
 /**
- * Converter to get the encounter date from an encounter and format it for the MOH
+ * Converter to get the encounter date from an encounter
  */
-public class MOHEncounterDateConverter implements DataConverter {
+public class EncounterDatetimeConverter implements DataConverter {
 	@Override
 	public Object convert(Object original) {
 		Encounter e = (Encounter) original;
 
 		if (e == null)
-			return "";
+			return null;
 
-		return MohRuleUtils.formatdates(e.getEncounterDatetime());
+		return e.getEncounterDatetime();
 	}
 
 	@Override
@@ -25,6 +27,6 @@ public class MOHEncounterDateConverter implements DataConverter {
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return Date.class;
 	}
 }

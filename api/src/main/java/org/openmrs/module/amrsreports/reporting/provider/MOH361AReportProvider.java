@@ -7,15 +7,16 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortD
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MOHEncounterDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.FirstEncounterAtFacilityDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
@@ -23,13 +24,15 @@ import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinit
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
+import org.openmrs.module.reporting.data.converter.BooleanConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
@@ -58,7 +61,6 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		String nullString = null;
 		ObjectFormatter nullStringConverter = new ObjectFormatter();
-		DateConverter commonDateConverter = new DateConverter(MohRuleUtils.DATE_FORMAT);
 		MohCoreService service = Context.getService(MohCoreService.class);
 
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
@@ -69,8 +71,9 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.setName("MOH 361A Data Set Definition");
 
 		// sort by serial number, then by date
+		dsd.addSortCriteria("Transfer", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("Date Chronic HIV Care Started", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Last Encounter At Facility", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 
@@ -82,7 +85,7 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
-		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString, commonDateConverter);
+		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString);
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
@@ -93,7 +96,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MohRuleUtils.DATE_FORMAT));
+		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
 
 		// e2. Age at Enrollment
 
@@ -113,7 +116,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new EntryPointConverter());
 
 		// h. Confirmed HIV+ Date
-		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString, commonDateConverter);
+		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString);
 
 //		// i. PEP Start / Stop Date
 //		LogicDataDefinition columnI = new LogicDataDefinition();
@@ -155,8 +158,10 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		// additional columns for troubleshooting
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
-		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new MOHEncounterDateConverter());
+		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
+		dsd.addColumn("Transfer", new TransferStatusDataDefinition(), nullString, new BooleanConverter("Transfer", "", ""));
+		dsd.addColumn("First Encounter At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
 
 		report.addDataSetDefinition(dsd, null);
 
