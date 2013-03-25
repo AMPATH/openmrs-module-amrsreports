@@ -52,7 +52,8 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 						" from obs " +
 						" where ((concept_id = 1263 and value_coded is not null) " +
 						"     or (concept_id = 1193 and value_coded = 916) " +
-						"     or (concept_id = 1109 and value_coded = 916)) " +
+						"     or (concept_id = 1109 and value_coded = 916) " +
+						"     or (concept_id = 1263 and value_coded = 916)) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
@@ -62,7 +63,9 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 		String stopQuery =
 				" select person_id, obs_datetime " +
 						" from obs " +
-						" where (concept_id = 1262 and value_coded is not null) " +
+						" where ((concept_id = 1262 and value_coded is not null) " +
+						"     or (concept_id = 1261 and value_coded = 1260) " +
+						"     or (concept_id = 1925 and value_coded is not null)) " +
 						"     and person_id in (:personIds) " +
 						"     and obs_datetime <= ':reportDate'" +
 						"     and voided = 0 " +
