@@ -4,7 +4,7 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -54,7 +54,7 @@ public class WHOStageAndDateConverter implements DataConverter {
 		else
 			return "";
 
-		return String.format("WHO Stage %d - %s", stage, MohRuleUtils.formatdates(o.getObsDatetime()));
+		return String.format("WHO Stage %d - %s", stage, MOHReportUtil.formatdates(o.getObsDatetime()));
 	}
 
 	@Override

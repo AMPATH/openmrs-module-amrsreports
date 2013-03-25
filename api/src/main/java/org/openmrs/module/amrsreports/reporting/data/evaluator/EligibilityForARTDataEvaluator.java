@@ -9,7 +9,7 @@ import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -30,6 +30,19 @@ import java.util.Map;
 @Handler(supports=EligibilityForARTDataDefinition.class, order=50)
 public class EligibilityForARTDataEvaluator implements PersonDataEvaluator {
 
+	/**
+	 * @see PersonDataEvaluator#evaluate(org.openmrs.module.reporting.data.person.definition.PersonDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)
+	 *
+	 * @should return Clinical and WHO Stage if under 12 and PEDS WHO Stage is 4
+	 * @should return CD4 and WHO Stage and CD4 values if under 12 and PEDS WHO Stage is 3 and CD4 is under 500 and CD4 percentage is under 25
+	 * @should return CD4 and HIV DNA PCR and WHO Stage and CD4 and HIV DNA PCR values if under 18 months and PEDS WHO Stage is 2 and CD4 is under 500 and HIV DNA PCR is positive
+	 * @should return HIV DNA PCR and WHO Stage and HIV DNA PCR value if under 18 months and PEDS WHO Stage is 1 and HIV DNA PCR is positive
+	 * @should return CD4 and WHO Stage and CD4 percentage values if between 18 months and 5 years and PEDS WHO Stage is 1 or 2 and CD4 percentage is under 20
+	 * @should return CD4 and WHO Stage and CD4 percentage values if between 5 years and 12 years and PEDS WHO Stage is 1 or 2 and CD4 percentage is under 25
+	 * @should return Clinical and WHO Stage if over 12 and ADULT WHO Stage is 3 or 4
+	 * @should return CD4 and WHO Stage and CD4 value if over 12 and ADULT or PEDS WHO Stage is 1 or 2 and CD4 is under 350
+	 * @should return reason only when ART started before eligibility date
+	 */
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
@@ -85,7 +98,7 @@ public class EligibilityForARTDataEvaluator implements PersonDataEvaluator {
 			while (!done && i.hasNext()) {
 				Obs o = i.next();
 				if (snapshot.consume(o)) {
-					snapshot.setAgeGroup(MohRuleUtils.getAgeGroupAtDate(p.getBirthdate(), o.getObsDatetime()));
+					snapshot.setAgeGroup(MOHReportUtil.getAgeGroupAtDate(p.getBirthdate(), o.getObsDatetime()));
 					if (snapshot.eligible()) {
 						done = true;
 					}

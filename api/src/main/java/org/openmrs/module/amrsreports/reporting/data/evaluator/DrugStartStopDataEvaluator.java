@@ -13,9 +13,6 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Obs;
-import org.openmrs.logic.result.Result;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 
@@ -82,7 +79,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 
 		List<String> results = new ArrayList<String>();
 		for (Date[] range : ranges) {
-			results.add(MohRuleUtils.formatdates(range[0]) + " - " + MohRuleUtils.formatdates(range[1]));
+			results.add(MOHReportUtil.formatdates(range[0]) + " - " + MOHReportUtil.formatdates(range[1]));
 		}
 
 		return MOHReportUtil.joinAsSingleCell(results);

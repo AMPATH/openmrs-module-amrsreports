@@ -1,15 +1,10 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.PatientIdentifier;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.logic.result.Result;
-import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
-import org.openmrs.module.amrsreports.service.MOHFacilityService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -18,7 +13,6 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -179,18 +173,18 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
 			// report dead if dead
 			if (deathFinal.containsKey(personId))
-				ret.addData(personId, "Dead - " + MohRuleUtils.formatdates(deathFinal.get(personId)));
+				ret.addData(personId, "Dead - " + MOHReportUtil.formatdates(deathFinal.get(personId)));
 
 			// report TO if after last encounter
 			else if (transfers.containsKey(personId) && transfers.get(personId).after(lastEncounterDate))
-				ret.addData(personId, "TO - " + MohRuleUtils.formatdates(transfers.get(personId)));
+				ret.addData(personId, "TO - " + MOHReportUtil.formatdates(transfers.get(personId)));
 
 			// report LTFU if RTC is overdue
 			else if (rtcExpectedDate != null && rtcExpectedDate.before(rtcOverdueDate.getTime())) {
 				Calendar expectedDate = Calendar.getInstance();
 				expectedDate.setTime(rtcExpectedDate);
 				expectedDate.add(Calendar.DAY_OF_MONTH, 93);
-				ret.addData(personId, "LTFU - " + MohRuleUtils.formatdates(expectedDate.getTime()));
+				ret.addData(personId, "LTFU - " + MOHReportUtil.formatdates(expectedDate.getTime()));
 			}
 
 			// otherwise, leave blank

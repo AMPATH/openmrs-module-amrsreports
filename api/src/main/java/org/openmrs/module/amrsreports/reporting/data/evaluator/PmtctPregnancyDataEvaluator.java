@@ -14,18 +14,14 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.util.OpenmrsUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -98,7 +94,7 @@ public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 				dates = new LinkedHashSet<String>();
 				mappedDates.put(personId, dates);
 			}
-			dates.add(MohRuleUtils.formatdates(valueDate) + " | PMTCT");
+			dates.add(MOHReportUtil.formatdates(valueDate) + " | PMTCT");
 		}
 
 		return mappedDates;
