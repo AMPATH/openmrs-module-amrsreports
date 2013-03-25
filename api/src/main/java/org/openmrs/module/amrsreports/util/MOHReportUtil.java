@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class MOHReportUtil {
 		return reportData;
 	}
 
-	public static String joinAsSingleCell(List<String> entries) {
+	public static String joinAsSingleCell(Collection<String> entries) {
 		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
 	}
 

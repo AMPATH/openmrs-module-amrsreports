@@ -20,6 +20,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -62,7 +63,7 @@ public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 
 		for (Integer memberId : memberIds) {
 			Set<String> dates = safeFind(mappedValueDates, memberId);
-			data.addData(memberId, StringUtils.join(dates, ";"));
+			data.addData(memberId, MOHReportUtil.joinAsSingleCell(dates));
 		}
 
 		return data;
