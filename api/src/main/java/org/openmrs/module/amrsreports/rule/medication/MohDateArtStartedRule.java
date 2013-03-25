@@ -14,8 +14,8 @@ import org.openmrs.logic.rule.RuleParameterInfo;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchOrdering;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;
@@ -102,22 +102,22 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 		// check them for reasons to exclude
 		for (Obs obs : observations) {
 
-			if (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_ANTIRETROVIRALS_STARTED)) {
+			if (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_ANTIRETROVIRALS_STARTED)) {
 				if (OpenmrsUtil.isConceptInList(obs.getValueCoded(), excludedReasons))
 					return excludePatient();
 			}
 
-			if (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.PATIENT_REPORTED_REASON_FOR_CURRENT_ANTIRETROVIRALS_STARTED)) {
-				if (MohRuleUtils.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV))
+			if (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.PATIENT_REPORTED_REASON_FOR_CURRENT_ANTIRETROVIRALS_STARTED)) {
+				if (MOHReportUtil.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.PREVENTION_OF_MOTHER_TO_CHILD_TRANSMISSION_OF_HIV))
 					return excludePatient();
 			}
 
-			if (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.NEWBORN_PROPHYLACTIC_ANTIRETROVIRAL_USE)) {
-				if (MohRuleUtils.compareConceptToName(obs.getValueCoded(), "TRUE"))
+			if (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.NEWBORN_PROPHYLACTIC_ANTIRETROVIRAL_USE)) {
+				if (MOHReportUtil.compareConceptToName(obs.getValueCoded(), "TRUE"))
 					return excludePatient();
 			}
 
-			if (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE)) {
+			if (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.NEWBORN_ANTIRETROVIRAL_USE)) {
 				if (OpenmrsUtil.isConceptInList(obs.getValueCoded(), excludedNewbornARVs))
 					return excludePatient();
 			}
@@ -132,11 +132,11 @@ public class MohDateArtStartedRule extends MohEvaluableRule {
 
 		// find the first qualifying observation
 		for (Obs obs : observations) {
-			if (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE))
-				return new Result(MohRuleUtils.formatdates(obs.getValueDatetime()));
+			if (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.ANTIRETROVIRAL_DRUG_TREATMENT_START_DATE))
+				return new Result(MOHReportUtil.formatdates(obs.getValueDatetime()));
 
 			if (OpenmrsUtil.isConceptInList(obs.getValueCoded(), allowedAnswers))
-				return new Result(MohRuleUtils.formatdates(obs.getObsDatetime()));
+				return new Result(MOHReportUtil.formatdates(obs.getObsDatetime()));
 		}
 
 		// give up

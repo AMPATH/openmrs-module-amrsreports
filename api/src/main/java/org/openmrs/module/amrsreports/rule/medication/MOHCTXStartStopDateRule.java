@@ -8,7 +8,7 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -58,16 +58,16 @@ public class MOHCTXStartStopDateRule extends DrugStartStopDateRule {
 		Concept c = obs.getConcept();
 		Concept v = obs.getValueCoded();
 
-		return (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) && v != null)
-				|| (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.CURRENT_MEDICATIONS)
-				&& MohRuleUtils.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE))
-				|| (MohRuleUtils.compareConceptToName(c, MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS)
-				&& MohRuleUtils.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE));
+		return (MOHReportUtil.compareConceptToName(c, MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED) && v != null)
+				|| (MOHReportUtil.compareConceptToName(c, MohEvaluableNameConstants.CURRENT_MEDICATIONS)
+				&& MOHReportUtil.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE))
+				|| (MOHReportUtil.compareConceptToName(c, MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_PCP_PROPHYLAXIS)
+				&& MOHReportUtil.compareConceptToName(v, MohEvaluableNameConstants.TRIMETHOPRIM_AND_SULFAMETHOXAZOLE));
 	}
 
 	@Override
 	protected boolean validateStopObs(Obs obs) {
-		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
+		return MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED)
 				&& obs.getValueCoded() != null;
 	}
 

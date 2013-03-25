@@ -7,7 +7,7 @@ import org.openmrs.logic.LogicException;
 import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,17 +53,17 @@ public class MohFluconazoleStartStopDateRule extends DrugStartStopDateRule {
 
 	@Override
 	protected boolean validateStartObs(Obs obs) {
-		return (MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN) &&
-				MohRuleUtils.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.START_DRUGS))
+		return (MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN) &&
+				MOHReportUtil.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.START_DRUGS))
 				||
-				(MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED) &&
-						MohRuleUtils.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.FLUCONAZOLE));
+				(MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOSSUS_TREATMENT_STARTED) &&
+						MOHReportUtil.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.FLUCONAZOLE));
 	}
 
 	@Override
 	protected boolean validateStopObs(Obs obs) {
-		return MohRuleUtils.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN) &&
-				MohRuleUtils.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.STOP_ALL);
+		return MOHReportUtil.compareConceptToName(obs.getConcept(), MohEvaluableNameConstants.CRYPTOCOCCAL_TREATMENT_PLAN) &&
+				MOHReportUtil.compareConceptToName(obs.getValueCoded(), MohEvaluableNameConstants.STOP_ALL);
 	}
 
 	@Override

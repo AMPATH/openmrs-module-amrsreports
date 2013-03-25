@@ -6,8 +6,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
+import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
+import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -19,6 +22,7 @@ import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.RenderingException;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +31,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,49 +48,8 @@ import java.util.Set;
  */
 public class MOHReportUtil {
 
-	private static final int MAX_RECORDS = 10;
 	private static final Log log = LogFactory.getLog(MOHReportUtil.class);
-
-	public static ReportData evaluate(ReportDefinition reportDefinition, EvaluationContext evaluationContext) throws EvaluationException {
-		ReportDefinitionService reportDefinitionService = Context.getService(ReportDefinitionService.class);
-
-		Map<String, List<DataSet>> dataSets = new HashMap<String, List<DataSet>>();
-		Cohort cohort = evaluationContext.getBaseCohort();
-		Set<Integer> memberIds = cohort.getMemberIds();
-		Integer[] members = memberIds.toArray(new Integer[]{});
-
-		while (members.length > 0) {
-
-			int size = Math.min(MAX_RECORDS, members.length);
-			Integer[] subset = Arrays.copyOfRange(members, 0, size);
-
-			if (size == members.length) {
-				members = new Integer[]{};
-			} else {
-				members = Arrays.copyOfRange(members, size, members.length);
-			}
-
-			Cohort subCohort = new Cohort(Arrays.asList(subset));
-			evaluationContext.setBaseCohort(subCohort);
-			ReportData tempReportData = reportDefinitionService.evaluate(reportDefinition, evaluationContext);
-
-			Map<String, DataSet> tmpDataSets = tempReportData.getDataSets();
-			for (String key: tmpDataSets.keySet()) {
-				if (!dataSets.containsKey(key))
-					dataSets.put(key, new ArrayList<DataSet>());
-				dataSets.get(key).add(tmpDataSets.get(key));
-			}
-		}
-
-		// at this point, dataSets has a map of lists of datasets
-		Map<String, DataSet> finalDataSets = new HashMap<String, DataSet>();
-
-		ReportData reportData = new ReportData();
-		reportData.setDefinition(reportDefinition);
-		reportData.setContext(evaluationContext);
-		// reportData.setDataSets(dataSets);
-		return reportData;
-	}
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
 
 	public static String joinAsSingleCell(Collection<String> entries) {
 		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
@@ -165,4 +132,69 @@ public class MOHReportUtil {
 		return results;
 	}
 
+	public static String formatdates(Date date){
+		if (date == null)
+			return "Unknown";
+
+		Format formatter;
+		formatter = new SimpleDateFormat(DATE_FORMAT);
+		String s = formatter.format(date);
+
+		return s;
+
+	}
+
+	/**
+     * determine the age group for a patient at a given date
+     * @should determine the age group for a patient at a given date
+     * @param birthdate birth date of the patient whose age is used in the calculations
+     * @param when the date upon which the age should be identified
+     * @return the appropriate age group
+     */
+    public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
+        //birthdate = patient.getBirthdate();
+        if (birthdate == null) {
+            return null;
+        }
+
+        Calendar now = Calendar.getInstance();
+        if (when != null) {
+            now.setTime(when);
+        }
+
+        Calendar then = Calendar.getInstance();
+        then.setTime(birthdate);
+
+        int ageInMonths = 0;
+        while (!then.after(now)) {
+            then.add(Calendar.MONTH, 1);
+            ageInMonths++;
+        }
+        ageInMonths--;
+
+        if (ageInMonths < 18) {
+            return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
+        }
+
+        if (ageInMonths < 60) {
+            return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
+        }
+
+        if (ageInMonths < 144) {
+            return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
+        }
+
+        return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
+    }
+
+	/**
+	 * helper method to reduce code for validation methods
+	 *
+	 * @param concept
+	 * @param name
+	 * @return
+	 */
+	public static boolean compareConceptToName(Concept concept, String name) {
+		return OpenmrsUtil.nullSafeEquals(concept, MohCacheUtils.getConcept(name));
+	}
 }

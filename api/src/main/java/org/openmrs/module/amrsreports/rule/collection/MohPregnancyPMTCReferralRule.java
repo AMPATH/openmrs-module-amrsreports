@@ -27,6 +27,7 @@ import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableRule;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchOrdering;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.util.OpenmrsUtil;
@@ -113,7 +114,7 @@ public class MohPregnancyPMTCReferralRule extends MohEvaluableRule {
 
 		for (Obs observation : observations) {
 			if (OpenmrsUtil.isConceptInList(observation.getConcept(), questionList))
-				dueDates.add(MohRuleUtils.formatdates(observation.getValueDatetime()) + " | PMTCT");
+				dueDates.add(MOHReportUtil.formatdates(observation.getValueDatetime()) + " | PMTCT");
 		}
 
 		return new Result(StringUtils.join(dueDates, ";"));
