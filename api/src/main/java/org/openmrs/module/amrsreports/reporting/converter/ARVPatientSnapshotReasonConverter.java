@@ -19,6 +19,10 @@ public class ARVPatientSnapshotReasonConverter implements DataConverter {
 		if (s == null)
 			return "";
 
+		if (!s.hasProperty("reason"))
+			return "";
+
+		// do not report a date if there is no reason
 		List<String> results = new ArrayList<String>();
 
 		results.add((String) s.get("reason"));
