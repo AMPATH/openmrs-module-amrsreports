@@ -5,6 +5,8 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
+import org.openmrs.module.amrsreports.reporting.converter.MOHEncounterDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
@@ -13,6 +15,7 @@ import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinitio
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
@@ -20,6 +23,7 @@ import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
@@ -57,9 +61,15 @@ public class MOH361AReportProvider implements ReportProvider {
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
 		report.setName("MOH 361A Report");
 
-		// set up the columns
+		// set up the DSD
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
 		dsd.setName("MOH 361A Data Set Definition");
+
+		// sort by serial number, then by date
+		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Date Chronic HIV Care Started", SortCriteria.SortDirection.ASC);
+
+		// set up the columns ...
 
 		// patient id ... until we get this thing working proper
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
@@ -142,6 +152,11 @@ public class MOH361AReportProvider implements ReportProvider {
 		LogicDataDefinition columnS = new LogicDataDefinition();
 		columnS.setLogicQuery("\"MOH Date ART Started\"");
 		dsd.addColumn("Date ART Started", columnS, nullString);
+
+		// additional columns for troubleshooting
+		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
+		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new MOHEncounterDateConverter());
+		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
 
 		report.addDataSetDefinition(dsd, null);
 
