@@ -73,7 +73,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Transfer", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("Last Encounter At Facility", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 
@@ -161,7 +161,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
 		dsd.addColumn("Transfer", new TransferStatusDataDefinition(), nullString, new BooleanConverter("Transfer", "", ""));
-		dsd.addColumn("First Encounter At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
+		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
 
 		report.addDataSetDefinition(dsd, null);
 
