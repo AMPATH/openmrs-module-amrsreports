@@ -48,16 +48,21 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 		do {
 			if (stopDate != null) {
 				// stop is before start, range is: Unknown - stop date
-				if (stopDate.before(startDate)) {
-					ranges.add(new Date[]{null, stopDate});
-					stopDate = safeNext(stopDateIterator);
-				} else {
-					// we will take this start date (earliest) and pair it with the stop
-					ranges.add(new Date[]{startDate, stopDate});
-					// start ignoring all other start in between the above start and stop pair.
-					while(startDateIterator.hasNext() && stopDate.after(startDate)) {
-						startDate = safeNext(startDateIterator);
+				if (startDate != null) {
+					if (stopDate.before(startDate)) {
+						ranges.add(new Date[]{null, stopDate});
+						stopDate = safeNext(stopDateIterator);
+					} else {
+						// we will take this start date (earliest) and pair it with the stop
+						ranges.add(new Date[]{startDate, stopDate});
+						// start ignoring all other start in between the above start and stop pair.
+						while (startDateIterator.hasNext() && stopDate.after(startDate)) {
+							startDate = safeNext(startDateIterator);
+						}
+						stopDate = safeNext(stopDateIterator);
 					}
+				} else {
+					ranges.add(new Date[]{null, stopDate});
 					stopDate = safeNext(stopDateIterator);
 				}
 			} else {
@@ -65,11 +70,11 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 					// stop date is null and start date is not null, range is: start date - unknown
 					ranges.add(new Date[]{startDate, null});
 					// we don't have stop date anymore, move the start date forward all the way.
-					while(startDateIterator.hasNext())
+					while (startDateIterator.hasNext())
 						startDate = safeNext(startDateIterator);
 				}
 			}
-		} while(startDateIterator.hasNext() || stopDateIterator.hasNext());
+		} while (startDateIterator.hasNext() || stopDateIterator.hasNext());
 
 		// build the response
 		List<String> results = new ArrayList<String>();

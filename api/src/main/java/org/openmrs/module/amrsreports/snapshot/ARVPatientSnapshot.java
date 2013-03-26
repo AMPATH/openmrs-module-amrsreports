@@ -34,7 +34,12 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 		Concept answer = o.getValueCoded();
 		Double value = o.getValueNumeric();
 
+		if (q == null)
+			return false;
+
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_ADULT))) {
+			if (answer == null)
+				return false;
 			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT))) {
 				this.set("adultWHOStage", 1);
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT))) {
@@ -48,6 +53,8 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_PEDS))) {
+			if (answer == null)
+				return false;
 			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_PEDS))) {
 				this.set("pedsWHOStage", 1);
 			} else if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_PEDS))) {
@@ -61,6 +68,8 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.HIV_DNA_PCR))) {
+			if (answer == null)
+				return false;
 			if (answer.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.POSITIVE))) {
 				this.set("HIVDNAPCRPositive", true);
 				this.set("lastDate", o.getObsDatetime());
@@ -68,11 +77,15 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 			}
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_BY_FACS))) {
+			if (value == null)
+				return false;
 			this.set("cd4ByFacs", value);
 			this.set("lastDate", o.getObsDatetime());
 			return true;
 		}
 		if (q.equals(MohCacheUtils.getConcept(MohEvaluableNameConstants.CD4_PERCENT))) {
+			if (value == null)
+				return false;
 			this.set("cd4PercentByFacs", value);
 			this.set("lastDate", o.getObsDatetime());
 			return true;
