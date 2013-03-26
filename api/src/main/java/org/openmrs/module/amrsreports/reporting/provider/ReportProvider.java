@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.provider;
 
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 
 /**
@@ -13,4 +14,6 @@ public interface ReportProvider {
 	public ReportDefinition getReportDefinition();
 
 	public CohortDefinition getCohortDefinition();
+
+	public ReportDesign getReportDesign();
 }

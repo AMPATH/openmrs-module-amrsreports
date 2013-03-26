@@ -173,23 +173,19 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
 			// report dead if dead
 			if (deathFinal.containsKey(personId))
-				ret.addData(personId, "Dead - " + MOHReportUtil.formatdates(deathFinal.get(personId)));
+				ret.addData(personId, MOHReportUtil.joinAsSingleCell("Dead", MOHReportUtil.formatdates(deathFinal.get(personId))));
 
 			// report TO if after last encounter
 			else if (transfers.containsKey(personId) && transfers.get(personId).after(lastEncounterDate))
-				ret.addData(personId, "TO - " + MOHReportUtil.formatdates(transfers.get(personId)));
+				ret.addData(personId, MOHReportUtil.joinAsSingleCell("TO", MOHReportUtil.formatdates(transfers.get(personId))));
 
 			// report LTFU if RTC is overdue
 			else if (rtcExpectedDate != null && rtcExpectedDate.before(rtcOverdueDate.getTime())) {
 				Calendar expectedDate = Calendar.getInstance();
 				expectedDate.setTime(rtcExpectedDate);
 				expectedDate.add(Calendar.DAY_OF_MONTH, 93);
-				ret.addData(personId, "LTFU - " + MOHReportUtil.formatdates(expectedDate.getTime()));
+				ret.addData(personId, MOHReportUtil.joinAsSingleCell("LTFU", MOHReportUtil.formatdates(expectedDate.getTime())));
 			}
-
-			// otherwise, leave blank
-			else
-				ret.addData(personId, "");
 		}
 
 		return ret;

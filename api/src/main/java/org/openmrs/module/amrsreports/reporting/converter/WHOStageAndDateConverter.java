@@ -54,7 +54,10 @@ public class WHOStageAndDateConverter implements DataConverter {
 		else
 			return "";
 
-		return String.format("WHO Stage %d - %s", stage, MOHReportUtil.formatdates(o.getObsDatetime()));
+		return String.format(
+				MOHReportUtil.joinAsSingleCell("WHO Stage %d", "%s"),
+				stage,
+				MOHReportUtil.formatdates(o.getObsDatetime()));
 	}
 
 	@Override

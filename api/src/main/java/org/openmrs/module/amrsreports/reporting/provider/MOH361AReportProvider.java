@@ -1,7 +1,9 @@
 package org.openmrs.module.amrsreports.reporting.provider;
 
+import org.apache.commons.io.IOUtils;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
@@ -43,8 +45,16 @@ import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDe
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.ReportDesignResource;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
+import org.openmrs.util.OpenmrsClassLoader;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
@@ -68,7 +78,7 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		// set up the DSD
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
-		dsd.setName("MOH 361A Data Set Definition");
+		dsd.setName("allPatients");
 
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Transfer", SortCriteria.SortDirection.ASC);
@@ -81,11 +91,14 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString, nullStringConverter);
+		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString);
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
 		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString);
+
+		// extra column to help understand reason for including in this cohort
+		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
@@ -96,7 +109,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString);
+		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
 
 		// e2. Age at Enrollment
 
@@ -105,7 +118,6 @@ public class MOH361AReportProvider implements ReportProvider {
 		mappedDef.addConverter(new DateConverter());
 		AgeAtDateOfOtherDataDefinition ageAtEnrollment = new AgeAtDateOfOtherDataDefinition();
 		ageAtEnrollment.setEffectiveDateDefinition(mappedDef);
-
 		dsd.addColumn("Age at Enrollment", ageAtEnrollment, nullString, new DecimalAgeConverter(2));
 
 		// f. Sex
@@ -161,7 +173,6 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
 		dsd.addColumn("Transfer", new TransferStatusDataDefinition(), nullString, new BooleanConverter("Transfer", "", ""));
-		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
 
 		report.addDataSetDefinition(dsd, null);
 
@@ -173,4 +184,34 @@ public class MOH361AReportProvider implements ReportProvider {
 		return new Moh361ACohortDefinition();
 	}
 
+	@Override
+	public ReportDesign getReportDesign() {
+		ReportDesign design = new ReportDesign();
+		design.setName("MOH 361A Register Design");
+		design.setReportDefinition(this.getReportDefinition());
+		design.setRendererType(ExcelTemplateRenderer.class);
+
+		Properties props = new Properties();
+		props.put("repeatingSections", "sheet:1,row:4,dataset:allPatients");
+
+		design.setProperties(props);
+
+		ReportDesignResource resource = new ReportDesignResource();
+		resource.setName("template.xls");
+		InputStream is = OpenmrsClassLoader.getInstance().getResourceAsStream("templates/MOH361AReportTemplate.xls");
+
+		if (is == null)
+			throw new APIException("Could not find report template.");
+
+		try {
+			resource.setContents(IOUtils.toByteArray(is));
+		} catch (IOException ex) {
+			throw new APIException("Could not create report design for MOH 361A Register.", ex);
+		}
+
+		IOUtils.closeQuietly(is);
+		design.addResource(resource);
+
+		return design;
+	}
 }

@@ -20,8 +20,10 @@ import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionSe
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.module.reporting.report.renderer.XlsReportRenderer;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -120,10 +122,22 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		String xlsFilename = FilenameUtils.getBaseName(fileURL) + ".xls";
 		File xlsFile = new File(loaddir, xlsFilename);
 		OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
-		XlsReportRenderer xlsReportRenderer = new XlsReportRenderer();
-		xlsReportRenderer.render(reportData, queuedReport.getReportName(), stream);
+
+		// get the report design
+		final ReportDesign design = reportProvider.getReportDesign();
+
+		// build an Excel template renderer with the report design
+		ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+			public ReportDesign getDesign(String argument) {
+				return design;
+			}
+		};
+
+		// render the Excel template
+		renderer.render(reportData, queuedReport.getReportName(), stream);
 		stream.close();
 
+		// finish off by purging the queued report
 		Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
 	}
 
