@@ -96,7 +96,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
+		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString);
 
 		// e2. Age at Enrollment
 
