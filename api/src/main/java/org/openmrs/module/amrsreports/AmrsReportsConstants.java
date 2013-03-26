@@ -7,7 +7,7 @@ package org.openmrs.module.amrsreports;
 public class AmrsReportsConstants {
 
 	// separator used to delineate multiple values within a single cell
-	public static final String INTER_CELL_SEPARATOR = "\n\r";
+	public static final String INTER_CELL_SEPARATOR = "\r\n";
 
 	public static final char DEFAULT_CSV_DELIMITER = ',';
 
