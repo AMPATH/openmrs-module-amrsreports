@@ -386,4 +386,32 @@
 
     </changeSet>
 
+    <changeSet id="amrsreports-2013-03-26-a" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="amrsreports_queued_report" columnName="csv_file_location"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding csv_file_location to the amrsreports_queued_report table
+        </comment>
+        <addColumn tableName="amrsreports_queued_report">
+            <column name="csv_file_location" type="varchar(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="amrsreports-2013-03-26-b" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="amrsreports_queued_report" columnName="xls_file_location"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding xls_file_location to the amrsreports_queued_report table
+        </comment>
+        <addColumn tableName="amrsreports_queued_report">
+            <column name="xls_file_location" type="varchar(512)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

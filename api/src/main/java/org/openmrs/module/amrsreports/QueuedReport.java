@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreports;
 
 import org.openmrs.BaseOpenmrsObject;
-import org.openmrs.Location;
 
 import java.util.Date;
 
@@ -16,10 +15,13 @@ public class QueuedReport extends BaseOpenmrsObject {
 	private Date evaluationDate;
 	private Date dateScheduled;
 	private String status;
+	private String csvFilename;
+	private String xlsFilename;
 
 	public static final String STATUS_NEW = "NEW";
 	public static final String STATUS_ERROR = "ERROR";
 	public static final String STATUS_RUNNING = "RUNNING";
+	public static final String STATUS_COMPLETE = "COMPLETE";
 
 	public Integer getQueuedReportId() {
 		return queuedReportId;
@@ -79,4 +81,19 @@ public class QueuedReport extends BaseOpenmrsObject {
 		setQueuedReportId(id);
 	}
 
+	public String getCsvFilename() {
+		return csvFilename;
+	}
+
+	public void setCsvFilename(String csvFilename) {
+		this.csvFilename = csvFilename;
+	}
+
+	public String getXlsFilename() {
+		return xlsFilename;
+	}
+
+	public void setXlsFilename(String xlsFilename) {
+		this.xlsFilename = xlsFilename;
+	}
 }
