@@ -81,7 +81,6 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.setName("allPatients");
 
 		// sort by serial number, then by date
-		dsd.addSortCriteria("Transfer", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
 
@@ -128,7 +127,7 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new EntryPointConverter());
 
 		// h. Confirmed HIV+ Date
-		dsd.addColumn("Confirmed HIV+ Date", enrollmentDate, nullString);
+		dsd.addColumn("Confirmed HIV Date", enrollmentDate, nullString);
 
 //		// i. PEP Start / Stop Date
 //		LogicDataDefinition columnI = new LogicDataDefinition();
@@ -141,19 +140,19 @@ public class MOH361AReportProvider implements ReportProvider {
 //		dsd.addColumn("Reasons for PEP Use", columnJ, nullString);
 
 		// k. CTX startdate and stopdate:
-		dsd.addColumn("CTX Start / Stop Date", new CtxStartStopDataDefinition(), nullString);
+		dsd.addColumn("CTX Start Stop Date", new CtxStartStopDataDefinition(), nullString);
 
 		// l. Fluconazole startdate and stopdate
-		dsd.addColumn("Fluconazole Start / Stop Date", new FluconazoleStartStopDataDefinition(), nullString);
+		dsd.addColumn("Fluconazole Start Stop Date", new FluconazoleStartStopDataDefinition(), nullString);
 
 		// m. TB treatment startdate and stopdate
-		dsd.addColumn("TB Treatment Start / Stop Date", new TbStartStopDataDefinition(), nullString);
+		dsd.addColumn("TB Treatment Start Stop Date", new TbStartStopDataDefinition(), nullString);
 
 		// n. Pregnancy Yes?, Due date, PMTCT refer
 		dsd.addColumn("Pregnancy EDD and Referral", new PmtctPregnancyDataDefinition(), nullString);
 
 		// o. LTFU / TO / Dead and date when the event occurred
-		dsd.addColumn("LTFU / TO / DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
+		dsd.addColumn("LTFU TO DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
 
 		// p. WHO clinical Stage and date
 		dsd.addColumn("WHO Clinical Stage", new FirstWHOStageDataDefinition(), nullString, new WHOStageAndDateConverter());
@@ -172,7 +171,6 @@ public class MOH361AReportProvider implements ReportProvider {
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
 		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
-		dsd.addColumn("Transfer", new TransferStatusDataDefinition(), nullString, new BooleanConverter("Transfer", "", ""));
 
 		report.addDataSetDefinition(dsd, null);
 

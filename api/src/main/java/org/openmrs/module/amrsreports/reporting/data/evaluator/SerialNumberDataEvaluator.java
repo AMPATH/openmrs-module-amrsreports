@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
@@ -34,7 +35,7 @@ public class SerialNumberDataEvaluator implements PersonDataEvaluator {
 		// populate them, leaving the rest null
 		for (Integer personId : context.getBaseCohort().getMemberIds()) {
 			ret.addData(personId,
-					cccMap.containsKey(personId) ? getSerialNumberFromIdentifier(cccMap.get(personId)) : null);
+					cccMap.containsKey(personId) ? getSerialNumberFromIdentifier(cccMap.get(personId)) : AmrsReportsConstants.TRANSFER_IN);
 		}
 
 		return ret;
