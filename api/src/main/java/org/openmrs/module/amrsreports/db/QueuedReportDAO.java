@@ -19,4 +19,6 @@ public interface QueuedReportDAO {
 	public List<QueuedReport> getAllQueuedReports();
 
 	public List<QueuedReport> getQueuedReportsWithStatus(String status);
+
+	public QueuedReport getQueuedReport(Integer reportId);
 }

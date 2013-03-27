@@ -29,4 +29,7 @@ public interface QueuedReportService {
 
 	@Transactional(readOnly = true)
 	public List<QueuedReport> getQueuedReportsWithStatus(String status);
+
+	@Transactional(readOnly = true)
+	public QueuedReport getQueuedReport(Integer reportId);
 }

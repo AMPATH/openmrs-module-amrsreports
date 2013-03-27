@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreports.service.impl;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
@@ -24,7 +23,6 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
-import org.openmrs.module.reporting.report.renderer.XlsReportRenderer;
 import org.openmrs.util.OpenmrsUtil;
 
 import java.io.BufferedOutputStream;
@@ -99,7 +97,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		// create a new file
 		String code = queuedReport.getFacility().getCode();
 
-		String fileURL = ""
+		String csvFilename = ""
 				+ queuedReport.getReportName().replaceAll(" ", "-")
 				+ "_"
 				+ code
@@ -112,14 +110,14 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 				+ ".csv";
 
 		File loaddir = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
-		File amrsreport = new File(loaddir, fileURL);
+		File amrsreport = new File(loaddir, csvFilename);
 		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(amrsreport));
 
 		// renderCSVFromReportData the CSV
 		MOHReportUtil.renderCSVFromReportData(reportData, outputStream);
 		outputStream.close();
 
-		String xlsFilename = FilenameUtils.getBaseName(fileURL) + ".xls";
+		String xlsFilename = FilenameUtils.getBaseName(csvFilename) + ".xls";
 		File xlsFile = new File(loaddir, xlsFilename);
 		OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
 
@@ -137,8 +135,11 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		renderer.render(reportData, queuedReport.getReportName(), stream);
 		stream.close();
 
-		// finish off by purging the queued report
-		Context.getService(QueuedReportService.class).purgeQueuedReport(queuedReport);
+		// finish off by setting stuff on the queued report
+		queuedReport.setCsvFilename(csvFilename);
+		queuedReport.setXlsFilename(xlsFilename);
+		queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
+		Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
 	}
 
 	@Override
@@ -165,5 +166,10 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 	@Override
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
 		return dao.getQueuedReportsWithStatus(status);
+	}
+
+	@Override
+	public QueuedReport getQueuedReport(Integer reportId) {
+		return dao.getQueuedReport(reportId);
 	}
 }
