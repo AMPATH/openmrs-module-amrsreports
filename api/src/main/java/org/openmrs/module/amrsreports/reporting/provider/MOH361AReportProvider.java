@@ -13,6 +13,7 @@ import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConve
 import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ObsValueDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
@@ -23,6 +24,7 @@ import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition
 import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
@@ -32,6 +34,7 @@ import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.BooleanConverter;
@@ -41,6 +44,7 @@ import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDat
 import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
@@ -54,6 +58,7 @@ import org.openmrs.util.OpenmrsClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -103,6 +108,13 @@ public class MOH361AReportProvider implements ReportProvider {
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
+
+		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
+		idTypes.remove(pit);
+		PatientIdentifierDataDefinition idColumn = new PatientIdentifierDataDefinition("Identifier");
+		idColumn.setTypes(idTypes);
+		idColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
@@ -171,6 +183,9 @@ public class MOH361AReportProvider implements ReportProvider {
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
 		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
+
+		// informative column for the destination clinics
+		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());
 
 		report.addDataSetDefinition(dsd, null);
 
