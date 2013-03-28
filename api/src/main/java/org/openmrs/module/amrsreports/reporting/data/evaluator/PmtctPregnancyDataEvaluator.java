@@ -13,17 +13,19 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.apache.commons.lang.StringUtils;
+import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
+import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -40,64 +42,50 @@ public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 	public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
 
-		Map<String, String> substitutions = new HashMap<String, String>();
-		Set<Integer> memberIds = context.getBaseCohort().getMemberIds();
-		String personIds = StringUtils.join(memberIds, ",");
-		substitutions.put(":personIds", personIds);
-		String reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
-		substitutions.put(":reportDate", reportDate);
+		String hql = "from Obs" +
+				" where voided = false" +
+				"   and person.personId in (:patientIds)" +
+				"   and concept.id in (5596, 6743)" +
+				"   and obsDatetime between '2001-01-01' and :reportDate" +
+				"   order by obsDatetime asc";
 
-		String startQuery =
-				" select person_id, value_datetime " +
-						" from obs " +
-						" where (concept_id = 6743 or concept_id = 5596) " +
-						"     and person_id in (:personIds) " +
-						"     and obs_datetime <= ':reportDate'" +
-						"     and obs_datetime >= '2001-01-01'" +
-						"     and voided = 0 " +
-						" order by person_id asc, obs_datetime asc";
-		Map<Integer, Set<String>> mappedValueDates = makeDatesMapFromSQL(startQuery, substitutions);
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("patientIds", context.getBaseCohort());
+		m.put("reportDate", context.getEvaluationDate());
 
-		for (Integer memberId : memberIds) {
-			Set<String> dates = safeFind(mappedValueDates, memberId);
-			data.addData(memberId, MOHReportUtil.joinAsSingleCell(dates));
+		ListMap<Integer, Date> dateMap = makeValueDatesMapFromSQL(hql, m);
+
+		for (Integer memberId : dateMap.keySet()) {
+			List<String> EDDs = new ArrayList<String>();
+			for (Date d : safeFind(dateMap, memberId)) {
+				EDDs.add(String.format("%s | PMTCT", MOHReportUtil.formatdates(d)));
+			}
+			data.addData(memberId, MOHReportUtil.joinAsSingleCell(EDDs));
 		}
 
 		return data;
 	}
 
-	private Set<String> safeFind(final Map<Integer, Set<String>> map, final Integer key) {
+	private Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
+		Set<Date> dateSet = new LinkedHashSet<Date>();
 		if (map.containsKey(key))
-			return map.get(key);
-		return new LinkedHashSet<String>();
+			dateSet.addAll(map.get(key));
+		return dateSet;
 	}
-
 
 	/**
 	 * replaces reportDate and personIds with data from private variables before generating a date map
 	 */
-	private Map<Integer, Set<String>> makeDatesMapFromSQL(final String query, final Map<String, String> substitutions) {
-		String sql = query;
-		for (String key : substitutions.keySet()) {
-			String replacement = substitutions.get(key);
-			if (StringUtils.isNotEmpty(replacement))
-				sql = sql.replaceAll(key, replacement);
-		}
-		List<List<Object>> data = Context.getAdministrationService().executeSQL(sql, false);
+	private ListMap<Integer, Date> makeValueDatesMapFromSQL(final String query, final Map<String, Object> substitutions) {
+		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+		List<Object> queryResult = qs.executeHqlQuery(query, substitutions);
 
-		Map<Integer, Set<String>> mappedDates = new HashMap<Integer, Set<String>>();
-		for (List<Object> objects : data) {
-			// there will be two objects per list
-			Integer personId = (Integer) objects.get(0);
-			Date valueDate = (Date) objects.get(1);
-			Set<String> dates = mappedDates.get(personId);
-			if (dates == null) {
-				dates = new LinkedHashSet<String>();
-				mappedDates.put(personId, dates);
-			}
-			dates.add(MOHReportUtil.formatdates(valueDate) + " | PMTCT");
+		ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
+		for (Object o : queryResult) {
+			Obs obs = (Obs) o;
+			dateListMap.putInList(obs.getPersonId(), obs.getValueDatetime());
 		}
 
-		return mappedDates;
+		return dateListMap;
 	}
 }
