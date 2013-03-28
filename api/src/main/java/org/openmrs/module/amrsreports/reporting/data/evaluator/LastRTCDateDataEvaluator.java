@@ -3,7 +3,6 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -28,7 +27,7 @@ public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
-		FirstWHOStageDataDefinition def = (FirstWHOStageDataDefinition) definition;
+		LastRTCDateDataDefinition def = (LastRTCDateDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
 		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
