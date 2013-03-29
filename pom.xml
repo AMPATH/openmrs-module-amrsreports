@@ -35,9 +35,9 @@
 	</organization>
 
 	<scm>
-		<connection>scm:svn:https://svn.openmrs.org/openmrs-modules/amrsreports/trunk/</connection>
-		<developerConnection>scm:svn:https://svn.openmrs.org/openmrs-modules/amrsreports/trunk/</developerConnection>
-		<url>https://svn.openmrs.org/openmrs-modules/amrsreports/trunk/</url>
+		<connection>scm:git:https://github.com/AMPATH/openmrs-module-amrsreports</connection>
+		<developerConnection>scm:git:https://github.com/AMPATH/openmrs-module-amrsreports</developerConnection>
+		<url>https://github.com/AMPATH/openmrs-module-amrsreports</url>
 	</scm>
 
 	<modules>
