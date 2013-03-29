@@ -47,7 +47,9 @@ public class ReportQueueProcessor {
 		if (++count > 25) {
 			// clean up memory after processing each queue entry (otherwise, the
 			// memory-intensive process may crash or eat up all our memory)
+			count = 0;
 			try {
+				Context.flushSession();
 				Context.clearSession();
 			} catch (Exception e) {
 				log.error("Exception while clearing session in report queue processor", e);
