@@ -3,12 +3,11 @@ package org.openmrs.module.amrsreports.task;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.scheduler.tasks.AbstractTask;
 
 /**
  * Updates the ARV encounter table with flags for each ARV drug for every related encounter
  */
-public class UpdateARVEncountersTask extends AbstractTask {
+public class UpdateARVEncountersTask extends AMRSReportsTask {
 
 	private static final String MACRO_DROP_TABLE =
 			"DROP TABLE IF EXISTS `:table`";
@@ -114,7 +113,7 @@ public class UpdateARVEncountersTask extends AbstractTask {
 	 * drops, creates and fills out the ARV encounter table
 	 */
 	@Override
-	public void execute() {
+	public void doExecute() {
 
 		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
 			// drop the table
