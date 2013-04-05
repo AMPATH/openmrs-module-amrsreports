@@ -76,7 +76,7 @@ public class ReportQueueProcessor {
 	/**
 	 * Starts up a thread to process all existing queue entries
 	 */
-	public void processQueuedReports() throws HL7Exception {
+	public void processQueuedReports() throws APIException {
 		synchronized (isRunning) {
 			if (isRunning) {
 				log.warn("Report queue processor aborting (another processor already running)");
