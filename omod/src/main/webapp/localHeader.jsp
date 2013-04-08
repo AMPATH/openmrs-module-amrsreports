@@ -17,7 +17,7 @@
         </li>
     </openmrs:hasPrivilege>
     <openmrs:hasPrivilege privilege="View Locations">
-        <li <c:if test='<%= request.getRequestURI().contains("facility") %>'>class="active"</c:if>>
+        <li <c:if test='<%= request.getRequestURI().contains("facilityList") %>'>class="active"</c:if>>
             <a href="${pageContext.request.contextPath}/module/amrsreports/facility.list">
                 View MOH Facilities
             </a>
@@ -30,9 +30,9 @@
             </a>
         </li>
     </openmrs:hasPrivilege>
-    <li <c:if test='<%= request.getRequestURI().contains("locationPrivileges") %>'>class="active"</c:if>>
-        <a href="${pageContext.request.contextPath}/module/amrsreports/locationPrivileges.form">
-            Location Privileges
+    <li <c:if test='<%= request.getRequestURI().contains("facilityPrivileges") %>'>class="active"</c:if>>
+        <a href="${pageContext.request.contextPath}/module/amrsreports/facilityPrivileges.form">
+            Manage User/Facility Privileges
         </a>
     </li>
     <li <c:if test='<%= request.getRequestURI().contains("settings") %>'>class="active"</c:if>>

@@ -4,14 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Location;
-import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.LocationService;
-import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
-import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -37,14 +32,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA. User: Nicholas Ingosi magaja Date: 6/6/12 Time: 8:55 AM To change this template use File
- * | Settings | File Templates.
+ * DWR service for AMRS Reports web pages
  */
 public class DWRAmrsReportService {
 	private static final Log log = LogFactory.getLog(DWRAmrsReportService.class);
 
 	public String viewMoreDetails(String file, String id) {
-
 
 		//open the file and do all the manipulation
 		AdministrationService as = Context.getAdministrationService();
@@ -75,7 +68,6 @@ public class DWRAmrsReportService {
 			//log.info(columnsSplit);
 			while ((record = br.readLine()) != null) {
 
-
 				splitByComma = record.split(",");
 
 				if (stripLeadingAndTrailingQuotes(splitByComma[0]).equals(id)) {
@@ -83,19 +75,16 @@ public class DWRAmrsReportService {
 						String columnName = stripLeadingAndTrailingQuotes(columnsSplit[i]);
 						String value = stripLeadingAndTrailingQuotes(splitByComma[i]);
 
-
 						strColumnData.append(columnName).append("    :").append(value).append(",");
-
 					}
-
 				}
-
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		//log.info("We are returning now "+recordsAfterAll);
 		log.info(strColumnData.toString());
 		return strColumnData.toString();
@@ -108,14 +97,12 @@ public class DWRAmrsReportService {
 		String[] splitByCommaDetails = null;
 		StringBuilder strColumnDataDetails = new StringBuilder();
 
-
 		//open the file and do all the manipulation
 		AdministrationService as = Context.getAdministrationService();
 		String folderName = as.getGlobalProperty("amrsreport.file_dir");
 
 		File fileDirectory = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 
-		///
 		File amrsFile = null;
 		FileInputStream fstream = null;
 		DataInputStream in = null;
@@ -159,7 +146,6 @@ public class DWRAmrsReportService {
 		File fileDirectory = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 		String urlToDownLoad = fileDirectory + "/" + csvFile;
 
-
 		try {
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(httpServletResponse.getOutputStream()));
 			String mimeType = new MimetypesFileTypeMap().getContentType(urlToDownLoad);
@@ -199,48 +185,6 @@ public class DWRAmrsReportService {
 		return str;
 	}
 
-
-	public String saveUserLoc(Integer userId, Integer locationId) {
-		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
-		UserService userservice = Context.getUserService();
-		LocationService locationService = Context.getLocationService();
-
-		// get user and location
-		User sysUser = userservice.getUser(userId);
-		Location location = locationService.getLocation(locationId);
-
-		// check if privilege already exists
-		if (mohCoreService.hasLocationPrivilege(sysUser, location)) {
-			log.info("The privilege already exists");
-			return "The privilege already exists";
-		}
-
-		// set location
-		UserLocation userlocation = new UserLocation();
-		userlocation.setSysUser(sysUser);
-		userlocation.setUserLoc(location);
-		mohCoreService.saveUserLocation(userlocation);
-
-		log.info("A new privilege has been added");
-		return "Record saved successfully";
-	}
-
-	public String purgeUserLocation(Integer rowid) {
-		MohCoreService mohCoreService = Context.getService(MohCoreService.class);
-		UserLocation userlocation = mohCoreService.getUserLocation(rowid);
-		mohCoreService.purgeUserLocation(userlocation);
-		return "Record removed successfully";
-	}
-
-	public String purgeMultiplePrivileges(List<Integer> myList) {
-		MohCoreService userlocservice = Context.getService(MohCoreService.class);
-		for (Integer privID : myList) {
-			UserLocation userlocation = userlocservice.getUserLocation(privID);
-			userlocservice.purgeUserLocation(userlocation);
-		}
-		return "A total of  " + myList.size() + " privileges have been processed";
-	}
-
 	/**
 	 * helper method for determining cohort size per location and report date
 	 */
@@ -278,5 +222,5 @@ public class DWRAmrsReportService {
 	public String rebuildEnrollment() {
 		HIVCareEnrollmentBuilder.execute();
 		return "done";
-	};
+	}
 }

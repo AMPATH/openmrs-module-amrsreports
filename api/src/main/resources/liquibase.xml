@@ -414,4 +414,44 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="amrsreports-2013-04-05-a" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="amrsreports_userlocation"/>
+        </preConditions>
+        <comment>
+            Dropping userlocation table
+        </comment>
+        <dropTable tableName="amrsreports_userlocation"/>
+    </changeSet>
+
+    <changeSet id="amrsreports-2013-04-05-b" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="amrsreports_user_facility"/>
+            </not>
+        </preConditions>
+        <comment>
+            Creating the amrsreports_user_facility table
+        </comment>
+        <createTable tableName="amrsreports_user_facility">
+            <column name="user_facility_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="int"/>
+            <column name="facility_id" type="int"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="amrsreports_user_facility_user"
+                                 baseTableName="amrsreports_user_facility" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="user_id"
+                />
+        <addForeignKeyConstraint constraintName="amrsreports_user_facility_facility"
+                                 baseTableName="amrsreports_user_facility" baseColumnNames="facility_id"
+                                 referencedTableName="amrsreports_facility" referencedColumnNames="facility_id"
+                />
+    </changeSet>
+
 </databaseChangeLog>

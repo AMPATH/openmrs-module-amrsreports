@@ -29,10 +29,8 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
-import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
@@ -341,52 +339,10 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return new Cohort(criteria.list());
 	}
 
-	/**
-	 * UserLocation methods
-	 */
-	@Override
-	public UserLocation saveUserLocation(UserLocation userlocation) {
-		sessionFactory.getCurrentSession().saveOrUpdate(userlocation);
-		return userlocation;
-	}
-
-	@Override
-	public UserLocation getUserLocation(Integer userlocationId) {
-		return (UserLocation) sessionFactory.getCurrentSession().get(UserLocation.class, userlocationId);
-	}
-
-	@Override
-	public List<UserLocation> getAllUserLocationPrivileges() {
-		Criteria crt = sessionFactory.getCurrentSession().createCriteria(UserLocation.class);
-		return crt.list();
-	}
-
-	@Override
-	public Boolean hasLocationPrivilege(User user, Location location) {
-		return (Integer) sessionFactory.getCurrentSession().createCriteria(UserLocation.class)
-				.add(Restrictions.eq("sysUser", user))
-				.add(Restrictions.eq("userLoc", location))
-				.setProjection(Projections.rowCount())
-				.uniqueResult()
-				>= 1;
-	}
-
-	@Override
-	public void deleteUserLocation(UserLocation userLocation) {
-		sessionFactory.getCurrentSession().delete(userLocation);
-	}
-
-	@Override
-	public List<UserLocation> getUserLocationsForUser(User user) {
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(UserLocation.class)
-				.add(Restrictions.eq("sysUser", user));
-		return (List<UserLocation>) crit.list();
-	}
-
 	@Override
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort) {
 		Map<Integer, Date> ret = new LinkedHashMap<Integer, Date>();
- 		if (cohort != null && cohort.size() > 0) {
+		if (cohort != null && cohort.size() > 0) {
 			Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
 					.add(Restrictions.in("person.personId", cohort))
 					.setProjection(Projections.projectionList()

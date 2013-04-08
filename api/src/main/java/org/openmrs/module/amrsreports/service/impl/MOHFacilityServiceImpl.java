@@ -36,7 +36,6 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 		return Context.getService(MOHFacilityService.class).getAllFacilities(false);
 	}
 
-
 	@Override
 	public List<MOHFacility> getAllFacilities(Boolean includeRetired) {
 		return dao.getAllFacilities(includeRetired);

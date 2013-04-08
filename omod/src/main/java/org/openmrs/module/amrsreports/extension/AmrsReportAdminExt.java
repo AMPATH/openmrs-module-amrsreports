@@ -55,7 +55,7 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 		}
 
 		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
-			map.put("module/amrsreports/locationPrivileges.form", "Location Privileges");
+			map.put("module/amrsreports/facilityPrivileges.form", "Manage User/Facility Privileges");
 		}
 
 		map.put("module/amrsreports/settings.form", "Settings");

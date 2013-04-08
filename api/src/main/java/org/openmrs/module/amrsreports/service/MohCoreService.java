@@ -22,7 +22,7 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.module.amrsreports.UserLocation;
+import org.openmrs.module.amrsreports.UserFacility;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.User;
@@ -33,7 +33,6 @@ import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
-import org.openmrs.module.reporting.report.definition.ReportDefinition;
 
 /**
  * Service contract for the core layer of OpenMRS
@@ -151,44 +150,6 @@ public interface MohCoreService extends OpenmrsService {
 			final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
 			final MohFetchRestriction mohFetchRestriction,
 			final Date evaluationDate) throws APIException;
-
-	/**
-	 * @should save a UserLocation
-	 * @param userlocation
-	 * @return
-	 */
-	@Transactional
-	public UserLocation saveUserLocation(UserLocation userlocation);
-
-	/**
-	 * @should get a UserLocation by its Id
-	 * @param userlocationId
-	 * @return
-	 */
-	@Transactional(readOnly=true)
-	public UserLocation getUserLocation(Integer userlocationId);
-
-	/**
-	 * @should purge a UserLocation
-	 * @param userlocation
-	 */
-	@Transactional(readOnly=true)
-	public List<UserLocation> getAllUserLocationPrivileges();
-
-	@Transactional
-	public void purgeUserLocation(UserLocation userlocation);
-
-	/**
-	 * @should only get specified locations for user
-	 * @should return empty list if none assigned
-	 * @param user
-	 * @return list of allowed locations
-	 */
-	@Transactional(readOnly=true)
-	public List<Location> getAllowedLocationsForUser(User user);
-
-	@Transactional(readOnly=true)
-	public Boolean hasLocationPrivilege(User user,Location location);
 
 	@Transactional(readOnly=true)
 	public Map<Integer,Date> getEnrollmentDateMap(Set<Integer> cohort);

@@ -34,7 +34,7 @@
 	<mappingFiles>
         MOHFacility.hbm.xml
         QueuedReport.hbm.xml
-		UserLocation.hbm.xml
+		UserFacility.hbm.xml
         HIVCareEnrollment.hbm.xml
 	</mappingFiles>
 	
@@ -73,13 +73,10 @@
 				<include method="viewMoreDetailsRender"/>
 				<include method="downloadCSV"/>
 				<include method="downloadPDF"/>
-				<include method="purgeUserLocation"/>
-				<include method="saveUserLoc"/>
-				<include method="purgeMultiplePrivileges"/>
                 <include method="getCohortCountForLocation"/>
                 <include method="getCohort"/>
                 <include method="rebuildEnrollment"/>
-                <convert match="org.openmrs.module.amrsreports.UserLocation" converter="bean" />
+                <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
 				<convert match="org.openmrs.Location" converter="bean" />
 				<convert match="org.openmrs.User" converter="bean"/>
 			</create>
@@ -93,9 +90,6 @@
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
 			DWRAmrsReportService.alertInput(String loc,String userr);
-			DWRAmrsReportService.saveUserLoc(Integer suser,Integer syslocc);
-			DWRAmrsReportService.purgeUserLocation(Integer rowid);
-			DWRAmrsReportService.purgeMultiplePrivileges(ArrayList myList);
         	DWRAmrsReportService.getCohortCountForLocation(Integer locationId,Date evaluationDate);
             DWRAmrsReportService.getCohort(Integer locationId,Date evaluationDate);
             DWRAmrsReportService.rebuildEnrollment();

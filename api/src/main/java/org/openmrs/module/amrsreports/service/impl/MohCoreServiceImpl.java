@@ -25,8 +25,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.UserLocation;
-import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.UserFacility;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -112,38 +111,6 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 			Date evaluationDate) throws APIException {
 		return mohCoreDAO.getPatientObservationsWithEncounterRestrictions(
 				patientId, obsRestrictions, encounterRestrictions, mohFetchRestriction, evaluationDate);
-	}
-
-	public UserLocation saveUserLocation(UserLocation userlocation) {
-		return mohCoreDAO.saveUserLocation(userlocation);
-	}
-
-	public UserLocation getUserLocation(Integer userlocationId) {
-		return mohCoreDAO.getUserLocation(userlocationId);
-	}
-
-	public List<UserLocation> getAllUserLocationPrivileges() {
-
-		return mohCoreDAO.getAllUserLocationPrivileges();
-	}
-
-	public void purgeUserLocation(UserLocation userlocation) {
-		mohCoreDAO.deleteUserLocation(userlocation);
-	}
-
-	@Override
-	public List<Location> getAllowedLocationsForUser(User user) {
-		List<Location> locations = new ArrayList<Location>();
-		List<UserLocation> userLocations = mohCoreDAO.getUserLocationsForUser(user);
-		for (UserLocation ul : userLocations) {
-			locations.add(ul.getUserLoc());
-		}
-		return locations;
-	}
-
-	@Override
-	public Boolean hasLocationPrivilege(User user, Location location) {
-		return mohCoreDAO.hasLocationPrivilege(user, location);
 	}
 
 	@Override

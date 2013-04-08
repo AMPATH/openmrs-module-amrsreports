@@ -17,9 +17,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
-import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.amrsreports.UserLocation;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
@@ -54,19 +52,6 @@ public interface MohCoreDAO {
 	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
 	                                                          final MohFetchRestriction mohFetchRestriction,
 	                                                          final Date evaluationDate);
-
-	/*Methods for UserLocation Class*/
-	public UserLocation saveUserLocation(UserLocation userlocation);
-
-	public UserLocation getUserLocation(Integer userlocationId);
-
-	public List<UserLocation> getAllUserLocationPrivileges();
-
-	public Boolean hasLocationPrivilege(User user, Location location);
-
-	public void deleteUserLocation(UserLocation userlocation);
-
-	public List<UserLocation> getUserLocationsForUser(User user);
 
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort);
 

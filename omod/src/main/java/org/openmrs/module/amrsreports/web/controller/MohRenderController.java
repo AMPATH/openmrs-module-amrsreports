@@ -12,6 +12,7 @@ import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
@@ -55,7 +56,7 @@ public class MohRenderController {
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
-		return Context.getService(MOHFacilityService.class).getAllFacilities();
+		return Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
 	}
 
 	@ModelAttribute("reportNames")
