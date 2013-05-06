@@ -96,7 +96,28 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 					"      and value_datetime IS NOT NULL" +
 					"  )";
 
-	private AdministrationService administrationService;
+    private static final String MACRO_UPDATE_EDD =
+            "INSERT INTO amrsreports_pregnancy (" +
+                    "	person_id," +
+                    "	pregnancy_date," +
+                    "	due_date" +
+                    " ) SELECT" +
+                    "	e.patient_id, " +
+                    "	DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') AS p_date," +
+                    "	DATE_ADD(o.obs_datetime, INTERVAL (280 - (o.value_numeric * :days)) DAY) AS d_date" +
+                    " FROM" +
+                    "	obs o INNER JOIN encounter e ON e.encounter_id = o.encounter_id AND e.voided = 0" +
+                    " WHERE" +
+                    "	o.voided = 0" +
+                    "	and ( :criteria )" +
+                    " GROUP BY" +
+                    "	p_date" +
+                    " ORDER BY" +
+                    "	p_date asc" +
+                    " ON DUPLICATE KEY UPDATE" +
+                    "	due_date = DATE_ADD(o.obs_datetime, INTERVAL (280 - (o.value_numeric * 7)) DAY)";
+
+    private AdministrationService administrationService;
 
 	/**
 	 * drops, creates and fills out the pregnancy table
@@ -118,8 +139,13 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 		updateColumn("durpreg", "concept_id in (1279, 5992) and value_numeric > 0");
 		updateColumn("fundpreg", "concept_id = 1855 and value_numeric > 0");
 		updateColumn("ancpreg", "concept_id = 2055 and value_coded = 1065");
+        // menstrual period date: 1836
 
 		// update due dates
+        updateEDD(7, "concept_id = 1855");
+        updateEDD(30, "concept_id = 5992 AND value_numeric <= 9");
+        updateEDD(7, "concept_id = 1279 OR (concept_id = 5992 AND value_numeric > 9)");
+
 		getAdministrationService().executeSQL(UPDATE_DUE_DATES, false);
 	}
 
@@ -133,6 +159,17 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 		String query = MACRO_UPDATE_COLUMN.replaceAll(":criteria", criteria).replaceAll(":column", column);
 		getAdministrationService().executeSQL(query, false);
 	}
+
+    /**
+     * updates due_date based on provided criteria
+     */
+    private void updateEDD(Integer days, String criteria) {
+        if (days == null || StringUtils.isBlank(criteria))
+            return;
+
+        String query = MACRO_UPDATE_EDD.replaceAll(":criteria", criteria).replaceAll(":days", days.toString());
+        getAdministrationService().executeSQL(query, false);
+    }
 
 	/**
 	 * getter for administrationService
