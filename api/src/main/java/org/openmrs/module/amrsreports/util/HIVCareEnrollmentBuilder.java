@@ -284,26 +284,6 @@ public class HIVCareEnrollmentBuilder {
 					"      and patient_id = ae.person_id" +
 					"      and voided =  0)";
 
-//	private static final String QUERY_MARK_CONFLICTING_OBS =
-//			"update amrsreports_hiv_care_enrollment ae" +
-//					"  join person p on p.person_id = ae.person_id" +
-//					" set" +
-//					"  ae.enrollment_location_id = ae.first_positive_obs_location_id," +
-//					"  ae.enrollment_date = ae.first_positive_obs_date," +
-//					"  ae.enrollment_age = datediff(ae.first_positive_obs_date, p.birthdate) / 365.25," +
-//					"  ae.enrollment_reason = 'POSITIVE OBSERVATION'" +
-//					" where" +
-//					"  ae.report_date = ':reportDate'" +
-//					"  and ae.enrollment_reason is NULL" +
-//					"  and ae.last_positive_obs_date is not NULL" +
-//					"  and (" +
-//					"    ae.last_negative_obs_date is NULL" +
-//					"    or (" +
-//					"      ae.last_negative_obs_date is not NULL" +
-//					"      and ae.last_negative_obs_date < ae.last_positive_obs_date" +
-//					"    )" +
-//					"  )";
-
 	private static final String QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS =
 			"update amrsreports_hiv_care_enrollment ae" +
 					"  join person p on p.person_id = ae.person_id" +
