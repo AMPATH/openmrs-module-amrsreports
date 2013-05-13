@@ -36,6 +36,8 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
             return null;
 
         String reportDate = sdf.format(context.getEvaluationDate());
+        List<Location> locationList = (List<Location>) context.getParameterValue("locationList");
+
 
         String sql =
                 "select person_id" +
@@ -44,9 +46,9 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
                         "  first_arv_date is not NULL" +
                         "  enrollment_date is not NULL" +
                         "  and enrollment_date <= ':reportDate'" +
-                        "  and enrollment_location_id in ( :locationList )";
+                        "  and first_arv_location_id in ( :locationList )";
 
-        List<Location> locationList = (List<Location>) context.getParameterValue("locationList");
+
 
         sql.replaceAll(":locationList",locationList.toString());
         SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));
