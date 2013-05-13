@@ -61,8 +61,26 @@ public class MOH361BReportProvider implements ReportProvider {
 		// patient id ... until we get this thing working proper
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
+		// b. Date ART started (Transfer to ART register)
+		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString);
+
+		// c. Unique Patient Number
+		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
+		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
+
 		// d. Patient's Name
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
+
+		// e. Sex
+		dsd.addColumn("Sex", new GenderDataDefinition(), nullString);
+
+		// f1. Date of Birth
+		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
+
+		// f1. Age
+		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
+		dsd.addColumn("Age", add, nullString, new DecimalAgeConverter(2));
 
 		report.addDataSetDefinition(dsd, null);
 
