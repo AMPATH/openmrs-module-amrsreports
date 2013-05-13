@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.Activator;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider;
+import org.openmrs.module.amrsreports.reporting.provider.MOH361BReportProvider;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 
 /**
@@ -34,6 +35,7 @@ public class AmrsReportModuleActivator implements Activator {
 		log.info("Starting AMRS Reporting Module");
 
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider());
+		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361BReportProvider());
 	}
 	
 	/**
