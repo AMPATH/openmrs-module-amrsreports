@@ -47,27 +47,8 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
                         "  and enrollment_location_id in ( :locationList )";
 
         List<Location> locationList = (List<Location>) context.getParameterValue("locationList");
-        for (Location location : locationList) {
-            String personAttributeQuery =
-                    " union " +
-                            " select pa.person_id" +
-                            " from person_attribute pa join amrsreports_hiv_care_enrollment ae" +
-                            "     on pa.person_id = ae.person_id" +
-                            "       and ae.enrollment_date is not null" +
-                            "       and ae.enrollment_date <= ':reportDate'" +
-                            "   join encounter e " +
-                            "     on e.patient_id = pa.person_id" +
-                            "       and e.voided = 0" +
-                            "       and e.location_id in ( :locationList )" +
-                            " where (pa.voided = 0" +
-                            "        or (pa.voided = 1 and pa.void_reason like 'New value: %'))" +
-                            "   and pa.person_attribute_type_id = 7" +
-                            "   and pa.value = '" + location.getLocationId() + "'" +
-                            "   and pa.date_created <= ':reportDate'";
 
-            sql = sql + personAttributeQuery;
-        }
-
+        sql.replaceAll(":locationList",locationList.toString());
         SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));
         Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);
 
