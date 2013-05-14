@@ -45,7 +45,7 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
                         " where " +
                         "  first_arv_date is not NULL" +
                         "  enrollment_date is not NULL" +
-                        "  and enrollment_date <= ':reportDate'" +
+                        "  and first_arv_date <= ':reportDate'" +
                         "  and first_arv_location_id in ( :locationList )";
 
 
