@@ -5,6 +5,7 @@ import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Registrar for handling ReportProvider instances
@@ -35,6 +36,6 @@ public class ReportProviderRegistrar {
 	}
 
 	public Set<String> getAllReportProviderNames() {
-		return providerMap.keySet();
+		return new TreeSet<String>(providerMap.keySet());
 	}
 }
