@@ -44,13 +44,10 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
                         " from amrsreports_hiv_care_enrollment " +
                         " where " +
                         "  first_arv_date is not NULL" +
-                        "  enrollment_date is not NULL" +
+                        "  and enrollment_date is not NULL" +
                         "  and first_arv_date <= ':reportDate'" +
                         "  and first_arv_location_id in ( :locationList )";
 
-
-
-        sql.replaceAll(":locationList",locationList.toString());
         SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql.replaceAll(":reportDate", reportDate));
         Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);
 

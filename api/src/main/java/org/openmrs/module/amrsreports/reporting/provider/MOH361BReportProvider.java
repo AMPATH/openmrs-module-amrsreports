@@ -35,7 +35,8 @@ import java.util.Properties;
 /**
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */
-public class MOH361BReportProvider implements ReportProvider {
+public class
+        MOH361BReportProvider implements ReportProvider {
 
 	@Override
 	public String getName() {
