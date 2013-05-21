@@ -33,6 +33,8 @@ import java.util.Properties;
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */
 public class MOH361BReportProvider implements ReportProvider {
+	
+	public static final String CONTACT_PHONE_ATTRIBUTE_TYPE = "Contact Phone Number"; 
 
 	@Override
 	public String getName() {
@@ -79,10 +81,11 @@ public class MOH361BReportProvider implements ReportProvider {
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("Age", add, nullString, new DecimalAgeConverter(2));
 
+		// g.Address
         PreferredAddressDataDefinition padd = new PreferredAddressDataDefinition();
         dsd.addColumn("Address",padd,nullString);
 
-        PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName("PersonPhoneContact");
+        PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
 
         PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
 
