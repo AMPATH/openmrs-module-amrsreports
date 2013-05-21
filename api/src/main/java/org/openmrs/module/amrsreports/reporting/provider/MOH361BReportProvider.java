@@ -6,16 +6,14 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
-import org.openmrs.module.amrsreports.reporting.converter.*;
-import org.openmrs.module.amrsreports.reporting.data.*;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
+import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.common.SortCriteria;
-import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
-import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.*;
@@ -29,13 +27,14 @@ import org.openmrs.util.OpenmrsClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 /**
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */
 public class MOH361BReportProvider implements ReportProvider {
+	
+	public static final String CONTACT_PHONE_ATTRIBUTE_TYPE = "Contact Phone Number"; 
 
 	@Override
 	public String getName() {
@@ -81,6 +80,16 @@ public class MOH361BReportProvider implements ReportProvider {
 		// f1. Age
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("Age", add, nullString, new DecimalAgeConverter(2));
+
+		// g.Address
+        PreferredAddressDataDefinition padd = new PreferredAddressDataDefinition();
+        dsd.addColumn("Address",padd,nullString);
+
+        PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
+
+        PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
+
+        dsd.addColumn("Phone Number",patientPhoneContact,nullString);
 
 		report.addDataSetDefinition(dsd, null);
 
