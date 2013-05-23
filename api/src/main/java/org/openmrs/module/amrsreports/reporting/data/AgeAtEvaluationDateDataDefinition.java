@@ -4,12 +4,15 @@ import org.openmrs.module.reporting.common.Age;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
+import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 import java.util.Date;
 
 /**
  * Evaluates age of a person at the date of report evaluation, provided by the context
  */
+@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
 public class AgeAtEvaluationDateDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	public static final long serialVersionUID = 1L;
