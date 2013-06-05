@@ -143,6 +143,7 @@
 
         <div id="choices">
             <div class="choice"><input type="radio" name="taskName" value="arvs"/> ARV Tables</div>
+            <div class="choice"><input type="radio" name="taskName" value="pregnancy"/> Pregnancy Tables</div>
             <div class="choice"><input type="radio" name="taskName" value="enrollment"/> HIV Care Enrollment Table</div>
         </div>
 

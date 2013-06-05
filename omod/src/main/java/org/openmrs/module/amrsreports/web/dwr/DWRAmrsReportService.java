@@ -13,6 +13,7 @@ import org.openmrs.module.amrsreports.task.AMRSReportsCommonTaskLock;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
+import org.openmrs.module.amrsreports.task.UpdatePregnanciesTask;
 import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -239,6 +240,8 @@ public class DWRAmrsReportService {
 
 		if (OpenmrsUtil.nullSafeEquals("arvs", taskName))
 			task = new UpdateARVEncountersTask();
+		else if (OpenmrsUtil.nullSafeEquals("pregnancy", taskName))
+			task = new UpdatePregnanciesTask();
 		else if (OpenmrsUtil.nullSafeEquals("enrollment", taskName))
 			task = new UpdateHIVCareEnrollmentTask();
 
