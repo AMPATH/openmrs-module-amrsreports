@@ -1,5 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
@@ -23,6 +25,8 @@ import java.util.Map;
 @Handler(supports = FirstEncounterAtFacilityDataDefinition.class, order = 50)
 public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluator {
 
+	private final Log log = LogFactory.getLog(getClass());
+
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
@@ -35,6 +39,12 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 
 		// find the facility number
 		MOHFacility facility = (MOHFacility) context.getParameterValue("facility");
+
+		// fail quickly if the facility does not exist
+		if (facility == null)   {
+			log.warn("No facility provided; returning empty data.");
+			return c;
+		}
 
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 

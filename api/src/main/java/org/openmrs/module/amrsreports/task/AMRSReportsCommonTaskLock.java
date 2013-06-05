@@ -83,4 +83,13 @@ public class AMRSReportsCommonTaskLock {
 		return !this.locked;
 	}
 
+	/**
+	 * responds with the last locking class
+	 *
+	 * @return last locking class
+	 */
+	public Class getLastLockingClass() {
+		return this.lastLockingClass;
+	}
+
 }

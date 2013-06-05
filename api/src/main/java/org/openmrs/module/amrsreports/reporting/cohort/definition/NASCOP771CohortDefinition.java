@@ -4,6 +4,8 @@ import org.openmrs.Location;
 import org.openmrs.module.reporting.cohort.definition.BaseCohortDefinition;
 import org.openmrs.module.reporting.common.Localized;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
+import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 /**
  * NASCOP 771 Register cohort definition
  */
+@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
 @Localized("reporting.NASCOP771CohortDefinition")
 public class NASCOP771CohortDefinition extends BaseCohortDefinition {
 
