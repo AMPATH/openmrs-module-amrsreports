@@ -3,8 +3,9 @@ package org.openmrs.module.amrsreports.web.controller;
 import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
-import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -26,6 +27,11 @@ import java.util.List;
  */
 @Controller
 public class CohortCountController {
+
+    @ModelAttribute("facilities")
+    public List<MOHFacility> getAllFacilities() {
+        return Context.getService(MOHFacilityService.class).getAllFacilities(true);
+    }
 
 	@ModelAttribute("locations")
 	public List<Location> getLocations() {
