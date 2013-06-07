@@ -7,13 +7,12 @@ import org.openmrs.Location;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.hl7.Hl7InArchivesMigrateThread;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
-import org.openmrs.module.amrsreports.task.AMRSReportsCommonTaskLock;
+import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
-import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -22,23 +21,8 @@ import org.openmrs.util.OpenmrsUtil;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * DWR service for AMRS Reports web pages
@@ -211,8 +195,11 @@ public class DWRAmrsReportService {
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
 
-		Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("locationList", Collections.singletonList(location));
+        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(locationId);
+
+        Set<Location> facilityLocations = mohFacility.getLocations();
+		//Location location = Context.getLocationService().getLocation(locationId);
+		context.addParameterValue("locationList", Collections.singletonList(facilityLocations));
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
 
