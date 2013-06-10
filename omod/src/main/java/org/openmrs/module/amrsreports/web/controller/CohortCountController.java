@@ -33,11 +33,6 @@ public class CohortCountController {
         return Context.getService(MOHFacilityService.class).getAllFacilities(true);
     }
 
-	@ModelAttribute("locations")
-	public List<Location> getLocations() {
-		return Context.getLocationService().getAllLocations();
-	}
-
 	@RequestMapping(value = "module/amrsreports/cohortCounts", method = RequestMethod.GET)
 	public void setup() {
 		// do nothing

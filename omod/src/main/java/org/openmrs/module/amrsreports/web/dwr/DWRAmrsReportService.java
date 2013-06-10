@@ -182,20 +182,20 @@ public class DWRAmrsReportService {
 	/**
 	 * helper method for determining cohort size per location and report date
 	 */
-	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) throws Exception {
-		Set<Integer> cohort = this.getCohort(locationId, evaluationDate);
+	public Integer getCohortCountForFacility(Integer facilityId, Date evaluationDate) throws Exception {
+		Set<Integer> cohort = this.getCohort(facilityId, evaluationDate);
 		return cohort.size();
 	}
 
 	/**
 	 * provide the list of patients in the MOH361A cohort for a given location and evaluation date
 	 */
-	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
+	public Set<Integer> getCohort(Integer facilityId, Date evaluationDate) throws Exception {
 
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
 
-        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(locationId);
+        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
         Set<Location> facilityLocations = mohFacility.getLocations();
 		//Location location = Context.getLocationService().getLocation(locationId);
