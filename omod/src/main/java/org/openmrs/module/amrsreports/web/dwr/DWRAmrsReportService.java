@@ -7,15 +7,12 @@ import org.openmrs.Location;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.hl7.Hl7InArchivesMigrateThread;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
-import org.openmrs.module.amrsreports.task.AMRSReportsCommonTaskLock;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
-import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -34,12 +31,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -200,21 +194,26 @@ public class DWRAmrsReportService {
 	/**
 	 * helper method for determining cohort size per location and report date
 	 */
-	public Integer getCohortCountForLocation(Integer locationId, Date evaluationDate) throws Exception {
-		Set<Integer> cohort = this.getCohort(locationId, evaluationDate);
+	public Integer getCohortCountForFacility(Integer facilityId, Date evaluationDate) throws Exception {
+		Set<Integer> cohort = this.getCohort(facilityId, evaluationDate);
 		return cohort.size();
 	}
 
 	/**
 	 * provide the list of patients in the MOH361A cohort for a given location and evaluation date
 	 */
-	public Set<Integer> getCohort(Integer locationId, Date evaluationDate) throws Exception {
+	public Set<Integer> getCohort(Integer facilityId, Date evaluationDate) throws Exception {
 
 		EvaluationContext context = new EvaluationContext();
 		context.setEvaluationDate(evaluationDate);
 
-		Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("locationList", Collections.singletonList(location));
+		MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		if (mohFacility == null)
+			return new HashSet<Integer>();
+
+		List<Location> facilityLocations = new ArrayList<Location>(mohFacility.getLocations());
+		context.addParameterValue("locationList", facilityLocations);
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
 
@@ -255,8 +254,7 @@ public class DWRAmrsReportService {
 			TaskRunnerThread.getInstance().start();
 
 			return "Started task: " + TaskRunnerThread.getInstance().getCurrentTaskClassname();
-		}
-		catch (APIAuthenticationException e) {
+		} catch (APIAuthenticationException e) {
 			log.warn("Could not authenticate when trying to run a task.");
 		}
 

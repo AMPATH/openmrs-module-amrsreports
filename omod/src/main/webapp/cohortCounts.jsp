@@ -31,9 +31,9 @@
         $j("#update").click(function(event){
             event.preventDefault();
             $j("[name=location]:checked").each(function(){
-                var locationId = $j(this).val();
-                getLocationCount(locationId, reportDate.getDate(), function(){
-                    $j("[name=location][location=" + locationId + "]").removeAttr("checked");
+                var facilityId = $j(this).val();
+                getFacilityCount(facilityId, reportDate.getDate(), function(){
+                    $j("[name=location][location=" + facilityId + "]").removeAttr("checked");
                 });
             });
         });
@@ -56,10 +56,10 @@
         reportDate.setDate(new Date());
     });
 
-    function getLocationCount(locationId, reportDate, callback) {
-        $j(".size[location=" + locationId + "]").html("Calculating ...");
-        DWRAmrsReportService.getCohortCountForLocation(locationId, reportDate, function(size){
-            $j(".size[location=" + locationId + "]").html(size);
+    function getFacilityCount(facilityId, reportDate, callback) {
+        $j(".size[location=" + facilityId + "]").html("Calculating ...");
+        DWRAmrsReportService.getCohortCountForFacility(facilityId, reportDate, function(size){
+            $j(".size[location=" + facilityId + "]").html(size);
             callback();
         });
     }
@@ -67,7 +67,7 @@
 
 <%@ include file="localHeader.jsp" %>
 
-<b class="boxHeader">Location Cohorts</b>
+<b class="boxHeader">Facility Cohorts</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form>
@@ -83,16 +83,16 @@
             <thead>
             <tr>
                 <th><a id="selectAll">All</a> | <a id="selectNone">None</a></th>
-                <th>Location</th>
+                <th>Facility</th>
                 <th>Size</th>
             </tr>
             </thead>
             <tbody>
-            <c:forEach items="${locations}" var="location">
+            <c:forEach items="${facilities}" var="facility">
                 <tr>
-                    <td align="center"><input name="location" type="checkbox" location="${location.id}" value="${location.id}"/></td>
-                    <td>${location.name}</td>
-                    <td align="right"><span class="size" location="${location.id}">--</span></td>
+                    <td align="center"><input name="location" type="checkbox" location="${facility.facilityId}" value="${facility.facilityId}"/></td>
+                    <td>${facility.name}</td>
+                    <td align="right"><span class="size" location="${facility.facilityId}">--</span></td>
                 </tr>
             </c:forEach>
             </tbody>

@@ -66,14 +66,14 @@
     <!-- /Required Global Properties -->
 	
 	<dwr>
-		<allow>
-			<create creator="new" javascript="DWRAmrsReportService">
-				<param name="class" value="${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService"/>
-				<include method="viewMoreDetails"/>
-				<include method="viewMoreDetailsRender"/>
-				<include method="downloadCSV"/>
-				<include method="downloadPDF"/>
-                <include method="getCohortCountForLocation"/>
+        <allow>
+            <create creator="new" javascript="DWRAmrsReportService">
+                <param name="class" value="${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService"/>
+                <include method="viewMoreDetails"/>
+                <include method="viewMoreDetailsRender"/>
+                <include method="downloadCSV"/>
+                <include method="downloadPDF"/>
+                <include method="getCohortCountForFacility"/>
                 <include method="getCohort"/>
                 <include method="startTaskRunner"/>
                 <include method="stopTaskRunner"/>
@@ -85,16 +85,16 @@
             <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
             <convert match="org.openmrs.Location" converter="bean" />
             <convert match="org.openmrs.User" converter="bean"/>
-		</allow>
+        </allow>
 
-		<signatures>
-			<![CDATA[
+        <signatures>
+            <![CDATA[
 			import ${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService;
 			DWRAmrsReportService.viewMoreDetails(String file, String amrsid);
 			DWRAmrsReportService.viewMoreDetailsRender(String bff, String id);
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
-        	DWRAmrsReportService.getCohortCountForLocation(Integer locationId, Date evaluationDate);
+        	DWRAmrsReportService.getCohortCountForFacility(Integer facilityId, Date evaluationDate);
             DWRAmrsReportService.getCohort(Integer locationId, Date evaluationDate);
             DWRAmrsReportService.startTaskRunner(String taskName);
             DWRAmrsReportService.stopTaskRunner();
@@ -103,8 +103,8 @@
             DWRAmrsReportService.getPatientCountMissingCCCNumbersInFacility(Integer facilityId);
             DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
 			]]>
-		</signatures>	
-	</dwr>
+        </signatures>
+    </dwr>
 	
 	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
