@@ -8,7 +8,7 @@
 		</id>
 		<discriminator column="enrollment_id" insert="false"/>
 
-        <many-to-one class="org.openmrs.Person" name="person" column="person_id" not-null="true"/>
+        <many-to-one class="org.openmrs.Patient" name="patient" column="patient_id" not-null="true"/>
 
         <property name="enrollmentDate" type="java.util.Date" column="enrollment_date" length="10" />
         <many-to-one class="org.openmrs.Location" name="enrollmentLocation" column="enrollment_location_id"/>

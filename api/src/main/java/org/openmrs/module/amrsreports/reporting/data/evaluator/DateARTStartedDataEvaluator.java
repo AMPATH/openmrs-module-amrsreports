@@ -49,7 +49,7 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 
 		for (Object o : queryResult) {
 			HIVCareEnrollment enrollment = (HIVCareEnrollment) o;
-			c.addData(enrollment.getPerson().getPersonId(), enrollment.getFirstARVDate());
+			c.addData(enrollment.getPatient().getPersonId(), enrollment.getFirstARVDate());
 		}
 
 		return c;

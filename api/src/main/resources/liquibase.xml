@@ -454,4 +454,23 @@
                 />
     </changeSet>
 
+    <changeSet id="amrsreports-2013-06-07" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="amrsreports_hiv_care_enrollment" columnName="patient_id"/>
+            </not>
+        </preConditions>
+
+        <comment>
+            Changing person to patient in HIV Care Enrollment table
+        </comment>
+
+        <dropForeignKeyConstraint baseTableName="amrsreports_hiv_care_enrollment" constraintName="amrsreports_hiv_care_enrollment_person_ref"/>
+        <renameColumn tableName="amrsreports_hiv_care_enrollment" oldColumnName="person_id" newColumnName="patient_id"/>
+        <addForeignKeyConstraint baseTableName="amrsreports_hiv_care_enrollment" baseColumnNames="patient_id"
+                                 constraintName="amrsreports_hiv_care_enrollment_patient_ref"
+                                 referencedTableName="patient"
+                                 referencedColumnNames="patient_id"/>
+    </changeSet>
+
 </databaseChangeLog>
