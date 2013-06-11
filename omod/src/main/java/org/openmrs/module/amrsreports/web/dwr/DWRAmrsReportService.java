@@ -197,9 +197,11 @@ public class DWRAmrsReportService {
 
         MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
-        Set<Location> facilityLocations = mohFacility.getLocations();
-		//Location location = Context.getLocationService().getLocation(locationId);
-		context.addParameterValue("locationList", Collections.singletonList(facilityLocations));
+		if (mohFacility == null)
+			return new HashSet<Integer>();
+
+        List<Location> facilityLocations = new ArrayList<Location>(mohFacility.getLocations());
+		context.addParameterValue("locationList", facilityLocations);
 
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
 
