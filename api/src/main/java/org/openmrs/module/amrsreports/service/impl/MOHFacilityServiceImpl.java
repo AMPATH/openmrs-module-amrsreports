@@ -9,9 +9,12 @@ import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
+import org.openmrs.module.amrsreports.db.hibernate.MohHibernateCoreDAO;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
@@ -128,28 +131,13 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 		return m;
 	}
 
-	private Cohort getMOH361ACohortForFacility(MOHFacility facility) {
-		CohortDefinitionService cds = Context.getService(CohortDefinitionService.class);
-		EvaluationContext ec = new PersonEvaluationContext(new Date());
-
-		List<Location> locations = new ArrayList<Location>();
-		locations.addAll(facility.getLocations());
-		ec.addParameterValue("locationList", locations);
-
-		EvaluatedCohort c;
-		try {
-			c = cds.evaluate(new Moh361ACohortDefinition(), ec);
-		} catch (EvaluationException e) {
-			log.warn("Could not evaluate 361A cohort for " + facility);
-			c = new EvaluatedCohort();
-		}
-
-		return c;
+	private Cohort getEnrolledPatientsForFacility(MOHFacility facility) {
+		return dao.getEnrolledPatientsForFacility(facility);
 	}
 
 	@Override
 	public Integer countPatientsInFacilityMissingCCCNumbers(MOHFacility facility) {
-		Cohort c = getMOH361ACohortForFacility(facility);
+		Cohort c = getEnrolledPatientsForFacility(facility);
 		Cohort missing = dao.getPatientsInCohortMissingCCCNumbers(c);
 		return missing.size();
 	}
@@ -169,11 +157,8 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 
 		// get some required information
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
-		Cohort c = getMOH361ACohortForFacility(facility);
+		Cohort c = getEnrolledPatientsForFacility(facility);
 		Integer serial = dao.getLatestSerialNumberForFacility(facility);
-
-		// this hurts ... need a better way to get the first element of a set
-		Location location = facility.getLocations().toArray(new Location[]{ })[0];
 
 		// start a counter for our progress
 		Integer count = 0;
@@ -191,6 +176,13 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 
 				// increase the serial number
 				serial++;
+
+				// get the enrollment information
+				HIVCareEnrollment enrollment = Context.getService(HIVCareEnrollmentService.class)
+						.getHIVCareEnrollmentForPatient(p);
+
+				// set the location for the identifier
+				Location location = enrollment.getEnrollmentLocation();
 
 				// create the new identifier
 				String identifier = String.format("%s-%05d", facility.getCode(), serial);

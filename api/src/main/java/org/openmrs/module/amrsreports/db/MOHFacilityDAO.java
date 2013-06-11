@@ -28,4 +28,6 @@ public interface MOHFacilityDAO {
 	public Cohort getPatientsInCohortMissingCCCNumbers(Cohort c);
 
 	public Integer getLatestSerialNumberForFacility(MOHFacility facility);
+
+	public Cohort getEnrolledPatientsForFacility(MOHFacility facility);
 }

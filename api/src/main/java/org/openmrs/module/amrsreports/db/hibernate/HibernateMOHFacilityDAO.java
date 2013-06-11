@@ -11,6 +11,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Cohort;
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
@@ -146,6 +147,20 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 
 		String serial = (String) q.uniqueResult();
 		return Integer.parseInt(serial);
+	}
+
+	@Override
+	public Cohort getEnrolledPatientsForFacility(MOHFacility facility) {
+		String hql = "select e.patient.patientId from HIVCareEnrollment e" +
+				" where e.enrollmentLocation in (:locationList)" +
+				"  and e.enrollmentDate is not null" +
+				"  and e.transferredInDate is null" +
+				" order by e.enrollmentDate asc";
+
+		Query q = sessionFactory.getCurrentSession().createQuery(hql);
+		q.setParameterList("locationList", new ArrayList<Location>(facility.getLocations()));
+
+		return new Cohort((List<Integer>) q.list());
 	}
 
 }
