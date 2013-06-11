@@ -8,7 +8,9 @@ import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.Hl7InArchivesMigrateThread;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.task.AMRSReportsCommonTaskLock;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
@@ -292,4 +294,38 @@ public class DWRAmrsReportService {
 		return null;
 	}
 
+	/**
+	 * Returns a facility's name indicated by its internal id
+	 */
+	public String getFacilityName(Integer facilityId) {
+		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		if (f == null)
+			return "";
+
+		return f.getName();
+	}
+
+	/**
+	 * returns the missing ccc numbers count for a given facility
+	 */
+	public Integer getPatientCountMissingCCCNumbersInFacility(Integer facilityId) {
+		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		if (f == null)
+			return -1;
+
+		return Context.getService(MOHFacilityService.class).countPatientsInFacilityMissingCCCNumbers(f);
+	}
+
+	public String assignMissingIdentifiersForFacility(Integer facilityId) {
+		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		if (f == null)
+			return "No facility specified.";
+
+		Integer count = Context.getService(MOHFacilityService.class).assignMissingIdentifiersForFacility(f);
+
+		return "Successfully created " + count + " identifiers.";
+	}
 }

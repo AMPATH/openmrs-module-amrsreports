@@ -40,4 +40,13 @@ public interface MOHFacilityService {
 
 	@Transactional
 	public Map<Integer,PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility);
+
+	@Transactional
+	public Map<Integer,Integer> getFacilityIdToLatestSerialNumberMap();
+
+	@Transactional
+	public Integer countPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
+
+	@Transactional
+	Integer assignMissingIdentifiersForFacility(MOHFacility facility);
 }

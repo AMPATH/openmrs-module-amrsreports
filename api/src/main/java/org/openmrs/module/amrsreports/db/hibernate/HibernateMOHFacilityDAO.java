@@ -1,12 +1,16 @@
 package org.openmrs.module.amrsreports.db.hibernate;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.Cohort;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
@@ -15,7 +19,9 @@ import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Hibernate implementation of MOHFacilityDAO
@@ -60,12 +66,12 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
 
 		// fail silently if no facility or patient identifier type is found
-		if (facility == null)   {
+		if (facility == null) {
 			log.warn("No facility provided; returning empty data.");
 			return new ArrayList<PatientIdentifier>();
 		}
 
-		if (pit == null)   {
+		if (pit == null) {
 			log.warn("No CCC patient identifier type found; returning empty data.");
 			return new ArrayList<PatientIdentifier>();
 		}
@@ -77,4 +83,69 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 
 		return c.list();
 	}
+
+	@Override
+	public Map<String, Integer> getFacilityCodeToLatestSerialNumberMap() {
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		String hql = "select max(pi.identifier)" +
+				" from PatientIdentifier as pi" +
+				" where pi.voided = false" +
+				"   and pi.identifierType = :identifierType" +
+				" group by substring(pi.identifier, 1, 5)";
+
+		Query q = sessionFactory.getCurrentSession().createQuery(hql);
+		q.setParameter("identifierType", pit);
+
+		Map<String, Integer> m = new HashMap<String, Integer>();
+
+		for (Object o : q.list()) {
+			String id = (String) o;
+			String[] s = id.split("-");
+			m.put(s[0], Integer.parseInt(s[1]));
+		}
+
+		return m;
+	}
+
+	@Override
+	public Cohort getPatientsInCohortMissingCCCNumbers(Cohort c) {
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		String sql = "select p.person_id" +
+				" from person p left join patient_identifier pi" +
+				"   on pi.patient_id = p.person_id" +
+				"     and pi.identifier_type = " + pit.getPatientIdentifierTypeId() +
+				"     and pi.voided = 0" +
+				" where" +
+				"   p.person_id in (" + StringUtils.join(c.getMemberIds(), ",") +
+				")" +
+				"	and pi.uuid is null";
+
+		SQLQuery q = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+		return new Cohort(q.list());
+	}
+
+	@Override
+	public Integer getLatestSerialNumberForFacility(MOHFacility facility) {
+		if (facility == null)
+			return -1;
+
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		String hql = "select max(substring(pi.identifier, 7, 5))" +
+				" from PatientIdentifier as pi" +
+				" where pi.voided = false" +
+				"   and pi.identifierType = :identifierType" +
+				"   and substring(pi.identifier, 1, 5) = :code";
+
+		Query q = sessionFactory.getCurrentSession().createQuery(hql);
+		q.setParameter("identifierType", pit);
+		q.setParameter("code", facility.getCode());
+
+		String serial = (String) q.uniqueResult();
+		return Integer.parseInt(serial);
+	}
+
 }

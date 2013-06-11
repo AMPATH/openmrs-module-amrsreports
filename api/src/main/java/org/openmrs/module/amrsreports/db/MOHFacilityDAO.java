@@ -1,9 +1,12 @@
 package org.openmrs.module.amrsreports.db;
 
+import org.openmrs.Cohort;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO for manipulating Facilities
@@ -19,4 +22,10 @@ public interface MOHFacilityDAO {
 	public void purgeFacility(MOHFacility facility);
 
 	public List<PatientIdentifier> getCCCNumbersForFacility(MOHFacility facility);
+
+	public Map<String, Integer> getFacilityCodeToLatestSerialNumberMap();
+
+	public Cohort getPatientsInCohortMissingCCCNumbers(Cohort c);
+
+	public Integer getLatestSerialNumberForFacility(MOHFacility facility);
 }

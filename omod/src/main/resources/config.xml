@@ -78,10 +78,13 @@
                 <include method="startTaskRunner"/>
                 <include method="stopTaskRunner"/>
                 <include method="getTaskRunnerStatus"/>
-                <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
-				<convert match="org.openmrs.Location" converter="bean" />
-				<convert match="org.openmrs.User" converter="bean"/>
-			</create>
+                <include method="getFacilityName"/>
+                <include method="getPatientCountMissingCCCNumbersInFacility"/>
+                <include method="assignMissingIdentifiersForFacility"/>
+            </create>
+            <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
+            <convert match="org.openmrs.Location" converter="bean" />
+            <convert match="org.openmrs.User" converter="bean"/>
 		</allow>
 
 		<signatures>
@@ -91,12 +94,14 @@
 			DWRAmrsReportService.viewMoreDetailsRender(String bff, String id);
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
-			DWRAmrsReportService.alertInput(String loc, String user);
         	DWRAmrsReportService.getCohortCountForLocation(Integer locationId, Date evaluationDate);
             DWRAmrsReportService.getCohort(Integer locationId, Date evaluationDate);
             DWRAmrsReportService.startTaskRunner(String taskName);
             DWRAmrsReportService.stopTaskRunner();
             DWRAmrsReportService.getTaskRunnerStatus();
+            DWRAmrsReportService.getFacilityName(Integer facilityId);
+            DWRAmrsReportService.getPatientCountMissingCCCNumbersInFacility(Integer facilityId);
+            DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
 			]]>
 		</signatures>	
 	</dwr>
