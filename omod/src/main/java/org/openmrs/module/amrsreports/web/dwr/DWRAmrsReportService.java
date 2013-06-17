@@ -1,14 +1,18 @@
 package org.openmrs.module.amrsreports.web.dwr;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Location;
+import org.openmrs.Patient;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
@@ -305,6 +309,18 @@ public class DWRAmrsReportService {
 	}
 
 	/**
+	 * Returns a facility's code indicated by its internal id
+	 */
+	public String getFacilityCode(Integer facilityId) {
+		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		if (f == null)
+			return "";
+
+		return f.getCode();
+	}
+
+	/**
 	 * returns the missing ccc numbers count for a given facility
 	 */
 	public Integer getPatientCountMissingCCCNumbersInFacility(Integer facilityId) {
@@ -316,6 +332,25 @@ public class DWRAmrsReportService {
 		return Context.getService(MOHFacilityService.class).countPatientsInFacilityMissingCCCNumbers(f);
 	}
 
+	/**
+	 * returns the patients missing ccc numbers for a given facility
+	 */
+	public List<String> getPatientUuidsMissingCCCNumbersInFacility(Integer facilityId) {
+		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+		List<String> c = new ArrayList<String>();
+
+		if (f != null) {
+			for (Integer patientId : Context.getService(MOHFacilityService.class)
+					.getPatientsInFacilityMissingCCCNumbers(f).getMemberIds()) {
+				c.add(Context.getPatientService().getPatient(patientId).getUuid());
+			}
+		}
+
+		return c;
+	}
+
+
 	public String assignMissingIdentifiersForFacility(Integer facilityId) {
 		MOHFacility f = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
@@ -325,5 +360,26 @@ public class DWRAmrsReportService {
 		Integer count = Context.getService(MOHFacilityService.class).assignMissingIdentifiersForFacility(f);
 
 		return "Successfully created " + count + " identifiers.";
+	}
+
+	public String getPreARTEnrollmentLocationUuidForPatientUuid(String patientUuid) {
+
+		if (StringUtils.isBlank(patientUuid))
+			return null;
+
+		Patient p = Context.getPatientService().getPatientByUuid(patientUuid);
+
+		if (p == null)
+			return null;
+
+		HIVCareEnrollment hce = Context.getService(HIVCareEnrollmentService.class).getHIVCareEnrollmentForPatient(p);
+
+		if (hce == null)
+			return null;
+
+		if (hce.getEnrollmentLocation() == null)
+			return null;
+
+		return hce.getEnrollmentLocation().getUuid();
 	}
 }

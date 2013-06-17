@@ -143,6 +143,19 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 	}
 
 	@Override
+	public Cohort getPatientsInFacilityMissingCCCNumbers(MOHFacility facility) {
+		Cohort c = getEnrolledPatientsForFacility(facility);
+		Cohort missing = dao.getPatientsInCohortMissingCCCNumbers(c);
+		return missing;
+	}
+
+	@Override
+	public Integer getLatestSerialNumberForFacility(MOHFacility facility) {
+		return dao.getLatestSerialNumberForFacility(facility);
+	}
+
+
+	@Override
 	public Integer assignMissingIdentifiersForFacility(MOHFacility facility) {
 
 		// fail quickly if the facility does not exist

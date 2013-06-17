@@ -63,6 +63,11 @@
         <defaultValue></defaultValue>
         <description>Identifier type for CCC Number identifiers</description>
     </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.productionServerURL</property>
+        <defaultValue>https://amrs.ampath.or.ke/amrs</defaultValue>
+        <description>URL for accessing the production server when creating patient identifiers.</description>
+    </globalProperty>
     <!-- /Required Global Properties -->
 	
 	<dwr>
@@ -79,8 +84,11 @@
                 <include method="stopTaskRunner"/>
                 <include method="getTaskRunnerStatus"/>
                 <include method="getFacilityName"/>
+                <include method="getFacilityCode"/>
                 <include method="getPatientCountMissingCCCNumbersInFacility"/>
+                <include method="getPatientUuidsMissingCCCNumbersInFacility"/>
                 <include method="assignMissingIdentifiersForFacility"/>
+                <include method="getPreARTEnrollmentLocationUuidForPatientUuid"/>
             </create>
             <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
             <convert match="org.openmrs.Location" converter="bean" />
@@ -100,8 +108,11 @@
             DWRAmrsReportService.stopTaskRunner();
             DWRAmrsReportService.getTaskRunnerStatus();
             DWRAmrsReportService.getFacilityName(Integer facilityId);
+            DWRAmrsReportService.getFacilityCode(Integer facilityId);
             DWRAmrsReportService.getPatientCountMissingCCCNumbersInFacility(Integer facilityId);
+            DWRAmrsReportService.getPatientUuidsMissingCCCNumbersInFacility(Integer facilityId);
             DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
+            DWRAmrsReportService.getPreARTEnrollmentLocationUuidForPatientUuid(String patientUuid);
 			]]>
         </signatures>
     </dwr>

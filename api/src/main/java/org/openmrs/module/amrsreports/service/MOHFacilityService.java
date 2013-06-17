@@ -1,6 +1,8 @@
 package org.openmrs.module.amrsreports.service;
 
+import org.openmrs.Cohort;
 import org.openmrs.Location;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,4 +51,10 @@ public interface MOHFacilityService {
 
 	@Transactional
 	Integer assignMissingIdentifiersForFacility(MOHFacility facility);
+
+	@Transactional
+	Cohort getPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
+
+	@Transactional
+	Integer getLatestSerialNumberForFacility(MOHFacility facility);
 }
