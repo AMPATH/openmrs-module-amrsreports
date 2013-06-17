@@ -344,9 +344,9 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		Map<Integer, Date> ret = new LinkedHashMap<Integer, Date>();
 		if (cohort != null && cohort.size() > 0) {
 			Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
-					.add(Restrictions.in("person.personId", cohort))
+					.add(Restrictions.in("patient.personId", cohort))
 					.setProjection(Projections.projectionList()
-							.add(Projections.property("person.personId"))
+							.add(Projections.property("patient.personId"))
 							.add(Projections.property("enrollmentDate")));
 
 			Iterator<Object[]> it = crit.list().iterator();
@@ -361,9 +361,9 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	@Override
 	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
 		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
-				.add(Restrictions.in("person.personId", cohort))
+				.add(Restrictions.in("patient.personId", cohort))
 				.setProjection(Projections.projectionList()
-						.add(Projections.property("person.personId"))
+						.add(Projections.property("patient.personId"))
 						.add(Projections.property("lastWHOStage"))
 						.add(Projections.property("lastWHOStageDate")));
 
