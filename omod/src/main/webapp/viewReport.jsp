@@ -5,18 +5,19 @@
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohHistory.form" />
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.dataTables.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.tools.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.tools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/TableTools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/ZeroClipboard.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jspdf.js" />
+
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css" />
-
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
+
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
 <script type="text/javascript">
