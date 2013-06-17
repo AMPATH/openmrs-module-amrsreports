@@ -39,7 +39,7 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		hql.append("from HIVCareEnrollment ");
 		hql.append(" where");
 
-		hql.append(" person.personId in (:personIds) ");
+		hql.append(" patient.personId in (:personIds) ");
 		m.put("personIds", context.getBaseCohort());
 
 		hql.append("and firstARVDate <= :onOrBefore ");

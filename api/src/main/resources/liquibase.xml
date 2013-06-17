@@ -454,19 +454,42 @@
                 />
     </changeSet>
 
-    <changeSet id="amrsreports-2013-06-07" author="jkeiper">
+    <changeSet id="amrsreports-2013-06-07a" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_person_ref"/>
+        </preConditions>
+
+        <comment>
+            Changing person to patient in HIV Care Enrollment table - removing FK
+        </comment>
+
+        <dropForeignKeyConstraint baseTableName="amrsreports_hiv_care_enrollment"
+                                  constraintName="amrsreports_hiv_care_enrollment_person_ref"/>
+    </changeSet>
+
+    <changeSet id="amrsreports-2013-06-07b" author="jkeiper">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="amrsreports_hiv_care_enrollment" columnName="person_id"/>
+        </preConditions>
+
+        <comment>
+            Changing person to patient in HIV Care Enrollment table - renaming column
+        </comment>
+
+        <renameColumn tableName="amrsreports_hiv_care_enrollment" oldColumnName="person_id" newColumnName="patient_id" columnDataType="int(11)"/>
+    </changeSet>
+
+    <changeSet id="amrsreports-2013-06-07c" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <columnExists tableName="amrsreports_hiv_care_enrollment" columnName="patient_id"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_patient_ref"/>
             </not>
         </preConditions>
 
         <comment>
-            Changing person to patient in HIV Care Enrollment table
+            Changing person to patient in HIV Care Enrollment table - adding new FK
         </comment>
 
-        <dropForeignKeyConstraint baseTableName="amrsreports_hiv_care_enrollment" constraintName="amrsreports_hiv_care_enrollment_person_ref"/>
-        <renameColumn tableName="amrsreports_hiv_care_enrollment" oldColumnName="person_id" newColumnName="patient_id"/>
         <addForeignKeyConstraint baseTableName="amrsreports_hiv_care_enrollment" baseColumnNames="patient_id"
                                  constraintName="amrsreports_hiv_care_enrollment_patient_ref"
                                  referencedTableName="patient"
