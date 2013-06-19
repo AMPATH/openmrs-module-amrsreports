@@ -35,14 +35,20 @@
 			}
 		});
 
+        var columns = $j('#tablehistory thead tr th').map(function() {
+
+            return $j(this).text();
+        });
+        columns.splice(0,1);
+
 		$j('#tablehistory').delegate('tbody td #img','click', function() {
 			var trow=this.parentNode.parentNode;
 			var aData2 = ti.fnGetData(trow);
-            var dialogColumns = defineDialogColumns();
-            $j("#dlgData").empty();
-            generate_table(aData2,"dlgData",dialogColumns);
 
-            $j("#dlgData").dialog("open");
+            $j("#dlgData").empty();
+            generate_table(aData2,"dlgData",columns);
+
+           $j("#dlgData").dialog("open");
 
 			return false;
 		});
@@ -55,7 +61,7 @@
 			hide: 'slide',
 			width:600,
 			cache: false,
-			position: 'top',
+			position: 'middle',
 			buttons: {
 				"Exit": function () { $j(this).dialog("close"); }
 			}
@@ -83,30 +89,10 @@
 
         var tblBody = document.createElement("tbody");
 
-        var pid = buildRow(columns[0],data[1]);
-        var pname = buildRow(columns[1],data[5]);
-        var ampathID = buildRow(columns[2],data[4]);
-        var uniquePatientNumber = buildRow(columns[3],data[3]);
+        for(var i=0;i<columns.length;i++){
+            tblBody.appendChild(buildRow(columns[i],data[i+1]));
 
-        var gender = buildRow(columns[4],data[6]);
-        var dOB = buildRow(columns[5],data[7]);
-        var age = buildRow(columns[6],data[8]);
-        var address = buildRow(columns[7],data[9]);
-        var phoneNo = buildRow(columns[8],data[10]);
-        var artStartDate = buildRow(columns[9],data[2]);
-
-
-        tblBody.appendChild(pid);
-        tblBody.appendChild(pname);
-        tblBody.appendChild(ampathID);
-        tblBody.appendChild(uniquePatientNumber);
-        tblBody.appendChild(gender);
-        tblBody.appendChild(dOB);
-        tblBody.appendChild(age);
-        tblBody.appendChild(address);
-        tblBody.appendChild(phoneNo);
-        tblBody.appendChild(artStartDate);
-
+        }
 
         tbl.appendChild(tblBody);
 
@@ -118,6 +104,7 @@
 
         var row = document.createElement("tr");
         var cell = document.createElement("th");
+        cell.setAttribute('align','right');
         var cell2 = document.createElement("td");
         var celllabel = document.createTextNode(label+": ");
         var cellval = document.createTextNode(tdvalue);
@@ -127,12 +114,6 @@
         row.appendChild(cell2);
         return row;
     }
-
-    function defineDialogColumns(){
-        var columns = ["Person ID","Name","Ampath ID","Unique Patient No","Sex","DOB","Age","Address","Phone No","Date ART Started"];
-        return columns;
-    }
-
 
 	function clearDataTable(){
 		//alert("on change has to take effect");
