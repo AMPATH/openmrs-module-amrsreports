@@ -63,7 +63,7 @@
 			cache: false,
 			position: 'middle',
 			buttons: {
-				"Exit": function () { $j(this).dialog("close"); }
+				"Close": function () { $j(this).dialog("close"); }
 			}
 		});
 
@@ -116,7 +116,7 @@
     }
 
 	function clearDataTable(){
-		//alert("on change has to take effect");
+
 		dwr.util.removeAllRows("tbodydata");
 		var hidepic= document.getElementById("maindetails");
 		var titleheader=document.getElementById("titleheader");
@@ -159,6 +159,6 @@
     </table>
 </c:if>
 
-<div id="dlgData" title="Patients More Information"></div>
+<div id="dlgData" title="Patient Information"></div>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>
