@@ -54,8 +54,10 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 			map.put("/module/amrsreports/cohortCounts.list", "View Cohort Counts");
 		}
 
-		if (Context.hasPrivilege(ReportingConstants.PRIV_RUN_REPORTS)) {
-			map.put("module/amrsreports/facilityPrivileges.form", "Manage User/Facility Privileges");
+		map.put("module/amrsreports/facilityPrivileges.form", "Manage User/Facility Privileges");
+
+		if (Context.hasPrivilege(PrivilegeConstants.ADD_PATIENT_IDENTIFIERS)) {
+			map.put("module/amrsreports/cccNumbers.list", "Manage CCC Numbers");
 		}
 
 		map.put("module/amrsreports/settings.form", "Settings");

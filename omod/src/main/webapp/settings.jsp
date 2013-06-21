@@ -21,8 +21,8 @@
     }
 
     function saveGPFor(wrapper) {
-        var property = $j("#" + wrapper + " input[name=property]").val();
-        var value = $j("#" + wrapper + " select[name=value]").val();
+        var property = $j("#" + wrapper + " [name=property]").val();
+        var value = $j("#" + wrapper + " [name=value]").val();
 
         DWRAdministrationService.setGlobalProperty(property, value, function(){
             $j("#" + wrapper + " input[name=save]").fadeOut("fast", function(){
@@ -120,6 +120,17 @@
                         </c:forEach>
                     </select>
                     <input type="submit" name="save" onclick="return saveGPFor('cccIdentifierType')" value="save"/>
+                    <span class="saved">saved</span>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>Production Server URL</td>
+            <td id="productionServerURL">
+                <form>
+                    <input type="hidden" name="property" value="amrsreports.productionServerURL"/>
+                    <input type="text" name="value" onkeyup="enableSaveFor('productionServerURL')" value="${productionServerURL}" size="60"/>
+                    <input type="submit" name="save" onclick="return saveGPFor('productionServerURL')" value="save"/>
                     <span class="saved">saved</span>
                 </form>
             </td>

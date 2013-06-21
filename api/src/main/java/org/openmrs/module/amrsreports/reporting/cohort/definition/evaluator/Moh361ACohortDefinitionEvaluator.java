@@ -38,7 +38,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		String reportDate = sdf.format(context.getEvaluationDate());
 
 		String sql =
-				"select person_id" +
+				"select patient_id" +
 						" from amrsreports_hiv_care_enrollment " +
 						" where " +
 						"  enrollment_date is not NULL" +
@@ -51,7 +51,7 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 					" union " +
 							" select pa.person_id" +
 							" from person_attribute pa join amrsreports_hiv_care_enrollment ae" +
-							"     on pa.person_id = ae.person_id" +
+							"     on pa.person_id = ae.patient_id" +
 							"       and ae.enrollment_date is not null" +
 							"       and ae.enrollment_date <= ':reportDate'" +
 							"   join encounter e " +

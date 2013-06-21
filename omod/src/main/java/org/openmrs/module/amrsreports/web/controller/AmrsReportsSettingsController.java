@@ -28,6 +28,12 @@ public class AmrsReportsSettingsController {
 				.getGlobalProperty(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE);
 	}
 
+	@ModelAttribute("productionServerURL")
+	public String getProductionServerURL() {
+		return Context.getAdministrationService()
+				.getGlobalProperty(AmrsReportsConstants.GP_PRODUCTION_SERVER_URL);
+	}
+
 	@RequestMapping(method = RequestMethod.GET)
 	public String viewSettings() {
 		return "module/amrsreports/settings";

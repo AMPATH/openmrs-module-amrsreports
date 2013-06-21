@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.Patient;
 import org.openmrs.Person;
 
 import java.util.Date;
@@ -13,7 +14,7 @@ import java.util.Date;
 public class HIVCareEnrollment extends BaseOpenmrsData {
 
 	Integer enrollmentId;
-	Person person;
+	Patient patient;
 
 	Date enrollmentDate;
 	Location enrollmentLocation;
@@ -63,12 +64,12 @@ public class HIVCareEnrollment extends BaseOpenmrsData {
 		this.enrollmentId = enrollmentId;
 	}
 
-	public Person getPerson() {
-		return person;
+	public Patient getPatient() {
+		return patient;
 	}
 
-	public void setPerson(Person person) {
-		this.person = person;
+	public void setPatient(Patient patient) {
+		this.patient = patient;
 	}
 
 	public Date getEnrollmentDate() {
