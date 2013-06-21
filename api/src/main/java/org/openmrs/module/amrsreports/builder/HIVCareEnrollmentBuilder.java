@@ -1,16 +1,28 @@
-package org.openmrs.module.amrsreports.util;
+package org.openmrs.module.amrsreports.builder;
 
-import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.util.TableBuilderUtil;
 
 /**
  * Builds the HIV Care Enrollment table via SQL statements
  */
 public class HIVCareEnrollmentBuilder {
 
+	private static HIVCareEnrollmentBuilder instance;
+
+	public static HIVCareEnrollmentBuilder getInstance() {
+		if (instance == null)
+			instance = new HIVCareEnrollmentBuilder();
+		return instance;
+	}
+
+	private HIVCareEnrollmentBuilder() {
+		// pass
+	}
+
 	private static final String QUERY_CLEAR_RECORDS =
 			"delete from amrsreports_hiv_care_enrollment";
 
-	private static String QUERY_DELETE_FAKE_PATIENTS =
+	private static final String QUERY_DELETE_FAKE_PATIENTS =
 			"delete" +
 					" from amrsreports_hiv_care_enrollment" +
 					" where patient_id in (" +
@@ -315,52 +327,48 @@ public class HIVCareEnrollmentBuilder {
 					"  and ae.last_who_stage_date is not NULL" +
 					"  and ae.first_arv_date is not NULL";
 
-	public static void execute() {
+	public void execute() {
 		// clear the table
-		runQueryForDate(QUERY_CLEAR_RECORDS);
+		TableBuilderUtil.runUpdateSQL(QUERY_CLEAR_RECORDS);
 
 		// insert from enrollment query
-		runQueryForDate(QUERY_INSERT_FROM_ENCOUNTERS);
+		TableBuilderUtil.runUpdateSQL(QUERY_INSERT_FROM_ENCOUNTERS);
 
 		// remove fake patients
-		runQueryForDate(QUERY_DELETE_FAKE_PATIENTS);
+		TableBuilderUtil.runUpdateSQL(QUERY_DELETE_FAKE_PATIENTS);
 
 		// update everyone with latest WHO stage
-		runQueryForDate(QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE);
 
 		// update everyone with first ARV date
-		runQueryForDate(QUERY_UPDATE_FIRST_ARV_DATE);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_FIRST_ARV_DATE);
 
 		// update everyone with latest positive obs
-		runQueryForDate(QUERY_UPDATE_LAST_POSITIVE);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_POSITIVE);
 
 		// update everyone with latest negative obs
-		runQueryForDate(QUERY_UPDATE_LAST_NEGATIVE);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_NEGATIVE);
 
 		// update everyone with first positive obs and location
-		runQueryForDate(QUERY_UPDATE_FIRST_POSITIVE);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_FIRST_POSITIVE);
 
 		// fill out enrollment info for patients >= 2 years old at first encounter (Group A)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER);
+		TableBuilderUtil.runUpdateSQL(QUERY_FILL_ENROLLMENT_FROM_FIRST_ENCOUNTER);
 
 		// fill out enrollment info for remainin patients with only adult encounters (Group A)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS);
+		TableBuilderUtil.runUpdateSQL(QUERY_FILL_ENROLLMENT_FOR_PEDS_WITH_ONLY_ADULT_ENCOUNTERS);
 
 		// fill out enrollment info for remaining with any positive observation (Groups B and C)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS);
+		TableBuilderUtil.runUpdateSQL(QUERY_FILL_ENROLLMENT_FROM_FIRST_POSITIVE_OBS);
 
 		// fill out enrollment info for patients taking ARVs if not found yet or if earlier than first positive obs (Group E)
-		runQueryForDate(QUERY_FILL_ENROLLMENT_FROM_ARVS);
+		TableBuilderUtil.runUpdateSQL(QUERY_FILL_ENROLLMENT_FROM_ARVS);
 
 		// update everyone with transfer in status
-		runQueryForDate(QUERY_UPDATE_TRANSFER_INS);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_TRANSFER_INS);
 
 		// update everyone with discontinue status
-		runQueryForDate(QUERY_UPDATE_DISCONTINUES);
-	}
-
-	private static void runQueryForDate(String query) {
-		Context.getAdministrationService().executeSQL(query, false);
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_DISCONTINUES);
 	}
 
 }

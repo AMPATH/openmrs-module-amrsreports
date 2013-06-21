@@ -1,13 +1,35 @@
-package org.openmrs.module.amrsreports.task;
+/**
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
+
+package org.openmrs.module.amrsreports.builder;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.util.TableBuilderUtil;
 
-/**
- * Updates the pregnancy table with flags for each date associated with a pregnancy observation
- */
-public class UpdatePregnanciesTask extends AMRSReportsTask {
+public class PregnancyTableBuilder {
+
+	private static PregnancyTableBuilder instance;
+
+	public static PregnancyTableBuilder getInstance() {
+		if (instance == null)
+			instance = new PregnancyTableBuilder();
+		return instance;
+	}
+
+	private PregnancyTableBuilder() {
+		// pass
+	}
 
 	private static final String DROP_TABLE =
 			"DROP TABLE IF EXISTS `amrsreports_pregnancy`";
@@ -150,19 +172,16 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 					"	due_date = VALUES(due_date)," +
 					"   due_date_source = ':source'";
 
-	private AdministrationService administrationService;
-
 	/**
 	 * drops, creates and fills out the pregnancy table
 	 */
-	@Override
-	public void doExecute() {
+	public void execute() {
 
 		// drop the table
-		getAdministrationService().executeSQL(DROP_TABLE, false);
+		TableBuilderUtil.runUpdateSQL(DROP_TABLE);
 
 		// recreate the table
-		getAdministrationService().executeSQL(CREATE_TABLE, false);
+		TableBuilderUtil.runUpdateSQL(CREATE_TABLE);
 
 		// update all of the columns
 		updateColumn("pregstatus", "concept_id = 5272 and value_coded = 1065 and e.form_id <> 245");
@@ -195,10 +214,10 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 		// update due dates based on valueDatetime
 
 		// EDD = valueDatetime of LMP + 287 days
-		getAdministrationService().executeSQL(UPDATE_EDD_FROM_LMP, false);
+		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_FROM_LMP);
 
 		// EDD = valueDatetime of EDC observation
-		getAdministrationService().executeSQL(UPDATE_EDD_FROM_EDC, false);
+		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_FROM_EDC);
 	}
 
 	/**
@@ -209,7 +228,7 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 			return;
 
 		String query = MACRO_UPDATE_COLUMN.replaceAll(":criteria", criteria).replaceAll(":column", column);
-		getAdministrationService().executeSQL(query, false);
+		TableBuilderUtil.runUpdateSQL(query);
 	}
 
 	/**
@@ -224,15 +243,7 @@ public class UpdatePregnanciesTask extends AMRSReportsTask {
 				.replaceAll(":criteria", criteria)
 				.replaceAll(":days", days.toString());
 
-		getAdministrationService().executeSQL(query, false);
+		TableBuilderUtil.runUpdateSQL(query);
 	}
 
-	/**
-	 * getter for administrationService
-	 */
-	public AdministrationService getAdministrationService() {
-		if (administrationService == null)
-			administrationService = Context.getAdministrationService();
-		return administrationService;
-	}
 }

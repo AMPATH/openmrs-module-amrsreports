@@ -15,10 +15,7 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortD
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
-import org.openmrs.module.amrsreports.task.UpdateARVEncountersTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
-import org.openmrs.module.amrsreports.task.UpdatePregnanciesTask;
-import org.openmrs.module.amrsreports.util.HIVCareEnrollmentBuilder;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -244,9 +241,9 @@ public class DWRAmrsReportService {
 
 		AMRSReportsTask task = null;
 
-		if (OpenmrsUtil.nullSafeEquals("arvs", taskName))
-			task = new UpdateARVEncountersTask();
-		else if (OpenmrsUtil.nullSafeEquals("enrollment", taskName))
+//		if (OpenmrsUtil.nullSafeEquals("arvs", taskName))
+//			task = new UpdateARVEncountersTask();
+		if (OpenmrsUtil.nullSafeEquals("enrollment", taskName))
 			task = new UpdateHIVCareEnrollmentTask();
 
 		if (task == null)

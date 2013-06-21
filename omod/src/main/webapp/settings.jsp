@@ -153,8 +153,10 @@
         </div>
 
         <div id="choices">
+            <!-- // changing to use just a single task to build all three tables
             <div class="choice"><input type="radio" name="taskName" value="arvs"/> ARV Tables</div>
             <div class="choice"><input type="radio" name="taskName" value="pregnancy"/> Pregnancy Tables</div>
+            -->
             <div class="choice"><input type="radio" name="taskName" value="enrollment"/> HIV Care Enrollment Table</div>
         </div>
 
