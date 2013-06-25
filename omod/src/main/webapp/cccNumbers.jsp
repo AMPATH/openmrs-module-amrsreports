@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
-<openmrs:require privilege="Add Patient Identifiers" otherwise="/login.htm" redirect="/module/amrsreports/cccNumbers.list"/>
+<openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/cccNumbers.list"/>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>

@@ -56,7 +56,7 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 
 		map.put("module/amrsreports/facilityPrivileges.form", "Manage User/Facility Privileges");
 
-		if (Context.hasPrivilege(PrivilegeConstants.ADD_PATIENT_IDENTIFIERS)) {
+		if (Context.hasPrivilege(PrivilegeConstants.VIEW_LOCATIONS)) {
 			map.put("module/amrsreports/cccNumbers.list", "Manage CCC Numbers");
 		}
 

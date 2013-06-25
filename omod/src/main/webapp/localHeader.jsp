@@ -35,7 +35,7 @@
             Manage User/Facility Privileges
         </a>
     </li>
-    <openmrs:hasPrivilege privilege="Add Patient Identifiers">
+    <openmrs:hasPrivilege privilege="View Locations">
         <li <c:if test='<%= request.getRequestURI().contains("cccNumbers") %>'>class="active"</c:if>>
         <a href="${pageContext.request.contextPath}/module/amrsreports/cccNumbers.list">
             Manage CCC Numbers
