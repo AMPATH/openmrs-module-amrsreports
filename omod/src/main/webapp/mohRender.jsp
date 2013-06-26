@@ -36,6 +36,17 @@
                 $j("#dateScheduled").removeAttr("disabled");
             }
         });
+
+        $j("#repeatSchedule").click(function(){
+            if ($j("#repeatSchedule").is(":checked")) {
+                $j("#repeatIntervalUnits").removeAttr("disabled");
+                $j("#repeatInterval").removeAttr("disabled");
+            } else {
+                $j("#repeatInterval").val("");
+                $j("#repeatIntervalUnits").attr("disabled", "disabled");
+                $j("#repeatInterval").attr("disabled", "disabled");
+            }
+        });
     });
 
 </script>
@@ -74,14 +85,16 @@
                 <label for="reportDate">Report Date (as of):</label>
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
                 <label for="dateScheduled">Schedule Date:</label>
-                <input type="text" name="dateScheduled" id="dateScheduled" onclick="javascript:NewCssCal ('dateScheduled','MMddyyyy','dropdown',true,'24')"/>
+                <input type="text" name="dateScheduled" id="dateScheduled" onclick="javascript:NewCssCal ('dateScheduled','ddMMyyyy','dropdown',true,'24')"/>
               <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
               <br/><br/>
-            <label for="repeatInterval">Repeat Interval:</label>
-            <input type="text" name="repeatInterval" id="repeatInterval"/>
+            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/> Check this for Repeat Schedule
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="repeatInterval">Repeat Interval:</label>
+            <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
 
-            <select name="repeatIntervalUnits" id="repeatIntervalUnits">
+            <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
                 <option value="seconds">Seconds </option>
                 <option value="minutes">Minutes </option>
                 <option value="hours">Hours </option>
