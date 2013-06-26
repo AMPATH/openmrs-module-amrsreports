@@ -29,9 +29,6 @@
         reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
         reportDate.setDate(new Date());
 
-        dateScheduled = new DatePicker("<openmrs:datePattern/>", "dateScheduled", { defaultDate: new Date() });
-        dateScheduled.setDate(new Date());
-
         $j("#immediately").click(function(){
             if ($j("#immediately").is(":checked")) {
                 $j("#dateScheduled").attr("disabled", "disabled");
@@ -76,12 +73,22 @@
             <legend>Dates</legend>
                 <label for="reportDate">Report Date (as of):</label>
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
-                <label for="dateScheduled">Schedule Date (run at midnight on):</label>
-                <input type="text" name="dateScheduled" id="dateScheduled"/>
-                <input type="text" name="datScheduled" id="datScheduled" />
-            <img src="images/datePickerImages/cal.gif" onclick="javascript:NewCssCal ('datScheduled','MMddyyyy','dropdown',true,'24')" style="cursor:pointer"/>
-                    <em>or</em>
+                <label for="dateScheduled">Schedule Date:</label>
+                <input type="text" name="dateScheduled" id="dateScheduled" onclick="javascript:NewCssCal ('dateScheduled','MMddyyyy','dropdown',true,'24')"/>
+              <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
+              <br/><br/>
+            <label for="repeatInterval">Repeat Interval:</label>
+            <input type="text" name="repeatInterval" id="repeatInterval"/>
+
+            <select name="repeatIntervalUnits" id="repeatIntervalUnits">
+                <option value="seconds">Seconds </option>
+                <option value="minutes">Minutes </option>
+                <option value="hours">Hours </option>
+                <option value="days">Days </option>
+            </select>
+
+
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Location</legend>
