@@ -18,6 +18,7 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/datetimepicker.js"/>
 
 <script type="text/javascript">
 
@@ -77,6 +78,8 @@
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
                 <label for="dateScheduled">Schedule Date (run at midnight on):</label>
                 <input type="text" name="dateScheduled" id="dateScheduled"/>
+                <input type="text" name="datScheduled" id="datScheduled" />
+            <img src="images/datePickerImages/cal.gif" onclick="javascript:NewCssCal ('datScheduled','MMddyyyy','dropdown',true,'24')" style="cursor:pointer"/>
                     <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
         </fieldset>
