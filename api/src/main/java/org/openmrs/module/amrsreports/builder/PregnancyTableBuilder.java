@@ -41,6 +41,10 @@ public class PregnancyTableBuilder {
 					"  `pregnancy_date` datetime NOT NULL," +
 					"  `due_date` datetime DEFAULT NULL," +
 					"  `due_date_source` varchar(255) DEFAULT NULL," +
+					"  `edd_fh` datetime DEFAULT NULL," +
+					"  `edd_edc` datetime DEFAULT NULL," +
+					"  `edd_wkmn` datetime DEFAULT NULL," +
+					"  `edd_lmp` datetime DEFAULT NULL," +
 					"  `pregstatus` int(1) DEFAULT 0," +
 					"  `probpreg` int(1) DEFAULT 0," +
 					"  `testpreg` int(1) DEFAULT 0," +
@@ -84,18 +88,16 @@ public class PregnancyTableBuilder {
 					" ON DUPLICATE KEY UPDATE" +
 					"  :column = 1";
 
-	private static final String UPDATE_EDD_FROM_LMP =
+	private static final String UPDATE_EDD_LMP =
 			"insert into amrsreports_pregnancy (" +
 					"  person_id, " +
 					"  pregnancy_date, " +
-					"  due_date," +
-					"  due_date_source" +
+					"  edd_lmp" +
 					" )" +
 					"  select " +
 					"    e.patient_id," +
 					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
-					"    DATE_ADD(value_datetime, INTERVAL (287) DAY) as d_date," +
-					"    'LMP'" +
+					"    DATE_ADD(value_datetime, INTERVAL (287) DAY) as d_date" +
 					"  from " +
 					"    obs o" +
 					"    join encounter e" +
@@ -113,21 +115,18 @@ public class PregnancyTableBuilder {
 					"  order by" +
 					"    p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"  due_date = VALUES(due_date)," +
-					"  due_date_source = 'LMP'";
+					"  due_date = VALUES(due_date)";
 
 	private static final String UPDATE_EDD_FROM_EDC =
 			"insert into amrsreports_pregnancy (" +
 					"  person_id, " +
 					"  pregnancy_date, " +
-					"  due_date," +
-					"  due_date_source" +
+					"  edd_edc" +
 					" )" +
 					"  select " +
 					"    e.patient_id," +
 					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
-					"    value_datetime as d_date," +
-					"    'EDC'" +
+					"    value_datetime as d_date" +
 					"  from " +
 					"    obs o" +
 					"    join encounter e" +
@@ -145,20 +144,17 @@ public class PregnancyTableBuilder {
 					"  order by" +
 					"    p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"  due_date = VALUES(due_date)," +
-					"  due_date_source = 'EDC'";
+					"  edd_edc = VALUES(due_date)";
 
 	private static String MACRO_UPDATE_EDD =
 			"INSERT INTO amrsreports_pregnancy (" +
 					"	person_id," +
 					"	pregnancy_date," +
-					"	due_date," +
-					"   due_date_source" +
+					"	:source" +
 					" ) SELECT" +
 					"	e.patient_id, " +
 					"	DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') AS p_date," +
-					"	DATE_ADD(o.obs_datetime, INTERVAL (280 - (o.value_numeric * :days)) DAY) AS d_date," +
-					"   ':source'" +
+					"	DATE_ADD(o.obs_datetime, INTERVAL (280 - (o.value_numeric * :days)) DAY) AS d_date" +
 					" FROM" +
 					"	obs o INNER JOIN encounter e ON e.encounter_id = o.encounter_id AND e.voided = 0" +
 					" WHERE" +
@@ -169,8 +165,20 @@ public class PregnancyTableBuilder {
 					" ORDER BY" +
 					"	p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"	due_date = VALUES(due_date)," +
-					"   due_date_source = ':source'";
+					"	:source = VALUES(due_date)";
+
+	private static final String UPDATE_EDD_PREFERENCE =
+			"UPDATE amrsreports_pregnancy" +
+					" SET due_date =" +
+					"   IF(edd_lmp IS NOT NULL, edd_lmp," +
+					"     IF(edd_edc IS NOT NULL, edd_edc," +
+					"       IF(edd_wkmn IS NOT NULL, edd_wkmn," +
+					"         IF(edd_fh IS NOT NULL, edd_fh, NULL))))," +
+					" due_date_source =" +
+					"   IF(edd_lmp IS NOT NULL, 'LMP'," +
+					"     IF(edd_edc IS NOT NULL, 'EDC'," +
+					"       IF(edd_wkmn IS NOT NULL, 'GEST'," +
+					"         IF(edd_fh IS NOT NULL, 'FH', NULL))))";
 
 	/**
 	 * drops, creates and fills out the pregnancy table
@@ -200,24 +208,27 @@ public class PregnancyTableBuilder {
 		// update due dates based on obsDatetime and valueNumeric
 
 		// obs date + (280 days - # days in weeks gestation from fundal height)
-		updateEDD("Fundal Height", 7, "concept_id = 1855");
+		updateEDD("edd_fh", 7, "concept_id = 1855");
 
 		// obs date + (280 days - # days in months gestation)
-		updateEDD("Gestation (Months)", 30, "concept_id = 5992 AND value_numeric <= 9");
+		updateEDD("edd_wkmn", 30, "concept_id = 5992 AND value_numeric <= 9");
 
 		// obs date + (280 days - # days in weeks gestation) ... value over 9 is considered to mean weeks
-		updateEDD("Gestation (weeks)", 7, "concept_id = 5992 AND value_numeric > 9");
+		updateEDD("edd_wkmn", 7, "concept_id = 5992 AND value_numeric > 9");
 
 		// obs date + (280 days - # days in weeks pregnant)
-		updateEDD("Weeks Pregnant", 7, "concept_id = 1279");
+		updateEDD("edd_wkmn", 7, "concept_id = 1279");
 
 		// update due dates based on valueDatetime
 
 		// EDD = valueDatetime of LMP + 287 days
-		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_FROM_LMP);
+		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_LMP);
 
 		// EDD = valueDatetime of EDC observation
 		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_FROM_EDC);
+
+		// select EDD based on priorities
+		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_PREFERENCE);
 	}
 
 	/**
