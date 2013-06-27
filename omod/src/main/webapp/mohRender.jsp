@@ -18,6 +18,7 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/datetimepicker.js"/>
 
 <script type="text/javascript">
 
@@ -28,14 +29,22 @@
         reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
         reportDate.setDate(new Date());
 
-        dateScheduled = new DatePicker("<openmrs:datePattern/>", "dateScheduled", { defaultDate: new Date() });
-        dateScheduled.setDate(new Date());
-
         $j("#immediately").click(function(){
             if ($j("#immediately").is(":checked")) {
                 $j("#dateScheduled").attr("disabled", "disabled");
             } else {
                 $j("#dateScheduled").removeAttr("disabled");
+            }
+        });
+
+        $j("#repeatSchedule").click(function(){
+            if ($j("#repeatSchedule").is(":checked")) {
+                $j("#repeatIntervalUnits").removeAttr("disabled");
+                $j("#repeatInterval").removeAttr("disabled");
+            } else {
+                $j("#repeatInterval").val("");
+                $j("#repeatIntervalUnits").attr("disabled", "disabled");
+                $j("#repeatInterval").attr("disabled", "disabled");
             }
         });
     });
@@ -75,10 +84,24 @@
             <legend>Dates</legend>
                 <label for="reportDate">Report Date (as of):</label>
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
-                <label for="dateScheduled">Schedule Date (run at midnight on):</label>
-                <input type="text" name="dateScheduled" id="dateScheduled"/>
-                    <em>or</em>
+                <label for="dateScheduled">Schedule Date:</label>
+                <input type="text" name="dateScheduled" id="dateScheduled" onclick="javascript:NewCssCal ('dateScheduled','ddMMyyyy','dropdown',true,'24')"/>
+              <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
+              <br/><br/>
+            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/> Check this for Repeat Schedule
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="repeatInterval">Repeat Interval:</label>
+            <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
+
+            <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
+                <option value="seconds">Seconds </option>
+                <option value="minutes">Minutes </option>
+                <option value="hours">Hours </option>
+                <option value="days">Days </option>
+            </select>
+
+
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Location</legend>

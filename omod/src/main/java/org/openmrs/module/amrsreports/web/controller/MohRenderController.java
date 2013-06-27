@@ -2,33 +2,23 @@ package org.openmrs.module.amrsreports.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Location;
-import org.openmrs.User;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
-import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
-import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -73,9 +63,13 @@ public class MohRenderController {
 	public void processForm(HttpServletRequest request,
 	                        @RequestParam(value = "immediate", required = false) Boolean immediate,
 	                        @RequestParam("reportDate") Date reportDate,
-	                        @RequestParam("dateScheduled") Date dateScheduled,
+	                        @RequestParam("dateScheduled") String dateScheduled,
 	                        @RequestParam("facility") Integer facilityId,
-	                        @RequestParam("reportName") String reportName) throws Exception {
+	                        @RequestParam("reportName") String reportName,
+                            @RequestParam("repeatIntervalUnits") String repeatIntervalUnits,
+                            @RequestParam("repeatInterval") Integer repeatInterval,
+                            @RequestParam(value = "repeatSchedule", required = false) Boolean repeatSchedule
+                                                                            ) throws Exception {
 
 		// find the facility
 		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
@@ -85,11 +79,39 @@ public class MohRenderController {
 		queuedReport.setFacility(facility);
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
+
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        Date scheduledDate = df.parse(dateScheduled);
 		if (immediate == null)
-			queuedReport.setDateScheduled(dateScheduled);
+			queuedReport.setDateScheduled(scheduledDate);
 		else
 			queuedReport.setDateScheduled(new Date());
 
+
+        if (repeatSchedule == null){
+            queuedReport.setRepeatSchedule(false);
+        }
+        else{
+            int repeatIntervalInSec;
+            queuedReport.setRepeatSchedule(true);
+
+            if(repeatIntervalUnits.equals("Seconds")){
+                repeatIntervalInSec = repeatInterval;
+
+            }
+            else if(repeatIntervalUnits.equals("Minutes")){
+                repeatIntervalInSec = repeatInterval * 60;
+            }
+            else if(repeatIntervalUnits.equals("Hours")){
+                repeatIntervalInSec = repeatInterval * 60 * 60;
+            }
+            else{
+                repeatIntervalInSec = repeatInterval * 60 * 60 * 24;
+            }
+
+            queuedReport.setRepeatInterval(repeatIntervalInSec);
+
+        }
 		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
 		queuedReportService.saveQueuedReport(queuedReport);
