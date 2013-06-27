@@ -65,7 +65,11 @@ public class MohRenderController {
 	                        @RequestParam("reportDate") Date reportDate,
 	                        @RequestParam("dateScheduled") String dateScheduled,
 	                        @RequestParam("facility") Integer facilityId,
-	                        @RequestParam("reportName") String reportName) throws Exception {
+	                        @RequestParam("reportName") String reportName,
+                            @RequestParam("repeatIntervalUnits") String repeatIntervalUnits,
+                            @RequestParam("repeatInterval") Integer repeatInterval,
+                            @RequestParam(value = "repeatSchedule", required = false) Boolean repeatSchedule
+                                                                            ) throws Exception {
 
 		// find the facility
 		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
@@ -83,6 +87,31 @@ public class MohRenderController {
 		else
 			queuedReport.setDateScheduled(new Date());
 
+
+        if (repeatSchedule == null){
+            queuedReport.setRepeatSchedule(false);
+        }
+        else{
+            int repeatIntervalInSec;
+            queuedReport.setRepeatSchedule(true);
+
+            if(repeatIntervalUnits.equals("Seconds")){
+                repeatIntervalInSec = repeatInterval;
+
+            }
+            else if(repeatIntervalUnits.equals("Minutes")){
+                repeatIntervalInSec = repeatInterval * 60;
+            }
+            else if(repeatIntervalUnits.equals("Hours")){
+                repeatIntervalInSec = repeatInterval * 60 * 60;
+            }
+            else{
+                repeatIntervalInSec = repeatInterval * 60 * 60 * 24;
+            }
+
+            queuedReport.setRepeatInterval(repeatIntervalInSec);
+
+        }
 		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
 		queuedReportService.saveQueuedReport(queuedReport);
