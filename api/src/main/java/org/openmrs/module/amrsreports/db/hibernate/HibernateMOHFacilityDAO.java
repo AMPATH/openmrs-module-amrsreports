@@ -113,6 +113,9 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 	public Cohort getPatientsInCohortMissingCCCNumbers(Cohort c) {
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
 
+		if (c == null || c.isEmpty())
+			return new Cohort();
+
 		String sql = "select p.person_id" +
 				" from person p left join patient_identifier pi" +
 				"   on pi.patient_id = p.person_id" +
