@@ -25,11 +25,7 @@ import org.openmrs.module.reporting.report.definition.service.ReportDefinitionSe
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -138,8 +134,41 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		// finish off by setting stuff on the queued report
 		queuedReport.setCsvFilename(csvFilename);
 		queuedReport.setXlsFilename(xlsFilename);
-		queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
-		Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+
+
+        if(!queuedReport.getRepeatSchedule()){
+            queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
+            Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+        }
+        else {
+            //Mark original QueuedReport as complete and save status
+            queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
+            Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+
+            //create a new QueuedReport borrowing some values from the run report
+            QueuedReport newQueuedReport = new QueuedReport();
+            newQueuedReport.setFacility(queuedReport.getFacility());
+            newQueuedReport.setReportName(queuedReport.getReportName());
+
+
+            //compute date for next schedule
+            Calendar newScheduleDate = Calendar.getInstance();
+            newScheduleDate.setTime(queuedReport.getDateScheduled());
+            newScheduleDate.add(Calendar.SECOND,newScheduleDate.get(Calendar.SECOND) + queuedReport.getRepeatInterval());
+            Date nextSchedule = newScheduleDate.getTime();
+
+            //set date for next schedule
+            newQueuedReport.setDateScheduled(nextSchedule);
+            newQueuedReport.setEvaluationDate(nextSchedule);
+
+            newQueuedReport.setStatus(QueuedReport.STATUS_NEW);
+            newQueuedReport.setRepeatSchedule(true);
+            newQueuedReport.setRepeatInterval(queuedReport.getRepeatInterval());
+
+            Context.getService(QueuedReportService.class).saveQueuedReport(newQueuedReport);
+        }
+
+
 	}
 
 	@Override
