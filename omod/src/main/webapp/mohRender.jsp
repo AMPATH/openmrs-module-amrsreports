@@ -105,9 +105,11 @@
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Location</legend>
-            <c:forEach var="facility" items="${facilities}">
-                <input type="radio" name="facility" value="${facility.facilityId}"/> ${facility.code} - ${facility.name} <br/>
-            </c:forEach>
+            <select name="facility" id="facility"  size="10">
+               <c:forEach var="facility" items="${facilities}">
+                    <option value="${facility.facilityId}">${facility.code} - ${facility.name} </option>
+               </c:forEach>
+            </select>
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Reports</legend>

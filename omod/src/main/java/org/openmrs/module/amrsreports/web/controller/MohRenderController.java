@@ -95,14 +95,14 @@ public class MohRenderController {
             int repeatIntervalInSec;
             queuedReport.setRepeatSchedule(true);
 
-            if(repeatIntervalUnits.equals("Seconds")){
+            if(repeatIntervalUnits.equals("seconds")){
                 repeatIntervalInSec = repeatInterval;
 
             }
-            else if(repeatIntervalUnits.equals("Minutes")){
+            else if(repeatIntervalUnits.equals("minutes")){
                 repeatIntervalInSec = repeatInterval * 60;
             }
-            else if(repeatIntervalUnits.equals("Hours")){
+            else if(repeatIntervalUnits.equals("hours")){
                 repeatIntervalInSec = repeatInterval * 60 * 60;
             }
             else{
