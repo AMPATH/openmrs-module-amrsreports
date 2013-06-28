@@ -142,6 +142,67 @@
             }
         });
 
+        // initialize the confirmation dialog
+        $j("#listDialog").dialog({
+            autoOpen: false,
+            resizable: false,
+            modal: true,
+            width: "400px",
+            buttons: {
+                "Generate Identifiers": function() {
+
+                    // validate
+                    var lastSerial = parseInt($j("#listSerialNumber").html());
+                    var startingSerial = parseInt($j("#startingSerial").val());
+
+                    // see if the starting serial number is a number
+                    if (isNaN(startingSerial)) {
+                        $j("#listSerialError").html("The starting serial should be a number.")
+                        $j("#listSerialError").fadeIn();
+                        $j("#startingSerial").focus();
+                        $j("#startingSerial").select();
+                        return;
+                    }
+
+                    // ensure the starting serial number comes after the last one assigned
+                    if (startingSerial <= lastSerial) {
+                        $j("#listSerialError").html("The starting serial should be after the last assigned one.")
+                        $j("#listSerialError").fadeIn();
+                        $j("#startingSerial").focus();
+                        $j("#startingSerial").select();
+                        return;
+                    }
+
+                    // hide the serial error message if all is well
+                    $j("#listSerialError").fadeOut();
+
+                    // ensure a size is selected
+                    var count = $j("#identifierCount").val();
+
+                    if (count == null) {
+                        $j("#listCountError").html("You must select a size.")
+                        $j("#listCountError").fadeIn();
+                        $j("#identifierCount").focus();
+                        return;
+                    }
+
+                    $j("#listCountError").fadeOut();
+
+                    // trigger the download
+                    window.location.href = "downloadCCCNumberList.htm?" +
+                            $j.param({
+                                facilityId: currentFacility,
+                                startingSerial: startingSerial,
+                                count: count
+                            });
+                    $j(this).dialog("close");
+                },
+                Cancel: function() {
+                    $j(this).dialog("close");
+                }
+            }
+        });
+
         // set the trigger for assign buttons
         $j("button.assign").live("click", function(event){
             event.preventDefault();
@@ -153,20 +214,16 @@
             // show the loading messages
             $j("#confirmDialog span.loading").show();
 
-            // open the assignment modal dialog
-            $j("#confirmDialog").dialog("open");
-
             // update the dialog variables from a DWR call
             currentFacility = $j(this).attr("facilityId");
             currentSerial = $j(this).attr("serial");
 
             // populate the facility name
-            DWRAmrsReportService.getFacilityName(currentFacility, function(name) {
-                $j("#confirmFacilityName").html(name);
-                $j("#confirmFacility span.loading").fadeOut("fast", function(){
-                    $j("#confirmFacilityName").fadeIn("fast");
-                });
-            });
+            $j("#confirmFacilityName").html($j(this).attr("facilityName"));
+            $j("#confirmFacilityName").show();
+
+            // open the assignment modal dialog
+            $j("#confirmDialog").dialog("open");
 
             // populate the missing patient count
             DWRAmrsReportService.getPatientUuidsMissingCCCNumbersInFacility(currentFacility, function(patients) {
@@ -177,6 +234,34 @@
                 });
             });
         });
+
+        // set the trigger for assign buttons
+        $j("button.list").live("click", function(event){
+            event.preventDefault();
+
+            currentFacility = $j(this).attr("facilityId");
+
+            // clear the variable spans
+            $j("#listDialog span.variable").html("");
+
+            // populate the facility name
+            $j("#listFacilityName").html($j(this).attr("facilityName"));
+
+            // populate the serial number
+            $j("#listSerialNumber").html($j(this).attr("serial"));
+
+            // clear some information before showing the dialog
+            $j("#listDialog .error").html("");
+            $j("#listDialog .error").hide();
+            $j("#startingSerial").val("");
+
+            // open the assignment modal dialog
+            $j("#listDialog").dialog("open");
+
+            // focus on the starting serial entry
+            $j("#startingSerial").select();
+        });
+
     });
 
     function assignIdentifiers() {
@@ -274,7 +359,10 @@
     <tbody>
     <c:forEach var="facility" items="${facilities}" varStatus="status">
         <tr>
-            <td valign="top"><button class="assign" facilityId="${facility.facilityId}" serial="${serials[facility.facilityId]}">Assign</button></td>
+            <td valign="top">
+                <button class="assign" facilityId="${facility.facilityId}" serial="${serials[facility.facilityId]}" facilityName="${facility.name}">Assign to Gap</button>
+                <button class="list" facilityId="${facility.facilityId}" serial="${serials[facility.facilityId]}" facilityName="${facility.name}">Generate List</button>
+            </td>
             <td valign="top" style="white-space:nowrap">${facility.name}</td>
             <td valign="top">${facility.code}</td>
             <td valign="top">${serials[facility.facilityId]}</td>
@@ -286,10 +374,6 @@
 <div id="confirmDialog">
     <div class="visualPadding" id="confirmFacility">
         <span class="bold">Facility:</span>
-        <span class="hidden message loading">
-            <img src="${pageContext.request.contextPath}/images/loading.gif"/>
-            <spring:message code="general.loading"/>
-        </span>
         <span class="variable" id="confirmFacilityName"></span>
     </div>
     <div class="visualPadding" id="confirmCount">
@@ -330,6 +414,40 @@
     <div class="hidden" id="authenticating">
         Authenticating ...
     </div>
+</div>
+
+<div id="listDialog">
+    <form id="listForm">
+        <div class="visualPadding" id="listFacility">
+            <span class="bold">Facility:</span>
+            <span class="variable" id="listFacilityName"></span>
+        </div>
+        <div class="visualPadding" id="listSerial">
+            <span class="bold">Last assigned serial number:</span>
+            <span class="variable" id="listSerialNumber"></span>
+        </div>
+        <div class="visualPadding description">
+            Set the starting serial number and amount of identifiers to generate.  Clicking "Generate" will then start
+            a download of a text file with the relevant identifiers.
+        </div>
+        <div class="visualPadding hidden error" id="listSerialError">
+        </div>
+        <div class="visualPadding" id="listStart">
+            <label for="startingSerial" class="bold">Starting Serial:</label>
+            <input type="text" id="startingSerial"/>
+        </div>
+        <div class="visualPadding hidden error" id="listCountError">
+        </div>
+        <div class="visualPadding" id="listCount">
+            <label for="identifierCount" class="bold">Number of Identifiers:</label>
+            <select id="identifierCount" size="4">
+                <option>100</option>
+                <option>500</option>
+                <option selected="true">1000</option>
+                <option>2000</option>
+            </select>
+        </div>
+    </form>
 </div>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>
