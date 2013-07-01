@@ -19,6 +19,7 @@ import org.openmrs.module.Activator;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361BReportProvider;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
+import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -43,6 +44,12 @@ public class AmrsReportModuleActivator implements Activator {
 	 */
 	public void shutdown() {
 		log.info("Shutting down AMRS Reporting Module");
+
+		try {
+			TaskRunnerThread.destroyInstance();
+		} catch (Throwable throwable) {
+			log.warn("problem destroying Task Runner Thread instance", throwable);
+		}
 	}
 	
 }

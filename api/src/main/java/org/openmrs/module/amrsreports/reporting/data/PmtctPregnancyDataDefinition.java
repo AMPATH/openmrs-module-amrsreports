@@ -15,9 +15,12 @@ package org.openmrs.module.amrsreports.reporting.data;
 
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
+import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 /**
  */
+@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
 public class PmtctPregnancyDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@Override

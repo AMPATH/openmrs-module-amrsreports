@@ -5,18 +5,19 @@
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohHistory.form" />
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.dataTables.min.js" />
-<openmrs:htmlInclude file="/moduleResources/amrsreports/jquery.tools.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.tools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/TableTools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/ZeroClipboard.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jspdf.js" />
+
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/smoothness/jquery-ui-1.8.16.custom.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css" />
-
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
+
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
 <script type="text/javascript">
@@ -34,11 +35,21 @@
 			}
 		});
 
+        var columns = $j('#tablehistory thead tr th').map(function() {
+
+            return $j(this).text();
+        });
+        columns.splice(0,1);
+
 		$j('#tablehistory').delegate('tbody td #img','click', function() {
 			var trow=this.parentNode.parentNode;
 			var aData2 = ti.fnGetData(trow);
-			var amrsNumber=aData2[1].trim();
-			DWRAmrsReportService.viewMoreDetails("${historyURL}", amrsNumber,callback);
+
+            $j("#dlgData").empty();
+            generate_table(aData2,"dlgData",columns);
+
+           $j("#dlgData").dialog("open");
+
 			return false;
 		});
 
@@ -50,22 +61,12 @@
 			hide: 'slide',
 			width:600,
 			cache: false,
-			position: 'top',
+			position: 'middle',
 			buttons: {
-				"Exit": function () { $j(this).dialog("close"); }
+				"Close": function () { $j(this).dialog("close"); }
 			}
 		});
 
-		function callback(data){
-			$j("#dlgData").empty();
-			//alert(data)
-
-			var listSplit=data.split(",");
-
-			maketable(listSplit);
-
-			$j("#dlgData").dialog("open");
-		}
 
 		$j('#xlsdownload').click(function() {
 			window.open("downloadxls.htm?reportId=${report.id}", 'Download Excel File');
@@ -73,8 +74,49 @@
 		});
 	});
 
+    function generate_table(data,bodyDiv,columns) {
+
+        var body = document.getElementById(bodyDiv);
+        var tbl     = document.createElement("table");
+
+        tbl.setAttribute('cellspacing','2');
+        tbl.setAttribute('border','0');
+        tbl.setAttribute('width','100%');
+        tbl.setAttribute('class','tblformat');
+
+        tbl.setAttribute('id','tblSummary');
+
+
+        var tblBody = document.createElement("tbody");
+
+        for(var i=0;i<columns.length;i++){
+            tblBody.appendChild(buildRow(columns[i],data[i+1]));
+
+        }
+
+        tbl.appendChild(tblBody);
+
+        body.appendChild(tbl);
+
+    }
+
+    function buildRow(label,tdvalue){
+
+        var row = document.createElement("tr");
+        var cell = document.createElement("th");
+        cell.setAttribute('align','right');
+        var cell2 = document.createElement("td");
+        var celllabel = document.createTextNode(label+": ");
+        var cellval = document.createTextNode(tdvalue);
+        cell.appendChild(celllabel);
+        cell2.appendChild(cellval);
+        row.appendChild(cell);
+        row.appendChild(cell2);
+        return row;
+    }
+
 	function clearDataTable(){
-		//alert("on change has to take effect");
+
 		dwr.util.removeAllRows("tbodydata");
 		var hidepic= document.getElementById("maindetails");
 		var titleheader=document.getElementById("titleheader");
@@ -82,36 +124,6 @@
 		titleheader.style.display='none';
 	}
 
-	function maketable(info1){
-		row=new Array();
-		cell=new Array();
-
-		row_num=info1.length; //edit this value to suit
-
-		tab=document.createElement('table');
-		tab.setAttribute('id','tblSummary');
-		tab.setAttribute('border','0');
-		tab.setAttribute('cellspacing','2');
-		tab.setAttribute('class','tblformat');
-
-		tbo=document.createElement('tbody');
-
-		for(c=0;c<row_num;c++){
-			var rowElement=info1[c].split(":");
-			row[c]=document.createElement('tr');
-			//alert(rowElement.length) ;
-
-			for(k=0;k<rowElement.length;k++) {
-				cell[k]=document.createElement('td');
-				cont=document.createTextNode(rowElement[k])
-				cell[k].appendChild(cont);
-				row[c].appendChild(cell[k]);
-			}
-			tbo.appendChild(row[c]);
-		}
-		tab.appendChild(tbo);
-		document.getElementById('dlgData').appendChild(tab);
-	}
 
 </script>
 
@@ -147,6 +159,6 @@
     </table>
 </c:if>
 
-<div id="dlgData" title="Patients More Information"></div>
+<div id="dlgData" title="Patient Information"></div>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

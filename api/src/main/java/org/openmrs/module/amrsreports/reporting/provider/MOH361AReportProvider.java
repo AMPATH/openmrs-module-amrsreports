@@ -5,6 +5,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
@@ -49,6 +50,7 @@ import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDe
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportDesignResource;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
@@ -58,7 +60,9 @@ import org.openmrs.util.OpenmrsClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -85,6 +89,15 @@ public class MOH361AReportProvider implements ReportProvider {
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
 		dsd.setName("allPatients");
 
+		// set up parameters
+		Parameter facility = new Parameter();
+		facility.setName("facility");
+		facility.setType(MOHFacility.class);
+
+		// add to report and data set definition
+		report.addParameter(facility);
+		dsd.addParameter(facility);
+
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
@@ -95,14 +108,15 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// a. serial number
-		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), nullString);
+		dsd.addColumn("Serial Number", new SerialNumberDataDefinition(), "facility=${facility}");
 
 		// b. date chronic HIV+ care started
 		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
 		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString);
 
 		// extra column to help understand reason for including in this cohort
-		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(), nullString, new EncounterDatetimeConverter());
+		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(),
+				"facility=${facility}", new EncounterDatetimeConverter());
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
@@ -120,7 +134,8 @@ public class MOH361AReportProvider implements ReportProvider {
 		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
+		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString,
+				new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
 
 		// e2. Age at Enrollment
 
@@ -187,7 +202,9 @@ public class MOH361AReportProvider implements ReportProvider {
 		// informative column for the destination clinics
 		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());
 
-		report.addDataSetDefinition(dsd, null);
+		Map<String, Object> mappings = new HashMap<String, Object>();
+		mappings.put("facility", "${facility}");
+		report.addDataSetDefinition(dsd, mappings);
 
 		return report;
 	}

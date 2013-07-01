@@ -35,6 +35,13 @@
             Manage User/Facility Privileges
         </a>
     </li>
+    <openmrs:hasPrivilege privilege="View Locations">
+        <li <c:if test='<%= request.getRequestURI().contains("cccNumbers") %>'>class="active"</c:if>>
+        <a href="${pageContext.request.contextPath}/module/amrsreports/cccNumbers.list">
+            Manage CCC Numbers
+        </a>
+    </li>
+    </openmrs:hasPrivilege>
     <li <c:if test='<%= request.getRequestURI().contains("settings") %>'>class="active"</c:if>>
         <a href="${pageContext.request.contextPath}/module/amrsreports/settings.form">
             Settings

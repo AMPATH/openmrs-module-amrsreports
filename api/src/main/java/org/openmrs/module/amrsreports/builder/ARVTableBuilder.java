@@ -1,13 +1,36 @@
-package org.openmrs.module.amrsreports.task;
+/**
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
+
+package org.openmrs.module.amrsreports.builder;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.util.TableBuilderUtil;
 
-/**
- * Updates the ARV encounter table with flags for each ARV drug for every related encounter
- */
-public class UpdateARVEncountersTask extends AMRSReportsTask {
+public class ARVTableBuilder {
+
+	private static ARVTableBuilder instance;
+
+	public static ARVTableBuilder getInstance() {
+		if (instance == null)
+			instance = new ARVTableBuilder();
+		return instance;
+	}
+
+	private ARVTableBuilder() {
+		// pass
+	}
 
 	private static final String MACRO_DROP_TABLE =
 			"DROP TABLE IF EXISTS `:table`";
@@ -112,14 +135,13 @@ public class UpdateARVEncountersTask extends AMRSReportsTask {
 	/**
 	 * drops, creates and fills out the ARV encounter table
 	 */
-	@Override
-	public void doExecute() {
+	public void execute() {
 
 		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
 			// drop the table
-			getAdministrationService().executeSQL(MACRO_DROP_TABLE.replaceAll(":table", table), false);
+			TableBuilderUtil.runUpdateSQL(MACRO_DROP_TABLE.replaceAll(":table", table));
 			// recreate the table
-			getAdministrationService().executeSQL(MACRO_CREATE_TABLE.replaceAll(":table", table), false);
+			TableBuilderUtil.runUpdateSQL(MACRO_CREATE_TABLE.replaceAll(":table", table));
 		}
 
 		// update all of the ARVs
@@ -145,7 +167,7 @@ public class UpdateARVEncountersTask extends AMRSReportsTask {
 
 		for (String table : new String[]{TABLE_CURRENT, TABLE_PREVIOUS}) {
 			// update on_ART column
-			getAdministrationService().executeSQL(MACRO_UPDATE_ON_ART.replaceAll(":table", table), false);
+			TableBuilderUtil.runUpdateSQL(MACRO_UPDATE_ON_ART.replaceAll(":table", table));
 		}
 	}
 
@@ -168,19 +190,11 @@ public class UpdateARVEncountersTask extends AMRSReportsTask {
 
 		// run query with for current questions
 		String query = baseQuery.replaceAll(":table", TABLE_CURRENT).replaceAll(":questions", QUESTIONS_CURRENT);
-		getAdministrationService().executeSQL(query, false);
+		TableBuilderUtil.runUpdateSQL(query);
 
 		// run query with for historical questions
 		query = baseQuery.replaceAll(":table", TABLE_PREVIOUS).replaceAll(":questions", QUESTIONS_PREVIOUS);
-		getAdministrationService().executeSQL(query, false);
+		TableBuilderUtil.runUpdateSQL(query);
 	}
 
-	/**
-	 * getter for administrationService
-	 */
-	public AdministrationService getAdministrationService() {
-		if (administrationService == null)
-			administrationService = Context.getAdministrationService();
-		return administrationService;
-	}
 }

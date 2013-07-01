@@ -13,5 +13,7 @@ public class AmrsReportsConstants {
 
 	public static final String GP_CCC_NUMBER_IDENTIFIER_TYPE = "amrsreports.cccIdentifierType";
 
+	public static final String GP_PRODUCTION_SERVER_URL = "amrsreports.productionServerURL";
+
 	public static final String TRANSFER_IN = "Transfer In";
 }

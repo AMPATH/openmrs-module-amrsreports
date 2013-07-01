@@ -26,7 +26,6 @@ public abstract class AMRSReportsTask extends AbstractTask {
 			return;
 		}
 
-		Context.openSession();
 		try {
 			this.doExecute();
 		} catch (Exception e) {
@@ -36,7 +35,6 @@ public abstract class AMRSReportsTask extends AbstractTask {
 			if (!AMRSReportsCommonTaskLock.getInstance().releaseLock(this.getClass()))
 				log.error("Could not release lock.");
 
-			Context.closeSession();
 		}
 	}
 

@@ -63,39 +63,59 @@
         <defaultValue></defaultValue>
         <description>Identifier type for CCC Number identifiers</description>
     </globalProperty>
+    <globalProperty>
+        <property>${project.parent.artifactId}.productionServerURL</property>
+        <defaultValue>https://amrs.ampath.or.ke/amrs</defaultValue>
+        <description>URL for accessing the production server when creating patient identifiers.</description>
+    </globalProperty>
     <!-- /Required Global Properties -->
 	
 	<dwr>
-		<allow>
-			<create creator="new" javascript="DWRAmrsReportService">
-				<param name="class" value="${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService"/>
-				<include method="viewMoreDetails"/>
-				<include method="viewMoreDetailsRender"/>
-				<include method="downloadCSV"/>
-				<include method="downloadPDF"/>
-                <include method="getCohortCountForLocation"/>
+        <allow>
+            <create creator="new" javascript="DWRAmrsReportService">
+                <param name="class" value="${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService"/>
+                <include method="viewMoreDetails"/>
+                <include method="viewMoreDetailsRender"/>
+                <include method="downloadCSV"/>
+                <include method="downloadPDF"/>
+                <include method="getCohortCountForFacility"/>
                 <include method="getCohort"/>
-                <include method="rebuildEnrollment"/>
-                <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
-				<convert match="org.openmrs.Location" converter="bean" />
-				<convert match="org.openmrs.User" converter="bean"/>
-			</create>
-		</allow>
+                <include method="startTaskRunner"/>
+                <include method="stopTaskRunner"/>
+                <include method="getTaskRunnerStatus"/>
+                <include method="getFacilityName"/>
+                <include method="getFacilityCode"/>
+                <include method="getPatientCountMissingCCCNumbersInFacility"/>
+                <include method="getPatientUuidsMissingCCCNumbersInFacility"/>
+                <include method="assignMissingIdentifiersForFacility"/>
+                <include method="getPreARTEnrollmentLocationUuidForPatientUuid"/>
+            </create>
+            <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
+            <convert match="org.openmrs.Location" converter="bean" />
+            <convert match="org.openmrs.User" converter="bean"/>
+        </allow>
 
-		<signatures>
-			<![CDATA[
+        <signatures>
+            <![CDATA[
 			import ${project.parent.groupId}.${project.parent.artifactId}.web.dwr.DWRAmrsReportService;
-			DWRAmrsReportService.viewMoreDetails(String file,String amrsid);
-			DWRAmrsReportService.viewMoreDetailsRender(String bff,String id);
+			DWRAmrsReportService.viewMoreDetails(String file, String amrsid);
+			DWRAmrsReportService.viewMoreDetailsRender(String bff, String id);
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
-			DWRAmrsReportService.alertInput(String loc,String userr);
-        	DWRAmrsReportService.getCohortCountForLocation(Integer locationId,Date evaluationDate);
-            DWRAmrsReportService.getCohort(Integer locationId,Date evaluationDate);
-            DWRAmrsReportService.rebuildEnrollment();
+        	DWRAmrsReportService.getCohortCountForFacility(Integer facilityId, Date evaluationDate);
+            DWRAmrsReportService.getCohort(Integer locationId, Date evaluationDate);
+            DWRAmrsReportService.startTaskRunner(String taskName);
+            DWRAmrsReportService.stopTaskRunner();
+            DWRAmrsReportService.getTaskRunnerStatus();
+            DWRAmrsReportService.getFacilityName(Integer facilityId);
+            DWRAmrsReportService.getFacilityCode(Integer facilityId);
+            DWRAmrsReportService.getPatientCountMissingCCCNumbersInFacility(Integer facilityId);
+            DWRAmrsReportService.getPatientUuidsMissingCCCNumbersInFacility(Integer facilityId);
+            DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
+            DWRAmrsReportService.getPreARTEnrollmentLocationUuidForPatientUuid(String patientUuid);
 			]]>
-		</signatures>	
-	</dwr>
+        </signatures>
+    </dwr>
 	
 	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> 
