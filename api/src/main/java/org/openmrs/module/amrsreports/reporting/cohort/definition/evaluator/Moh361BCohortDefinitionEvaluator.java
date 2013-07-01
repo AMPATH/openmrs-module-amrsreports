@@ -55,15 +55,16 @@ public class Moh361BCohortDefinitionEvaluator implements CohortDefinitionEvaluat
                     " union " +
                             " select pa.person_id" +
                             " from person_attribute pa join amrsreports_hiv_care_enrollment ae" +
-                            "     on pa.person_id = ae.person_id" +
-                            "       and ae.enrollment_date is not null" +
-                            "       and ae.enrollment_date <= ':reportDate'" +
+                            "     on pa.person_id = ae.patient_id" +
+                            "       and ae.first_arv_date is not null" +
+                            "       and ae.first_arv_date <= ':reportDate'" +
                             "   join encounter e " +
                             "     on e.patient_id = pa.person_id" +
                             "       and e.voided = 0" +
                             "       and e.location_id in ( :locationList )" +
                             " where (pa.voided = 0" +
                             "        or (pa.voided = 1 and pa.void_reason like 'New value: %'))" +
+                            "   and pa.date_created >= ae.first_arv_date" +
                             "   and pa.person_attribute_type_id = 7" +
                             "   and pa.value = '" + location.getLocationId() + "'" +
                             "   and pa.date_created <= ':reportDate'";
