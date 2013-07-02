@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
+import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -49,9 +51,9 @@ public class QueuedReportFormController {
 		return Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
 	}
 
-	@ModelAttribute("reportNames")
-	public Set<String> getReportNames() {
-		return ReportProviderRegistrar.getInstance().getAllReportProviderNames();
+	@ModelAttribute("reportProviders")
+	public List<ReportProvider> getReportProviders() {
+		return ReportProviderRegistrar.getInstance().getAllReportProviders();
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")

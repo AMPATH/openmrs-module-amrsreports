@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.Activator;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider_0_1;
+import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider_0_2;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361BReportProvider_0_1;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
@@ -35,7 +36,9 @@ public class AmrsReportModuleActivator implements Activator {
 	public void startup() {
 		log.info("Starting AMRS Reporting Module");
 
+		// TODO use some classpath or Spring magic to acquire these automatically
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider_0_1());
+		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider_0_2());
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361BReportProvider_0_1());
 	}
 	

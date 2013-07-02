@@ -19,6 +19,10 @@
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 
+<style>
+    .hidden { display: none; }
+</style>
+
 <script type="text/javascript">
 
     var reportDate;
@@ -88,8 +92,10 @@
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Reports</legend>
-            <c:forEach var="reportName" items="${reportNames}">
-                <input type="radio" name="reportName" value="${reportName}"/> ${reportName} <br/>
+            <c:forEach var="report" items="${reportProviders}">
+                <div class="reportProvider<c:if test="${not report.visible}"> hidden</c:if>">
+                    <input type="radio" name="reportName" value="${report.name}"/> ${report.name}
+                </div>
             </c:forEach>
         </fieldset>
         <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
