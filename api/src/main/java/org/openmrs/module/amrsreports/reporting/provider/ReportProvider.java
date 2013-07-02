@@ -7,13 +7,51 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 /**
  * Defines what it means to be a report provider
  */
-public interface ReportProvider {
+public abstract class ReportProvider {
 
-	public String getName();
+	protected String name;
+	protected Boolean visible = false;
+	protected ReportDefinition reportDefinition;
+	protected CohortDefinition cohortDefinition;
+	protected ReportDesign reportDesign;
 
-	public ReportDefinition getReportDefinition();
+	public String getName() {
+		return name;
+	}
 
-	public CohortDefinition getCohortDefinition();
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	public ReportDesign getReportDesign();
+	public Boolean getVisible() {
+		return visible;
+	}
+
+	public void setVisible(Boolean visible) {
+		this.visible = visible;
+	}
+
+	public ReportDefinition getReportDefinition() {
+		return reportDefinition;
+	}
+
+	public void setReportDefinition(ReportDefinition reportDefinition) {
+		this.reportDefinition = reportDefinition;
+	}
+
+	public CohortDefinition getCohortDefinition() {
+		return cohortDefinition;
+	}
+
+	public void setCohortDefinition(CohortDefinition cohortDefinition) {
+		this.cohortDefinition = cohortDefinition;
+	}
+
+	public ReportDesign getReportDesign() {
+		return reportDesign;
+	}
+
+	public void setReportDesign(ReportDesign reportDesign) {
+		this.reportDesign = reportDesign;
+	}
 }

@@ -35,7 +35,7 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 		FirstWHOStageDataDefinition def = (FirstWHOStageDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 

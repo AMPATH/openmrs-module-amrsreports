@@ -25,10 +25,13 @@ public class AgeAtEvaluationDateDataEvaluator implements PersonDataEvaluator {
 	 */
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
+
 		EvaluatedPersonData c = Context.getService(PersonDataService.class).evaluate(new BirthdateDataDefinition(), context);
 		AgeAtEvaluationDateDataDefinition add = (AgeAtEvaluationDateDataDefinition) definition;
+
 		BirthdateToAgeConverter converter = new BirthdateToAgeConverter(context.getEvaluationDate());
-		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
+		EvaluatedPersonData ret = new EvaluatedPersonData(add, context);
+
 		for (Map.Entry<Integer, Object> e : c.getData().entrySet()) {
 			ret.addData(e.getKey(), converter.convert(e.getValue()));
 		}

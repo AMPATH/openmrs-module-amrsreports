@@ -2,7 +2,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
-<openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohRender.form"/>
+<openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js"/>
@@ -20,6 +20,10 @@
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.js"/>
 
+
+<style>
+    .hidden { display: none; }
+</style>
 
 <script type="text/javascript">
 
@@ -106,10 +110,10 @@
     <br />
 </c:if>
 
-<b class="boxHeader">Run AMRS Reports</b>
+<b class="boxHeader">Add a Scheduled Report</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-    <form method="POST" name="amrsreportrenderer" action="mohRender.form">
+    <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
                 <label for="reportDate">Report Date (as of):</label>
@@ -143,8 +147,10 @@
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Reports</legend>
-            <c:forEach var="reportName" items="${reportNames}">
-                <input type="radio" name="reportName" value="${reportName}"/> ${reportName} <br/>
+            <c:forEach var="report" items="${reportProviders}">
+                <div class="reportProvider<c:if test="${not report.visible}"> hidden</c:if>">
+                    <input type="radio" name="reportName" value="${report.name}"/> ${report.name}
+                </div>
             </c:forEach>
         </fieldset>
         <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>

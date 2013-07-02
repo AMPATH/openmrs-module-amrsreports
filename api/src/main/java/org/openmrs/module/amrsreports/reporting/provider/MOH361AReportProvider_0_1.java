@@ -68,11 +68,11 @@ import java.util.Properties;
 /**
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */
-public class MOH361AReportProvider implements ReportProvider {
+public class MOH361AReportProvider_0_1 extends ReportProvider {
 
-	@Override
-	public String getName() {
-		return "MOH 361A";
+	public MOH361AReportProvider_0_1() {
+		this.name = "MOH 361A 0.1";
+		this.visible = true;
 	}
 
 	@Override
@@ -228,7 +228,7 @@ public class MOH361AReportProvider implements ReportProvider {
 
 		ReportDesignResource resource = new ReportDesignResource();
 		resource.setName("template.xls");
-		InputStream is = OpenmrsClassLoader.getInstance().getResourceAsStream("templates/MOH361AReportTemplate.xls");
+		InputStream is = OpenmrsClassLoader.getInstance().getResourceAsStream("templates/MOH361AReportTemplate_0_1.xls");
 
 		if (is == null)
 			throw new APIException("Could not find report template.");

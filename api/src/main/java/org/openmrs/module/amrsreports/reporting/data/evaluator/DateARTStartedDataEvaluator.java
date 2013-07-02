@@ -27,7 +27,7 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		DateARTStartedDataDefinition def = (DateARTStartedDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 
