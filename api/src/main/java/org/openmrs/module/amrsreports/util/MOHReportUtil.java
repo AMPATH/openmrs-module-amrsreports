@@ -17,10 +17,21 @@ import org.openmrs.module.reporting.indicator.IndicatorResult;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper utility for running reports and not overloading the system
@@ -28,7 +39,7 @@ import java.util.*;
 public class MOHReportUtil {
 
 	private static final Log log = LogFactory.getLog(MOHReportUtil.class);
-	public static final String DATE_FORMAT = "dd/MM/yyyy hh:mm aa";
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
 
 	public static String joinAsSingleCell(Collection<String> entries) {
 		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
@@ -59,7 +70,7 @@ public class MOHReportUtil {
 	 */
 	public static void renderCSVFromReportData(ReportData results, OutputStream out) throws IOException {
 
-		CSVWriter w = new CSVWriter(new OutputStreamWriter(out,"UTF-8"), AmrsReportsConstants.DEFAULT_CSV_DELIMITER);
+		CSVWriter w = new CSVWriter(new OutputStreamWriter(out, "UTF-8"), AmrsReportsConstants.DEFAULT_CSV_DELIMITER);
 
 		DataSet dataset = getFirstDataSetForReportData(results);
 
@@ -111,7 +122,7 @@ public class MOHReportUtil {
 		return results;
 	}
 
-	public static String formatdates(Date date){
+	public static String formatdates(Date date) {
 		if (date == null)
 			return "Unknown";
 
@@ -124,47 +135,48 @@ public class MOHReportUtil {
 	}
 
 	/**
-     * determine the age group for a patient at a given date
-     * @should determine the age group for a patient at a given date
-     * @param birthdate birth date of the patient whose age is used in the calculations
-     * @param when the date upon which the age should be identified
-     * @return the appropriate age group
-     */
-    public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
-        //birthdate = patient.getBirthdate();
-        if (birthdate == null) {
-            return null;
-        }
+	 * determine the age group for a patient at a given date
+	 *
+	 * @param birthdate birth date of the patient whose age is used in the calculations
+	 * @param when      the date upon which the age should be identified
+	 * @return the appropriate age group
+	 * @should determine the age group for a patient at a given date
+	 */
+	public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
+		//birthdate = patient.getBirthdate();
+		if (birthdate == null) {
+			return null;
+		}
 
-        Calendar now = Calendar.getInstance();
-        if (when != null) {
-            now.setTime(when);
-        }
+		Calendar now = Calendar.getInstance();
+		if (when != null) {
+			now.setTime(when);
+		}
 
-        Calendar then = Calendar.getInstance();
-        then.setTime(birthdate);
+		Calendar then = Calendar.getInstance();
+		then.setTime(birthdate);
 
-        int ageInMonths = 0;
-        while (!then.after(now)) {
-            then.add(Calendar.MONTH, 1);
-            ageInMonths++;
-        }
-        ageInMonths--;
+		int ageInMonths = 0;
+		while (!then.after(now)) {
+			then.add(Calendar.MONTH, 1);
+			ageInMonths++;
+		}
+		ageInMonths--;
 
-        if (ageInMonths < 18) {
-            return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
-        }
+		if (ageInMonths < 18) {
+			return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
+		}
 
-        if (ageInMonths < 60) {
-            return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
-        }
+		if (ageInMonths < 60) {
+			return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
+		}
 
-        if (ageInMonths < 144) {
-            return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
-        }
+		if (ageInMonths < 144) {
+			return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
+		}
 
-        return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
-    }
+		return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
+	}
 
 	/**
 	 * helper method to reduce code for validation methods
