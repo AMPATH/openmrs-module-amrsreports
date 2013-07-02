@@ -30,7 +30,6 @@ public class ReportProviderRegistrar {
 			providerMap.put(reportProvider.getName(), reportProvider);
 	}
 
-
 	public ReportProvider getReportProviderByName(String reportName) {
 		return providerMap.get(reportName);
 	}
