@@ -17,10 +17,22 @@ import org.openmrs.module.reporting.indicator.IndicatorResult;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Helper utility for running reports and not overloading the system
@@ -28,7 +40,7 @@ import java.util.*;
 public class MOHReportUtil {
 
 	private static final Log log = LogFactory.getLog(MOHReportUtil.class);
-	public static final String DATE_FORMAT = "dd/MM/yyyy hh:mm aa";
+	public static final String DATE_FORMAT = "dd/MM/yyyy";
 
 	public static String joinAsSingleCell(Collection<String> entries) {
 		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
