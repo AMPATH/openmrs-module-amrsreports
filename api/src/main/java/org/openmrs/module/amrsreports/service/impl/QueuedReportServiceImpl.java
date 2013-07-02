@@ -135,14 +135,13 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		queuedReport.setCsvFilename(csvFilename);
 		queuedReport.setXlsFilename(xlsFilename);
 
+        //Mark original QueuedReport as complete and save status
         queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
         Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
 
 
         if (queuedReport.getRepeatInterval() != null && queuedReport.getRepeatInterval() > 0){
-            //Mark original QueuedReport as complete and save status
-            queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
-            Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+
 
             //create a new QueuedReport borrowing some values from the run report
             QueuedReport newQueuedReport = new QueuedReport();
