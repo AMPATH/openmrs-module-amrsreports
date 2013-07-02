@@ -29,7 +29,7 @@ public class LastHIVEncounterDataEvaluator implements PersonDataEvaluator {
 		LastHIVEncounterDataDefinition def = (LastHIVEncounterDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 
