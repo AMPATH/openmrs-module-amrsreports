@@ -67,8 +67,7 @@ public class MohRenderController {
 	                        @RequestParam("facility") Integer facilityId,
 	                        @RequestParam("reportName") String reportName,
                             @RequestParam("repeatIntervalUnits") String repeatIntervalUnits,
-                            @RequestParam("repeatInterval") Integer repeatInterval,
-                            @RequestParam(value = "repeatSchedule", required = false) Boolean repeatSchedule
+                            @RequestParam("repeatInterval") Integer repeatInterval
                                                                             ) throws Exception {
 
 		// find the facility
@@ -80,20 +79,19 @@ public class MohRenderController {
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-mm-dd hh:mm a");
         Date scheduledDate = df.parse(dateScheduled);
 		if (immediate == null)
 			queuedReport.setDateScheduled(scheduledDate);
 		else
 			queuedReport.setDateScheduled(new Date());
 
+        int repeatIntervalInSec;
 
-        if (repeatSchedule == null){
-            queuedReport.setRepeatSchedule(false);
+        if (repeatInterval == null || repeatInterval==0){
+            repeatIntervalInSec = 0;
         }
         else{
-            int repeatIntervalInSec;
-            queuedReport.setRepeatSchedule(true);
 
             if(repeatIntervalUnits.equals("seconds")){
                 repeatIntervalInSec = repeatInterval;

@@ -414,19 +414,6 @@
             <column name="xls_file_location" type="varchar(512)"/>
         </addColumn>
     </changeSet>
-    <changeSet id="amrsreports-2013-03-27" author="aojwang">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="amrsreports_queued_report" columnName="repeat_schedule"/>
-            </not>
-        </preConditions>
-        <comment>
-            Adding repeat_schedule to the amrsreports_queued_report table
-        </comment>
-        <addColumn tableName="amrsreports_queued_report">
-            <column name="repeat_schedule" type="int(11)"/>
-        </addColumn>
-    </changeSet>
 
     <changeSet id="amrsreports-2013-03-27a" author="aojwang">
         <preConditions onFail="MARK_RAN">

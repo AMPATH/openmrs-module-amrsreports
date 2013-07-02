@@ -18,7 +18,8 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/datetimepicker.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.js"/>
+
 
 <script type="text/javascript">
 
@@ -28,6 +29,23 @@
     $j(document).ready(function () {
         reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
         reportDate.setDate(new Date());
+
+        var defaultOpts = {
+            changeMonth: true,
+            changeYear: true,
+            ampm: true,
+            controlType: 'select',
+            buttonImageOnly: false,
+            dateFormat: 'yy-mm-dd'
+        };
+        var elem = $j('#dateScheduled');
+        elem.datetimepicker(defaultOpts);
+        elem.datetimepicker('setDate', new Date());
+
+
+
+
+       // dateScheduled = $j('#dateScheduled').datetimepicker(defaultOpts);
 
         $j("#immediately").click(function(){
             if ($j("#immediately").is(":checked")) {
@@ -50,6 +68,18 @@
     });
 
 </script>
+<style type="text/css">
+    .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+    .ui-timepicker-div dl { text-align: left; }
+    .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+    .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+    .ui-timepicker-div td { font-size: 90%; }
+    .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+    .ui-timepicker-rtl{ direction: rtl; }
+    .ui-timepicker-rtl dl { text-align: right; }
+    .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
+</style>
 
 <%@ include file="localHeader.jsp" %>
 
@@ -85,7 +115,7 @@
                 <label for="reportDate">Report Date (as of):</label>
                 <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
                 <label for="dateScheduled">Schedule Date:</label>
-                <input type="text" name="dateScheduled" id="dateScheduled" onclick="javascript:NewCssCal ('dateScheduled','ddMMyyyy','dropdown',true,'24')"/>
+                <input type="text" name="dateScheduled" id="dateScheduled"/>
               <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
               <br/><br/>

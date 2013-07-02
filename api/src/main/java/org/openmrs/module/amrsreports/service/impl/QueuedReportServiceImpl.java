@@ -136,7 +136,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		queuedReport.setXlsFilename(xlsFilename);
 
 
-        if(!queuedReport.getRepeatSchedule()){
+        if(queuedReport.getRepeatInterval()==0 || queuedReport.getRepeatInterval()==null ){
             queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
             Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
         }
@@ -162,7 +162,6 @@ public class QueuedReportServiceImpl implements QueuedReportService {
             newQueuedReport.setEvaluationDate(nextSchedule);
 
             newQueuedReport.setStatus(QueuedReport.STATUS_NEW);
-            newQueuedReport.setRepeatSchedule(true);
             newQueuedReport.setRepeatInterval(queuedReport.getRepeatInterval());
 
             Context.getService(QueuedReportService.class).saveQueuedReport(newQueuedReport);
