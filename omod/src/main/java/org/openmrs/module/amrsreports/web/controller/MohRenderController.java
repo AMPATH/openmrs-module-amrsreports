@@ -93,11 +93,7 @@ public class MohRenderController {
         }
         else{
 
-            if(repeatIntervalUnits.equals("seconds")){
-                repeatIntervalInSec = repeatInterval;
-
-            }
-            else if(repeatIntervalUnits.equals("minutes")){
+            if(repeatIntervalUnits.equals("minutes")){
                 repeatIntervalInSec = repeatInterval * 60;
             }
             else if(repeatIntervalUnits.equals("hours")){

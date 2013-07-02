@@ -18,7 +18,7 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.js"/>
+<openmrs:htmlInclude file="/scripts/jquery-ui/js/jquery-ui-timepicker-addon.js"/>
 
 
 <script type="text/javascript">
@@ -125,10 +125,10 @@
             <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
 
             <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
-                <option value="seconds">Seconds </option>
+
                 <option value="minutes">Minutes </option>
                 <option value="hours">Hours </option>
-                <option value="days">Days </option>
+                <option value="days" SELECTED="selected">Days </option>
             </select>
 
 
