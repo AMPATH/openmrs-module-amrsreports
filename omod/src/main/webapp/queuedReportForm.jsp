@@ -2,7 +2,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
-<openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohRender.form"/>
+<openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js"/>
@@ -67,10 +67,10 @@
     <br />
 </c:if>
 
-<b class="boxHeader">Run AMRS Reports</b>
+<b class="boxHeader">Add a Scheduled Report</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-    <form method="POST" name="amrsreportrenderer" action="mohRender.form">
+    <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
                 <label for="reportDate">Report Date (as of):</label>
