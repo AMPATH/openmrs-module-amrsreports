@@ -16,7 +16,6 @@ public class QueuedReport extends BaseOpenmrsObject {
 	private Date dateScheduled;
 	private String status;
     private Integer repeatInterval;
-    private Boolean repeatSchedule;
 	private String csvFilename;
 	private String xlsFilename;
 
@@ -98,14 +97,6 @@ public class QueuedReport extends BaseOpenmrsObject {
 	public void setXlsFilename(String xlsFilename) {
 		this.xlsFilename = xlsFilename;
 	}
-
-    public Boolean getRepeatSchedule() {
-        return repeatSchedule;
-    }
-
-    public void setRepeatSchedule(Boolean repeatSchedule) {
-        this.repeatSchedule = repeatSchedule;
-    }
 
     public Integer getRepeatInterval() {
         return repeatInterval;
