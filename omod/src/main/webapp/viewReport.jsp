@@ -2,7 +2,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
-<openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohHistory.form" />
+<openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/viewReport.form" />
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js" />

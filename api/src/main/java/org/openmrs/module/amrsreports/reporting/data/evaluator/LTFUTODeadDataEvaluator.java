@@ -33,6 +33,9 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
 
+		if (context.getBaseCohort().isEmpty())
+			return ret;
+
 		personIds = StringUtils.join(context.getBaseCohort().getMemberIds(), ",");
 		reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
 

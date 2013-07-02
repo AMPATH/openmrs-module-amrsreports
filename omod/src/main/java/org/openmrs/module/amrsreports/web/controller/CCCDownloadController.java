@@ -120,4 +120,53 @@ public class CCCDownloadController {
 		response.getOutputStream().close();
 	}
 
+	@RequestMapping("module/amrsreports/downloadCCCNumberList")
+	public void downloadList(HttpServletResponse response,
+							@RequestParam(required = true, value = "facilityId") Integer facilityId,
+							@RequestParam(required = true, value = "startingSerial") Integer startingSerial,
+							@RequestParam(required = true, value = "count") Integer count) throws IOException {
+
+		if (facilityId == null) {
+			// TODO say something ...
+			return;
+		}
+
+		// get the facility
+		MOHFacilityService fs = Context.getService(MOHFacilityService.class);
+		MOHFacility facility = fs.getFacility(facilityId);
+
+		if (facility == null) {
+			// TODO say something ...
+			return;
+		}
+
+		Integer serial = startingSerial;
+
+		// build the list of identifiers
+		List<String> identifiers = new ArrayList<String>();
+		for (int i = 0; i < count; i++) {
+			identifiers.add(String.format("%s-%05d", facility.getCode(), serial++));
+		}
+
+		// join the individual identifiers with newlines
+		String result = StringUtils.join(identifiers, "\n");
+
+		// format the filename
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+		String filename = String.format("ccc-identifiers-facility-%d-%s.txt", facility.getFacilityId(), sdf.format(new Date()));
+
+		// set the information
+		response.setContentType("text/plain");
+		response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+		response.setContentLength(result.length());
+
+		// push the data to the stream
+		response.getOutputStream().println(result);
+
+		// close the stream
+		response.getOutputStream().close();
+	}
+
+
+
 }

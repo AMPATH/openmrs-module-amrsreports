@@ -9,6 +9,7 @@ import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.util.RoleConstants;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,6 +45,9 @@ public class UserFacilityServiceImpl implements UserFacilityService {
 
 	@Override
 	public List<MOHFacility> getAllowedFacilitiesForUser(User user) {
+		if (user == null)
+			return Collections.emptyList();
+
 		if (user.hasRole(RoleConstants.SUPERUSER))
 			return Context.getService(MOHFacilityService.class).getAllFacilities();
 

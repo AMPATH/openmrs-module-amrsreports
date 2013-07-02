@@ -38,6 +38,8 @@ public interface UserFacilityService {
 
 	/**
 	 * Gets all Facilities linked to a given User
+	 *
+	 * @should return an empty list if the user is null
 	 */
 	@Transactional(readOnly = true)
 	public List<MOHFacility> getAllowedFacilitiesForUser(User user);

@@ -24,6 +24,9 @@ public class TransferStatusDataEvaluator implements PersonDataEvaluator {
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
 
+		if (context.getBaseCohort().isEmpty())
+			return ret;
+
 		// find the facility number
 		MOHFacility facility = (MOHFacility) context.getParameterValue("facility");
 

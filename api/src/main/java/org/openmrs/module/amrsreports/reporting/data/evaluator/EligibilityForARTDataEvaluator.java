@@ -57,7 +57,7 @@ public class EligibilityForARTDataEvaluator implements PersonDataEvaluator {
 		EligibilityForARTDataDefinition def = (EligibilityForARTDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 

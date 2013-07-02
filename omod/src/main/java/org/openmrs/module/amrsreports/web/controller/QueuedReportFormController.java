@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
+import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
@@ -28,11 +29,12 @@ import java.util.Set;
  * controller for Run AMRS Reports page
  */
 @Controller
-public class MohRenderController {
+public class QueuedReportFormController {
 
-	private static final Log log = LogFactory.getLog(MohRenderController.class);
+	private static final Log log = LogFactory.getLog(QueuedReportFormController.class);
 
-	private static final String SUCCESS_VIEW = "redirect:mohHistory.form";
+	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
+	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
 	@ModelAttribute("queuedReports")
 	public List<QueuedReport> getQueuedReports() {
@@ -49,18 +51,18 @@ public class MohRenderController {
 		return Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
 	}
 
-	@ModelAttribute("reportNames")
-	public Set<String> getReportNames() {
-		return ReportProviderRegistrar.getInstance().getAllReportProviderNames();
+	@ModelAttribute("reportProviders")
+	public List<ReportProvider> getReportProviders() {
+		return ReportProviderRegistrar.getInstance().getAllReportProviders();
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/mohRender.form")
-	public void preparePage() {
-		// pass
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
+	public String preparePage() {
+		return FORM_VIEW;
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/mohRender.form")
-	public void processForm(HttpServletRequest request,
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
+	public String processForm(HttpServletRequest request,
 	                        @RequestParam(value = "immediate", required = false) Boolean immediate,
 	                        @RequestParam("reportDate") Date reportDate,
 	                        @RequestParam("dateScheduled") String dateScheduled,
@@ -114,7 +116,7 @@ public class MohRenderController {
 		HttpSession httpSession = request.getSession();
 		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for processing.");
 
-//		return SUCCESS_VIEW;
+		return SUCCESS_VIEW;
 	}
 
 }

@@ -35,7 +35,7 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 		FirstWHOStageDataDefinition def = (FirstWHOStageDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 
@@ -53,23 +53,11 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 		}
 
 		hql.append("and 		concept.conceptId in ( 1224, 5356 ) ");
-//		hql.append("and 		concept.conceptId = :question ");
-//		m.put("question", def.getQuestion().getConceptId());
-
-//		if (def.getOnOrAfter() != null) {
-//			hql.append("and		obsDatetime >= :onOrAfter ");
-//			m.put("onOrAfter", def.getOnOrAfter());
-//		}
 
 		hql.append("and		obsDatetime <= :onOrBefore ");
-		m.put("onOrBefore", context.getEvaluationDate());
-//		if (def.getOnOrBefore() != null) {
-//			hql.append("and		obsDatetime <= :onOrBefore ");
-//			m.put("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(def.getOnOrBefore()));
-//		}
+		m.put("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(context.getEvaluationDate()));
 
 		hql.append("order by 	obsDatetime asc");
-//		hql.append("order by 	obsDatetime " + (def.getWhich() == TimeQualifier.LAST ? "desc" : "asc"));
 
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
 
