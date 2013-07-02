@@ -1,5 +1,4 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
-
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.list" />
@@ -46,7 +45,7 @@
                     <td>${r.reportName}</td>
                     <td>${r.facility}</td>
                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
-                    <td><openmrs:formatDate date="${r.dateScheduled}" type="textbox"/></td>
+                    <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                 </tr>
             </c:forEach>
             <tr><td colspan="5">&nbsp;</td></tr>
@@ -70,7 +69,7 @@
                     <td>${r.reportName}</td>
                     <td>${r.facility}</td>
                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
-                    <td><openmrs:formatDate date="${r.dateScheduled}" type="textbox"/></td>
+                    <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                 </tr>
             </c:forEach>
             <tr><td colspan="5">&nbsp;</td></tr>
@@ -96,7 +95,7 @@
                     <td>${r.reportName}</td>
                     <td>${r.facility}</td>
                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
-                    <td><openmrs:formatDate date="${r.dateScheduled}" type="textbox"/></td>
+                    <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                 </tr>
             </c:forEach>
             <tr><td colspan="5">&nbsp;</td></tr>
@@ -120,7 +119,7 @@
                     <td>${r.reportName}</td>
                     <td>${r.facility}</td>
                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
-                    <td><openmrs:formatDate date="${r.dateScheduled}" type="textbox"/></td>
+                    <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                 </tr>
             </c:forEach>
         </c:if>

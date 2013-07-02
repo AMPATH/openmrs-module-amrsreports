@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -45,6 +46,14 @@ public class QueuedReportListController {
 	@ModelAttribute("completeReports")
 	public List<QueuedReport> getCompleteReport() {
 		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_COMPLETE);
+	}
+
+	@ModelAttribute("datetimeFormat")
+	public String getDatetimeFormat() {
+		SimpleDateFormat sdf = Context.getDateFormat();
+		String format = sdf.toPattern();
+		format += " hh:mm a";
+		return format;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.list")
