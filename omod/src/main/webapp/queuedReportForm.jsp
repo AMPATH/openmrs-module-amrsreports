@@ -1,25 +1,13 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
-
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
 <openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.tools.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/TableTools.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/ZeroClipboard.js"/>
-
-<openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/smoothness/jquery-ui-1.8.16.custom.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
-
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-<openmrs:htmlInclude file="/scripts/jquery-ui/js/jquery-ui-timepicker-addon.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.min.js"/>
 
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <style>
     .hidden { display: none; }
@@ -42,14 +30,10 @@
             buttonImageOnly: false,
             dateFormat: 'yy-mm-dd'
         };
+
         var elem = $j('#dateScheduled');
         elem.datetimepicker(defaultOpts);
         elem.datetimepicker('setDate', new Date());
-
-
-
-
-       // dateScheduled = $j('#dateScheduled').datetimepicker(defaultOpts);
 
         $j("#immediately").click(function(){
             if ($j("#immediately").is(":checked")) {
@@ -87,40 +71,18 @@
 
 <%@ include file="localHeader.jsp" %>
 
-<c:if test="${not empty queuedReports}">
-
-    <b class="boxHeader">Queued Reports</b>
-    <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-        <c:forEach var="r" items="${queuedReports}">
-            <div class="queued">
-                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
-            </div>
-        </c:forEach>
-        <c:if test="${not empty queuedReports and not empty currentReport}">
-            <hr />
-        </c:if>
-        <c:forEach var="r" items="${currentReport}">
-            <div class="running">
-                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
-            </div>
-        </c:forEach>
-    </div>
-    <br />
-</c:if>
-
 <b class="boxHeader">Add a Scheduled Report</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
-                <label for="reportDate">Report Date (as of):</label>
-                <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
-                <label for="dateScheduled">Schedule Date:</label>
-                <input type="text" name="dateScheduled" id="dateScheduled"/>
-              <em>or</em>
+            <label for="reportDate">Report Date (as of):</label>
+            <input type="text" name="reportDate" id="reportDate" size="20"/>
+            <br /> <br />
+            <label for="dateScheduled">Schedule Date:</label>
+            <input type="text" id="dateScheduled" name="dateScheduled" size="20"/>
+            <em>or</em>
                 <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
               <br/><br/>
             <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/> Check this for Repeat Schedule

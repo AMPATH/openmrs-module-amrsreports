@@ -10,6 +10,7 @@ import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
+import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,16 +36,6 @@ public class QueuedReportFormController {
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
-	@ModelAttribute("queuedReports")
-	public List<QueuedReport> getQueuedReports() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_NEW);
-	}
-
-	@ModelAttribute("currentReport")
-	public List<QueuedReport> getCurrentReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_RUNNING);
-	}
-
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
 		return Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
@@ -67,8 +58,8 @@ public class QueuedReportFormController {
 							  @RequestParam("dateScheduled") String dateScheduled,
 							  @RequestParam("facility") Integer facilityId,
 							  @RequestParam("reportName") String reportName,
-							  @RequestParam("repeatIntervalUnits") String repeatIntervalUnits,
-							  @RequestParam("repeatInterval") Integer repeatInterval
+							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits,
+							  @RequestParam(value = "repeatInterval", required = false) Integer repeatInterval
 	) throws Exception {
 
 		// find the facility
@@ -80,30 +71,26 @@ public class QueuedReportFormController {
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-mm-dd hh:mm a");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 		Date scheduledDate = df.parse(dateScheduled);
 		if (immediate == null)
 			queuedReport.setDateScheduled(scheduledDate);
 		else
 			queuedReport.setDateScheduled(new Date());
 
-		int repeatIntervalInSec;
+		if (repeatInterval == null || repeatInterval < 0)
+			repeatInterval = 0;
 
-		if (repeatInterval == null || repeatInterval == 0) {
-			repeatIntervalInSec = 0;
+		if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "minutes")) {
+			repeatInterval = repeatInterval * 60;
+		} else if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "hours")) {
+			repeatInterval = repeatInterval * 60 * 60;
 		} else {
-
-			if (repeatIntervalUnits.equals("minutes")) {
-				repeatIntervalInSec = repeatInterval * 60;
-			} else if (repeatIntervalUnits.equals("hours")) {
-				repeatIntervalInSec = repeatInterval * 60 * 60;
-			} else {
-				repeatIntervalInSec = repeatInterval * 60 * 60 * 24;
-			}
-
-			queuedReport.setRepeatInterval(repeatIntervalInSec);
-
+			repeatInterval = repeatInterval * 60 * 60 * 24;
 		}
+
+		queuedReport.setRepeatInterval(repeatInterval);
+
 		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
 		queuedReportService.saveQueuedReport(queuedReport);
