@@ -42,6 +42,9 @@ public class PmtctPregnancyDataEvaluator extends DrugStartStopDataEvaluator {
 	public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
 
+		if (context.getBaseCohort().isEmpty())
+			return data;
+
 		String hql = "from Obs" +
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +

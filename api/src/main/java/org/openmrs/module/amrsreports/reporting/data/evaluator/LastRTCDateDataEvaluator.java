@@ -30,7 +30,7 @@ public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 		LastRTCDateDataDefinition def = (LastRTCDateDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
 			return c;
 		}
 

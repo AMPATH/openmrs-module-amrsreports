@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
-<openmrs:require privilege="View Global Properties" otherwise="/login.htm" redirect="/module/amrsreports/cohortCounts.list"/>
+<openmrs:require privilege="View Global Properties" otherwise="/login.htm" redirect="/module/amrsreports/settings.form"/>
 
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>

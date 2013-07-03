@@ -2,7 +2,7 @@
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 
-<openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/mohHistory.form" />
+<openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.list" />
 
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
@@ -15,6 +15,11 @@
 
 
 <%@ include file="localHeader.jsp"%>
+
+<a href="queuedReport.form">Add a Scheduled Report</a>
+
+<br />
+<br />
 
 <b class="boxHeader">View AMRS Reports</b>
 <div class="box">
