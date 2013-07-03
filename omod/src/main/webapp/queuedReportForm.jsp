@@ -6,41 +6,34 @@
 <openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.min.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/openmrs-1.9.js"/>
 
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/jquery-ui-timepicker-addon.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
 <style>
     .hidden { display: none; }
+    fieldset.visualPadding { padding: 1em; }
+    .right { text-align: right; }
+    input.hasDatepicker { width: 14em; }
 </style>
 
 <script type="text/javascript">
 
     var reportDate;
-    var dateScheduled;
+    var scheduleDate;
 
     $j(document).ready(function () {
-        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
+
+        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", {
+            defaultDate: new Date()
+        });
         reportDate.setDate(new Date());
 
-        var defaultOpts = {
-            changeMonth: true,
-            changeYear: true,
-            ampm: true,
-            controlType: 'select',
-            buttonImageOnly: false,
-            dateFormat: 'yy-mm-dd'
-        };
-
-        var elem = $j('#dateScheduled');
-        elem.datetimepicker(defaultOpts);
-        elem.datetimepicker('setDate', new Date());
-
-        $j("#immediately").click(function(){
-            if ($j("#immediately").is(":checked")) {
-                $j("#dateScheduled").attr("disabled", "disabled");
-            } else {
-                $j("#dateScheduled").removeAttr("disabled");
-            }
+        scheduleDate = new DateTimePicker("<openmrs:datePattern/>", "h:mm tt", "scheduleDate", {
+            hourGrid: 6,
+            minuteGrid: 10,
+            stepMinute: 5
         });
 
         $j("#repeatSchedule").click(function(){
@@ -56,18 +49,6 @@
     });
 
 </script>
-<style type="text/css">
-    .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-    .ui-timepicker-div dl { text-align: left; }
-    .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-    .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-    .ui-timepicker-div td { font-size: 90%; }
-    .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
-
-    .ui-timepicker-rtl{ direction: rtl; }
-    .ui-timepicker-rtl dl { text-align: right; }
-    .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
-</style>
 
 <%@ include file="localHeader.jsp" %>
 
@@ -77,28 +58,47 @@
     <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
-            <label for="reportDate">Report Date (as of):</label>
-            <input type="text" name="reportDate" id="reportDate" size="20"/>
-            <br /> <br />
-            <label for="dateScheduled">Schedule Date:</label>
-            <input type="text" id="dateScheduled" name="dateScheduled" size="20"/>
-            <em>or</em>
-                <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
-              <br/><br/>
-            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/> Check this for Repeat Schedule
-            <br/>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label for="repeatInterval">Repeat Interval:</label>
-            <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
-
-            <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
-
-                <option value="minutes">Minutes </option>
-                <option value="hours">Hours </option>
-                <option value="days" SELECTED="selected">Days </option>
-            </select>
-
-
+            <table cellspacing="0" cellpadding="2">
+                <tr>
+                    <td class="right">
+                        <label for="reportDate">Report date (as of):</label>
+                    </td>
+                    <td>
+                        <input type="text" name="reportDate" id="reportDate"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="right">
+                        <label for="scheduleDate">Schedule date (run on):</label>
+                    </td>
+                    <td>
+                        <input type="text" id="scheduleDate" name="scheduleDate" value="${now}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="right">
+                        <label for="repeatSchedule">Make this a repeating schedule:</label>
+                    </td>
+                    <td>
+                        <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="right">
+                        <label for="repeatInterval">Repeat Interval:</label>
+                    </td>
+                    <td>
+                        <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
+                        <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                            <option value="days" selected="selected">Days</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
         </fieldset>
+
         <fieldset class="visualPadding">
             <legend>Location</legend>
             <select name="facility" id="facility"  size="10">

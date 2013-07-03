@@ -46,6 +46,20 @@ public class QueuedReportFormController {
 		return ReportProviderRegistrar.getInstance().getAllReportProviders();
 	}
 
+	@ModelAttribute("datetimeFormat")
+	public String getDatetimeFormat() {
+		SimpleDateFormat sdf = Context.getDateFormat();
+		String format = sdf.toPattern();
+		format += " h:mm a";
+		return format;
+	}
+
+	@ModelAttribute("now")
+	public String getNow() {
+		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
+		return sdf.format(new Date());
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
 	public String preparePage() {
 		return FORM_VIEW;
@@ -55,7 +69,7 @@ public class QueuedReportFormController {
 	public String processForm(HttpServletRequest request,
 							  @RequestParam(value = "immediate", required = false) Boolean immediate,
 							  @RequestParam("reportDate") Date reportDate,
-							  @RequestParam("dateScheduled") String dateScheduled,
+							  @RequestParam("scheduleDate") String scheduleDate,
 							  @RequestParam("facility") Integer facilityId,
 							  @RequestParam("reportName") String reportName,
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits,
@@ -71,8 +85,8 @@ public class QueuedReportFormController {
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
-		Date scheduledDate = df.parse(dateScheduled);
+		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
+		Date scheduledDate = sdf.parse(scheduleDate);
 		if (immediate == null)
 			queuedReport.setDateScheduled(scheduledDate);
 		else
