@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>amrsreports</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.2</version>
 	<packaging>pom</packaging>
 	<name>AMRS Reports Module</name>
 	<description>Provides easy acess to AMPATH reports, limits access and adds logic rules and cohort definitions for MOH reports.</description>
@@ -38,7 +38,7 @@
 		<connection>scm:git:https://github.com/AMPATH/openmrs-module-amrsreports</connection>
 		<developerConnection>scm:git:https://github.com/AMPATH/openmrs-module-amrsreports</developerConnection>
 		<url>https://github.com/AMPATH/openmrs-module-amrsreports</url>
-	  <tag>HEAD</tag>
+	  <tag>0.2</tag>
   </scm>
 
 	<modules>
