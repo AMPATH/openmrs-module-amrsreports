@@ -29,7 +29,9 @@ public class DateListCustomConverterTest extends TestCase {
 
         List<Date> dateList = Arrays.asList(new Date("05 Dec 2012"), new Date("02 Apr 2013"), new Date("25 May 2013"));
 
-        Assert.assertTrue("The test has failed",new DateListCustomConverter().convert(format,dateList).toString().equals("12/2012\n" +
+        DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format,dateList);
+
+        Assert.assertTrue("The test has failed",dateListCustomConverter.convert(null).toString().equals("12/2012\n" +
                 "04/2013\n" +
                 "05/2013\n"));
 
