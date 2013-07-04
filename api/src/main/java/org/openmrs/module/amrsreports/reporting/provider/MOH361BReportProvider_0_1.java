@@ -9,6 +9,7 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortD
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -100,6 +101,10 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
 		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
+
+        // CTX start date
+        CtxStartDataDefinition csd = new CtxStartDataDefinition();
+        //TODO: after approval of date list custom converter
 
 		report.addDataSetDefinition(dsd, null);
 
