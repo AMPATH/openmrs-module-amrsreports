@@ -103,9 +103,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
 
         // CTX start date
-        CtxStartDataDefinition csd = new CtxStartDataDefinition();
-        dsd.addColumn("CTX Start Dates",CtxStartDataDefinition,nullString, new DateListCustomConverter("MM/yyyy"));
-
+        dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString);
 
 		report.addDataSetDefinition(dsd, null);
 

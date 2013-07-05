@@ -16,7 +16,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -32,8 +32,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * evaluator for CtxStartDataDefinition
  */
-@Handler(supports = CtxStartStopDataDefinition.class, order = 50)
+@Handler(supports = CtxStartDataDefinition.class, order = 50)
 public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 
 	@Override
@@ -46,8 +47,8 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 		String hql = "from Obs" +
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +
-				"   and " +
-				"    (concept.id = 1263 and valueCoded.id = 916) " +
+				"   and concept.id = 1263" +
+				"   and valueCoded.id = 916" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
 				"   order by obsDatetime asc";
 

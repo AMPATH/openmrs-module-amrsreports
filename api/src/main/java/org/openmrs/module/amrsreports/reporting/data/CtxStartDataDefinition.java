@@ -21,8 +21,9 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
 import java.util.List;
 
 /**
+ * Lists all CTX Start Dates for a patient
  */
-@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class CtxStartDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@Override
