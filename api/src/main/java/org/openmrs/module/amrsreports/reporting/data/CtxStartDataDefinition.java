@@ -18,7 +18,7 @@ import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Lists all CTX Start Dates for a patient
@@ -28,6 +28,6 @@ public class CtxStartDataDefinition extends BaseDataDefinition implements Person
 
 	@Override
 	public Class<?> getDataType() {
-		return List.class;
+		return Set.class;
 	}
 }

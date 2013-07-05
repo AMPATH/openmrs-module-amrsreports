@@ -6,6 +6,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
@@ -41,6 +42,7 @@ import java.util.Properties;
 public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 	public static final String CONTACT_PHONE_ATTRIBUTE_TYPE = "Contact Phone Number";
+	private static final String MONTH_AND_YEAR_FORMAT = "MM/yyyy";
 
 	public MOH361BReportProvider_0_1() {
 		this.name = "MOH 361B 0.1-SNAPSHOT";
@@ -103,7 +105,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
 
         // CTX start date
-        dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString);
+        dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
 		report.addDataSetDefinition(dsd, null);
 

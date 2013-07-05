@@ -5,61 +5,65 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 /**
- * Converter for formatting WHO Stage and Date column data
+ * Converter for formatting a list of dates using a simple date format
  */
 
 public class DateListCustomConverter implements DataConverter {
 
-    private String desiredFormat;
+	private String desiredFormat;
 
 
-    public DateListCustomConverter(){
-       //do nothing
-    }
+	public DateListCustomConverter() {
+		//do nothing
+	}
 
-    public  DateListCustomConverter(String format){
-        this.desiredFormat = format;
+	public DateListCustomConverter(String format) {
+		this.desiredFormat = format;
+	}
 
-    }
-
-    /**
-     * @should return a formatted String from a list of dates
-     * @param original
-     * @return formatted string of date list
-     */
+	/**
+	 * @param original
+	 * @return formatted string of date list
+	 * @should return a formatted String from a list of dates
+	 */
 	@Override
 	public Object convert(Object original) {
-        List<Date> listOfDates = (List<Date>) original;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(this.desiredFormat);
 
-        String formattedDate = "";
+		if (original == null)
+			return null;
 
-        for(Date date:listOfDates){
-            String thisDate = simpleDateFormat.format(date);
-            formattedDate += thisDate + AmrsReportsConstants.INTER_CELL_SEPARATOR;
-        }
-        return formattedDate;
+		Set<Date> listOfDates = (Set<Date>) original;
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(this.desiredFormat);
+
+		String formattedDates = "";
+
+		for (Date date : listOfDates) {
+			String thisDate = simpleDateFormat.format(date);
+			formattedDates += thisDate + AmrsReportsConstants.INTER_CELL_SEPARATOR;
+		}
+
+		return formattedDates;
 	}
 
 	@Override
 	public Class<?> getInputDataType() {
-		return List.class;
+		return Set.class;
 	}
 
 	@Override
 	public Class<?> getDataType() {
-		return List.class;
+		return String.class;
 	}
 
-    public String getDesiredFormat() {
-        return desiredFormat;
-    }
+	public String getDesiredFormat() {
+		return desiredFormat;
+	}
 
-    public void setDesiredFormat(String desiredFormat) {
-        this.desiredFormat = desiredFormat;
-    }
+	public void setDesiredFormat(String desiredFormat) {
+		this.desiredFormat = desiredFormat;
+	}
 
 }

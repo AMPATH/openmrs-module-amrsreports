@@ -19,23 +19,29 @@ import org.openmrs.module.amrsreports.AmrsReportsConstants;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * returns a formatted string of dates from a list of dates
+ * Test class for DateListCustomConverter
  */
 public class DateListCustomConverterTest extends TestCase {
-    public void testConvert() throws Exception {
-        String format ="MM/yyyy";
+	public void testConvert() throws Exception {
+		String format = "MM/yyyy";
 
-        List<Date> dateList = Arrays.asList(new Date("05 Dec 2012"), new Date("02 Apr 2013"), new Date("25 May 2013"));
+		Set<Date> dateList = new LinkedHashSet<Date>(Arrays.asList(
+				new Date("05 Dec 2012"),
+				new Date("02 Apr 2013"),
+				new Date("25 May 2013")));
 
-        DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format);
-        String expected = ("12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
-                "04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
-                "05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR);
+		String expected = (
+				"12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+				"04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+				"05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR);
 
-        Assert.assertEquals(expected, dateListCustomConverter.convert(dateList));
+		DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format);
 
-    }
+		Assert.assertEquals(expected, dateListCustomConverter.convert(dateList));
+	}
 }
