@@ -3,9 +3,6 @@
 
 <openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/facility.list"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
 <script>
     $j(document).ready(function(){
         toggleRowVisibilityForClass('facilityTable', 'voided');

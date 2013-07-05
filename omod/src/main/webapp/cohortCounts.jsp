@@ -3,30 +3,13 @@
 
 <openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/cohortCounts.list"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
+<%@ include file="localHeader.jsp" %>
 
 <script type="text/javascript">
 
     var reportDate;
 
     $j(document).ready(function () {
-
-//        $j("#download").click(function(event){
-//            event.preventDefault();
-//
-//            var evaluationDate = $j("#evaluationDate").val();
-//
-//            var locations = [];
-//            $j("[name=location]:checked").each(function(){
-//                $j(this).removeAttr("checked");
-//                var locationId = $j(this).val();
-//                locations.push(locationId);
-//            });
-//
-//            var query = $j.param({ 'locations': locations, 'evaluationDate': evaluationDate });
-//            window.location.href = "<openmrs:contextPath/>/module/amrsreport/downloadCohortCounts.htm?" + query;
-//        });
 
         $j("#update").click(function(event){
             event.preventDefault();
@@ -65,7 +48,7 @@
     }
 </script>
 
-<%@ include file="localHeader.jsp" %>
+<h2>View Cohort Counts</h2>
 
 <b class="boxHeader">Facility Cohorts</b>
 
@@ -75,9 +58,6 @@
             <label>Report Date (as of):</label> <br/>
             <input type="text" name="reportDate" id="reportDate"/>
             <button id="update">Update</button>
-            <!--
-            <button id="download">Download Cohort List for Selected Location(s)</button>
-            -->
         </div>
         <table>
             <thead>

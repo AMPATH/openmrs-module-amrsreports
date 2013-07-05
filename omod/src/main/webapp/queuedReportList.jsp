@@ -3,15 +3,11 @@
 
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.list" />
 
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
 <style>
     .subheading { height: 3em; }
     .subheading th { font-size: 120%; font-weight: normal; text-align: left !important; }
     #reportTable th, #reportTable td { text-align: center; }
 </style>
-
 
 <%@ include file="localHeader.jsp"%>
 

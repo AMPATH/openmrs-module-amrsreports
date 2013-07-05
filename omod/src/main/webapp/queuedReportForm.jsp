@@ -3,16 +3,14 @@
 
 <openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.min.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/openmrs-1.9.js"/>
 
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/jquery-ui-timepicker-addon.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
+
+<%@ include file="localHeader.jsp" %>
 
 <style>
-    .hidden { display: none; }
     fieldset.visualPadding { padding: 1em; }
     .right { text-align: right; }
     input.hasDatepicker { width: 14em; }
@@ -50,9 +48,9 @@
 
 </script>
 
-<%@ include file="localHeader.jsp" %>
+<h2>Add Scheduled Report</h2>
 
-<b class="boxHeader">Add a Scheduled Report</b>
+<b class="boxHeader">Scheduled Report Details</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form method="POST">

@@ -1,11 +1,6 @@
-/*.tblformat tr:nth-child(odd) {
-    background-color: #009d8e;
-    color: #FFFFFF;
-}
-.tblformat tr:nth-child(even) {
-    background-color: #d3d3d3;
-    color: #000000;
-}*/
+/**
+ * AMRS Reports common css
+ */
 
 .tblformat tr:nth-child(odd) td {
     background-color: #eee;
@@ -23,14 +18,10 @@
     background-color: #bbb;
 }
 
-.queued { }
 .running { font-style: italic; }
 
-.visualPadding {
-    margin: 1em;
-}
+.hidden { display: none; }
 
-.newline {
-    clear: both;
-    display: block;
-}
+.visualPadding { margin: 1em; }
+
+.newline { clear: both; display: block; }

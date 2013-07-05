@@ -3,9 +3,6 @@
 
 <openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/facility.form"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
 <%@ include file="localHeader.jsp" %>
 
 <c:if test="${not empty facility.facilityId}">

@@ -5,9 +5,6 @@
 
 <%@ include file="localHeader.jsp" %>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
 <script type="text/javascript">
 
     $j(document).ready(function () {
@@ -36,11 +33,13 @@
     tr.header td, tr.header th { padding-top: 1em; font-weight: bold; border-bottom: 1px solid black; }
 </style>
 
+<h2>Manage User / Facility Privileges</h2>
+
 <form method="POST">
 
     <input type="hidden" name="action" value=""/>
 
-    <b class="boxHeader">User Facility Privileges</b>
+    <b class="boxHeader">Add User / Facility Privilege</b>
 
     <div class="box" style=" width:99%; height:auto; overflow-x: auto;">
         <table>
