@@ -89,6 +89,7 @@
                 <include method="getPatientUuidsMissingCCCNumbersInFacility"/>
                 <include method="assignMissingIdentifiersForFacility"/>
                 <include method="getPreARTEnrollmentLocationUuidForPatientUuid"/>
+                <include method="isReportRunnerScheduledTaskOn"/>
             </create>
             <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
             <convert match="org.openmrs.Location" converter="bean" />
@@ -113,6 +114,7 @@
             DWRAmrsReportService.getPatientUuidsMissingCCCNumbersInFacility(Integer facilityId);
             DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
             DWRAmrsReportService.getPreARTEnrollmentLocationUuidForPatientUuid(String patientUuid);
+            DWRAmrsReportService.isReportRunnerScheduledTaskOn();
 			]]>
         </signatures>
     </dwr>

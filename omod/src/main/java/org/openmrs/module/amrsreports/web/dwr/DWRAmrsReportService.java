@@ -15,12 +15,16 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortD
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
+import org.openmrs.module.amrsreports.task.RunQueuedReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.util.PrivilegeConstants;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
@@ -380,5 +384,20 @@ public class DWRAmrsReportService {
 			return null;
 
 		return hce.getEnrollmentLocation().getUuid();
+	}
+
+	public Boolean isReportRunnerScheduledTaskOn() {
+		Context.addProxyPrivilege(PrivilegeConstants.MANAGE_SCHEDULER);
+
+		for (TaskDefinition definition: Context.getSchedulerService().getScheduledTasks()) {
+			if (OpenmrsUtil.nullSafeEquals(RunQueuedReportsTask.class.getCanonicalName(), definition.getTaskClass())
+				&& definition.getStarted()) {
+					Context.removeProxyPrivilege(PrivilegeConstants.MANAGE_SCHEDULER);
+					return true;
+			}
+		}
+
+		Context.removeProxyPrivilege(PrivilegeConstants.MANAGE_SCHEDULER);
+		return false;
 	}
 }
