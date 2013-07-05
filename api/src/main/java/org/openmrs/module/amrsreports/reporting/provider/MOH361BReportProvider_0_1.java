@@ -104,7 +104,8 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
         // CTX start date
         CtxStartDataDefinition csd = new CtxStartDataDefinition();
-        //TODO: after approval of date list custom converter
+        dsd.addColumn("CTX Start Dates",CtxStartDataDefinition,nullString, new DateListCustomConverter("MM/yyyy"));
+
 
 		report.addDataSetDefinition(dsd, null);
 

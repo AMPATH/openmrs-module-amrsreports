@@ -46,10 +46,8 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 		String hql = "from Obs" +
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +
-				"   and (" +
-				"     (concept.id = 1263 and valueCoded is not null) " +
-				"     or (concept.id = 1263 and valueCoded.id = 916) " +
-				"   )" +
+				"   and " +
+				"    (concept.id = 1263 and valueCoded.id = 916) " +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
 				"   order by obsDatetime asc";
 
@@ -57,7 +55,7 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 		m.put("patientIds", context.getBaseCohort());
 		m.put("reportDate", context.getEvaluationDate());
 
-		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(hql, m);
+		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromHQL(hql, m);
 
 		for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 
@@ -78,7 +76,7 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 	/**
 	 * replaces reportDate and personIds with data from private variables before generating a date map
 	 */
-	private ListMap<Integer, Date> makeDatesMapFromSQL(final String query, final Map<String, Object> substitutions) {
+	private ListMap<Integer, Date> makeDatesMapFromHQL(final String query, final Map<String, Object> substitutions) {
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 		List<Object> queryResult = qs.executeHqlQuery(query, substitutions);
 

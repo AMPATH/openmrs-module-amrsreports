@@ -18,6 +18,8 @@ import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
+import java.util.List;
+
 /**
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
@@ -25,6 +27,6 @@ public class CtxStartDataDefinition extends BaseDataDefinition implements Person
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return List.class;
 	}
 }
