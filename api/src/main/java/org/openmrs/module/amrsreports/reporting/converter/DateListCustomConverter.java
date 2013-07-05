@@ -1,11 +1,9 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
-import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,15 +14,14 @@ import java.util.List;
 public class DateListCustomConverter implements DataConverter {
 
     private String desiredFormat;
-    private List<Date> listOfDates = new ArrayList<Date>();
+
 
     public DateListCustomConverter(){
        //do nothing
     }
 
-    public  DateListCustomConverter(String format,List<Date> dateList){
+    public  DateListCustomConverter(String format){
         this.desiredFormat = format;
-        this.listOfDates = dateList;
 
     }
 
@@ -35,11 +32,12 @@ public class DateListCustomConverter implements DataConverter {
      */
 	@Override
 	public Object convert(Object original) {
+        List<Date> listOfDates = (List<Date>) original;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(this.desiredFormat);
 
         String formattedDate = "";
 
-        for(Date date:this.listOfDates){
+        for(Date date:listOfDates){
             String thisDate = simpleDateFormat.format(date);
             formattedDate += thisDate + AmrsReportsConstants.INTER_CELL_SEPARATOR;
         }
@@ -48,12 +46,12 @@ public class DateListCustomConverter implements DataConverter {
 
 	@Override
 	public Class<?> getInputDataType() {
-		return Obs.class;
+		return List.class;
 	}
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return List.class;
 	}
 
     public String getDesiredFormat() {
@@ -64,11 +62,4 @@ public class DateListCustomConverter implements DataConverter {
         this.desiredFormat = desiredFormat;
     }
 
-    public List<Date> getListOfDates() {
-        return listOfDates;
-    }
-
-    public void setListOfDates(List<Date> listOfDates) {
-        this.listOfDates = listOfDates;
-    }
 }

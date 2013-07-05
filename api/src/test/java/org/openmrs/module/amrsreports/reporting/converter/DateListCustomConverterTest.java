@@ -13,15 +13,16 @@
  */
 package org.openmrs.module.amrsreports.reporting.converter;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.junit.Assert;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- *  formats and returns a list of dates as a string with each date formatted according to a given format string
+ * returns a formatted string of dates from a list of dates
  */
 public class DateListCustomConverterTest extends TestCase {
     public void testConvert() throws Exception {
@@ -29,11 +30,12 @@ public class DateListCustomConverterTest extends TestCase {
 
         List<Date> dateList = Arrays.asList(new Date("05 Dec 2012"), new Date("02 Apr 2013"), new Date("25 May 2013"));
 
-        DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format,dateList);
+        DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format);
+        String expected = ("12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+                "04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+                "05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR);
 
-        Assert.assertTrue("The test has failed",dateListCustomConverter.convert(null).toString().equals("12/2012\n" +
-                "04/2013\n" +
-                "05/2013\n"));
+        Assert.assertEquals(expected, dateListCustomConverter.convert(dateList));
 
     }
 }
