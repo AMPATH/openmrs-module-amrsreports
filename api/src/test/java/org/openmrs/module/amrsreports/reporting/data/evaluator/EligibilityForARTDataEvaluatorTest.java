@@ -14,6 +14,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.LogicContext;
 import org.openmrs.logic.result.Result;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -22,7 +23,10 @@ import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
+import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.PersonEvaluationContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -75,17 +79,22 @@ public class EligibilityForARTDataEvaluatorTest {
 	private ConceptService conceptService;
 	private PatientService patientService;
 	private DataSetQueryService dataSetQueryService;
+	private PersonDataService personDataService;
 	private List<Object> currentObs;
+	private EvaluatedPersonData currentARTStartDates;
 	private Date evaluationDate;
 	private PersonEvaluationContext evaluationContext;
 	private EligibilityForARTDataEvaluator evaluator;
 	private PersonDataDefinition definition;
 
 	@Before
-	public void setup() {
+	public void setup() throws EvaluationException {
 
 		// initialize the current obs
 		currentObs = new ArrayList<Object>();
+
+		// initialize art start dates
+		currentARTStartDates = new EvaluatedPersonData();
 
 		// set up the patient
 		patient = new Patient();
@@ -109,11 +118,17 @@ public class EligibilityForARTDataEvaluatorTest {
 		dataSetQueryService = Mockito.mock(DataSetQueryService.class);
 		Mockito.when(dataSetQueryService.executeHqlQuery(Mockito.anyString(), Mockito.anyMap())).thenReturn(currentObs);
 
+		// build the person data service
+		personDataService = Mockito.mock(PersonDataService.class);
+		Mockito.when(personDataService.evaluate(Mockito.any(DateARTStartedDataDefinition.class), Mockito.any(EvaluationContext.class)))
+				.thenReturn(currentARTStartDates);
+
 		// set up Context
 		PowerMockito.mockStatic(Context.class);
 		Mockito.when(Context.getConceptService()).thenReturn(conceptService);
 		Mockito.when(Context.getPatientService()).thenReturn(patientService);
 		Mockito.when(Context.getService(DataSetQueryService.class)).thenReturn(dataSetQueryService);
+		Mockito.when(Context.getService(PersonDataService.class)).thenReturn(personDataService);
 
 		// set evaluation date
 		evaluationDate = makeDate("2013-01-01");
@@ -177,6 +192,13 @@ public class EligibilityForARTDataEvaluatorTest {
 	 */
 	private void clearObs() {
 		currentObs.clear();
+	}
+
+	/**
+	 * adds an ART start date
+	 */
+	private void addARTStartDate(Date date) {
+		currentARTStartDates.addData(PATIENT_ID, date);
 	}
 
 	/**
@@ -476,6 +498,27 @@ public class EligibilityForARTDataEvaluatorTest {
 
 		assertThat((Date) actual.get("lastDate"), is(makeDate("20 Oct 2012")));
 		assertThat((String) actual.get("reason"), is(ARVPatientSnapshot.REASON_CLINICAL_CD4));
+		assertThat((List<String>) actual.get("extras"), is(extras));
+	}
+
+	/**
+	 * @verifies return reason only when ART started before eligibility date
+	 * @see EligibilityForARTDataEvaluator#evaluate(org.openmrs.module.reporting.data.person.definition.PersonDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)
+	 */
+	@Test
+	public void evaluate_shouldReturnReasonOnlyWhenARTStartedBeforeEligibilityDate() throws Exception {
+		patient.setBirthdate(makeDate("16 Oct 2012"));
+
+		addObs(MohEvaluableNameConstants.WHO_STAGE_PEDS, MohEvaluableNameConstants.WHO_STAGE_4_PEDS, "16 Nov 2012");
+		addARTStartDate(makeDate("15 Nov 2012"));
+
+		List<String> extras = Arrays.asList("WHO Stage 4");
+
+		EvaluatedPersonData results = evaluator.evaluate(definition, evaluationContext);
+		ARVPatientSnapshot actual = (ARVPatientSnapshot) results.getData().get(PATIENT_ID);
+
+		assertThat((Date) actual.get("lastDate"), is((Date) null));
+		assertThat((String) actual.get("reason"), is(ARVPatientSnapshot.REASON_CLINICAL));
 		assertThat((List<String>) actual.get("extras"), is(extras));
 	}
 }
