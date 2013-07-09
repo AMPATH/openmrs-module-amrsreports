@@ -10,6 +10,14 @@
 
 <%@ include file="localHeader.jsp" %>
 
+<c:if test="${not empty queuedReports.queuedReportId}">
+    <h2>Edit Scheduled Report</h2>
+</c:if>
+
+<c:if test="${empty queuedReports.queuedReportId}">
+    <h2>Add Scheduled Report</h2>
+</c:if>
+
 <style>
     fieldset.visualPadding { padding: 1em; }
     .right { text-align: right; }
@@ -48,7 +56,7 @@
 
 </script>
 
-<h2>Add Scheduled Report</h2>
+
 
 <b class="boxHeader">Scheduled Report Details</b>
 

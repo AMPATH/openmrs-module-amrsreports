@@ -36,8 +36,7 @@
             </tr>
             <c:forEach var="r" items="${queuedReports}" varStatus="status">
                 <tr class="queued ${status.index % 2 == 0 ? "evenRow" : "oddRow"}">
-                    <td>
-                    </td>
+                    <td><a href="queuedReport.form?queuedReportId=${r.queuedReportId}">Edit</a> </td>
                     <td>${r.reportName}</td>
                     <td>${r.facility}</td>
                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
