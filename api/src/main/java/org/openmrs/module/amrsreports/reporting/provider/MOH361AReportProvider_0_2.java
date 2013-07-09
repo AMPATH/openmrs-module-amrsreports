@@ -68,7 +68,7 @@ public class MOH361AReportProvider_0_2 extends ReportProvider {
 
 	public MOH361AReportProvider_0_2() {
 		this.name = "MOH 361A 0.2-SNAPSHOT";
-		this.visible = false;
+		this.visible = true;
 	}
 
 	@Override
@@ -218,7 +218,7 @@ public class MOH361AReportProvider_0_2 extends ReportProvider {
 		design.setRendererType(ExcelTemplateRenderer.class);
 
 		Properties props = new Properties();
-		props.put("repeatingSections", "sheet:1,row:4,dataset:allPatients");
+		props.put("repeatingSections", "sheet:2,row:4,dataset:allPatients");
 
 		design.setProperties(props);
 
