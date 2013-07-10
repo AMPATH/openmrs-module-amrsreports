@@ -104,7 +104,14 @@
                         <label for="repeatSchedule">Make this a repeating schedule:</label>
                     </td>
                     <td>
-                        <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="<c:if test="${status.value > 0}">checked</c:if>" />
+                        <c:if test="${not empty queuedReports.queuedReportId}">
+                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="checked" />
+                        </c:if>
+
+                        <c:if test="${empty queuedReports.queuedReportId}">
+                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" />
+                        </c:if>
+
                     </td>
                 </tr>
                 <tr>
@@ -131,10 +138,20 @@
                             <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
                         </c:if>
 
-
+                        <c:if test="${not empty queuedReports.queuedReportId}">
                             <option value="minutes" <c:if test="${intervalUnit=='minutes'}">selected</c:if> >Minutes</option>
                             <option value="hours" <c:if test="${intervalUnit=='hours'}">selected</c:if> >Hours</option>
                             <option value="days" <c:if test="${intervalUnit=='days'}">selected</c:if> >Days</option>
+                        </c:if>
+
+                        <c:if test="${empty queuedReports.queuedReportId}">
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                            <option value="days" selected="selected">Days</option>
+                        </c:if>
+
+
+
                         </select>
                     </td>
                 </tr>
