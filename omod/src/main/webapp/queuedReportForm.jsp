@@ -10,6 +10,32 @@
 
 <%@ include file="localHeader.jsp" %>
 
+
+<c:if test="${not empty queuedReports.queuedReportId}">
+
+    <h2>Edit Scheduled Report</h2>
+</c:if>
+
+<c:if test="${empty queuedReports.queuedReportId}">
+    <h2>Add Scheduled Report</h2>
+</c:if>
+
+<c:set var="seconds" value="${queuedReports.repeatInterval}"/>
+<c:choose>
+    <c:when test="${seconds >= 86400}">
+        <c:set var="interval" value="${seconds/(24*60*60)}"/>
+        <c:set var="intervalUnit" value="days"/>
+    </c:when>
+    <c:when test="${seconds < 86400 and seconds >= 3600}">
+        <c:set var="interval" value="${seconds/(60*60)}"/>
+        <c:set var="intervalUnit" value="hours"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="interval" value="${seconds/60}"/>
+        <c:set var="intervalUnit" value="minutes"/>
+    </c:otherwise>
+</c:choose>
+
 <style>
     fieldset.visualPadding { padding: 1em; }
     .right { text-align: right; }
@@ -48,9 +74,9 @@
 
 </script>
 
-<h2>Add Scheduled Report</h2>
 
-<b class="boxHeader">Scheduled Report Details</b>
+
+        <b class="boxHeader">Scheduled Report Details</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
     <form method="POST">
@@ -78,7 +104,14 @@
                         <label for="repeatSchedule">Make this a repeating schedule:</label>
                     </td>
                     <td>
-                        <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true"/>
+                        <c:if test="${not empty queuedReports.queuedReportId}">
+                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="checked" />
+                        </c:if>
+
+                        <c:if test="${empty queuedReports.queuedReportId}">
+                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" />
+                        </c:if>
+
                     </td>
                 </tr>
                 <tr>
@@ -86,11 +119,39 @@
                         <label for="repeatInterval">Repeat Interval:</label>
                     </td>
                     <td>
-                        <input type="text" name="repeatInterval" id="repeatInterval" disabled="disabled"/>
-                        <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
+                        <spring:bind path="queuedReports.repeatInterval">
+                            <c:if test="${not empty queuedReports.queuedReportId}">
+                                <input type="text" name="repeatInterval" id="repeatInterval" value="${interval}" />
+                            </c:if>
+
+                            <c:if test="${empty queuedReports.queuedReportId}">
+                                <input type="text" name="repeatInterval" id="repeatInterval"  disabled="disabled"/>
+                            </c:if>
+
+                        </spring:bind>
+
+                        <c:if test="${not empty queuedReports.queuedReportId}">
+                            <select name="repeatIntervalUnits" id="repeatIntervalUnits" >
+                        </c:if>
+
+                        <c:if test="${empty queuedReports.queuedReportId}">
+                            <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
+                        </c:if>
+
+                        <c:if test="${not empty queuedReports.queuedReportId}">
+                            <option value="minutes" <c:if test="${intervalUnit=='minutes'}">selected</c:if> >Minutes</option>
+                            <option value="hours" <c:if test="${intervalUnit=='hours'}">selected</c:if> >Hours</option>
+                            <option value="days" <c:if test="${intervalUnit=='days'}">selected</c:if> >Days</option>
+                        </c:if>
+
+                        <c:if test="${empty queuedReports.queuedReportId}">
                             <option value="minutes">Minutes</option>
                             <option value="hours">Hours</option>
                             <option value="days" selected="selected">Days</option>
+                        </c:if>
+
+
+
                         </select>
                     </td>
                 </tr>
