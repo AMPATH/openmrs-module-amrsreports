@@ -19,7 +19,7 @@
 <c:if test="${empty queuedReports.queuedReportId}">
     <h2>Add Scheduled Report</h2>
 </c:if>
-<c:set var="facility" value="${queuedReports.facility}"/>
+
 <c:set var="seconds" value="${queuedReports.repeatInterval}"/>
 <c:choose>
     <c:when test="${seconds >= 86400}">
@@ -89,7 +89,7 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.evaluationDate">
-                           <input type="text" name="reportDate" id="reportDate" value="${status.value}"/>
+                           <input type="text" name="reportDate" id="reportDate"  value="${status.value}"/>
                         </spring:bind>
                     </td>
                 </tr>
@@ -99,7 +99,14 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.dateScheduled">
-                              <input type="text" id="scheduleDate" name="scheduleDate" value="${status.value}"/>
+                            <c:if test="${not empty queuedReports.queuedReportId}">
+                                <input type="text" id="scheduleDate" name="scheduleDate" value="${status.value}"/>
+                            </c:if>
+
+                            <c:if test="${empty queuedReports.queuedReportId}">
+                                <input type="text" id="scheduleDate" name="scheduleDate" value="${now}"/>
+                            </c:if>
+
                         </spring:bind>
                     </td>
                 </tr>
@@ -174,11 +181,13 @@
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Reports</legend>
+            <spring:bind path="queuedReports.reportName">
             <c:forEach var="report" items="${reportProviders}">
                 <div class="reportProvider<c:if test="${not report.visible}"> hidden</c:if>">
-                    <input type="radio" name="reportName" value="${report.name}"/> ${report.name}
+                    <input type="radio" name="reportName" <c:if test="${status.value==report.name}">checked</c:if> value="${report.name}"/> ${report.name}
                 </div>
             </c:forEach>
+           </spring:bind>
         </fieldset>
         <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
     </form>

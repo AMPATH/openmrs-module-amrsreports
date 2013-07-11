@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -121,9 +122,6 @@ public class QueuedReportFormController {
             @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             ModelMap modelMap) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
-
-
         QueuedReport queuedReport = null;
 
         if (queuedReportId != null)
@@ -131,7 +129,7 @@ public class QueuedReportFormController {
 
         if (queuedReport == null){
             queuedReport = new QueuedReport();
-            queuedReport.setDateScheduled(new Date());
+
             queuedReport.setEvaluationDate(new Date());
         }
 
