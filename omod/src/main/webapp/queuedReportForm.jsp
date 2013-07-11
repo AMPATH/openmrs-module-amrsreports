@@ -19,7 +19,7 @@
 <c:if test="${empty queuedReports.queuedReportId}">
     <h2>Add Scheduled Report</h2>
 </c:if>
-
+<c:set var="facility" value="${queuedReports.facility}"/>
 <c:set var="seconds" value="${queuedReports.repeatInterval}"/>
 <c:choose>
     <c:when test="${seconds >= 86400}">
@@ -88,7 +88,9 @@
                         <label for="reportDate">Report date (as of):</label>
                     </td>
                     <td>
-                        <input type="text" name="reportDate" id="reportDate"/>
+                        <spring:bind path="queuedReports.evaluationDate">
+                           <input type="text" name="reportDate" id="reportDate" value="${status.value}"/>
+                        </spring:bind>
                     </td>
                 </tr>
                 <tr>
@@ -96,7 +98,9 @@
                         <label for="scheduleDate">Schedule date (run on):</label>
                     </td>
                     <td>
-                        <input type="text" id="scheduleDate" name="scheduleDate" value="${now}"/>
+                        <spring:bind path="queuedReports.dateScheduled">
+                              <input type="text" id="scheduleDate" name="scheduleDate" value="${status.value}"/>
+                        </spring:bind>
                     </td>
                 </tr>
                 <tr>
@@ -160,11 +164,13 @@
 
         <fieldset class="visualPadding">
             <legend>Location</legend>
+         <spring:bind path="queuedReports.facility.facilityId">
             <select name="facility" id="facility"  size="10">
                <c:forEach var="facility" items="${facilities}">
-                    <option value="${facility.facilityId}">${facility.code} - ${facility.name} </option>
+                    <option <c:if test="${status.value==facility.facilityId}">selected</c:if> value="${facility.facilityId}">${facility.code} - ${facility.name} </option>
                </c:forEach>
             </select>
+          </spring:bind>
         </fieldset>
         <fieldset class="visualPadding">
             <legend>Reports</legend>

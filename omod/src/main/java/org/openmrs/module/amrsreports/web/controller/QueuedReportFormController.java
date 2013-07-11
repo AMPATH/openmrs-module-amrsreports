@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class QueuedReportFormController {
 
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
-   // private static final String EDIT_VIEW = "module/amrsreports/queuedReportForm";
+
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
@@ -120,14 +121,19 @@ public class QueuedReportFormController {
             @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             ModelMap modelMap) {
 
+        SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
+
 
         QueuedReport queuedReport = null;
 
         if (queuedReportId != null)
             queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
 
-        if (queuedReport == null)
+        if (queuedReport == null){
             queuedReport = new QueuedReport();
+            queuedReport.setDateScheduled(new Date());
+            queuedReport.setEvaluationDate(new Date());
+        }
 
         modelMap.put("queuedReports", queuedReport);
 
