@@ -4,11 +4,12 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.openmrs.Location;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.db.QueuedReportDAO;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Hibernate implementation of the QueuedReportDAO
@@ -63,4 +64,32 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 	public QueuedReport getQueuedReport(Integer reportId) {
 		return (QueuedReport) sessionFactory.getCurrentSession().get(QueuedReport.class, reportId);
 	}
+
+    public Map<MOHFacility,List<QueuedReport>> completedReports(){
+
+        Map<MOHFacility,List<QueuedReport>> finalMap = new HashMap<MOHFacility, List<QueuedReport>>();
+        List<QueuedReport> completeReports = getQueuedReportsWithStatus(QueuedReport.STATUS_COMPLETE);
+        Set<MOHFacility> requiredFacilities = new HashSet<MOHFacility>();
+        for(QueuedReport thisReport:completeReports){
+            MOHFacility thisMohFacility = thisReport.getFacility();
+            requiredFacilities.add(thisMohFacility);
+
+        }
+
+        for(MOHFacility facilityLoop:requiredFacilities){
+            List<QueuedReport> relevantReports = new ArrayList<QueuedReport>();
+            for(QueuedReport queuedReportLoop:completeReports){
+                if(facilityLoop.equals(queuedReportLoop.getFacility())){
+                   relevantReports.add(queuedReportLoop);
+                }
+
+            }
+
+            finalMap.put(facilityLoop,relevantReports);
+
+        }
+
+      return finalMap;
+
+    }
 }
