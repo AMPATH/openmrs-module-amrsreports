@@ -1,6 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 <%@ include file="/WEB-INF/template/header.jsp" %>
 
+
 <openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.min.js"/>
@@ -21,6 +22,8 @@
 </c:if>
 
 <c:set var="seconds" value="${queuedReports.repeatInterval}"/>
+<c:set var="dateScheduled" value="${fn:substringBefore(queuedReports.dateScheduled,'.') }"/>
+
 <c:choose>
     <c:when test="${seconds >= 86400}">
         <c:set var="interval" value="${seconds/(24*60*60)}"/>
@@ -98,16 +101,18 @@
                         <label for="scheduleDate">Schedule date (run on):</label>
                     </td>
                     <td>
-                        <spring:bind path="queuedReports.dateScheduled">
+
                             <c:if test="${not empty queuedReports.queuedReportId}">
-                                <input type="text" id="scheduleDate" name="scheduleDate" value="${status.value}"/>
+                                <spring:bind path="queuedReports.dateScheduled">
+                                    <input type="text" id="scheduleDate" name="scheduleDate" value="${dateScheduled}" />
+                                </spring:bind>
                             </c:if>
 
                             <c:if test="${empty queuedReports.queuedReportId}">
                                 <input type="text" id="scheduleDate" name="scheduleDate" value="${now}"/>
                             </c:if>
 
-                        </spring:bind>
+
                     </td>
                 </tr>
                 <tr>
@@ -115,7 +120,7 @@
                         <label for="repeatSchedule">Make this a repeating schedule:</label>
                     </td>
                     <td>
-                        <c:if test="${not empty queuedReports.queuedReportId}">
+                        <c:if test="${not empty queuedReports.queuedReportId and interval>0}">
                             <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="checked" />
                         </c:if>
 
