@@ -120,7 +120,7 @@
                         <label for="repeatSchedule">Make this a repeating schedule:</label>
                     </td>
                     <td>
-                        <c:if test="${not empty queuedReports.queuedReportId and interval>0}">
+                        <c:if test="${not empty queuedReports.queuedReportId}">
                             <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="checked" />
                         </c:if>
 
@@ -136,7 +136,7 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.repeatInterval">
-                            <c:if test="${not empty queuedReports.queuedReportId}">
+                            <c:if test="${not empty queuedReports.queuedReportId }">
                                 <input type="text" name="repeatInterval" id="repeatInterval" value="${interval}" />
                             </c:if>
 
