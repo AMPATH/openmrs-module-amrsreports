@@ -121,18 +121,20 @@ public class PregnancyTableBuilder {
 					"  order by" +
 					"    p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"  due_date = VALUES(due_date)";
+					"  edd_lmp = VALUES(edd_lmp)";
 
 	private static final String UPDATE_EDD_FROM_EDC =
 			"insert into amrsreports_pregnancy (" +
 					"  person_id, " +
 					"  pregnancy_date, " +
-					"  edd_edc" +
+					"  edd_edc," +
+					"  eddpreg" +
 					" )" +
 					"  select " +
 					"    e.patient_id," +
 					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
-					"    value_datetime as d_date" +
+					"    value_datetime as d_date," +
+					"    1" +
 					"  from " +
 					"    obs o" +
 					"    join encounter e" +
@@ -150,7 +152,8 @@ public class PregnancyTableBuilder {
 					"  order by" +
 					"    p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"  edd_edc = VALUES(due_date)";
+					"  edd_edc = VALUES(edd_edc)," +
+					"  eddpreg = 1";
 
 	private static String MACRO_UPDATE_EDD =
 			"INSERT INTO amrsreports_pregnancy (" +
@@ -173,7 +176,7 @@ public class PregnancyTableBuilder {
 					" ORDER BY" +
 					"	p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
-					"	:source = VALUES(due_date)," +
+					"	:source = VALUES(:source)," +
 					"   :column = 1";
 
 	private static final String UPDATE_EDD_PREFERENCE =
@@ -220,20 +223,15 @@ public class PregnancyTableBuilder {
 		// recreate the table
 		TableBuilderUtil.runUpdateSQL(CREATE_TABLE);
 
-		// update all of the columns
+		// update several columns
 		updateColumn("pregstatus", "concept_id = 5272 and value_coded = 1065 and e.form_id <> 245");
 		updateColumn("probpreg", "concept_id in (6042, 1790) and value_coded in (44, 47, 46)");
 		updateColumn("testpreg", "(concept_id = 45 and value_coded = 703) or (concept_id = 1856 and value_coded <> 1175)");
 		updateColumn("reasnvispreg", "concept_id in (1834, 1835) and value_coded = 1831");
 		updateColumn("ancpreg", "concept_id = 2055 and value_coded = 1065");
-		updateColumn("eddpreg", "concept_id in (5596, 1854) and value_coded > obs_datetime");
 		updateColumn("arvpreg", "(concept_id = 1181 and value_coded = 1148)" +
 				" or (concept_id = 1251 and value_coded = 1776)" +
 				" or (concept_id = 1992 and value_coded not in (1066, 67))");
-
-		// ***** fundpreg and durpreg handled in updateEDD
-		// updateColumn("durpreg", "concept_id in (1279, 5992) and value_numeric > 0");
-		// updateColumn("fundpreg", "concept_id = 1855 and value_numeric > 0");
 
 		// update due dates based on obsDatetime and valueNumeric
 
