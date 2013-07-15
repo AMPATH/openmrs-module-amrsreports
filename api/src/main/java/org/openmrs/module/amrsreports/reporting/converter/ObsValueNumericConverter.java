@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -28,8 +29,8 @@ public class ObsValueNumericConverter implements DataConverter {
 	public Object convert(Object original) {
 		Obs o = (Obs) original;
 
-		if (o == null)
-			return null;
+		if (o == null || !(o.getConcept() instanceof ConceptNumeric))
+			return "";
 
 		ConceptNumeric cn = (ConceptNumeric) o.getConcept();
 		String units = cn.getUnits();
