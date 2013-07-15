@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.util.OpenmrsUtil;
@@ -18,7 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.*;
 
 /**
  * controller for View AMRS Reports page
@@ -44,8 +45,8 @@ public class QueuedReportListController {
 	}
 
 	@ModelAttribute("completeReports")
-	public List<QueuedReport> getCompleteReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_COMPLETE);
+	public Map<MOHFacility,List<QueuedReport>> getCompleteReport() {
+		return getCompletedReports(QueuedReport.STATUS_COMPLETE);
 	}
 
 	@ModelAttribute("datetimeFormat")
@@ -88,5 +89,46 @@ public class QueuedReportListController {
 
 		FileCopyUtils.copy(new FileInputStream(amrsFileToDownload), response.getOutputStream());
 	}
+
+    public Map<MOHFacility,List<QueuedReport>> getCompletedReports(String status){
+
+        Map<MOHFacility,List<QueuedReport>> finalMap = new HashMap<MOHFacility, List<QueuedReport>>();
+        List<QueuedReport> completeReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
+
+        Set<MOHFacility> requiredFacilities = new HashSet<MOHFacility>();
+
+        for(QueuedReport thisReport:completeReports){
+            MOHFacility thisMohFacility = thisReport.getFacility();
+            requiredFacilities.add(thisMohFacility);
+
+        }
+
+        for(MOHFacility facilityLoop:requiredFacilities){
+            List<QueuedReport> relevantReports = new ArrayList<QueuedReport>();
+            for(QueuedReport queuedReportLoop:completeReports){
+                if(facilityLoop.equals(queuedReportLoop.getFacility())){
+                    relevantReports.add(queuedReportLoop);
+                }
+
+            }
+
+            finalMap.put(facilityLoop,relevantReports);
+
+        }
+
+        return finalMap;
+
+    }
+
+    /*Map<MOHFacility,List<QueuedReport>> test(){
+
+        Map<MOHFacility,List<QueuedReport>> retRec = getCompletedReports(QueuedReport.STATUS_COMPLETE);
+
+        for(MOHFacility thisFacility:retRec.keySet()){
+            List<QueuedReport> allReports = retRec.get(thisFacility);
+
+        }
+
+    }*/
 
 }

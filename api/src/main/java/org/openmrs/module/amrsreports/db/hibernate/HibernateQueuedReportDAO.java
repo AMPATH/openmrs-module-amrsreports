@@ -65,31 +65,4 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 		return (QueuedReport) sessionFactory.getCurrentSession().get(QueuedReport.class, reportId);
 	}
 
-    public Map<MOHFacility,List<QueuedReport>> completedReports(){
-
-        Map<MOHFacility,List<QueuedReport>> finalMap = new HashMap<MOHFacility, List<QueuedReport>>();
-        List<QueuedReport> completeReports = getQueuedReportsWithStatus(QueuedReport.STATUS_COMPLETE);
-        Set<MOHFacility> requiredFacilities = new HashSet<MOHFacility>();
-        for(QueuedReport thisReport:completeReports){
-            MOHFacility thisMohFacility = thisReport.getFacility();
-            requiredFacilities.add(thisMohFacility);
-
-        }
-
-        for(MOHFacility facilityLoop:requiredFacilities){
-            List<QueuedReport> relevantReports = new ArrayList<QueuedReport>();
-            for(QueuedReport queuedReportLoop:completeReports){
-                if(facilityLoop.equals(queuedReportLoop.getFacility())){
-                   relevantReports.add(queuedReportLoop);
-                }
-
-            }
-
-            finalMap.put(facilityLoop,relevantReports);
-
-        }
-
-      return finalMap;
-
-    }
 }

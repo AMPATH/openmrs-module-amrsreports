@@ -197,8 +197,4 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		return dao.getQueuedReport(reportId);
 	}
 
-    @Override
-    public Map<MOHFacility, List<QueuedReport>> completedReports() {
-        return dao.completedReports();
-    }
 }

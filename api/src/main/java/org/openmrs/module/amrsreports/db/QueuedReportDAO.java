@@ -24,5 +24,4 @@ public interface QueuedReportDAO {
 
 	public QueuedReport getQueuedReport(Integer reportId);
 
-    public Map<MOHFacility,List<QueuedReport>> completedReports();
 }

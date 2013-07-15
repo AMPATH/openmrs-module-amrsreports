@@ -75,24 +75,26 @@
             <tr class="subheading">
                 <th colspan="5">Completed Reports</th>
             </tr>
-            <tr>
-                <th>Actions</th>
-                <th>Report</th>
-                <th>Facility</th>
-                <th>Evaluation Date</th>
-                <th>Scheduled Date</th>
-            </tr>
-            <c:forEach var="r" items="${completeReports}" varStatus="status">
-                <tr class="completed ${status.index % 2 == 0 ? "evenRow" : "oddRow"}">
-                    <td>
+
+            <c:forEach var="f" items="${completeReports}" varStatus="status">
+                <tr class="subheading"><td colspan="5"><strong><u>${f.key}</u></strong></td></tr>
+                <tr>
+                    <th>Actions</th>
+                    <th colspan="2">Report</th>
+                    <th>Evaluation Date</th>
+                    <th>Scheduled Date</th>
+                </tr>
+                <c:forEach var="r" items="${f.value}" >
+                    <tr class="completed ${status.index % 2 == 0 ? "evenRow" : "oddRow"}">
+                       <td>
                         <a href="viewReport.form?reportId=${r.id}">View</a>
                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
-                    </td>
-                    <td>${r.reportName}</td>
-                    <td>${r.facility}</td>
-                    <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
-                    <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
-                </tr>
+                       </td>
+                       <td colspan="2">${r.reportName}</td>
+                       <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
+                       <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
+                    </tr>
+                </c:forEach>
             </c:forEach>
             <tr><td colspan="5">&nbsp;</td></tr>
         </c:if>
