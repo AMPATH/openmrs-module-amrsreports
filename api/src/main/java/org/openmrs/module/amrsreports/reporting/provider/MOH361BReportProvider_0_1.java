@@ -106,15 +106,24 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
 
-        // CTX start date
-        dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
+		// j. CD4 at start of ARVs
+		ObsNearestARVStartDateDataDefinition cd4Def = new ObsNearestARVStartDateDataDefinition(
+				"CD4 closest to ARV start",
+				Context.getConceptService().getConcept(5497),
+				Context.getConceptService().getConcept(730)
+		);
+		dsd.addColumn("CD4 at ART Start", cd4Def, nullString, new ObsValueNumericConverter(2));
 
-		// Weight at start of ARVs
+		// l. Weight at start of ARVs
 		ObsNearestARVStartDateDataDefinition weightDef = new ObsNearestARVStartDateDataDefinition(
 				"weight closest to ARV start",
 				Context.getConceptService().getConcept(5089)
 		);
+		weightDef.setAgeLimit(12);
 		dsd.addColumn("Weight at ART Start", weightDef, nullString, new ObsValueNumericConverter(2));
+
+		// m. CTX start date
+		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
 		report.addDataSetDefinition(dsd, null);
 
@@ -134,7 +143,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		design.setRendererType(ExcelTemplateRenderer.class);
 
 		Properties props = new Properties();
-		props.put("repeatingSections", "sheet:1,row:7-8,dataset:allPatients");
+		props.put("repeatingSections", "sheet:1,row:7,dataset:allPatients");
 
 		design.setProperties(props);
 
