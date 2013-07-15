@@ -10,6 +10,7 @@ import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverte
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsValueNumericConverter;
+import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
@@ -105,6 +106,14 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
 		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
+
+		// i. WHO Stage at start of ARVs
+		ObsNearestARVStartDateDataDefinition whoDef = new ObsNearestARVStartDateDataDefinition(
+				"WHO closest to ARV start",
+				Context.getConceptService().getConcept(5356),
+				Context.getConceptService().getConcept(1224)
+		);
+		dsd.addColumn("WHO Stage at ART Start", whoDef, nullString, new WHOStageConverter());
 
 		// j. CD4 at start of ARVs
 		ObsNearestARVStartDateDataDefinition cd4Def = new ObsNearestARVStartDateDataDefinition(
