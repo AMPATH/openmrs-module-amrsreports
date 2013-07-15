@@ -17,15 +17,22 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
+import org.openmrs.module.reporting.common.Age;
 import org.openmrs.module.reporting.common.ListMap;
+import org.openmrs.module.reporting.data.MappedData;
+import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
+import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
+import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -48,9 +55,37 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 		ObsNearestARVStartDateDataDefinition def = (ObsNearestARVStartDateDataDefinition) definition;
 		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
 
+		Cohort cohort = new Cohort(context.getBaseCohort().getMemberIds());
+
 		// give up early if the cohort is empty
-		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
+		if (cohort == null || cohort.isEmpty()) {
 			return c;
+		}
+
+		if (def.getAgeLimit() != null) {
+
+			// create a mapped Date ART Started definition
+			DateARTStartedDataDefinition artStarted = new DateARTStartedDataDefinition();
+			MappedData<DateARTStartedDataDefinition> mappedDef = new MappedData<DateARTStartedDataDefinition>();
+			mappedDef.setParameterizable(artStarted);
+			mappedDef.addConverter(new DateConverter());
+
+			// create the Age definition
+			AgeAtDateOfOtherDataDefinition startAge = new AgeAtDateOfOtherDataDefinition();
+			startAge.setEffectiveDateDefinition(mappedDef);
+
+			// evaluate it
+			EvaluatedPersonData startAges = Context.getService(PersonDataService.class).evaluate(startAge, context);
+
+			// get the evaluated data
+			Map<Integer, Object> artStartAges = startAges.getData();
+
+			// loop and remove from base cohort if over the age limit
+			for (Integer personId : artStartAges.keySet()) {
+				Age age = (Age) artStartAges.get(personId);
+				if (age.getFullYears() > def.getAgeLimit())
+					cohort.removeMember(personId);
+			}
 		}
 
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
@@ -69,7 +104,7 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 
 		// set the variables
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("patientIds", cohort);
 		m.put("onOrBefore", context.getEvaluationDate());
 		m.put("conceptIds", getListOfIds(def.getQuestions()));
 
@@ -87,10 +122,9 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 			obsListMap.putInList(obs.getPersonId(), obs);
 		}
 
-		// get the first one
+		// fill response data by taking first in list (if it's in there)
 		for (Integer pId : obsListMap.keySet()) {
-			List<Obs> l = obsListMap.get(pId);
-			c.addData(pId, l.get(0));
+			c.addData(pId, obsListMap.get(pId).get(0));
 		}
 
 		return c;

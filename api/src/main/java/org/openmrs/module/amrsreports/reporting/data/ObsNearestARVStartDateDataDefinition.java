@@ -29,6 +29,9 @@ public class ObsNearestARVStartDateDataDefinition extends BaseDataDefinition imp
 	@ConfigurationProperty(required = true)
 	private List<Concept> questions;
 
+	@ConfigurationProperty(required = false)
+	private Integer ageLimit = null;
+
 	public ObsNearestARVStartDateDataDefinition() {
 		super();
 	}
@@ -59,5 +62,13 @@ public class ObsNearestARVStartDateDataDefinition extends BaseDataDefinition imp
 
 	public void addQuestion(Concept question) {
 		this.getQuestions().add(question);
+	}
+
+	public Integer getAgeLimit() {
+		return ageLimit;
+	}
+
+	public void setAgeLimit(Integer ageLimit) {
+		this.ageLimit = ageLimit;
 	}
 }
