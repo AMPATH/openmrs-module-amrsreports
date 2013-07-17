@@ -56,7 +56,7 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
 		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
 				.add(Restrictions.eq("status", status))
-				.addOrder(Order.asc("dateScheduled"))
+				.addOrder(Order.desc("dateScheduled"))
 				.list();
 	}
 

@@ -30,23 +30,23 @@ public class QueuedReportListController {
 	private static final Log log = LogFactory.getLog(QueuedReportListController.class);
 
 	@ModelAttribute("queuedReports")
-	public List<QueuedReport> getQueuedReports() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_NEW);
+	public Map<MOHFacility,List<QueuedReport>> getQueuedReports() {
+		return getFacilityReportMap(QueuedReport.STATUS_NEW);
 	}
 
 	@ModelAttribute("runningReports")
-	public List<QueuedReport> getRunningReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_RUNNING);
+	public Map<MOHFacility,List<QueuedReport>> getRunningReport() {
+		return getFacilityReportMap(QueuedReport.STATUS_RUNNING);
 	}
 
 	@ModelAttribute("errorReports")
-	public List<QueuedReport> getErrorReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_ERROR);
+	public Map<MOHFacility,List<QueuedReport>> getErrorReport() {
+		return getFacilityReportMap(QueuedReport.STATUS_ERROR);
 	}
 
 	@ModelAttribute("completeReports")
 	public Map<MOHFacility,List<QueuedReport>> getCompleteReport() {
-		return getCompletedReports(QueuedReport.STATUS_COMPLETE);
+		return getFacilityReportMap(QueuedReport.STATUS_COMPLETE);
 	}
 
 	@ModelAttribute("datetimeFormat")
@@ -90,7 +90,8 @@ public class QueuedReportListController {
 		FileCopyUtils.copy(new FileInputStream(amrsFileToDownload), response.getOutputStream());
 	}
 
-    public Map<MOHFacility,List<QueuedReport>> getCompletedReports(String status){
+    public Map<MOHFacility,List<QueuedReport>> getFacilityReportMap(String status){
+
 
         Map<MOHFacility,List<QueuedReport>> finalMap = new HashMap<MOHFacility, List<QueuedReport>>();
         List<QueuedReport> completeReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
@@ -99,20 +100,11 @@ public class QueuedReportListController {
 
         for(QueuedReport thisReport:completeReports){
             MOHFacility thisMohFacility = thisReport.getFacility();
-            requiredFacilities.add(thisMohFacility);
 
-        }
+            if (!finalMap.containsKey(thisMohFacility))
+               finalMap.put(thisMohFacility,new ArrayList<QueuedReport>());
 
-        for(MOHFacility facilityLoop:requiredFacilities){
-            List<QueuedReport> relevantReports = new ArrayList<QueuedReport>();
-            for(QueuedReport queuedReportLoop:completeReports){
-                if(facilityLoop.equals(queuedReportLoop.getFacility())){
-                    relevantReports.add(queuedReportLoop);
-                }
-
-            }
-
-            finalMap.put(facilityLoop,relevantReports);
+            finalMap.get(thisMohFacility).add(thisReport);
 
         }
 
@@ -120,15 +112,5 @@ public class QueuedReportListController {
 
     }
 
-    /*Map<MOHFacility,List<QueuedReport>> test(){
-
-        Map<MOHFacility,List<QueuedReport>> retRec = getCompletedReports(QueuedReport.STATUS_COMPLETE);
-
-        for(MOHFacility thisFacility:retRec.keySet()){
-            List<QueuedReport> allReports = retRec.get(thisFacility);
-
-        }
-
-    }*/
 
 }
