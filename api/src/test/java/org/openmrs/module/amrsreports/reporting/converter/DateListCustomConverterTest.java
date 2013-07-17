@@ -38,7 +38,7 @@ public class DateListCustomConverterTest extends TestCase {
 		String expected = (
 				"12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
 				"04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
-				"05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR);
+				"05/2013");
 
 		DateListCustomConverter dateListCustomConverter = new DateListCustomConverter(format);
 

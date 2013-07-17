@@ -1,10 +1,13 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,14 +41,14 @@ public class DateListCustomConverter implements DataConverter {
 		Set<Date> listOfDates = (Set<Date>) original;
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(this.desiredFormat);
 
-		String formattedDates = "";
+		List<String> formattedDates = new ArrayList<String>();
 
 		for (Date date : listOfDates) {
-			String thisDate = simpleDateFormat.format(date);
-			formattedDates += thisDate + AmrsReportsConstants.INTER_CELL_SEPARATOR;
+			if (date != null)
+				formattedDates.add(simpleDateFormat.format(date));
 		}
 
-		return formattedDates;
+		return StringUtils.join(formattedDates, AmrsReportsConstants.INTER_CELL_SEPARATOR);
 	}
 
 	@Override
