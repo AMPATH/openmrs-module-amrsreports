@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
@@ -17,22 +18,6 @@ import java.util.List;
 
 public class WHOStageAndDateConverter implements DataConverter {
 
-	private static final List<Concept> STAGE_1_CONCEPTS = Arrays.asList(
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_ADULT),
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_1_PEDS));
-
-	private static final List<Concept> STAGE_2_CONCEPTS = Arrays.asList(
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_ADULT),
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_2_PEDS));
-
-	private static final List<Concept> STAGE_3_CONCEPTS = Arrays.asList(
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_ADULT),
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_3_PEDS));
-
-	private static final List<Concept> STAGE_4_CONCEPTS = Arrays.asList(
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_ADULT),
-			MohCacheUtils.getConcept(MohEvaluableNameConstants.WHO_STAGE_4_PEDS));
-
 	@Override
 	public Object convert(Object original) {
 		Obs o = (Obs) original;
@@ -40,23 +25,13 @@ public class WHOStageAndDateConverter implements DataConverter {
 		if (o == null)
 			return "";
 
-		Concept answer = o.getValueCoded();
-		Integer stage = null;
+		String whoStage = (String) new WHOStageConverter().convert(o);
 
-		if (OpenmrsUtil.isConceptInList(answer, STAGE_1_CONCEPTS))
-			stage = 1;
-		else if (OpenmrsUtil.isConceptInList(answer, STAGE_2_CONCEPTS))
-			stage = 2;
-		else if (OpenmrsUtil.isConceptInList(answer, STAGE_3_CONCEPTS))
-			stage = 3;
-		else if (OpenmrsUtil.isConceptInList(answer, STAGE_4_CONCEPTS))
-			stage = 4;
-		else
+		if (StringUtils.isBlank(whoStage))
 			return "";
 
 		return String.format(
-				MOHReportUtil.joinAsSingleCell("WHO Stage %d", "%s"),
-				stage,
+				MOHReportUtil.joinAsSingleCell(whoStage, "%s"),
 				MOHReportUtil.formatdates(o.getObsDatetime()));
 	}
 
