@@ -23,7 +23,9 @@
 <style>
     .subheading { height: 3em; }
     .subheading th { font-size: 120%; font-weight: normal; text-align: left !important; }
-    #reportTable th, #reportTable td { text-align: center; }
+    #reportTable th, #reportTable td { text-align: left; }
+    .spancontent {float:right;color: green;font-weight: bold;}
+
 </style>
 
 <%@ include file="localHeader.jsp"%>
@@ -46,24 +48,26 @@
 
         <c:if test="${not empty queuedReports}">
             <tr class="subheading">
-                <th colspan="5">Queued Reports</th>
+                <th colspan="4">Queued Reports</th>
             </tr>
             <tr>
-                <td colspan="5">
+                <td colspan="4">
                     <c:forEach var="f" items="${queuedReports}" >
 
-                        <table cellpadding="2" cellspacing="0"  width="98%">
+                        <table cellpadding="2" cellspacing="0"  width="100%">
                             <tr>
-                                <td colspan="5"><div align="left"><strong>"${f.key}"</strong></div></td>
+                                <td colspan="4"><HR size="2"></td>
 
                             </tr>
                             <tr>
-                                <th>Actions</th>
-                                <th>Report</th>
-                                <th>Facility</th>
-                                <th>Evaluation Date</th>
-                                <th>Scheduled Date</th>
+                                <td colspan="4"><div align="left"><strong>"${f.key}"</strong><span class="spancontent"><c:if test="${fn:length(f.value) gt 2}"><a class="show_hide" href="#" rel="#q${f.key.code}">View More</a></c:if></span></div></td>
+
                             </tr>
+                            <tr>
+                                <td colspan="4"><HR size="2"></td>
+
+                            </tr>
+
 
 
                             <c:forEach var="r" items="${f.value}" varStatus="status">
@@ -75,22 +79,21 @@
                                                 <a href="viewReport.form?reportId=${r.id}">View</a>
                                                 <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                             </td>
-                                            <td>${r.reportName}</td>
-                                            <td>${r.facility}</td>
+                                            <td >${r.reportName}</td>
                                             <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                             <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                         </tr>
+                                        <c:if test="${status.last }">
+                                            <tr><td colspan="4"><HR size="3" ></td></tr>
+                                        </c:if>
                                     </c:when>
                                     <c:otherwise>
                                         <c:if test="${status.index == 2 }">
-                                            <tr><td colspan="5">&nbsp;</td></tr>
-                                            <tr>
-                                                <td colspan="5"><div align="left"><a class="show_hide" href="#" rel="#q${f.key.code}">View more Reports for "${f.key}"</a></div></td>
+                                            <tr><td colspan="4">&nbsp;</td></tr>
 
-                                            </tr>
                                             <tr>
-                                                <td colspan="5"><div id="q${f.key.code}" class="toggleDiv" style="display: none;">
-                                                    <table width="98%">
+                                                <td colspan="4"><div id="q${f.key.code}" class="toggleDiv" style="display: none;">
+                                                    <table width="100%">
 
 
 
@@ -102,8 +105,7 @@
                                                     <a href="viewReport.form?reportId=${r.id}">View</a>
                                                     <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                                 </td>
-                                                <td>${r.reportName}</td>
-                                                <td>${r.facility}</td>
+                                                <td >${r.reportName}</td>
                                                 <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                                 <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                             </tr>
@@ -113,8 +115,7 @@
                                                       </div>
                                                     </td>
                                                 </tr>
-                                                <tr><td colspan="5">&nbsp;</td></tr>
-                                                <tr><td colspan="5">&nbsp;</td></tr>
+                                                <tr><td colspan="4"><HR size="3" ></td></tr>
                                         </c:if>
 
                                     </c:otherwise>
@@ -125,30 +126,31 @@
                     </c:forEach>
                 </td>
             </tr>
-        <tr><td colspan="5">&nbsp;</td></tr>
+        <tr><td colspan="4">&nbsp;</td></tr>
     </c:if>
 
 
 
 <c:if test="${not empty runningReports}">
     <tr class="subheading">
-        <th colspan="5">Running Reports</th>
+        <th colspan="4">Running Reports</th>
     </tr>
     <tr>
-        <td colspan="5">
+        <td colspan="4">
             <c:forEach var="f" items="${runningReports}" >
 
-                <table cellpadding="2" cellspacing="0"  width="98%">
+                <table cellpadding="2" cellspacing="0"  width="100%">
                     <tr>
-                        <td colspan="5"><div align="left"><strong>"${f.key}"</strong></div></td>
+                        <td colspan="4"><HR size="2"></td>
 
                     </tr>
                     <tr>
-                        <th>Actions</th>
-                        <th>Report</th>
-                        <th>Facility</th>
-                        <th>Evaluation Date</th>
-                        <th>Scheduled Date</th>
+                        <td colspan="4"><div align="left"><strong>"${f.key}"</strong><span class="spancontent"><c:if test="${fn:length(f.value) gt 2}"><a class="show_hide" href="#" rel="#r${f.key.code}">View More</a></c:if></span></div></td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="4"><HR size="2"></td>
+
                     </tr>
 
 
@@ -161,22 +163,21 @@
                                         <a href="viewReport.form?reportId=${r.id}">View</a>
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </td>
-                                    <td>${r.reportName}</td>
-                                    <td>${r.facility}</td>
+                                    <td >${r.reportName}</td>
                                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                     <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                 </tr>
+                                <c:if test="${status.last }">
+                                    <tr><td colspan="4"><HR size="3" ></td></tr>
+                                </c:if>
                             </c:when>
                             <c:otherwise>
                                 <c:if test="${status.index == 2 }">
-                                    <tr><td colspan="5">&nbsp;</td></tr>
-                                    <tr>
-                                        <td colspan="5"><div align="left"><a class="show_hide" href="#" rel="#r${f.key.code}">View more Reports for "${f.key}"</a></div></td>
+                                    <tr><td colspan="4">&nbsp;</td></tr>
 
-                                    </tr>
                                     <tr>
-                                        <td colspan="5"><div id="r${f.key.code}" class="toggleDiv" style="display: none;">
-                                            <table width="98%">
+                                        <td colspan="4"><div id="r${f.key.code}" class="toggleDiv" style="display: none;">
+                                            <table width="100%">
 
 
 
@@ -188,8 +189,7 @@
                                             <a href="viewReport.form?reportId=${r.id}">View</a>
                                             <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                         </td>
-                                        <td>${r.reportName}</td>
-                                        <td>${r.facility}</td>
+                                        <td >${r.reportName}</td>
                                         <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                         <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                     </tr>
@@ -199,8 +199,7 @@
                                           </div>
                                         </td>
                                        </tr>
-                                       <tr><td colspan="5">&nbsp;</td></tr>
-                                       <tr><td colspan="5">&nbsp;</td></tr>
+                                       <tr><td colspan="4"><HR size="3" ></td></tr>
                                 </c:if>
 
                             </c:otherwise>
@@ -211,7 +210,7 @@
             </c:forEach>
         </td>
     </tr>
-    <tr><td colspan="5">&nbsp;</td></tr>
+    <tr><td colspan="4">&nbsp;</td></tr>
 </c:if>
 
 
@@ -219,23 +218,24 @@
 
 <c:if test="${not empty completeReports}">
             <tr class="subheading">
-                <th colspan="5">Completed Reports</th>
+                <th colspan="4">Completed Reports</th>
             </tr>
            <tr>
-               <td colspan="5">
+               <td colspan="4">
                    <c:forEach var="f" items="${completeReports}" >
 
-                       <table cellpadding="2" cellspacing="0"  width="98%">
+                       <table cellpadding="2" cellspacing="0"  width="100%">
                            <tr>
-                               <td colspan="5"><div align="left"><strong>"${f.key}"</strong></div></td>
+                               <td colspan="4"><HR size="2"></td>
 
                            </tr>
                            <tr>
-                               <th>Actions</th>
-                               <th>Report</th>
-                               <th>Facility</th>
-                               <th>Evaluation Date</th>
-                               <th>Scheduled Date</th>
+                               <td colspan="4"><div align="left"><strong>"${f.key}"</strong><span class="spancontent"><c:if test="${fn:length(f.value) gt 2}"><a class="show_hide" href="#" rel="#c${f.key.code}">View More</a></c:if></span></div></td>
+
+                           </tr>
+                           <tr>
+                               <td colspan="4"><HR size="2"></td>
+
                            </tr>
 
 
@@ -248,22 +248,21 @@
                                                <a href="viewReport.form?reportId=${r.id}">View</a>
                                                <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                            </td>
-                                           <td>${r.reportName}</td>
-                                           <td>${r.facility}</td>
+                                           <td >${r.reportName}</td>
                                            <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                            <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                        </tr>
+                                       <c:if test="${status.last }">
+                                           <tr><td colspan="4"><HR size="3" ></td></tr>
+                                       </c:if>
                                    </c:when>
                                    <c:otherwise>
                                        <c:if test="${status.index == 2 }">
-                                           <tr><td colspan="5">&nbsp;</td></tr>
-                                           <tr>
-                                               <td colspan="5"><div align="left"><a class="show_hide" href="#" rel="#c${f.key.code}">View more Reports for "${f.key}"</a></div></td>
+                                           <tr><td colspan="4">&nbsp;</td></tr>
 
-                                           </tr>
                                            <tr>
-                                               <td colspan="5"><div id="c${f.key.code}" class="toggleDiv" style="display: none;">
-                                                   <table width="98%">
+                                               <td colspan="4"><div id="c${f.key.code}" class="toggleDiv" style="display: none;">
+                                                   <table width="100%">
 
 
 
@@ -275,8 +274,7 @@
                                                    <a href="viewReport.form?reportId=${r.id}">View</a>
                                                    <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                                </td>
-                                               <td>${r.reportName}</td>
-                                               <td>${r.facility}</td>
+                                               <td >${r.reportName}</td>
                                                <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                                <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                            </tr>
@@ -286,8 +284,7 @@
                                             </div>
                                              </td>
                                                </tr>
-                                            <tr><td colspan="5">&nbsp;</td></tr>
-                                            <tr><td colspan="5">&nbsp;</td></tr>
+                                               <tr><td colspan="4"><HR size="3" ></td></tr>
                                        </c:if>
 
                                    </c:otherwise>
@@ -298,28 +295,29 @@
                    </c:forEach>
                </td>
            </tr>
-           <tr><td colspan="5">&nbsp;</td></tr>
+           <tr><td colspan="4">&nbsp;</td></tr>
 </c:if>
 
 <c:if test="${not empty errorReports}">
     <tr class="subheading">
-        <th colspan="5">Error Reports</th>
+        <th colspan="4">Error Reports</th>
     </tr>
     <tr>
-        <td colspan="5">
+        <td colspan="4">
             <c:forEach var="f" items="${errorReports}" >
 
-                <table cellpadding="2" cellspacing="0"  width="98%">
+                <table cellpadding="2" cellspacing="0"  width="100%">
                     <tr>
-                        <td colspan="5"><div align="left"><strong>"${f.key}"</strong></div></td>
+                        <td colspan="4"><HR size="2"></td>
 
                     </tr>
                     <tr>
-                        <th>Actions</th>
-                        <th>Report</th>
-                        <th>Facility</th>
-                        <th>Evaluation Date</th>
-                        <th>Scheduled Date</th>
+                        <td colspan="4"><div align="left"><strong>"${f.key}"</strong><span class="spancontent"><c:if test="${fn:length(f.value) gt 2}"><a class="show_hide" href="#" rel="#e${f.key.code}">View More</a></c:if></span></div></td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="4"><HR size="2"></td>
+
                     </tr>
 
 
@@ -332,22 +330,21 @@
                                         <a href="viewReport.form?reportId=${r.id}">View</a>
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </td>
-                                    <td>${r.reportName}</td>
-                                    <td>${r.facility}</td>
+                                    <td >${r.reportName}</td>
                                     <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                     <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                 </tr>
+                                <c:if test="${status.last }">
+                                    <tr><td colspan="4"><HR size="3" ></td></tr>
+                                </c:if>
                             </c:when>
                             <c:otherwise>
                                 <c:if test="${status.index == 2 }">
-                                    <tr><td colspan="5">&nbsp;</td></tr>
-                                    <tr>
-                                        <td colspan="5"><div align="left"><a class="show_hide" href="#" rel="#e${f.key.code}">View more Reports for "${f.key}"</a></div></td>
+                                    <tr><td colspan="4">&nbsp;</td></tr>
 
-                                    </tr>
                                     <tr>
-                                        <td colspan="5"><div id="e${f.key.code}" class="toggleDiv" style="display: none;">
-                                            <table width="98%">
+                                        <td colspan="4"><div id="e${f.key.code}" class="toggleDiv" style="display: none;">
+                                            <table  width="100%">
 
 
 
@@ -359,8 +356,7 @@
                                             <a href="viewReport.form?reportId=${r.id}">View</a>
                                             <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                         </td>
-                                        <td>${r.reportName}</td>
-                                        <td>${r.facility}</td>
+                                        <td >${r.reportName}</td>
                                         <td><openmrs:formatDate date="${r.evaluationDate}" type="textbox"/></td>
                                         <td><openmrs:formatDate date="${r.dateScheduled}" format="${datetimeFormat}"/></td>
                                     </tr>
@@ -370,8 +366,7 @@
                                         </div>
                                       </td>
                                    </tr>
-                                   <tr><td colspan="5">&nbsp;</td></tr>
-                                   <tr><td colspan="5">&nbsp;</td></tr>
+                                   <tr><td colspan="4"><HR size="3" ></td></tr>
                                 </c:if>
 
                                 </c:otherwise>
@@ -382,7 +377,7 @@
             </c:forEach>
         </td>
     </tr>
-    <tr><td colspan="5">&nbsp;</td></tr>
+    <tr><td colspan="4">&nbsp;</td></tr>
 </c:if>
 
 </table>
