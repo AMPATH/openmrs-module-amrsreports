@@ -63,16 +63,6 @@
             stepMinute: 5
         });
 
-        $j("#repeatSchedule").click(function(){
-            if ($j("#repeatSchedule").is(":checked")) {
-                $j("#repeatIntervalUnits").removeAttr("disabled");
-                $j("#repeatInterval").removeAttr("disabled");
-            } else {
-                $j("#repeatInterval").val("");
-                $j("#repeatIntervalUnits").attr("disabled", "disabled");
-                $j("#repeatInterval").attr("disabled", "disabled");
-            }
-        });
     });
 
 </script>
@@ -92,7 +82,7 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.evaluationDate">
-                           <input type="text" name="reportDate" id="reportDate"  value="${status.value}"/>
+                           <input type="text" name="${status.expression}" id="reportDate"  value="${status.value}"/>
                         </spring:bind>
                     </td>
                 </tr>
@@ -104,13 +94,14 @@
 
                             <c:if test="${not empty queuedReports.queuedReportId}">
                                 <spring:bind path="queuedReports.dateScheduled">
-                                    <input type="text" id="scheduleDate" name="scheduleDate" value="${dateScheduled}" />
+                                    <input type="text" id="scheduleDate" name="${status.expression}" value="${dateScheduled}" />
                                 </spring:bind>
                             </c:if>
-
+                            <spring:bind path="queuedReports.dateScheduled">
                             <c:if test="${empty queuedReports.queuedReportId}">
-                                <input type="text" id="scheduleDate" name="scheduleDate" value="${now}"/>
+                                <input type="text" id="scheduleDate" name="${status.expression}" value="${now}"/>
                             </c:if>
+                            </spring:bind>
 
 
                     </td>
@@ -119,16 +110,7 @@
                     <td class="right">
                         <label for="repeatSchedule">Make this a repeating schedule:</label>
                     </td>
-                    <td>
-                        <c:if test="${not empty queuedReports.queuedReportId}">
-                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" checked="checked" />
-                        </c:if>
-
-                        <c:if test="${empty queuedReports.queuedReportId}">
-                            <input type="checkbox" name="repeatSchedule" id="repeatSchedule" value="true" />
-                        </c:if>
-
-                    </td>
+                    <td>&nbsp;</td>
                 </tr>
                 <tr>
                     <td class="right">
@@ -136,39 +118,19 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.repeatInterval">
-                            <c:if test="${not empty queuedReports.queuedReportId }">
-                                <input type="text" name="repeatInterval" id="repeatInterval" value="${interval}" />
-                            </c:if>
-
-                            <c:if test="${empty queuedReports.queuedReportId}">
-                                <input type="text" name="repeatInterval" id="repeatInterval"  disabled="disabled"/>
-                            </c:if>
-
+                                <fmt:parseNumber var="i" integerOnly="true" type="number" value="${status.value}" />
+                                <input type="text" name="${status.expression}" id="repeatInterval" value="${i}" />
                         </spring:bind>
 
-                        <c:if test="${not empty queuedReports.queuedReportId}">
-                            <select name="repeatIntervalUnits" id="repeatIntervalUnits" >
-                        </c:if>
+                        <spring:bind path="queuedReports.repeatInterval">
+                        <select name="${status.expression}" id="repeatIntervalUnits" >
 
-                        <c:if test="${empty queuedReports.queuedReportId}">
-                            <select name="repeatIntervalUnits" id="repeatIntervalUnits" disabled="disabled">
-                        </c:if>
-
-                        <c:if test="${not empty queuedReports.queuedReportId}">
                             <option value="minutes" <c:if test="${intervalUnit=='minutes'}">selected</c:if> >Minutes</option>
                             <option value="hours" <c:if test="${intervalUnit=='hours'}">selected</c:if> >Hours</option>
                             <option value="days" <c:if test="${intervalUnit=='days'}">selected</c:if> >Days</option>
-                        </c:if>
-
-                        <c:if test="${empty queuedReports.queuedReportId}">
-                            <option value="minutes">Minutes</option>
-                            <option value="hours">Hours</option>
-                            <option value="days" selected="selected">Days</option>
-                        </c:if>
-
-
 
                         </select>
+                        </spring:bind>
                     </td>
                 </tr>
             </table>
