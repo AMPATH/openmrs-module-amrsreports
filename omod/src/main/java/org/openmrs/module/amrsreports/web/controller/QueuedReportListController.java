@@ -29,34 +29,6 @@ public class QueuedReportListController {
 
 	private static final Log log = LogFactory.getLog(QueuedReportListController.class);
 
-	@ModelAttribute("queuedReports")
-	public Map<MOHFacility,List<QueuedReport>> getQueuedReports() {
-		return getFacilityReportMap(QueuedReport.STATUS_NEW);
-	}
-
-	@ModelAttribute("runningReports")
-	public Map<MOHFacility,List<QueuedReport>> getRunningReport() {
-		return getFacilityReportMap(QueuedReport.STATUS_RUNNING);
-	}
-
-	@ModelAttribute("errorReports")
-	public Map<MOHFacility,List<QueuedReport>> getErrorReport() {
-		return getFacilityReportMap(QueuedReport.STATUS_ERROR);
-	}
-
-	@ModelAttribute("completeReports")
-	public Map<MOHFacility,List<QueuedReport>> getCompleteReport() {
-		return getFacilityReportMap(QueuedReport.STATUS_COMPLETE);
-	}
-
-	@ModelAttribute("datetimeFormat")
-	public String getDatetimeFormat() {
-		SimpleDateFormat sdf = Context.getDateFormat();
-		String format = sdf.toPattern();
-		format += " hh:mm a";
-		return format;
-	}
-
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.list")
 	public String preparePage() {
 		return "module/amrsreports/queuedReportList";
@@ -89,28 +61,5 @@ public class QueuedReportListController {
 
 		FileCopyUtils.copy(new FileInputStream(amrsFileToDownload), response.getOutputStream());
 	}
-
-    public Map<MOHFacility,List<QueuedReport>> getFacilityReportMap(String status){
-
-
-        Map<MOHFacility,List<QueuedReport>> finalMap = new HashMap<MOHFacility, List<QueuedReport>>();
-        List<QueuedReport> completeReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
-
-        Set<MOHFacility> requiredFacilities = new HashSet<MOHFacility>();
-
-        for(QueuedReport thisReport:completeReports){
-            MOHFacility thisMohFacility = thisReport.getFacility();
-
-            if (!finalMap.containsKey(thisMohFacility))
-               finalMap.put(thisMohFacility,new ArrayList<QueuedReport>());
-
-            finalMap.get(thisMohFacility).add(thisReport);
-
-        }
-
-        return finalMap;
-
-    }
-
 
 }
