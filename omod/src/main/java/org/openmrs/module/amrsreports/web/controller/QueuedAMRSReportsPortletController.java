@@ -34,21 +34,21 @@ import java.util.*;
 @RequestMapping("**/queuedAMRSReports.portlet")
 public class QueuedAMRSReportsPortletController extends PortletController {
 
-	/**
-	 * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
-	 *      java.util.Map)
-	 */
-	@Override
-	protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
+    /**
+     * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
+     *      java.util.Map)
+     */
+    @Override
+    protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
 
-		String status = (String) model.get("status");
+        String status = (String) model.get("status");
 
-		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
+        Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
 
-		if (Context.isAuthenticated() && status != null) {
+        if (Context.isAuthenticated() && status != null) {
 
-			List<QueuedReport> queuedReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
-             //Find list of super users
+            List<QueuedReport> queuedReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
+            //Find list of super users
             Role superUserRole = Context.getUserService().getRole(RoleConstants.SUPERUSER);
             List<User> superUsers=Context.getUserService().getUsers(null, Collections.singletonList(superUserRole), false);
 
@@ -56,29 +56,29 @@ public class QueuedAMRSReportsPortletController extends PortletController {
             User currentUser=Context.getAuthenticatedUser();
 
             if( superUsers.contains(currentUser)) {
-            //  display all reports if the user is a super user
-			for (QueuedReport thisReport : queuedReports) {
+                //  display all reports if the user is a super user
+                for (QueuedReport thisReport : queuedReports) {
 
-				MOHFacility thisMohFacility = thisReport.getFacility();
+                    MOHFacility thisMohFacility = thisReport.getFacility();
 
-				if (!queuedReportsMap.containsKey(thisMohFacility))
-					queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
+                    if (!queuedReportsMap.containsKey(thisMohFacility))
+                        queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
-				queuedReportsMap.get(thisMohFacility).add(thisReport);
-			}
+                    queuedReportsMap.get(thisMohFacility).add(thisReport);
+                }
 
             } else{
                 //filter reports based on current user as per facility
-                   List<MOHFacility> allowedFacilities  =Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(currentUser);
-                  for (QueuedReport thisReport : queuedReports) {
+                List<MOHFacility> allowedFacilities  =Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(currentUser);
+                for (QueuedReport thisReport : queuedReports) {
 
                     MOHFacility thisMohFacility = thisReport.getFacility();
 
                     if(allowedFacilities.contains(thisMohFacility)){
-                            if (!queuedReportsMap.containsKey(thisMohFacility))
-                                queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
+                        if (!queuedReportsMap.containsKey(thisMohFacility))
+                            queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
-                            queuedReportsMap.get(thisMohFacility).add(thisReport);
+                        queuedReportsMap.get(thisMohFacility).add(thisReport);
 
 
                     }
@@ -86,18 +86,18 @@ public class QueuedAMRSReportsPortletController extends PortletController {
                 }
 
             }
-		}
+        }
 
-		model.put("queuedReportsMap", queuedReportsMap);
+        model.put("queuedReportsMap", queuedReportsMap);
 
-		// date time format -- needs to come from here because we can make it locale-specific
-		// TODO extract this to a utility if used more than once
+        // date time format -- needs to come from here because we can make it locale-specific
+        // TODO extract this to a utility if used more than once
 
-		SimpleDateFormat sdf = Context.getDateFormat();
-		String format = sdf.toPattern();
-		format += " hh:mm a";
+        SimpleDateFormat sdf = Context.getDateFormat();
+        String format = sdf.toPattern();
+        format += " hh:mm a";
 
-		model.put("datetimeFormat", format);
-	}
+        model.put("datetimeFormat", format);
+    }
 
 }
