@@ -65,4 +65,13 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 		return (QueuedReport) sessionFactory.getCurrentSession().get(QueuedReport.class, reportId);
 	}
 
+    @Override
+    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities,String status) {
+        return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
+                .add(Restrictions.eq("status",status))
+                .add(Restrictions.in("facility",allowedFacilities))
+                .addOrder(Order.desc("dateScheduled"))
+                .list();
+    }
+
 }

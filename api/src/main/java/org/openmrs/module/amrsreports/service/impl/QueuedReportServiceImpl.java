@@ -5,6 +5,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Location;
+import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -13,6 +15,7 @@ import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.db.QueuedReportDAO;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -25,6 +28,7 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.util.RoleConstants;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -189,7 +193,21 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 	@Override
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
-		return dao.getQueuedReportsWithStatus(status);
+
+        Role superUserRole = Context.getUserService().getRole(RoleConstants.SUPERUSER);
+        List<User> superUsers=Context.getUserService().getUsers(null, Collections.singletonList(superUserRole), false);
+
+         User user =Context.getAuthenticatedUser();
+         UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
+         List<MOHFacility>allowedFacilities=userFacilityService.getAllowedFacilitiesForUser(user);
+
+
+             if( superUsers.contains(user)){
+		      return dao.getQueuedReportsWithStatus(status);
+              } else{
+                 return dao.getAllowedReportsByUser(allowedFacilities,status);
+             }
+
 	}
 
 	@Override

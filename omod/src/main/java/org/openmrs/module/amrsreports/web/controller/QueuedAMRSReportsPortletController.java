@@ -13,15 +13,10 @@
  */
 
 package org.openmrs.module.amrsreports.web.controller;
-
-import org.openmrs.Role;
-import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
-import org.openmrs.module.amrsreports.service.UserFacilityService;
-import org.openmrs.util.RoleConstants;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,44 +43,18 @@ public class QueuedAMRSReportsPortletController extends PortletController {
         if (Context.isAuthenticated() && status != null) {
 
             List<QueuedReport> queuedReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
-            //Find list of super users
-            Role superUserRole = Context.getUserService().getRole(RoleConstants.SUPERUSER);
-            List<User> superUsers=Context.getUserService().getUsers(null, Collections.singletonList(superUserRole), false);
 
-            //Find current user
-            User currentUser=Context.getAuthenticatedUser();
+                    for (QueuedReport thisReport : queuedReports) {
 
-            if( superUsers.contains(currentUser)) {
-                //  display all reports if the user is a super user
-                for (QueuedReport thisReport : queuedReports) {
+                        MOHFacility thisMohFacility = thisReport.getFacility();
 
-                    MOHFacility thisMohFacility = thisReport.getFacility();
-
-                    if (!queuedReportsMap.containsKey(thisMohFacility))
-                        queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
-
-                    queuedReportsMap.get(thisMohFacility).add(thisReport);
-                }
-
-            } else{
-                //filter reports based on current user as per facility
-                List<MOHFacility> allowedFacilities  =Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(currentUser);
-                for (QueuedReport thisReport : queuedReports) {
-
-                    MOHFacility thisMohFacility = thisReport.getFacility();
-
-                    if(allowedFacilities.contains(thisMohFacility)){
                         if (!queuedReportsMap.containsKey(thisMohFacility))
                             queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
                         queuedReportsMap.get(thisMohFacility).add(thisReport);
-
-
                     }
 
-                }
 
-            }
         }
 
         model.put("queuedReportsMap", queuedReportsMap);
