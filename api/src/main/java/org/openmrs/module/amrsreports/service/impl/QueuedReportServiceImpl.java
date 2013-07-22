@@ -215,4 +215,9 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		return dao.getQueuedReport(reportId);
 	}
 
+    @Override
+    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities, String status) {
+        return dao.getAllowedReportsByUser(allowedFacilities,status);
+    }
+
 }
