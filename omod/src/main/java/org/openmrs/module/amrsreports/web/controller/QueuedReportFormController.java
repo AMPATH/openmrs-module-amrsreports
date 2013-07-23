@@ -71,25 +71,35 @@ public class QueuedReportFormController {
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
 	public String processForm(HttpServletRequest request,
 							  @RequestParam(value = "immediate", required = false) Boolean immediate,
-							  @RequestParam("reportDate") Date reportDate,
-							  @RequestParam("scheduleDate") String scheduleDate,
+							  @RequestParam("evaluationDate") Date reportDate,
+							  @RequestParam("dateScheduled") String scheduleDate,
 							  @RequestParam("facility") Integer facilityId,
 							  @RequestParam("reportName") String reportName,
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits,
-							  @RequestParam(value = "repeatInterval", required = false) Integer repeatInterval
+							  @RequestParam(value = "repeatInterval", required = false) Integer repeatInterval,
+                              @ModelAttribute("queuedReports") QueuedReport editedReport
 	) throws Exception {
 
+        QueuedReport queuedReport;
 		// find the facility
 		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
 		// create a queued report
-		QueuedReport queuedReport = new QueuedReport();
+        if(editedReport.getId() !=null){
+           queuedReport = editedReport;
+        }
+        else {
+           queuedReport =  new QueuedReport();
+        }
+        queuedReport =  new QueuedReport();
+
 		queuedReport.setFacility(facility);
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 
 		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
 		Date scheduledDate = sdf.parse(scheduleDate);
+
 		if (immediate == null)
 			queuedReport.setDateScheduled(scheduledDate);
 		else

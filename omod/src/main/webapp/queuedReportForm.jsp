@@ -26,15 +26,15 @@
 
 <c:choose>
     <c:when test="${seconds >= 86400}">
-        <c:set var="interval" value="${seconds/(24*60*60)}"/>
+        <c:set var="interval" value="${fn:substringBefore(seconds/(24*60*60),'.')}"/>
         <c:set var="intervalUnit" value="days"/>
     </c:when>
     <c:when test="${seconds < 86400 and seconds >= 3600}">
-        <c:set var="interval" value="${seconds/(60*60)}"/>
+        <c:set var="interval" value="${fn:substringBefore(seconds/(60*60),'.')}"/>
         <c:set var="intervalUnit" value="hours"/>
     </c:when>
     <c:otherwise>
-        <c:set var="interval" value="${seconds/60}"/>
+        <c:set var="interval" value="${fn:substringBefore((seconds/60),'.')}"/>
         <c:set var="intervalUnit" value="minutes"/>
     </c:otherwise>
 </c:choose>
@@ -52,12 +52,12 @@
 
     $j(document).ready(function () {
 
-        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", {
+        reportDate = new DatePicker("<openmrs:datePattern/>", "evaluationDate", {
             defaultDate: new Date()
         });
         reportDate.setDate(new Date());
 
-        scheduleDate = new DateTimePicker("<openmrs:datePattern/>", "h:mm tt", "scheduleDate", {
+        scheduleDate = new DateTimePicker("<openmrs:datePattern/>", "h:mm tt", "dateScheduled", {
             hourGrid: 6,
             minuteGrid: 10,
             stepMinute: 5
@@ -78,30 +78,30 @@
             <table cellspacing="0" cellpadding="2">
                 <tr>
                     <td class="right">
-                        <label for="reportDate">Report date (as of):</label>
+                        <label for="evaluationDate">Report date (as of):</label>
                     </td>
                     <td>
                         <spring:bind path="queuedReports.evaluationDate">
-                           <input type="text" name="${status.expression}" id="reportDate"  value="${status.value}"/>
+                           <input type="text" name="${status.expression}" id="evaluationDate"  value="${status.value}"/>
                         </spring:bind>
                     </td>
                 </tr>
                 <tr>
                     <td class="right">
-                        <label for="scheduleDate">Schedule date (run on):</label>
+                        <label for="dateScheduled">Schedule date (run on):</label>
                     </td>
                     <td>
 
-                            <c:if test="${not empty queuedReports.queuedReportId}">
+
                                 <spring:bind path="queuedReports.dateScheduled">
-                                    <input type="text" id="scheduleDate" name="${status.expression}" value="${dateScheduled}" />
+                                    <c:if test="${not empty dateScheduled}">
+                                    <input type="text" id="dateScheduled" name="dateScheduled" value="${dateScheduled}" />
+
+                                    </c:if>
+                                    <c:if test="${empty queuedReports.queuedReportId}">
+                                    <input type="text" id="dateScheduled" name="dateScheduled" value="${now}"/>
+                                    </c:if>
                                 </spring:bind>
-                            </c:if>
-                            <spring:bind path="queuedReports.dateScheduled">
-                            <c:if test="${empty queuedReports.queuedReportId}">
-                                <input type="text" id="scheduleDate" name="${status.expression}" value="${now}"/>
-                            </c:if>
-                            </spring:bind>
 
 
                     </td>
@@ -118,8 +118,8 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.repeatInterval">
-                                <fmt:parseNumber var="i" integerOnly="true" type="number" value="${status.value}" />
-                                <input type="text" name="${status.expression}" id="repeatInterval" value="${i}" />
+                                <%--<fmt:parseNumber var="formattedInterval" integerOnly="true" type="number" value="${interval}" />--%>
+                                <input type="text" name="${status.expression}" id="repeatInterval" value="${interval}" />
                         </spring:bind>
 
                         <spring:bind path="queuedReports.repeatInterval">
