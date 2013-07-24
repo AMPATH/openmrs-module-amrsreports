@@ -9,9 +9,12 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortD
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ObsValueNumericConverter;
+import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -104,8 +107,40 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
 
-        // CTX start date
-        dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
+		// i. WHO Stage at start of ARVs
+		ObsNearestARVStartDateDataDefinition whoDef = new ObsNearestARVStartDateDataDefinition(
+				"WHO closest to ARV start",
+				Context.getConceptService().getConcept(5356),
+				Context.getConceptService().getConcept(1224)
+		);
+		dsd.addColumn("WHO Stage at ART Start", whoDef, nullString, new WHOStageConverter());
+
+		// j. CD4 at start of ARVs
+		ObsNearestARVStartDateDataDefinition cd4Def = new ObsNearestARVStartDateDataDefinition(
+				"CD4 closest to ARV start",
+				Context.getConceptService().getConcept(5497),
+				Context.getConceptService().getConcept(730)
+		);
+		dsd.addColumn("CD4 at ART Start", cd4Def, nullString, new ObsValueNumericConverter(1));
+
+		// k. Height at start of ARVs
+		ObsNearestARVStartDateDataDefinition heightDef = new ObsNearestARVStartDateDataDefinition(
+				"height closest to ARV start",
+				Context.getConceptService().getConcept(5090)
+		);
+		heightDef.setAgeLimit(12);
+		dsd.addColumn("Height at ART Start", heightDef, nullString, new ObsValueNumericConverter(1));
+
+		// l. Weight at start of ARVs
+		ObsNearestARVStartDateDataDefinition weightDef = new ObsNearestARVStartDateDataDefinition(
+				"weight closest to ARV start",
+				Context.getConceptService().getConcept(5089)
+		);
+		weightDef.setAgeLimit(12);
+		dsd.addColumn("Weight at ART Start", weightDef, nullString, new ObsValueNumericConverter(1));
+
+		// m. CTX start date
+		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
 		report.addDataSetDefinition(dsd, null);
 
@@ -125,7 +160,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		design.setRendererType(ExcelTemplateRenderer.class);
 
 		Properties props = new Properties();
-		props.put("repeatingSections", "sheet:1,row:7-8,dataset:allPatients");
+		props.put("repeatingSections", "sheet:1,row:7,dataset:allPatients");
 
 		design.setProperties(props);
 

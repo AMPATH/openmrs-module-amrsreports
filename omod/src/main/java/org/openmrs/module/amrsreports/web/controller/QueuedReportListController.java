@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.util.OpenmrsUtil;
@@ -18,7 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
+import java.util.*;
 
 /**
  * controller for View AMRS Reports page
@@ -27,34 +28,6 @@ import java.util.List;
 public class QueuedReportListController {
 
 	private static final Log log = LogFactory.getLog(QueuedReportListController.class);
-
-	@ModelAttribute("queuedReports")
-	public List<QueuedReport> getQueuedReports() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_NEW);
-	}
-
-	@ModelAttribute("runningReports")
-	public List<QueuedReport> getRunningReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_RUNNING);
-	}
-
-	@ModelAttribute("errorReports")
-	public List<QueuedReport> getErrorReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_ERROR);
-	}
-
-	@ModelAttribute("completeReports")
-	public List<QueuedReport> getCompleteReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_COMPLETE);
-	}
-
-	@ModelAttribute("datetimeFormat")
-	public String getDatetimeFormat() {
-		SimpleDateFormat sdf = Context.getDateFormat();
-		String format = sdf.toPattern();
-		format += " hh:mm a";
-		return format;
-	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.list")
 	public String preparePage() {

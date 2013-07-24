@@ -13,32 +13,27 @@ import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
  * controller for Run AMRS Reports page
  */
 @Controller
-@SessionAttributes("queuedReports")
 public class QueuedReportFormController {
 
 	private final Log log = LogFactory.getLog(getClass());
 
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
-   // private static final String EDIT_VIEW = "module/amrsreports/queuedReportForm";
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
@@ -62,6 +57,11 @@ public class QueuedReportFormController {
 	public String getNow() {
 		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
 		return sdf.format(new Date());
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
+	public String preparePage() {
+		return FORM_VIEW;
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")

@@ -24,6 +24,10 @@ public class DecimalAgeConverter implements DataConverter {
 
 	@Override
 	public Object convert(Object original) {
+
+		if (original == null)
+			return null;
+
 		Age age = (Age) original;
 		Double decimalAge = age.getFullYears() + (new Double(age.getFullMonthsSinceLastBirthday()) / 12d);
 
