@@ -50,6 +50,10 @@
                                         <a href="viewReport.form?reportId=${r.id}">View</a>
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </c:when>
+                                    <c:when test="${model.status == 'NEW'}">
+                                        <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
+
+                                    </c:when>
                                 </c:choose>
                             </span>
 

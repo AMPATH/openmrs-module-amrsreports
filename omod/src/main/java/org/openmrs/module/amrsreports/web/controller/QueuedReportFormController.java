@@ -13,27 +13,37 @@ import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 
 
 /**
  * controller for Run AMRS Reports page
  */
 @Controller
+@SessionAttributes("queuedReports")
 public class QueuedReportFormController {
 
 	private final Log log = LogFactory.getLog(getClass());
 
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
+   // private static final String EDIT_VIEW = "module/amrsreports/queuedReportForm";
+
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
@@ -59,33 +69,38 @@ public class QueuedReportFormController {
 		return sdf.format(new Date());
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
-	public String preparePage() {
-		return FORM_VIEW;
-	}
-
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
 	public String processForm(HttpServletRequest request,
 							  @RequestParam(value = "immediate", required = false) Boolean immediate,
-							  @RequestParam("reportDate") Date reportDate,
-							  @RequestParam("scheduleDate") String scheduleDate,
+							  @RequestParam("evaluationDate") Date reportDate,
+							  @RequestParam("dateScheduled") String scheduleDate,
 							  @RequestParam("facility") Integer facilityId,
 							  @RequestParam("reportName") String reportName,
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits,
-							  @RequestParam(value = "repeatInterval", required = false) Integer repeatInterval
+							  @RequestParam(value = "repeatInterval", required = false) Integer repeatInterval,
+                              @ModelAttribute("queuedReports") QueuedReport editedReport
 	) throws Exception {
 
+        QueuedReport queuedReport;
 		// find the facility
 		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
 
 		// create a queued report
-		QueuedReport queuedReport = new QueuedReport();
+        if(editedReport.getId() !=null){
+           queuedReport = editedReport;
+        }
+        else {
+           queuedReport =  new QueuedReport();
+        }
+        queuedReport =  new QueuedReport();
+
 		queuedReport.setFacility(facility);
 		queuedReport.setReportName(reportName);
 		queuedReport.setEvaluationDate(reportDate);
 
 		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
 		Date scheduledDate = sdf.parse(scheduleDate);
+
 		if (immediate == null)
 			queuedReport.setDateScheduled(scheduledDate);
 		else
@@ -120,19 +135,22 @@ public class QueuedReportFormController {
             @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             ModelMap modelMap) {
 
-
         QueuedReport queuedReport = null;
 
         if (queuedReportId != null)
             queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
 
-        if (queuedReport == null)
+        if (queuedReport == null){
             queuedReport = new QueuedReport();
+
+            queuedReport.setEvaluationDate(new Date());
+        }
 
         modelMap.put("queuedReports", queuedReport);
 
 
         return FORM_VIEW;
     }
+
 
 }

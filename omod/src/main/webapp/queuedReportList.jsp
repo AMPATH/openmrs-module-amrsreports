@@ -22,6 +22,7 @@
 
 <br/>
 
+
 <openmrs:portlet id="queuedAMRSReports" moduleId="amrsreports" url="queuedAMRSReports"
                  parameters="status=NEW|title=Queued Reports"/>
 
