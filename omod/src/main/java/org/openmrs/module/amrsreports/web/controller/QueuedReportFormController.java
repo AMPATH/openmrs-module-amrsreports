@@ -34,7 +34,6 @@ import java.util.Date;
 import java.util.List;
 
 
-
 /**
  * controller for Run AMRS Reports page
  */
@@ -46,8 +45,6 @@ public class QueuedReportFormController {
 
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
-   // private static final String EDIT_VIEW = "module/amrsreports/queuedReportForm";
-
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
@@ -75,25 +72,29 @@ public class QueuedReportFormController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
 	public String processForm(HttpServletRequest request,
-                              @ModelAttribute("queuedReports") QueuedReport editedReport,
-                              BindingResult errors,
+							  @ModelAttribute("queuedReports") QueuedReport editedReport,
+							  BindingResult errors,
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits
 	) throws Exception {
 
-		if (editedReport.getRepeatInterval() == null || editedReport.getRepeatInterval() < 0){
+		// determine the repeat interval by units
+		repeatIntervalUnits = repeatIntervalUnits.toLowerCase().trim();
+
+		// ignore if the repeat interval is empty / zero
+		if (editedReport.getRepeatInterval() == null || editedReport.getRepeatInterval() < 0) {
 			editedReport.setRepeatInterval(0);
-        }
-        else if(editedReport.getRepeatInterval() > 0){
 
-            if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "minutes")) {
-                editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60);//repeatInterval = repeatInterval * 60;
-            } else if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "hours")) {
-                editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60);//repeatInterval = repeatInterval * 60 * 60;
-            } else {
-                editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60 * 24);//repeatInterval = repeatInterval * 60 * 60 * 24;
-            }
-        }
+		} else if (editedReport.getRepeatInterval() > 0) {
 
+			if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "minutes")) {
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60);
+			} else if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "hours")) {
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60);
+			} else {
+				// assume days
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60 * 24);
+			}
+		}
 
 		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
@@ -106,50 +107,55 @@ public class QueuedReportFormController {
 		return SUCCESS_VIEW;
 	}
 
-    @RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
-    public String editQueuedReport(
-            @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
-            ModelMap modelMap) {
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
+	public String editQueuedReport(
+			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
+			ModelMap modelMap) {
 
-        QueuedReport queuedReport = null;
+		QueuedReport queuedReport = null;
 
-        if (queuedReportId != null)
-            queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
+		if (queuedReportId != null)
+			queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
 
-        if (queuedReport == null){
-            queuedReport = new QueuedReport();
+		if (queuedReport == null) {
+			queuedReport = new QueuedReport();
+		}
 
-            queuedReport.setEvaluationDate(new Date());
-        }
+		modelMap.put("queuedReports", queuedReport);
 
-        modelMap.put("queuedReports", queuedReport);
+		Integer interval = queuedReport.getRepeatInterval();
+		Integer repeatInterval;
 
+		if (interval < 60) {
+			modelMap.put("units", "seconds");
+			repeatInterval = interval;
+		} else if (interval < 3600) {
+			modelMap.put("units", "minutes");
+			repeatInterval = interval / 60;
+		} else if (interval < 86400) {
+			modelMap.put("units", "hours");
+			repeatInterval = interval / 3600;
+		} else {
+			modelMap.put("units", "days");
+			repeatInterval = interval / 86400;
+		}
 
-        return FORM_VIEW;
-    }
+		modelMap.put("repeatInterval", repeatInterval.toString());
 
-    @InitBinder
-    private void dateBinder(WebDataBinder binder) {
-        //The date format to parse or output your dates
+		return FORM_VIEW;
+	}
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	@InitBinder
+	private void dateBinder(WebDataBinder binder) {
+		// The date format to parse or output your dates
+		SimpleDateFormat dateFormat = Context.getDateFormat();
 
-        //Create a new CustomDateEditor
-        CustomDateEditor editor = new CustomDateEditor(dateFormat, true);
-        //Register it as custom editor for the Date type
-        binder.registerCustomEditor(Date.class, editor);
-    }
+		// Another date format for datetime
+		SimpleDateFormat datetimeFormat = new SimpleDateFormat(getDatetimeFormat());
 
-    @InitBinder
-    private void dateTimeBinder(WebDataBinder binder) {
-        //The date format to parse or output your dates
-        SimpleDateFormat dateFormat = new SimpleDateFormat(getDatetimeFormat());
-
-        //Create a new CustomDateEditor
-        CustomDateEditor editor = new CustomDateEditor(dateFormat, true);
-        //Register it as custom editor for the Date type
-        binder.registerCustomEditor(Date.class, editor);
-    }
-
+		// Register them as custom editors for the Date type
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(datetimeFormat, true));
+	}
 
 }
