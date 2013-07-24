@@ -68,10 +68,15 @@
 </script>
 
 
-
-        <b class="boxHeader">Scheduled Report Details</b>
+ <b class="boxHeader">Scheduled Report Details</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
+
+    <spring:hasBindErrors name="queuedReports">
+        <spring:message code="fix.error"/>
+        <br />
+    </spring:hasBindErrors>
+
     <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
@@ -83,6 +88,12 @@
                     <td>
                         <spring:bind path="queuedReports.evaluationDate">
                            <input type="text" name="${status.expression}" id="evaluationDate"  value="${status.value}"/>
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
                         </spring:bind>
                     </td>
                 </tr>
@@ -95,11 +106,18 @@
 
                                 <spring:bind path="queuedReports.dateScheduled">
                                     <c:if test="${not empty dateScheduled}">
-                                    <input type="text" id="dateScheduled" name="dateScheduled" value="${dateScheduled}" />
+                                    <input type="text" id="dateScheduled" name="${status.expression}" value="${dateScheduled}" />
 
                                     </c:if>
                                     <c:if test="${empty queuedReports.queuedReportId}">
-                                    <input type="text" id="dateScheduled" name="dateScheduled" value="${now}"/>
+                                    <input type="text" id="dateScheduled" name="${status.expression}" value="${now}"/>
+                                    </c:if>
+
+                                    <c:if test="${status.error}">
+                                        Error codes:
+                                        <c:forEach items="${status.errorMessages}" var="error">
+                                        <c:out value="${error}"/>
+                                        </c:forEach>
                                     </c:if>
                                 </spring:bind>
 
@@ -118,8 +136,13 @@
                     </td>
                     <td>
                         <spring:bind path="queuedReports.repeatInterval">
-                                <%--<fmt:parseNumber var="formattedInterval" integerOnly="true" type="number" value="${interval}" />--%>
                                 <input type="text" name="${status.expression}" id="repeatInterval" value="${interval}" />
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
                         </spring:bind>
 
                         <spring:bind path="queuedReports.repeatInterval">
@@ -130,6 +153,12 @@
                             <option value="days" <c:if test="${intervalUnit=='days'}">selected</c:if> >Days</option>
 
                         </select>
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
                         </spring:bind>
                     </td>
                 </tr>
@@ -139,11 +168,17 @@
         <fieldset class="visualPadding">
             <legend>Location</legend>
          <spring:bind path="queuedReports.facility.facilityId">
-            <select name="facility" id="facility"  size="10">
+            <select name="${status.expression}" id="facility"  size="10">
                <c:forEach var="facility" items="${facilities}">
                     <option <c:if test="${status.value==facility.facilityId}">selected</c:if> value="${facility.facilityId}">${facility.code} - ${facility.name} </option>
                </c:forEach>
             </select>
+             <c:if test="${status.error}">
+                 Error codes:
+                 <c:forEach items="${status.errorMessages}" var="error">
+                 <c:out value="${error}"/>
+                 </c:forEach>
+             </c:if>
           </spring:bind>
         </fieldset>
         <fieldset class="visualPadding">
@@ -154,6 +189,12 @@
                     <input type="radio" name="reportName" <c:if test="${status.value==report.name}">checked</c:if> value="${report.name}"/> ${report.name}
                 </div>
             </c:forEach>
+                <c:if test="${status.error}">
+                Error codes:
+                <c:forEach items="${status.errorMessages}" var="error">
+                <c:out value="${error}"/>
+                </c:forEach>
+                </c:if>
            </spring:bind>
         </fieldset>
         <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
