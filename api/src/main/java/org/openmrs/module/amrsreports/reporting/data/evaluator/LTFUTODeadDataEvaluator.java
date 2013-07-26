@@ -46,8 +46,8 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				"	select person_id, obs_datetime" +
 				"	from obs" +
 				"	where" +
-				"		person_id in (:personIds)" +
-				"		and voided=0" +
+				"		voided=0" +
+				"		and person_id in (:personIds)" +
 				"		and obs_datetime <= ':reportDate'" +
 				"		and (" +
 				"			concept_id in (1570, 1734, 1573)" +
@@ -64,8 +64,8 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				"	select patient_id, encounter_datetime" +
 				"	from encounter" +
 				"	where" +
-				"		patient_id in (:personIds)" +
-				"		and voided=0" +
+				"		voided=0" +
+				"		and patient_id in (:personIds)" +
 				"		and encounter_type=31" +
 				"		and encounter_datetime <= ':reportDate'" +
 				"	order by encounter_datetime asc" +
