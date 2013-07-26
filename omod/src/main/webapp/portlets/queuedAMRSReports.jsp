@@ -61,9 +61,22 @@
 
                             <span class="evaluationDate">as of <openmrs:formatDate date="${r.evaluationDate}"
                                                                                    type="textbox"/></span>
+                            <c:choose>
+                                <c:when test="${model.status == 'NEW'}">
+                                    <c:forEach items="${model.repeatIntervalUnitMap}" var="thisReport">
+                                        <c:if test="${thisReport.key eq r}">
+                                            <c:set var="repeatUnit" value="${thisReport.value}"  />
+                                        </c:if>
+                                    </c:forEach>
+                                        <span class="scheduledDate">run on <openmrs:formatDate date="${r.dateScheduled}"
+                                                                                               format="${model.datetimeFormat}"/>  ${repeatUnit}</span>
+                                </c:when>
+                                <c:otherwise>
+                                     <span class="scheduledDate">ran on <openmrs:formatDate date="${r.dateScheduled}"
+                                                                                            format="${model.datetimeFormat}"/></span>
+                                </c:otherwise>
+                            </c:choose>
 
-                            <span class="scheduledDate">ran on <openmrs:formatDate date="${r.dateScheduled}"
-                                                                                   format="${model.datetimeFormat}"/></span>
                         </div>
                     </c:forEach>
 

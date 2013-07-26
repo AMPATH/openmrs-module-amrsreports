@@ -15,9 +15,11 @@
 package org.openmrs.module.amrsreports.web.controller;
 
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,7 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 		String status = (String) model.get("status");
 
 		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
+        Map<QueuedReport, String> repeatIntervalUnitMap = new HashMap<QueuedReport, String>();
 
 		if (Context.isAuthenticated() && status != null) {
 
@@ -55,11 +58,17 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 				if (!queuedReportsMap.containsKey(thisMohFacility))
 					queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
+                if(status.equals(QueuedReport.STATUS_NEW)/* && thisReport.getRepeatInterval()>0*/){
+                   repeatIntervalUnitMap.put(thisReport, getScheduleInterval(thisReport));
+
+                }
+
 				queuedReportsMap.get(thisMohFacility).add(thisReport);
 			}
 		}
 
 		model.put("queuedReportsMap", queuedReportsMap);
+        model.put("repeatIntervalUnitMap",repeatIntervalUnitMap);
 
 		// date time format -- needs to come from here because we can make it locale-specific
 		// TODO extract this to a utility if used more than once
@@ -70,5 +79,34 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
 		model.put("datetimeFormat", format);
 	}
+
+    private String getScheduleInterval(QueuedReport queuedReport){
+
+        Integer interval = queuedReport.getRepeatInterval();
+
+        String repeatIntervalString;
+        String units;
+        Integer repeatInterval;
+
+        if (interval <=0) {
+            return "[No Repeat]";
+        }
+        else if (interval < 60) {
+            units = "seconds";
+            repeatInterval = interval;
+        } else if (interval < 3600) {
+            units = "minutes";
+            repeatInterval = interval / 60;
+        } else if (interval < 86400) {
+            units = "hours";
+            repeatInterval = interval / 3600;
+        } else {
+            units = "days";
+            repeatInterval = interval / 86400;
+        }
+
+        return repeatIntervalString = "["+repeatInterval+" "+units+" interval]";
+
+    }
 
 }
