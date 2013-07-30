@@ -24,6 +24,6 @@ public interface QueuedReportDAO {
 
 	public QueuedReport getQueuedReport(Integer reportId);
 
-    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities, String status);
+    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities, String status);
 
 }

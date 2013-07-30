@@ -193,20 +193,12 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 	@Override
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
-
-        Role superUserRole = Context.getUserService().getRole(RoleConstants.SUPERUSER);
-        List<User> superUsers=Context.getUserService().getUsers(null, Collections.singletonList(superUserRole), false);
-
-         User user =Context.getAuthenticatedUser();
          UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
-         List<MOHFacility>allowedFacilities=userFacilityService.getAllowedFacilitiesForUser(user);
+         List<MOHFacility>allowedFacilities=userFacilityService.getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
 
 
-             if( superUsers.contains(user)){
-		      return dao.getQueuedReportsWithStatus(status);
-              } else{
-                 return dao.getAllowedReportsByUser(allowedFacilities,status);
-             }
+
+                 return dao.getReportsByFacilities(allowedFacilities,status);
 
 	}
 
@@ -216,8 +208,8 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 	}
 
     @Override
-    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities, String status) {
-        return dao.getAllowedReportsByUser(allowedFacilities,status);
+    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities, String status) {
+        return dao.getReportsByFacilities(allowedFacilities,status);
     }
 
 }

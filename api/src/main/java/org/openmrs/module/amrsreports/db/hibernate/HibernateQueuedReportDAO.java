@@ -66,7 +66,7 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 	}
 
     @Override
-    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities,String status) {
+    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities,String status) {
         return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
                 .add(Restrictions.eq("status",status))
                 .add(Restrictions.in("facility",allowedFacilities))

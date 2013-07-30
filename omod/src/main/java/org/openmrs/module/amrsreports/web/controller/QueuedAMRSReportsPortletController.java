@@ -23,19 +23,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Controller
 @RequestMapping("**/queuedAMRSReports.portlet")
 public class QueuedAMRSReportsPortletController extends PortletController {
-
     /**
      * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
      *      java.util.Map)
      */
     @Override
     protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
-
         String status = (String) model.get("status");
 
         Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();

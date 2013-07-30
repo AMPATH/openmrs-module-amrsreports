@@ -36,6 +36,6 @@ public interface QueuedReportService {
 	public QueuedReport getQueuedReport(Integer reportId);
 
     @Transactional(readOnly = true)
-    public List<QueuedReport> getAllowedReportsByUser(List<MOHFacility> allowedFacilities, String status);
+    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities, String status);
 
 }
