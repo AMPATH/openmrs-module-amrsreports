@@ -52,6 +52,7 @@
                                     </c:when>
                                     <c:when test="${model.status == 'NEW'}">
                                         <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
+                                        <a class="remove" id="${r.id}" >Remove</a>
 
                                     </c:when>
                                 </c:choose>
