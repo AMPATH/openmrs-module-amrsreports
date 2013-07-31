@@ -6,6 +6,15 @@
 <script type="text/javascript">
     $j(document).ready(function () {
 
+        $j(".interval").each(function(){
+
+            var interval = $j(this).attr("seconds");
+
+            var intervalString = getScheduleInterval(interval);
+            $j(this).text(intervalString);
+
+        });
+
         $j('.show_hide').showHide({
             speed: 1000,
             easing: 'swing',
@@ -14,6 +23,33 @@
             hideText: 'View Last Two' // the button text to show when a div is open
         });
     });
+
+    function getScheduleInterval(interval){
+
+        var repeatIntervalString;
+        var units;
+        var repeatInterval;
+
+        if (interval <=0) {
+            return "[No Repeat]";
+        }
+        else if (interval < 60) {
+            units = "seconds";
+            repeatInterval = interval;
+        } else if (interval < 3600) {
+            units = "minutes";
+            repeatInterval = interval / 60;
+        } else if (interval < 86400) {
+            units = "hours";
+            repeatInterval = interval / 3600;
+        } else {
+            units = "days";
+            repeatInterval = interval / 86400;
+        }
+
+        return repeatIntervalString = "["+repeatInterval+" "+units+" interval]";
+
+    }
 </script>
 
 <%@ include file="localHeader.jsp" %>
