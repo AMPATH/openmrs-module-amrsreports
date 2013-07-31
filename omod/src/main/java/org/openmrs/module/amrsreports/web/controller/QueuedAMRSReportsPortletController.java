@@ -69,7 +69,7 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
 		SimpleDateFormat sdf = Context.getDateFormat();
 		String format = sdf.toPattern();
-		format += " hh:mm a";
+		format += " 'at' hh:mm a";
 
 		model.put("datetimeFormat", format);
 	}

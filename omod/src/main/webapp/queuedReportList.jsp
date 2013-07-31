@@ -4,15 +4,11 @@
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.list"/>
 
 <script type="text/javascript">
-    $j(document).ready(function () {
+    $j(document).ready(function(){
 
         $j(".interval").each(function(){
-
-            var interval = $j(this).attr("seconds");
-
-            var intervalString = getScheduleInterval(interval);
+            var intervalString = getScheduleInterval($j(this).attr("seconds"));
             $j(this).text(intervalString);
-
         });
 
         $j('.show_hide').showHide({
@@ -22,33 +18,37 @@
             showText: 'View All', // the button text to show when a div is closed
             hideText: 'View Last Two' // the button text to show when a div is open
         });
+
     });
 
     function getScheduleInterval(interval){
-
-        var repeatIntervalString;
         var units;
         var repeatInterval;
 
-        if (interval <=0) {
-            return "[No Repeat]";
+        if (interval <= 0) {
+            return "";
         }
         else if (interval < 60) {
-            units = "seconds";
+            units = "second";
             repeatInterval = interval;
         } else if (interval < 3600) {
-            units = "minutes";
+            units = "minute";
             repeatInterval = interval / 60;
         } else if (interval < 86400) {
-            units = "hours";
+            units = "hour";
             repeatInterval = interval / 3600;
         } else {
-            units = "days";
+            units = "day";
             repeatInterval = interval / 86400;
         }
 
-        return repeatIntervalString = "["+repeatInterval+" "+units+" interval]";
+        if (repeatInterval == 1) {
+            repeatInterval = "";
+        } else {
+            units += "s";
+        }
 
+        return "every " + repeatInterval + " " + units;
     }
 </script>
 
@@ -57,7 +57,6 @@
 <a href="queuedReport.form">Add a Scheduled Report</a>
 
 <br/>
-
 
 <openmrs:portlet id="queuedAMRSReports" moduleId="amrsreports" url="queuedAMRSReports"
                  parameters="status=NEW|title=Queued Reports"/>
