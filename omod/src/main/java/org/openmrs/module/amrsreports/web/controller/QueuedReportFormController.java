@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.web.controller;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
@@ -110,9 +111,27 @@ public class QueuedReportFormController {
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
-			ModelMap modelMap) {
+            @RequestParam(value = "action", required = false) String action,
+			ModelMap modelMap,
+            HttpServletRequest request) {
 
 		QueuedReport queuedReport = null;
+        HttpSession httpSession = request.getSession();
+
+        if(queuedReportId !=null && !action.equals("")){
+            QueuedReportService queuedReportService= Context.getService(QueuedReportService.class);
+
+            try{
+                queuedReportService.purgeQueuedReport(queuedReportService.getQueuedReport(queuedReportId));
+                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
+                return SUCCESS_VIEW;
+            }
+            catch (Exception e){
+                log.error(e);
+                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "There was an error removing the report");
+
+            }
+        }
 
 		if (queuedReportId != null)
 			queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
