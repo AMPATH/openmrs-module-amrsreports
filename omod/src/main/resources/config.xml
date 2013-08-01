@@ -90,7 +90,6 @@
                 <include method="assignMissingIdentifiersForFacility"/>
                 <include method="getPreARTEnrollmentLocationUuidForPatientUuid"/>
                 <include method="isReportRunnerScheduledTaskOn"/>
-                <include method="purgeQueuedReport"/>
             </create>
             <convert match="org.openmrs.module.amrsreports.UserFacility" converter="bean" />
             <convert match="org.openmrs.Location" converter="bean" />
@@ -116,7 +115,6 @@
             DWRAmrsReportService.assignMissingIdentifiersForFacility(Integer facilityId);
             DWRAmrsReportService.getPreARTEnrollmentLocationUuidForPatientUuid(String patientUuid);
             DWRAmrsReportService.isReportRunnerScheduledTaskOn();
-            DWRAmrsReportService.purgeQueuedReport(Integer reportId);
 			]]>
         </signatures>
     </dwr>

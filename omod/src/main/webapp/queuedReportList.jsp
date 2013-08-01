@@ -19,58 +19,6 @@
             hideText: 'View Last Two' // the button text to show when a div is open
         });
 
-
-        $j('.remove').delegate('','click', function() {
-
-            thisReport = $j(this).attr("id");
-            thisParentDiv = $j(this).closest("div");
-
-            $j("#dlgRemoveReport").dialog("open");
-
-            return false;
-
-        });
-
-
-        $j("#dlgRemoveReport" ).dialog({
-            autoOpen:false,
-            modal: true,
-            /*show: 'slide',*/
-            height: 'auto',
-            hide: 'slide',
-            width:600,
-            cache: false,
-            position: 'middle',
-            buttons: {
-                "Remove": function () {
-
-                    if(thisReport !=null){
-
-                     DWRAmrsReportService.purgeQueuedReport(thisReport,function(data){
-
-
-                         if(data=="The report was successfully removed"){
-
-                             $j("#dlgRemoveReport").dialog("close");
-                             thisParentDiv.remove();
-                             $j("#openmrs_dwr_error").html(data);
-                             $j("#openmrs_dwr_error").style.display = "";
-
-
-                         }
-                         else{
-                             $j("#openmrs_dwr_error").html(data);
-                             $j("#openmrs_dwr_error").style.display = "";
-                             $j("#dlgRemoveReport").dialog("close");
-                         }
-                      });
-
-                    }
-
-                },
-                "Cancel": function () { $j(this).dialog("close"); }
-            }
-        });
     });
 
 
@@ -125,7 +73,5 @@
 
 <openmrs:portlet id="queuedAMRSReports" moduleId="amrsreports" url="queuedAMRSReports"
                  parameters="status=ERROR|title=Reports in Error"/>
-
-<div id="dlgRemoveReport" title="Remove Report"><p>Are you sure you want to remove the Report?</p></div>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

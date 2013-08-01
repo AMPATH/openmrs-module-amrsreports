@@ -402,20 +402,4 @@ public class DWRAmrsReportService {
 		return false;
 	}
 
-    public String purgeQueuedReport(Integer reportId){
-        QueuedReportService queuedReportService= Context.getService(QueuedReportService.class);
-        try{
-            queuedReportService.getQueuedReport(reportId);
-            queuedReportService.purgeQueuedReport(queuedReportService.getQueuedReport(reportId));
-            log.info("QueuedReport was removed successfully");
-            return "The report was successfully removed";
-
-        }
-        catch (Exception e){
-            log.error("There was a problem removing a QueuedReports "+e);
-            return "There was an error removing the report";
-        }
-
-
-    }
 }
