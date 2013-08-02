@@ -51,11 +51,11 @@
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </c:when>
                                     <c:when test="${model.status == 'NEW'}">
-                                        <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
-                                        <a class="remove" id="${r.id}" >Remove</a>
+                                        <a href="queuedReport.form?queuedReportId=${r.id}&action">Edit</a>
 
                                     </c:when>
                                 </c:choose>
+                                 <a class="remove" id="${r.id}"<%-- href="queuedReport.form?queuedReportId=${r.id}&action='remove'"--%>>Remove</a>
                             </span>
 
                             <span class="reportName">${r.reportName}</span>

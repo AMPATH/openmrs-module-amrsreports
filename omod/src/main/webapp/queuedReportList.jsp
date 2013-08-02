@@ -21,9 +21,11 @@
 
 
         $j('.remove').delegate('','click', function() {
+
+            thisReport = $j(this).attr("id");
+            thisParentDiv = $j(this).closest("div");
+
             $j("#dlgRemoveReport").dialog("open");
-             thisReport = $j(this).attr("id");
-             //thisParentDiv = $j(this).parentNode;
 
             return false;
 
@@ -43,18 +45,26 @@
                 "Remove": function () {
 
                     if(thisReport !=null){
-                      DWRAmrsReportService.purgeQueuedReport(thisReport,function(data){
+
+                     DWRAmrsReportService.purgeQueuedReport(thisReport,function(data){
+
+
                          if(data=="The report was successfully removed"){
-                             $j("#openmrs_dwr_error_msg").html(data);
-                             /*$j(".queuedReportsSubSectionContent").remove(thisParentDiv);*/
-                             $j(this).dialog("close");
-                             location.reload();
+
+                             $j("#dlgRemoveReport").dialog("close");
+                             thisParentDiv.remove();
+                             $j("#openmrs_dwr_error").html(data);
+                             $j("#openmrs_dwr_error").style.display = "";
+
+
                          }
                          else{
-                             $j("#openmrs_dwr_error_msg").html(data);
-                             $j(this).dialog("close");
+                             $j("#openmrs_dwr_error").html(data);
+                             $j("#openmrs_dwr_error").style.display = "";
+                             $j("#dlgRemoveReport").dialog("close");
                          }
                       });
+
                     }
 
                 },
