@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.cohort.definition.evaluator;
 
 import org.openmrs.Cohort;
+import org.openmrs.Location;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
@@ -14,6 +15,9 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Evaluator for NASCOP 771 Cohort Definition
@@ -31,7 +35,13 @@ public class NASCOP771CohortDefinitionEvaluator implements CohortDefinitionEvalu
 		if (definition == null)
 			return null;
 
+		if (definition.getFacility() == null)
+			return null;
+
 		String reportDate = sdf.format(context.getEvaluationDate());
+		List<Location> locationList = new ArrayList<Location>();
+		locationList.addAll(definition.getFacility().getLocations());
+		context.addParameterValue("locationList", locationList);
 
 		String sql =
 				"select person_id" +

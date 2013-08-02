@@ -1,10 +1,10 @@
 package org.openmrs.module.amrsreports.service.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
-import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -19,6 +19,7 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportData;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
@@ -26,9 +27,15 @@ import org.openmrs.module.reporting.report.definition.service.ReportDefinitionSe
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Implementation of {@link QueuedReportService}
@@ -59,30 +66,44 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 		// find the report provider
 		ReportProvider reportProvider = ReportProviderRegistrar.getInstance().getReportProviderByName(queuedReport.getReportName());
-		ReportDefinition reportDefinition = reportProvider.getReportDefinition();
+
 		CohortDefinition cohortDefinition = reportProvider.getCohortDefinition();
+		cohortDefinition.addParameter(new Parameter("facility", "Facility", MOHFacility.class));
+
+		ReportDefinition reportDefinition = reportProvider.getReportDefinition();
+		reportDefinition.addParameter(new Parameter("facility", "Facility", MOHFacility.class));
 
 		// try rendering the report
 		EvaluationContext evaluationContext = new EvaluationContext();
 
 		// set up evaluation context values
-		List<Location> locations = new ArrayList<Location>();
-		locations.addAll(queuedReport.getFacility().getLocations());
-		evaluationContext.addParameterValue("locationList", locations);
 		evaluationContext.addParameterValue("facility", queuedReport.getFacility());
 		evaluationContext.setEvaluationDate(queuedReport.getEvaluationDate());
+
+		StopWatch timer = new StopWatch();
+		timer.start();
 
 		// get the cohort
 		CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 		Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
 		evaluationContext.setBaseCohort(cohort);
 
+		timer.stop();
+		String cohortTime = timer.toString();
+		timer.reset();
+		timer.start();
+
 		// get the time the report was started (not finished)
 		Date startTime = Calendar.getInstance().getTime();
 		String formattedStartTime = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(startTime);
 		String formattedEvaluationDate = new SimpleDateFormat("yyyy-MM-dd").format(queuedReport.getEvaluationDate());
 		ReportData reportData = Context.getService(ReportDefinitionService.class)
-		        .evaluate(reportDefinition, evaluationContext);
+				.evaluate(reportDefinition, evaluationContext);
+
+		timer.stop();
+
+		log.info("Time for rendering " + cohort.getSize() + "-person cohort: " + cohortTime);
+		log.info("Time for rendering " + cohort.getSize() + "-person report: " + timer.toString());
 
 		// find the directory to put the file in
 		AdministrationService as = Context.getAdministrationService();
@@ -133,37 +154,34 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		queuedReport.setCsvFilename(csvFilename);
 		queuedReport.setXlsFilename(xlsFilename);
 
-        //Mark original QueuedReport as complete and save status
-        queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
-        Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+		//Mark original QueuedReport as complete and save status
+		queuedReport.setStatus(QueuedReport.STATUS_COMPLETE);
+		Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
 
 
-        if (queuedReport.getRepeatInterval() != null && queuedReport.getRepeatInterval() > 0){
+		if (queuedReport.getRepeatInterval() != null && queuedReport.getRepeatInterval() > 0) {
+
+			//create a new QueuedReport borrowing some values from the run report
+			QueuedReport newQueuedReport = new QueuedReport();
+			newQueuedReport.setFacility(queuedReport.getFacility());
+			newQueuedReport.setReportName(queuedReport.getReportName());
 
 
-            //create a new QueuedReport borrowing some values from the run report
-            QueuedReport newQueuedReport = new QueuedReport();
-            newQueuedReport.setFacility(queuedReport.getFacility());
-            newQueuedReport.setReportName(queuedReport.getReportName());
+			//compute date for next schedule
+			Calendar newScheduleDate = Calendar.getInstance();
+			newScheduleDate.setTime(queuedReport.getDateScheduled());
+			newScheduleDate.add(Calendar.SECOND, newScheduleDate.get(Calendar.SECOND) + queuedReport.getRepeatInterval());
+			Date nextSchedule = newScheduleDate.getTime();
 
+			//set date for next schedule
+			newQueuedReport.setDateScheduled(nextSchedule);
+			newQueuedReport.setEvaluationDate(nextSchedule);
 
-            //compute date for next schedule
-            Calendar newScheduleDate = Calendar.getInstance();
-            newScheduleDate.setTime(queuedReport.getDateScheduled());
-            newScheduleDate.add(Calendar.SECOND,newScheduleDate.get(Calendar.SECOND) + queuedReport.getRepeatInterval());
-            Date nextSchedule = newScheduleDate.getTime();
+			newQueuedReport.setStatus(QueuedReport.STATUS_NEW);
+			newQueuedReport.setRepeatInterval(queuedReport.getRepeatInterval());
 
-            //set date for next schedule
-            newQueuedReport.setDateScheduled(nextSchedule);
-            newQueuedReport.setEvaluationDate(nextSchedule);
-
-            newQueuedReport.setStatus(QueuedReport.STATUS_NEW);
-            newQueuedReport.setRepeatInterval(queuedReport.getRepeatInterval());
-
-            Context.getService(QueuedReportService.class).saveQueuedReport(newQueuedReport);
-        }
-
-
+			Context.getService(QueuedReportService.class).saveQueuedReport(newQueuedReport);
+		}
 	}
 
 	@Override
