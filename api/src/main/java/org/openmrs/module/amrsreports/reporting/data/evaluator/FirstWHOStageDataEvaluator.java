@@ -52,10 +52,10 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 			m.put("patientIds", context.getBaseCohort());
 		}
 
-		hql.append("and 		concept.conceptId in ( 1224, 5356 ) ");
-
 		hql.append("and		obsDatetime <= :onOrBefore ");
 		m.put("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(context.getEvaluationDate()));
+
+		hql.append("and 		concept.conceptId in ( 1224, 5356 ) ");
 
 		hql.append("order by 	obsDatetime asc");
 

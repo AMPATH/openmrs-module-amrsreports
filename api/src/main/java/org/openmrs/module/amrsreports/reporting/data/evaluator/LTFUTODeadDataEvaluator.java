@@ -48,13 +48,13 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				"	where" +
 				"		voided=0" +
 				"		and person_id in (:personIds)" +
-				"		and obs_datetime <= ':reportDate'" +
 				"		and (" +
 				"			concept_id in (1570, 1734, 1573)" +
 				"			or (concept_id=6206 and value_coded=159)" +
 				"			or (concept_id=1733 and value_coded=159)" +
 				"			or (concept_id=1596 and value_coded=1593)" +
 				"		)" +
+				"		and obs_datetime <= ':reportDate'" +
 				"		order by obs_datetime asc" +
 				" ) ordered" +
 				" group by person_id";
@@ -113,10 +113,10 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				"	select person_id, obs_datetime" +
 				"	from obs" +
 				"	where" +
-				"		person_id in (:personIds)" +
-				"		and voided=0" +
-				"		and obs_datetime <= ':reportDate'" +
+				"		voided=0" +
+				"		and person_id in (:personIds)" +
 				"		and (concept_id=1285 and value_coded=1287)" +
+				"		and obs_datetime <= ':reportDate'" +
 				"		order by obs_datetime desc" +
 				" ) ordered" +
 				" group by person_id";
@@ -144,10 +144,10 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		String rtcSQL = "select person_id, max(value_datetime)" +
 				" from obs" +
 				" where" +
-				"	person_id in (:personIds)" +
-				"	and voided=0" +
-				"   and obs_datetime <= ':reportDate'" +
+				"	voided=0" +
+				"	and person_id in (:personIds)" +
 				"	and concept_id in (1502, 5096)" +
+				"   and obs_datetime <= ':reportDate'" +
 				" group by person_id";
 
 		Map<Integer, Date> rtcDates = makeDateMapFromSQL(rtcSQL);

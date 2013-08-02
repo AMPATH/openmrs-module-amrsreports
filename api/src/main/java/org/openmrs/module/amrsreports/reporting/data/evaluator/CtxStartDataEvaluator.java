@@ -48,8 +48,8 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +
 				"   and concept.id = 1263" +
-				"   and valueCoded.id = 916" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
+				"   and valueCoded.id = 916" +
 				"   order by obsDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
