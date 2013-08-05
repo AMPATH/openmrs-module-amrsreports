@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.web.controller;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
@@ -14,6 +15,7 @@ import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -78,6 +80,8 @@ public class QueuedReportFormController {
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits
 	) throws Exception {
 
+        HttpSession httpSession = request.getSession();
+        QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
 		// determine the repeat interval by units
 		repeatIntervalUnits = repeatIntervalUnits.toLowerCase().trim();
 
@@ -97,12 +101,29 @@ public class QueuedReportFormController {
 			}
 		}
 
+        if (request.getParameter("purge") != null) {
+
+            try {
+                queuedReportService.purgeQueuedReport(editedReport);
+                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
+                return SUCCESS_VIEW;
+            }
+            catch (DataIntegrityViolationException e) {
+                httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.object.inuse.cannot.purge");
+                return FORM_VIEW;
+            }
+            catch (APIException e) {
+                httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.general: " + e.getLocalizedMessage());
+                return FORM_VIEW;
+            }
+        }
+
 		// save it
-		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
+
 		queuedReportService.saveQueuedReport(editedReport);
 
 		// kindly respond
-		HttpSession httpSession = request.getSession();
+
 		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for processing.");
 
 		return SUCCESS_VIEW;
@@ -112,26 +133,11 @@ public class QueuedReportFormController {
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             @RequestParam(value = "action", required = false) String action,
-			ModelMap modelMap,
-            HttpServletRequest request) {
+			ModelMap modelMap
+                                ) {
 
 		QueuedReport queuedReport = null;
-        HttpSession httpSession = request.getSession();
 
-        if(queuedReportId !=null && !action.equals("")){
-            QueuedReportService queuedReportService= Context.getService(QueuedReportService.class);
-
-            try{
-                queuedReportService.purgeQueuedReport(queuedReportService.getQueuedReport(queuedReportId));
-                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
-                return SUCCESS_VIEW;
-            }
-            catch (Exception e){
-                log.error(e);
-                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "There was an error removing the report");
-
-            }
-        }
 
 		if (queuedReportId != null)
 			queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
@@ -139,6 +145,8 @@ public class QueuedReportFormController {
 		if (queuedReport == null) {
 			queuedReport = new QueuedReport();
 		}
+
+
 
 		modelMap.put("queuedReports", queuedReport);
 
@@ -160,6 +168,11 @@ public class QueuedReportFormController {
 		}
 
 		modelMap.put("repeatInterval", repeatInterval.toString());
+
+        if(action.equals("remove")){
+            modelMap.put("action","remove");
+
+        }
 
 		return FORM_VIEW;
 	}
