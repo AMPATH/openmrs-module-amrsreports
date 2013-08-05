@@ -47,10 +47,12 @@ public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 			m.put("patientIds", context.getBaseCohort());
 		}
 
-		hql.append("and encounter.encounterType.id in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)");
 		hql.append("and concept.id in (1502, 5096)  ");
+
 		hql.append("and obsDatetime <= :onOrBefore ");
 		m.put("onOrBefore", context.getEvaluationDate());
+
+		hql.append("and encounter.encounterType.id in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)");
 
 		hql.append("order by obsDatetime desc");
 

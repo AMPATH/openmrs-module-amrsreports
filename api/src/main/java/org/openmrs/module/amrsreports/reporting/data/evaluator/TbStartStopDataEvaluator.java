@@ -47,8 +47,8 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +
 				"   and concept.id = 1113" +
-				"   and valueDatetime is not null" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
+				"   and valueDatetime is not null" +
 				"   order by obsDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
@@ -61,8 +61,8 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 				" where voided = false" +
 				"   and person.personId in (:patientIds)" +
 				"   and concept.id = 2041" +
-				"   and valueDatetime is not null" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
+				"   and valueDatetime is not null" +
 				"   order by obsDatetime asc";
 
 		ListMap<Integer, Date> mappedStopDates = makeValueDatesMapFromSQL(hql, m);
