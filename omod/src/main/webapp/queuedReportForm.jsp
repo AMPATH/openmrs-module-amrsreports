@@ -8,11 +8,6 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/openmrs-1.9.js"/>
 
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/jquery-ui-timepicker-addon.css"/>
-<script type="text/javascript">
-    function navigateBack(){
-        location.href="queuedReport.list";
-    }
-</script>
 
 <%@ include file="localHeader.jsp" %>
 
@@ -179,21 +174,7 @@
             </spring:bind>
         </fieldset>
 
-        <c:choose>
-            <c:when test="${action=='remove'}">
-                <form id="purge" method="post" onsubmit="return confirmPurge()">
-                    <fieldset>
-                        <h4><spring:message code="general.purge"/></h4>
-                        <input type="submit" value='<spring:message code="general.purge"/>' name="purge" />&nbsp;
-                        <input type="button" value='Cancel' onclick="navigateBack();" />
-                    </fieldset>
-                </form>
-            </c:when>
-            <c:otherwise>
                 <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
-            </c:otherwise>
-        </c:choose>
-
 
     </form>
 

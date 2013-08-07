@@ -132,7 +132,6 @@ public class QueuedReportFormController {
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
-            @RequestParam(value = "action", required = false) String action,
 			ModelMap modelMap
                                 ) {
 
@@ -169,13 +168,41 @@ public class QueuedReportFormController {
 
 		modelMap.put("repeatInterval", repeatInterval.toString());
 
-        if(action.equals("remove")){
-            modelMap.put("action","remove");
-
-        }
-
 		return FORM_VIEW;
 	}
+
+    @RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/removeQueuedReport.form")
+    public String removeQueuedReport( HttpServletRequest request,
+            @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
+            ModelMap modelMap
+    ) {
+
+        HttpSession httpSession = request.getSession();
+        QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
+
+        QueuedReport queuedReport = null;
+
+
+        if (queuedReportId != null)
+            queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
+
+
+
+        try {
+            queuedReportService.purgeQueuedReport(queuedReport);
+            httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
+            return SUCCESS_VIEW;
+        }
+        catch (DataIntegrityViolationException e) {
+            httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.object.inuse.cannot.purge");
+            return FORM_VIEW;
+        }
+        catch (APIException e) {
+            httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.general: " + e.getLocalizedMessage());
+            return FORM_VIEW;
+        }
+
+    }
 
 	@InitBinder
 	private void dateBinder(WebDataBinder binder) {
