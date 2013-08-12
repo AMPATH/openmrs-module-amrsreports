@@ -200,7 +200,7 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 	private Map<Integer, Date> makeDateMapFromSQL(String sql) {
 		List<List<Object>> data = Context.getAdministrationService().executeSQL(
 				sql.replaceAll(":reportDate", reportDate).replaceAll(":personIds", personIds),
-				false);
+				true);
 		return makeDateMap(data);
 	}
 
