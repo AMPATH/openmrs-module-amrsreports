@@ -101,23 +101,6 @@ public class QueuedReportFormController {
 			}
 		}
 
-        if (request.getParameter("purge") != null) {
-
-            try {
-                queuedReportService.purgeQueuedReport(editedReport);
-                httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
-                return SUCCESS_VIEW;
-            }
-            catch (DataIntegrityViolationException e) {
-                httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.object.inuse.cannot.purge");
-                return FORM_VIEW;
-            }
-            catch (APIException e) {
-                httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.general: " + e.getLocalizedMessage());
-                return FORM_VIEW;
-            }
-        }
-
 		// save it
 
 		queuedReportService.saveQueuedReport(editedReport);
