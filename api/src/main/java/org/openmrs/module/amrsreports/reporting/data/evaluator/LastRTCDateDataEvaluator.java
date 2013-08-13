@@ -23,8 +23,6 @@ import java.util.Map;
 @Handler(supports = LastRTCDateDataDefinition.class, order = 50)
 public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 		LastRTCDateDataDefinition def = (LastRTCDateDataDefinition) definition;

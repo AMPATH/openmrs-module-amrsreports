@@ -1,8 +1,8 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -26,7 +26,6 @@ import java.util.Set;
 @Handler(supports = LTFUTODeadDataDefinition.class, order = 50)
 public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
-	private String personIds = null;
 	private String reportDate = null;
 
 	@Override
@@ -36,7 +35,6 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		if (context.getBaseCohort().isEmpty())
 			return ret;
 
-		personIds = StringUtils.join(context.getBaseCohort().getMemberIds(), ",");
 		reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
 
 		// determine death status and date using multiple queries
@@ -45,9 +43,14 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				" from (" +
 				"	select person_id, obs_datetime" +
 				"	from obs" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on obs.person_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
-				"		and person_id in (:personIds)" +
 				"		and (" +
 				"			concept_id in (1570, 1734, 1573)" +
 				"			or (concept_id=6206 and value_coded=159)" +
@@ -61,11 +64,16 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
 		String encDeathSQL = "select patient_id, min(encounter_datetime)" +
 				" from (" +
-				"	select patient_id, encounter_datetime" +
+				"	select encounter.patient_id, encounter_datetime" +
 				"	from encounter" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on encounter.patient_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
-				"		and patient_id in (:personIds)" +
 				"		and encounter_type=31" +
 				"		and encounter_datetime <= ':reportDate'" +
 				"	order by encounter_datetime asc" +
@@ -73,10 +81,16 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				" group by patient_id";
 
 		String propsDeathSQL = "select person_id, death_date" +
-				" from person" +
-				" where person_id in (:personIds)" +
-				" and death_date <= ':reportDate'" +
-				" and dead = 1";
+				" 	from person" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on person.person_id = cms.patient_id" +
+				" 	where" +
+				"		death_date <= ':reportDate'" +
+				" 		and dead = 1";
 
 		// gather multiple potential indicators for death
 		Map<Integer, Date> deathObs = makeDateMapFromSQL(obsDeathSQL);
@@ -112,9 +126,14 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 				" from (" +
 				"	select person_id, obs_datetime" +
 				"	from obs" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on obs.person_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
-				"		and person_id in (:personIds)" +
 				"		and (concept_id=1285 and value_coded=1287)" +
 				"		and obs_datetime <= ':reportDate'" +
 				"		order by obs_datetime desc" +
@@ -125,11 +144,16 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
 		// get most recent encounter date
 
-		String lastEncounterSQL = "select patient_id, max(encounter_datetime)" +
+		String lastEncounterSQL = "select encounter.patient_id, max(encounter_datetime)" +
 				" from encounter" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on encounter.patient_id = cms.patient_id" +
 				" where" +
-				"	patient_id in (:personIds)" +
-				"	and voided=0" +
+				"	voided=0" +
 				"   and encounter_datetime <= ':reportDate'" +
 				"	and (" +
 				"		encounter_type in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)" +
@@ -142,13 +166,18 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		// get most recent RTC dates
 
 		String rtcSQL = "select person_id, max(value_datetime)" +
-				" from obs" +
-				" where" +
-				"	voided=0" +
-				"	and person_id in (:personIds)" +
-				"	and concept_id in (1502, 5096)" +
-				"   and obs_datetime <= ':reportDate'" +
-				" group by person_id";
+				" 	from obs" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on obs.person_id = cms.patient_id" +
+				" 	where" +
+				"		voided=0" +
+				"		and concept_id in (1502, 5096)" +
+				"   	and obs_datetime <= ':reportDate'" +
+				" 	group by person_id";
 
 		Map<Integer, Date> rtcDates = makeDateMapFromSQL(rtcSQL);
 
@@ -178,11 +207,11 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 			if (deathFinal.containsKey(personId))
 				ret.addData(personId, MOHReportUtil.joinAsSingleCell("Dead", MOHReportUtil.formatdates(deathFinal.get(personId))));
 
-			// report TO if after last encounter
+				// report TO if after last encounter
 			else if (transfers.containsKey(personId) && transfers.get(personId).after(lastEncounterDate))
 				ret.addData(personId, MOHReportUtil.joinAsSingleCell("TO", MOHReportUtil.formatdates(transfers.get(personId))));
 
-			// report LTFU if RTC is overdue
+				// report LTFU if RTC is overdue
 			else if (rtcExpectedDate != null && rtcExpectedDate.before(rtcOverdueDate.getTime())) {
 				Calendar expectedDate = Calendar.getInstance();
 				expectedDate.setTime(rtcExpectedDate);
@@ -199,8 +228,9 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 	 */
 	private Map<Integer, Date> makeDateMapFromSQL(String sql) {
 		List<List<Object>> data = Context.getAdministrationService().executeSQL(
-				sql.replaceAll(":reportDate", reportDate).replaceAll(":personIds", personIds),
-				true);
+				sql.replaceAll(":reportDate", reportDate)
+						.replaceAll(":cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID),
+				false);
 		return makeDateMap(data);
 	}
 

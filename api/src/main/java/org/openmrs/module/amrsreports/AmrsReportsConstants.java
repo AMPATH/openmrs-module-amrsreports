@@ -16,4 +16,6 @@ public class AmrsReportsConstants {
 	public static final String GP_PRODUCTION_SERVER_URL = "amrsreports.productionServerURL";
 
 	public static final String TRANSFER_IN = "Transfer In";
+
+	public static final String SAVED_COHORT_UUID = "AMRSReportsTemporaryCohort000000000000";
 }
