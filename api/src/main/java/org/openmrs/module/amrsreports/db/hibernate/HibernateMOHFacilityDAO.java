@@ -62,6 +62,30 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 		sessionFactory.getCurrentSession().delete(facility);
 	}
 
+	public Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility) {
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		String hql = "select pi.patient.patientId, substring(pi.identifier,7,5)" +
+				"	from PatientIdentifier as pi" +
+				"	where" +
+				"		pi.voided = false" +
+				"		and pi.identifierType.id = :identifierTypeId" +
+				"		and substring(pi.identifier,1,5) = :facilityCode";
+
+		Query q = sessionFactory.getCurrentSession().createQuery(hql);
+		q.setInteger("identifierTypeId", pit.getId());
+		q.setString("facilityCode", facility.getCode());
+
+		List<Object> res = q.list();
+		Map<Integer, String> m = new HashMap<Integer, String>();
+		for (Object r : res) {
+			Object[] a = (Object[]) r;
+			m.put((Integer) a[0], (String) a[1]);
+		}
+
+		return m;
+	}
+
 	@Override
 	public List<PatientIdentifier> getCCCNumbersForFacility(MOHFacility facility) {
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();

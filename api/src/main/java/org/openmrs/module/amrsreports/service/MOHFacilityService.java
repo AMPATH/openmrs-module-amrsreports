@@ -40,21 +40,24 @@ public interface MOHFacilityService {
 	@Transactional
 	void purgeFacility(MOHFacility facility);
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Map<Integer,PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility);
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Map<Integer,Integer> getFacilityIdToLatestSerialNumberMap();
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Integer countPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
 
 	@Transactional
 	Integer assignMissingIdentifiersForFacility(MOHFacility facility);
 
-	@Transactional
+	@Transactional(readOnly = true)
 	Cohort getPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
 
-	@Transactional
+	@Transactional(readOnly = true)
 	Integer getLatestSerialNumberForFacility(MOHFacility facility);
+
+	@Transactional(readOnly = true)
+	Map<Integer,String> getSerialNumberMapForFacility(MOHFacility facility);
 }
