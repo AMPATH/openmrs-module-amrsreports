@@ -14,6 +14,8 @@
 
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.annotation.Handler;
@@ -38,6 +40,8 @@ import java.util.Map;
 @Handler(supports = CohortRestrictedPatientIdentifierDataDefinition.class, order = 50)
 public class CohortRestrictedPatientIdentifierDataEvaluator implements PatientDataEvaluator {
 
+	private final Log log = LogFactory.getLog(getClass());
+
 	/**
 	 * @should return all identifiers of the passed types for each patient in the passed context
 	 * @see org.openmrs.module.reporting.data.patient.evaluator.PatientDataEvaluator#evaluate(org.openmrs.module.reporting.data.patient.definition.PatientDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)
@@ -60,14 +64,15 @@ public class CohortRestrictedPatientIdentifierDataEvaluator implements PatientDa
 		}
 
 		StringBuilder hql = new StringBuilder();
-		hql.append("from PatientIdentifier ");
-		hql.append("where voided = false ");
-		hql.append("and patient.patientId in (" +
-				"select c.memberIds from Cohort as c" +
+		hql.append("select pi.patient.patientId, pi ");
+		hql.append("from PatientIdentifier as pi ");
+		hql.append("where pi.voided = false ");
+		hql.append("and pi.patient.patientId in (" +
+				"select elements(c.memberIds) from Cohort as c" +
 				"	where c.uuid = :cohortUuid" +
 				") ");
-		hql.append("and identifierType.patientIdentifierTypeId in (:idTypes) ");
-		hql.append("order by preferred asc");
+		hql.append("and pi.identifierType.patientIdentifierTypeId in (:idTypes) ");
+		hql.append("order by pi.preferred asc");
 
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
@@ -77,8 +82,10 @@ public class CohortRestrictedPatientIdentifierDataEvaluator implements PatientDa
 
 		ListMap<Integer, PatientIdentifier> patIds = new ListMap<Integer, PatientIdentifier>();
 		for (Object o : queryResult) {
-			PatientIdentifier pi = (PatientIdentifier) o;
-			patIds.putInList(pi.getPatient().getPatientId(), pi);  // TODO: This is probably inefficient.  Try to improve this with HQL
+			Object[] parts = (Object[]) o;
+			Integer pId = (Integer) parts[0];
+			PatientIdentifier pi = (PatientIdentifier) parts[1];
+			patIds.putInList(pId, pi);
 		}
 
 		// Order the resulting patient identifiers by the type of identifiers passed in, followed by preferred/non-preferred

@@ -12,6 +12,7 @@ import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentif
 import org.openmrs.module.amrsreports.reporting.converter.ObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPatientIdentifierDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
@@ -75,12 +76,13 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
+		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
+		cccColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
 		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
 		idTypes.remove(pit);
-		PatientIdentifierDataDefinition idColumn = new PatientIdentifierDataDefinition("Identifier");
+		CohortRestrictedPatientIdentifierDataDefinition idColumn = new CohortRestrictedPatientIdentifierDataDefinition("Identifier");
 		idColumn.setTypes(idTypes);
 		idColumn.setIncludeFirstNonNullOnly(true);
 		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
