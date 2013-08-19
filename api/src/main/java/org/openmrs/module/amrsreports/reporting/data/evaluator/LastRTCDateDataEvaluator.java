@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -40,10 +41,11 @@ public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 		hql.append("from Obs ");
 		hql.append("where voided = false ");
 
-		if (context.getBaseCohort() != null) {
-			hql.append("and personId in (:patientIds) ");
-			m.put("patientIds", context.getBaseCohort());
-		}
+		hql.append("and 		personId in (" +
+				"	SELECT elements(c.memberIds) from Cohort as c" +
+				"	where c.uuid = :cohortUuid" +
+				") ");
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 
 		hql.append("and concept.id in (1502, 5096)  ");
 

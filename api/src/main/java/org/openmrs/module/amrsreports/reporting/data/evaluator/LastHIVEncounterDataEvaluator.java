@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Encounter;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -38,7 +39,10 @@ public class LastHIVEncounterDataEvaluator implements PersonDataEvaluator {
 		// use HQL to do our bidding
 		String hql = "from Encounter" +
 				" where voided=false" +
-				" and patientId in (:patientIds)" +
+				" and patientId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				" and encounterType.encounterTypeId in (:encounterTypeIds)" +
 				" and encounterDatetime <= :onOrBefore" +
 				" order by encounterDatetime desc";
@@ -46,7 +50,7 @@ public class LastHIVEncounterDataEvaluator implements PersonDataEvaluator {
 		List<Integer> encounterTypeIds = Arrays.asList(1, 2, 3, 4, 13);
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 		m.put("encounterTypeIds", encounterTypeIds);
 		m.put("onOrBefore", context.getEvaluationDate());
 

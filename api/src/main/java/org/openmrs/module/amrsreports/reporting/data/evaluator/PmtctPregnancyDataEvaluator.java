@@ -13,9 +13,9 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -48,10 +48,15 @@ public class PmtctPregnancyDataEvaluator implements PersonDataEvaluator {
 				"	ap.due_date" +
 				" from (" +
 				"	select person_id, episode, max(pregnancy_id) as p_id" +
-				"	from amrsreports_pregnancy " +
+				"	from amrsreports_pregnancy ap" +
+				"		inner join (" +
+				"			select patient_id from cohort_member cm" +
+				"				inner join cohort c" +
+				"					on cm.cohort_id = c.cohort_id" +
+				"					where c.uuid = ':cohortUuid'" +
+				"		) cms on ap.person_id = cms.patient_id" +
 				"   where" +
-				"     person_id in (:personIds)" +
-				"     and pregnancy_date < ':reportDate'" +
+				"     pregnancy_date < ':reportDate'" +
 				"	group by person_id, episode " +
 				"	having episode > 0" +
 				"	order by person_id asc" +
@@ -59,10 +64,9 @@ public class PmtctPregnancyDataEvaluator implements PersonDataEvaluator {
 				"	left join amrsreports_pregnancy ap" +
 				"		on ap.pregnancy_id = ordered.p_id";
 
-		String personIds = StringUtils.join(context.getBaseCohort().getMemberIds(), ",");
 		String reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
 
-		ListMap<Integer, Date> dateMap = makeDateMapFromSQL(sql, personIds, reportDate);
+		ListMap<Integer, Date> dateMap = makeDateMapFromSQL(sql, AmrsReportsConstants.SAVED_COHORT_UUID, reportDate);
 
 		for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 
@@ -83,9 +87,9 @@ public class PmtctPregnancyDataEvaluator implements PersonDataEvaluator {
 	/**
 	 * replaces reportDate and personIds with data from private variables before generating a date map
 	 */
-	private ListMap<Integer, Date> makeDateMapFromSQL(String sql, String personIds, String reportDate) {
+	private ListMap<Integer, Date> makeDateMapFromSQL(String sql, String cohortUuid, String reportDate) {
 		List<List<Object>> data = Context.getAdministrationService().executeSQL(
-				sql.replaceAll(":reportDate", reportDate).replaceAll(":personIds", personIds),
+				sql.replaceAll(":reportDate", reportDate).replaceAll(":cohortUuid", cohortUuid),
 				true);
 
 		return makeDateMap(data);

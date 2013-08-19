@@ -16,6 +16,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -45,7 +46,10 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 
 		String hql = "from Obs" +
 				" where voided = false" +
-				"   and person.personId in (:patientIds)" +
+				"	and personId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				"   and (" +
 				"     (concept.id = 1263 and valueCoded is not null) " +
 				"     or (concept.id in (1193, 1109, 1263) and valueCoded.id = 916) " +
@@ -54,14 +58,17 @@ public class CtxStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 				"   order by obsDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 		m.put("reportDate", context.getEvaluationDate());
 
 		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(hql, m);
 
 		hql = "from Obs" +
 				" where voided = false" +
-				"   and person.personId in (:patientIds)" +
+				"	and personId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				"   and (" +
 				"     (concept.id in (1262, 1925) and valueCoded is not null) " +
 				"     or (concept.id = 1261 and valueCoded.id = 1260) " +

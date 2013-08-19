@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  * Evaluator for WHO Stage and Date columns
  */
-@Handler(supports=FirstWHOStageDataDefinition.class, order=50)
+@Handler(supports = FirstWHOStageDataDefinition.class, order = 50)
 public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -47,10 +48,11 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 		hql.append("from 		Obs ");
 		hql.append("where 		voided = false ");
 
-		if (context.getBaseCohort() != null) {
-			hql.append("and 		personId in (:patientIds) ");
-			m.put("patientIds", context.getBaseCohort());
-		}
+		hql.append("and 		personId in (" +
+				"	SELECT elements(c.memberIds) from Cohort as c" +
+				"	where c.uuid = :cohortUuid" +
+				") ");
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 
 		hql.append("and		obsDatetime <= :onOrBefore ");
 		m.put("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(context.getEvaluationDate()));
@@ -63,7 +65,7 @@ public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
 
 		ListMap<Integer, Obs> obsForPatients = new ListMap<Integer, Obs>();
 		for (Object o : queryResult) {
-			Obs obs = (Obs)o;
+			Obs obs = (Obs) o;
 			obsForPatients.putInList(obs.getPersonId(), obs);
 		}
 

@@ -16,6 +16,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -45,21 +46,27 @@ public class TbStartStopDataEvaluator extends DrugStartStopDataEvaluator {
 
 		String hql = "from Obs" +
 				" where voided = false" +
-				"   and person.personId in (:patientIds)" +
+				"	and personId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				"   and concept.id = 1113" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
 				"   and valueDatetime is not null" +
 				"   order by obsDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 		m.put("reportDate", context.getEvaluationDate());
 
 		ListMap<Integer, Date> mappedStartDates = makeValueDatesMapFromSQL(hql, m);
 
 		hql = "from Obs" +
 				" where voided = false" +
-				"   and person.personId in (:patientIds)" +
+				"	and personId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				"   and concept.id = 2041" +
 				"   and obsDatetime between '2001-01-01' and :reportDate" +
 				"   and valueDatetime is not null" +

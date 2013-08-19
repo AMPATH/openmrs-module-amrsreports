@@ -22,6 +22,7 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.reporting.common.Age;
@@ -95,7 +96,10 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 				" WHERE" +
 				"	o.person.personId = hce.patient.personId" +
 				"   AND o.voided = false" +
-				"	AND o.personId in (:patientIds)" +
+				"	AND o.personId in (" +
+				"		SELECT elements(c.memberIds) from Cohort as c" +
+				"			where c.uuid = :cohortUuid" +
+				" 	) " +
 				"	AND o.concept.conceptId in (:conceptIds)" +
 				"	AND o.obsDatetime <= :onOrBefore" +
 				"	AND o.obsDatetime BETWEEN SUBDATE(hce.firstARVDate, 21) AND ADDDATE(hce.firstARVDate, 7)" +
@@ -104,9 +108,9 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 
 		// set the variables
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", cohort);
-		m.put("onOrBefore", context.getEvaluationDate());
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 		m.put("conceptIds", getListOfIds(def.getQuestions()));
+		m.put("onOrBefore", context.getEvaluationDate());
 
 		// execute the HQL
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
