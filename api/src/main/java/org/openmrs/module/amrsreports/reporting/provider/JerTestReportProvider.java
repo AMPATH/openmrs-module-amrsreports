@@ -17,6 +17,7 @@ import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentif
 import org.openmrs.module.amrsreports.reporting.converter.ObsValueDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPatientIdentifierDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
@@ -80,7 +81,7 @@ public class JerTestReportProvider extends ReportProvider {
 		MohCoreService service = Context.getService(MohCoreService.class);
 
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
-		report.setName("MOH 361A Report");
+		report.setName("Jer's Test Report");
 
 		// set up the DSD
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
@@ -117,9 +118,10 @@ public class JerTestReportProvider extends ReportProvider {
 //
 //		// c. Unique Patient Number
 //		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-//		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-//		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
-//
+//		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
+//		cccColumn.setIncludeFirstNonNullOnly(true);
+//		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
+////
 //		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
 //		idTypes.remove(pit);
 //		PatientIdentifierDataDefinition idColumn = new PatientIdentifierDataDefinition("Identifier");
@@ -164,10 +166,10 @@ public class JerTestReportProvider extends ReportProvider {
 //
 //		// n. Pregnancy Yes?, Due date, PMTCT refer
 //		dsd.addColumn("Pregnancy EDD and Referral", new PmtctPregnancyDataDefinition(), nullString, new PMTCTDatesConverter());
-
-		// o. LTFU / TO / Dead and date when the event occurred
-		dsd.addColumn("LTFU TO DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
-
+//
+//		// o. LTFU / TO / Dead and date when the event occurred
+//		dsd.addColumn("LTFU TO DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
+//
 //		// p. WHO clinical Stage and date
 //		dsd.addColumn("WHO Clinical Stage", new FirstWHOStageDataDefinition(), nullString, new WHOStageAndDateConverter());
 //
