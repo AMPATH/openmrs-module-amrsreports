@@ -8,11 +8,14 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedGenderDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPatientIdentifierDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPersonAttributeDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPreferredNameDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
@@ -20,13 +23,11 @@ import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredAddressDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportDesignResource;
@@ -88,13 +89,13 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
 
 		// d. Patient's Name
-		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
+		dsd.addColumn("Name", new CohortRestrictedPreferredNameDataDefinition(), nullString);
 
 		// e. Sex
-		dsd.addColumn("Sex", new GenderDataDefinition(), nullString);
+		dsd.addColumn("Sex", new CohortRestrictedGenderDataDefinition(), nullString);
 
 		// f1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
+		dsd.addColumn("Date of Birth", new CohortRestrictedBirthdateDataDefinition(), nullString, new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
 
 		// f1. Age
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
@@ -106,7 +107,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// g2. Phone Number
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
-		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
+		CohortRestrictedPersonAttributeDataDefinition patientPhoneContact = new CohortRestrictedPersonAttributeDataDefinition(pat);
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
 
 		// i. WHO Stage at start of ARVs
