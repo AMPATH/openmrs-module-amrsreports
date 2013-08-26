@@ -1,79 +1,68 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Obs;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.model.WHOStageAndDate;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
+import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
-import org.openmrs.module.amrsreports.service.MohCoreService;
-import org.openmrs.module.reporting.common.DateUtil;
-import org.openmrs.module.reporting.common.ListMap;
-import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
-import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
-import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
-import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * Evaluator for WHO Stage and Date columns
  */
 @Handler(supports = FirstWHOStageDataDefinition.class, order = 50)
-public class FirstWHOStageDataEvaluator implements PersonDataEvaluator {
+public class FirstWHOStageDataEvaluator extends BatchedExecutionDataEvaluator {
 
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	private Log log = LogFactory.getLog(getClass());
+
+	private FirstWHOStageDataDefinition definition;
 
 	@Override
-	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
-		FirstWHOStageDataDefinition def = (FirstWHOStageDataDefinition) definition;
-		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
+	protected PersonDataDefinition setDefinition(PersonDataDefinition def) {
+		definition = (FirstWHOStageDataDefinition) def;
+		return definition;
+	}
 
-		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
-			return c;
-		}
+	@Override
+	protected Object doExecute(Integer pId, SortedSet<ObsRepresentation> o, EvaluationContext context) {
+		ObsRepresentation or = o.first();
+		if (!or.getObsDatetime().after(context.getEvaluationDate()))
+			return or;
+		return null;
+	}
 
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+	@Override
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c) {
+		// pass
+		return true;
+	}
 
-		StringBuilder hql = new StringBuilder();
-		Map<String, Object> m = new HashMap<String, Object>();
+	@Override
+	protected void doAfter(EvaluationContext context, EvaluatedPersonData c) {
+		// pass
+	}
 
-		hql.append("from 		Obs ");
-		hql.append("where 		voided = false ");
+	@Override
+	protected String getHQL() {
+		return "select new map(" +
+				"		personId as personId, " +
+				"		valueCoded.id as valueCodedId," +
+				"		obsDatetime as obsDatetime)" +
+				"	from Obs " +
+				"	where voided = false " +
+				"		and personId in (:personIds) " +
+				"		and concept.id in (1224, 5356)";
+	}
 
-		hql.append("and 		personId in (" +
-				"	SELECT elements(c.memberIds) from Cohort as c" +
-				"	where c.uuid = :cohortUuid" +
-				") ");
-		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
-
-		hql.append("and		obsDatetime <= :onOrBefore ");
-		m.put("onOrBefore", DateUtil.getEndOfDayIfTimeExcluded(context.getEvaluationDate()));
-
-		hql.append("and 		concept.conceptId in ( 1224, 5356 ) ");
-
-		hql.append("order by 	obsDatetime asc");
-
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
-
-		ListMap<Integer, Obs> obsForPatients = new ListMap<Integer, Obs>();
-		for (Object o : queryResult) {
-			Obs obs = (Obs) o;
-			obsForPatients.putInList(obs.getPersonId(), obs);
-		}
-
-		for (Integer pId : obsForPatients.keySet()) {
-			List<Obs> l = obsForPatients.get(pId);
-			c.addData(pId, l.get(0));
-		}
-
-		return c;
+	@Override
+	protected Map<String, Object> getSubstitutions() {
+		return new HashMap<String, Object>();
 	}
 }
