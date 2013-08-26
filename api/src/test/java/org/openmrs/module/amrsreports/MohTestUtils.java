@@ -1,4 +1,4 @@
-package org.openmrs.module.amrsreports.rule.util;
+package org.openmrs.module.amrsreports;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
