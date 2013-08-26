@@ -6,8 +6,7 @@ import org.junit.Test;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
-import org.openmrs.module.amrsreports.rule.util.MohTestUtils;
+import org.openmrs.module.amrsreports.MohTestUtils;
 
 /**
  * Test class for PatientSnapshot
