@@ -80,4 +80,8 @@ public final class MohCacheUtils {
 		MohEncounterTypeCacheInstance.getInstance().clear();
 	}
 
+	public static Integer getConceptId(String conceptName) {
+		Concept concept = getConcept(conceptName);
+		return concept.getId();
+	}
 }
