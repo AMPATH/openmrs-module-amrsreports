@@ -42,12 +42,10 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 		MOHFacility facility = (MOHFacility) context.getParameterValue("facility");
 
 		// fail quickly if the facility does not exist
-		if (facility == null)   {
+		if (facility == null) {
 			log.warn("No facility provided; returning empty data.");
 			return c;
 		}
-
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
 		// use HQL to do our bidding
 		String hql = "from Encounter" +
@@ -65,7 +63,8 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 		m.put("locationList", facility.getLocations());
 		m.put("onOrBefore", context.getEvaluationDate());
 
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
+		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
 		ListMap<Integer, Encounter> encForPatients = new ListMap<Integer, Encounter>();
 		for (Object o : queryResult) {
