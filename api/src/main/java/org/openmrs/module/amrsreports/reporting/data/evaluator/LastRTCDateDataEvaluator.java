@@ -1,11 +1,11 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
+import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
-import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -13,10 +13,11 @@ import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * Evaluator for WHO Stage and Date columns
@@ -35,38 +36,35 @@ public class LastRTCDateDataEvaluator implements PersonDataEvaluator {
 
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
-		StringBuilder hql = new StringBuilder();
+
+		String hql = "select new map(" +
+				"		personId as personId, " +
+				"		valueDatetime as valueDatetime," +
+				"		obsDatetime as obsDatetime)" +
+				"	from Obs " +
+				"	where voided = false " +
+				"		and personId in (:personIds) " +
+				"		and concept.id in (1502, 5096)" +
+				"		and obsDatetime <= :reportDate" +
+				"		and encounter.encounterType.id in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)";
+
 		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("personIds", context.getBaseCohort());
+		m.put("reportDate", context.getEvaluationDate());
 
-		hql.append("from Obs ");
-		hql.append("where voided = false ");
+		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
-		hql.append("and 		personId in (" +
-				"	SELECT elements(c.memberIds) from Cohort as c" +
-				"	where c.uuid = :cohortUuid" +
-				") ");
-		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
+		SortedSetMap<Integer, ObsRepresentation> obsForPatients = new SortedSetMap<Integer, ObsRepresentation>();
+		obsForPatients.setSetComparator(new ObsRepresentationDatetimeComparator());
 
-		hql.append("and concept.id in (1502, 5096)  ");
-
-		hql.append("and obsDatetime <= :onOrBefore ");
-		m.put("onOrBefore", context.getEvaluationDate());
-
-		hql.append("and encounter.encounterType.id in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)");
-
-		hql.append("order by obsDatetime desc");
-
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
-
-		ListMap<Integer, Obs> obsForPatients = new ListMap<Integer, Obs>();
 		for (Object o : queryResult) {
-			Obs obs = (Obs) o;
-			obsForPatients.putInList(obs.getPersonId(), obs);
+			ObsRepresentation or = new ObsRepresentation((Map<String, Object>) o);
+			obsForPatients.putInList(or.getPersonId(), or);
 		}
 
 		for (Integer pId : obsForPatients.keySet()) {
-			List<Obs> l = obsForPatients.get(pId);
-			c.addData(pId, l.get(0));
+			SortedSet<ObsRepresentation> l = obsForPatients.get(pId);
+			c.addData(pId, l.last());
 		}
 
 		return c;
