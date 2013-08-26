@@ -1,8 +1,10 @@
 package org.openmrs.module.amrsreports.snapshot;
 
 import org.openmrs.Obs;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -14,6 +16,7 @@ public abstract class PatientSnapshot {
 
 	private MohEvaluableNameConstants.AgeGroup ageGroup;
 	private Map<String, Object> properties;
+	private Date evaluationDate;
 
 	public void setProperties(Map<String, Object> properties) {
 		this.properties = properties;
@@ -57,6 +60,14 @@ public abstract class PatientSnapshot {
 		this.ageGroup = ageGroup;
 	}
 
+	public Date getEvaluationDate() {
+		return evaluationDate;
+	}
+
+	public void setEvaluationDate(Date evaluationDate) {
+		this.evaluationDate = evaluationDate;
+	}
+
 	/**
 	 * set flags based on observation values. if a flag is set, return true.  otherwise, false.
 	 *
@@ -65,6 +76,15 @@ public abstract class PatientSnapshot {
 	 * @should recognize and set WHO stage from an obs or specify peds WHO
 	 */
 	public abstract Boolean consume(Obs o);
+
+	/**
+	 * set flags based on observation values. if a flag is set, return true.  otherwise, false.
+	 *
+	 * @param o observation to be consumed
+	 * @return whether a flag was set
+	 * @should recognize and set WHO stage from an obs or specify peds WHO
+	 */
+	public abstract Boolean consume(ObsRepresentation o);
 
 	/**
 	 * determine eligibility based on age group and flags

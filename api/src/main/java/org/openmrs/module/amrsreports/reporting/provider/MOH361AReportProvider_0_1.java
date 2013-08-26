@@ -13,7 +13,7 @@ import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ObsValueDatetimeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedAgeAtDateOfOtherDataDefinition;
@@ -44,8 +44,6 @@ import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -198,7 +196,7 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
 
 		// informative column for the destination clinics
-		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());
+		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsRepresentationValueDatetimeConverter());
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");
