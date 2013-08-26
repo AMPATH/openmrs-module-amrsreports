@@ -1,52 +1,17 @@
 package org.openmrs.module.amrsreports.reporting.provider;
 
 import org.apache.commons.io.IOUtils;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
-import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
-import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
-import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
-import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ObsValueDatetimeConverter;
-import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
-import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
-import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPatientIdentifierDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.FirstEncounterAtFacilityDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.FirstWHOStageDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.FluconazoleStartStopDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
-import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
-import org.openmrs.module.reporting.data.MappedData;
-import org.openmrs.module.reporting.data.converter.BirthdateConverter;
-import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -59,7 +24,6 @@ import org.openmrs.util.OpenmrsClassLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -111,17 +75,17 @@ public class JerTestReportProvider extends ReportProvider {
 //		// b. date chronic HIV+ care started
 //		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
 //		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString);
-//
-//		// extra column to help understand reason for including in this cohort
-//		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(),
-//				"facility=${facility}", new EncounterDatetimeConverter());
-//
+
+		// extra column to help understand reason for including in this cohort
+		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(),
+				"facility=${facility}", new EncounterDatetimeConverter());
+
 //		// c. Unique Patient Number
 //		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 //		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
 //		cccColumn.setIncludeFirstNonNullOnly(true);
 //		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
-////
+//
 //		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
 //		idTypes.remove(pit);
 //		PatientIdentifierDataDefinition idColumn = new PatientIdentifierDataDefinition("Identifier");

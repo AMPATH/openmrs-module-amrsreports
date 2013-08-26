@@ -4,7 +4,9 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.LTFUTODeadDataDefinition;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -26,8 +28,6 @@ import java.util.Set;
 @Handler(supports = LTFUTODeadDataDefinition.class, order = 50)
 public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 
-	private String reportDate = null;
-
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
@@ -35,67 +35,61 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		if (context.getBaseCohort().isEmpty())
 			return ret;
 
-		reportDate = new SimpleDateFormat("yyyy-MM-dd").format(context.getEvaluationDate());
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("patientIds", context.getBaseCohort());
 
 		// determine death status and date using multiple queries
 
 		String obsDeathSQL = "select person_id, min(obs_datetime)" +
-				" from (" +
-				"	select person_id, obs_datetime" +
 				"	from obs" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on obs.person_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
+				"		and person_id in (:patientIds)" +
 				"		and (" +
 				"			concept_id in (1570, 1734, 1573)" +
 				"			or (concept_id=6206 and value_coded=159)" +
 				"			or (concept_id=1733 and value_coded=159)" +
 				"			or (concept_id=1596 and value_coded=1593)" +
 				"		)" +
-				"		and obs_datetime <= ':reportDate'" +
-				"		order by obs_datetime asc" +
-				" ) ordered" +
-				" group by person_id";
+				" 	group by person_id";
+
+		Map<Integer, Date> deathObs = makeDateMapFromSQL(obsDeathSQL, m);
+
+		// get most recent RTC dates
+		String rtcSQL = "select person_id, max(value_datetime)" +
+				" 	from obs" +
+				" 	where" +
+				"		voided=0" +
+				"		and person_id in (:patientIds)" +
+				"		and concept_id in (1502, 5096)" +
+				// TODO reintroduce the datetime limitation somehow
+				// "   	and obs_datetime <= :reportDate" +
+				" 	group by person_id";
+
+		Map<Integer, Date> rtcDates = makeDateMapFromSQL(rtcSQL, m);
+
+		// add reportDate for the rest of the queries
+		m.put("reportDate", context.getEvaluationDate());
 
 		String encDeathSQL = "select patient_id, min(encounter_datetime)" +
-				" from (" +
-				"	select encounter.patient_id, encounter_datetime" +
 				"	from encounter" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on encounter.patient_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
+				"		and patient_id in (:patientIds)" +
 				"		and encounter_type=31" +
-				"		and encounter_datetime <= ':reportDate'" +
-				"	order by encounter_datetime asc" +
-				" ) ordered" +
-				" group by patient_id";
+				"		and encounter_datetime <= :reportDate" +
+				" 	group by patient_id";
+
+		Map<Integer, Date> deathEncs = makeDateMapFromSQL(encDeathSQL, m);
 
 		String propsDeathSQL = "select person_id, death_date" +
 				" 	from person" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on person.person_id = cms.patient_id" +
 				" 	where" +
-				"		death_date <= ':reportDate'" +
+				"		death_date <= :reportDate" +
+				"		and person_id in (:patientIds)" +
 				" 		and dead = 1";
 
-		// gather multiple potential indicators for death
-		Map<Integer, Date> deathObs = makeDateMapFromSQL(obsDeathSQL);
-		Map<Integer, Date> deathEncs = makeDateMapFromSQL(encDeathSQL);
-		Map<Integer, Date> deathProps = makeDateMapFromSQL(propsDeathSQL);
+		Map<Integer, Date> deathProps = makeDateMapFromSQL(propsDeathSQL, m);
 
 		// load up a combined set of ids for dead patients
 		Set<Integer> deadPeople = new HashSet<Integer>();
@@ -121,65 +115,31 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		}
 
 		// find transfer out dates
-
 		String transferSQL = "select person_id, max(obs_datetime)" +
-				" from (" +
-				"	select person_id, obs_datetime" +
 				"	from obs" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on obs.person_id = cms.patient_id" +
 				"	where" +
 				"		voided=0" +
+				"		and person_id in (:patientIds)" +
 				"		and (concept_id=1285 and value_coded=1287)" +
-				"		and obs_datetime <= ':reportDate'" +
-				"		order by obs_datetime desc" +
-				" ) ordered" +
-				" group by person_id";
+				"		and obs_datetime <= :reportDate" +
+				" 	group by person_id";
 
-		Map<Integer, Date> transfers = makeDateMapFromSQL(transferSQL);
+		Map<Integer, Date> transfers = makeDateMapFromSQL(transferSQL, m);
 
 		// get most recent encounter date
-
 		String lastEncounterSQL = "select encounter.patient_id, max(encounter_datetime)" +
 				" from encounter" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on encounter.patient_id = cms.patient_id" +
 				" where" +
 				"	voided=0" +
-				"   and encounter_datetime <= ':reportDate'" +
+				"	and patient_id in (:patientIds)" +
+				"   and encounter_datetime <= :reportDate" +
 				"	and (" +
 				"		encounter_type in (1, 2, 3, 4, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 26)" +
 				"		or form_id in (248, 249)" +
 				"	)" +
 				" group by patient_id";
 
-		Map<Integer, Date> lastEncounters = makeDateMapFromSQL(lastEncounterSQL);
-
-		// get most recent RTC dates
-
-		String rtcSQL = "select person_id, max(value_datetime)" +
-				" 	from obs" +
-				"		inner join (" +
-				"			select patient_id from cohort_member cm" +
-				"				inner join cohort c" +
-				"					on cm.cohort_id = c.cohort_id" +
-				"					where c.uuid = ':cohortUuid'" +
-				"		) cms on obs.person_id = cms.patient_id" +
-				" 	where" +
-				"		voided=0" +
-				"		and concept_id in (1502, 5096)" +
-				"   	and obs_datetime <= ':reportDate'" +
-				" 	group by person_id";
-
-		Map<Integer, Date> rtcDates = makeDateMapFromSQL(rtcSQL);
+		Map<Integer, Date> lastEncounters = makeDateMapFromSQL(lastEncounterSQL, m);
 
 		// set a few repeatedly used variables
 		Calendar rtcOverdueDate = Calendar.getInstance();
@@ -223,25 +183,26 @@ public class LTFUTODeadDataEvaluator implements PersonDataEvaluator {
 		return ret;
 	}
 
-	/**
-	 * replaces reportDate and personIds with data from private variables before generating a date map
-	 */
-	private Map<Integer, Date> makeDateMapFromSQL(String sql) {
-		List<List<Object>> data = Context.getAdministrationService().executeSQL(
-				sql.replaceAll(":reportDate", reportDate)
-						.replaceAll(":cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID),
-				false);
+	private Map<Integer, Date> makeDateMapFromSQL(String sql, Map<String, Object> substitutions) {
+		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
 		return makeDateMap(data);
 	}
 
 	/**
 	 * generates a map of integers to dates, assuming this is the kind of response expected from the SQL
 	 */
-	private Map<Integer, Date> makeDateMap(List<List<Object>> data) {
+	private Map<Integer, Date> makeDateMap(List<Object> data) {
 		Map<Integer, Date> m = new HashMap<Integer, Date>();
-		for (List<Object> row : data) {
-			m.put((Integer) row.get(0), (Date) row.get(1));
+		for (Object o : data) {
+			Object[] parts = (Object[]) o;
+			if (parts.length == 2) {
+				Integer pId = (Integer) parts[0];
+				Date date = (Date) parts[1];
+				m.put(pId, date);
+			}
 		}
+
 		return m;
 	}
+
 }

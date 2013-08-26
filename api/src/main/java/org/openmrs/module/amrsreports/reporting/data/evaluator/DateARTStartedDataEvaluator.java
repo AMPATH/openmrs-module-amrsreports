@@ -12,6 +12,7 @@ import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,23 +38,28 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		StringBuilder hql = new StringBuilder();
 		Map<String, Object> m = new HashMap<String, Object>();
 
-		hql.append("from HIVCareEnrollment ");
+		hql.append("select hce.patient.patientId, hce.firstARVDate");
+		hql.append(" from HIVCareEnrollment as hce");
 		hql.append(" where");
 
-		hql.append(" patient.patientId in (" +
+		hql.append(" hce.patient.patientId in (" +
 				"	SELECT elements(c.memberIds) from Cohort as c" +
 				"	where c.uuid = :cohortUuid" +
 				") ");
 		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 
-		hql.append("and firstARVDate <= :onOrBefore ");
+		hql.append("and hce.firstARVDate <= :onOrBefore ");
 		m.put("onOrBefore", context.getEvaluationDate());
 
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
 
 		for (Object o : queryResult) {
-			HIVCareEnrollment enrollment = (HIVCareEnrollment) o;
-			c.addData(enrollment.getPatient().getPersonId(), enrollment.getFirstARVDate());
+			Object[] parts = (Object[]) o;
+			if (parts.length == 2) {
+				Integer pId = (Integer) parts[0];
+				Date firstARVDate = (Date) parts[1];
+				c.addData(pId, firstARVDate);
+			}
 		}
 
 		return c;

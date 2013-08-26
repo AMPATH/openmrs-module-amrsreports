@@ -59,7 +59,7 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 		Cohort cohort = new Cohort(context.getBaseCohort().getMemberIds());
 
 		// give up early if the cohort is empty
-		if (cohort == null || cohort.isEmpty()) {
+		if (cohort.isEmpty()) {
 			return c;
 		}
 
@@ -92,7 +92,8 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
 		// define the HQL
-		String hql = "FROM Obs AS o, HIVCareEnrollment AS hce" +
+		String hql = "SELECT o" +
+				" FROM Obs AS o, HIVCareEnrollment AS hce" +
 				" WHERE" +
 				"	o.person.personId = hce.patient.personId" +
 				"   AND o.voided = false" +
@@ -118,11 +119,7 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 		// create a listmap of the observations
 		ListMap<Integer, Obs> obsListMap = new ListMap<Integer, Obs>();
 		for (Object o : queryResult) {
-
-			// each result is an array: [Obs, HIVCareEnrollment]
-			Object[] arr = (Object[]) o;
-			Obs obs = (Obs) arr[0];
-
+			Obs obs = (Obs) o;
 			obsListMap.putInList(obs.getPersonId(), obs);
 		}
 
