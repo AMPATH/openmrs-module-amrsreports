@@ -36,14 +36,6 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 
 	private Map<Integer, Object> artStartDates;
 
-	private List<Integer> questionConcepts = Arrays.asList(
-			MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_BY_FACS),
-			MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_PERCENT),
-			MohCacheUtils.getConceptId(MohEvaluableNameConstants.HIV_DNA_PCR),
-			MohCacheUtils.getConceptId(MohEvaluableNameConstants.WHO_STAGE_PEDS),
-			MohCacheUtils.getConceptId(MohEvaluableNameConstants.WHO_STAGE_ADULT)
-	);
-
 	private EligibilityForARTDataDefinition definition;
 
 	@Override
@@ -131,6 +123,14 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 
 	@Override
 	protected Map<String, Object> getSubstitutions() {
+		List<Integer> questionConcepts = Arrays.asList(
+				MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_BY_FACS),
+				MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_PERCENT),
+				MohCacheUtils.getConceptId(MohEvaluableNameConstants.HIV_DNA_PCR),
+				MohCacheUtils.getConceptId(MohEvaluableNameConstants.WHO_STAGE_PEDS),
+				MohCacheUtils.getConceptId(MohEvaluableNameConstants.WHO_STAGE_ADULT)
+		);
+
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("questionList", questionConcepts);
 		return m;

@@ -363,17 +363,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions) {
 		Query q = sessionFactory.openStatelessSession().createQuery(query);
 
-		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
-			if (e.getValue() instanceof Collection) {
-				q.setParameterList(e.getKey(), (Collection) e.getValue());
-			} else if (e.getValue() instanceof Object[]) {
-				q.setParameterList(e.getKey(), (Object[]) e.getValue());
-			} else if (e.getValue() instanceof Cohort) {
-				q.setParameterList(e.getKey(), ((Cohort) e.getValue()).getMemberIds());
-			} else {
-				q.setParameter(e.getKey(), e.getValue());
-			}
-		}
+		applySubstitutions(q, substitutions);
 
 		// optimizations go here
 		q.setFetchSize(Integer.MIN_VALUE);
@@ -409,8 +399,9 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	@Override
 	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions) {
 
-		StatelessSession s = sessionFactory.openStatelessSession();
-		SQLQuery q = s.createSQLQuery(query);
+//		StatelessSession s = sessionFactory.openStatelessSession();
+//		SQLQuery q = s.createSQLQuery(query);
+		SQLQuery q = sessionFactory.getCurrentSession().createSQLQuery(query);
 
 		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
 			if (e.getValue() instanceof Collection) {
@@ -430,7 +421,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 
 		List<Object> r = q.list();
 
-		s.close();
+//		s.close();
 
 		return r;
 	}
@@ -439,17 +430,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions) {
 		Query q = sessionFactory.openStatelessSession().createQuery(query);
 
-		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
-			if (e.getValue() instanceof Collection) {
-				q.setParameterList(e.getKey(), (Collection) e.getValue());
-			} else if (e.getValue() instanceof Object[]) {
-				q.setParameterList(e.getKey(), (Object[]) e.getValue());
-			} else if (e.getValue() instanceof Cohort) {
-				q.setParameterList(e.getKey(), ((Cohort) e.getValue()).getMemberIds());
-			} else {
-				q.setParameter(e.getKey(), e.getValue());
-			}
-		}
+		applySubstitutions(q, substitutions);
 
 		// optimizations go here
 		q.setReadOnly(true);
@@ -457,10 +438,7 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 		return q.list();
 	}
 
-	private List<Object> executeBatchingHqlQuery(String query, Map<String, Object> substitutions, int start, int size) {
-		StatelessSession s = sessionFactory.openStatelessSession();
-		Query q = s.createQuery(query);
-
+	private void applySubstitutions(Query q, Map<String, Object> substitutions) {
 		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
 			if (e.getValue() instanceof Collection) {
 				q.setParameterList(e.getKey(), (Collection) e.getValue());
@@ -468,20 +446,11 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 				q.setParameterList(e.getKey(), (Object[]) e.getValue());
 			} else if (e.getValue() instanceof Cohort) {
 				q.setParameterList(e.getKey(), ((Cohort) e.getValue()).getMemberIds());
+			} else if (e.getValue() instanceof Date) {
+				q.setDate(e.getKey(), (Date) e.getValue());
 			} else {
 				q.setParameter(e.getKey(), e.getValue());
 			}
 		}
-
-		q.setFirstResult(start);
-		q.setMaxResults(size);
-		q.setReadOnly(true);
-
-		List<Object> r = q.list();
-
-		s.close();
-
-		return r;
 	}
-
 }
