@@ -143,6 +143,11 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 		return dao.getLatestSerialNumberForFacility(facility);
 	}
 
+	@Override
+	public Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility) {
+		return dao.getSerialNumberMapForFacility(facility);
+	}
+
 
 	@Override
 	public Integer assignMissingIdentifiersForFacility(MOHFacility facility) {

@@ -1,5 +1,7 @@
 package org.openmrs.module.amrsreports.db;
 
+import org.openmrs.Cohort;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 
@@ -28,4 +30,6 @@ public interface MOHFacilityDAO {
 	public Integer getLatestSerialNumberForFacility(MOHFacility facility);
 
 	public List<Integer> getEnrolledPatientsForFacility(MOHFacility facility);
+
+	public Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility);
 }

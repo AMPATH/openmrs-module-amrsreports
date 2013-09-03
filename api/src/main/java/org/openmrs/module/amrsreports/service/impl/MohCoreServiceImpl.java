@@ -20,18 +20,14 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.PatientIdentifierType;
-import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.UserFacility;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
-import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -81,24 +77,24 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	/**
-	 * @see MohCoreService#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreService#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction, java.util.Date)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId,
-	                                            final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                            final MohFetchRestriction mohFetchRestriction,
-	                                            final Date evaluationDate) throws APIException {
+												final Map<String, Collection<OpenmrsObject>> restrictions,
+												final MohFetchRestriction mohFetchRestriction,
+												final Date evaluationDate) throws APIException {
 		return mohCoreDAO.getPatientEncounters(patientId, restrictions, mohFetchRestriction, evaluationDate);
 	}
 
 	/**
-	 * @see MohCoreService#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreService#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction, java.util.Date)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId,
-	                                        final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                        final MohFetchRestriction mohFetchRestriction,
-	                                        final Date evaluationDate) throws APIException {
+											final Map<String, Collection<OpenmrsObject>> restrictions,
+											final MohFetchRestriction mohFetchRestriction,
+											final Date evaluationDate) throws APIException {
 		return mohCoreDAO.getPatientObservations(patientId, restrictions, mohFetchRestriction, evaluationDate);
 	}
 
@@ -119,13 +115,23 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	}
 
 	@Override
-	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
-		return mohCoreDAO.getWHOStageAndDateMap(cohort);
-	}
-
-	@Override
 	public PatientIdentifierType getCCCNumberIdentifierType() {
 		String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE);
 		return Context.getPatientService().getPatientIdentifierType(Integer.valueOf(typeId));
+	}
+
+	@Override
+	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions) {
+		return mohCoreDAO.executeScrollingHqlQuery(query, substitutions);
+	}
+
+	@Override
+	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions) {
+		return mohCoreDAO.executeSqlQuery(query, substitutions);
+	}
+
+	@Override
+	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions) {
+		return mohCoreDAO.executeHqlQuery(query, substitutions);
 	}
 }

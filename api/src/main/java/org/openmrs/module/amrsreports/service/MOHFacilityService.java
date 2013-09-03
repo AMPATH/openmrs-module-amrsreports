@@ -1,6 +1,8 @@
 package org.openmrs.module.amrsreports.service;
 
+import org.openmrs.Cohort;
 import org.openmrs.Location;
+import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,9 @@ public interface MOHFacilityService {
 	@Transactional(readOnly = true)
 	List<Integer> getPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
 
-	@Transactional(readOnly = true)
+	@Transactional
 	Integer getLatestSerialNumberForFacility(MOHFacility facility);
+
+	@Transactional(readOnly = true)
+	Map<Integer,String> getSerialNumberMapForFacility(MOHFacility facility);
 }

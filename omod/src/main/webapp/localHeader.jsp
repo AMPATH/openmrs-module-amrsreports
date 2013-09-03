@@ -59,7 +59,7 @@
     </openmrs:hasPrivilege>
 </ul>
 
-<div id="runningTaskAlert" class="visualPadding error">
+<div id="runningTaskAlert" class="visualPadding hidden error">
     The scheduled task for running queued reports is not turned on.  Please
     <a href="<openmrs:contextPath/>/admin/scheduler/scheduler.list">activate it</a> or ask an administrator to do the same.
 </div>

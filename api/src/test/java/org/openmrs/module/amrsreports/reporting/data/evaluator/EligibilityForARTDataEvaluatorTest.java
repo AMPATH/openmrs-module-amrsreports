@@ -1,7 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -12,15 +12,10 @@ import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.logic.LogicContext;
-import org.openmrs.logic.result.Result;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
-import org.openmrs.module.amrsreports.util.MOHReportUtil;
-import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.service.PersonDataService;
@@ -45,6 +40,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Unit tests for {@link EligibilityForARTDataEvaluator}
  */
+@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
 public class EligibilityForARTDataEvaluatorTest {
