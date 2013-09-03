@@ -345,7 +345,7 @@ public class DWRAmrsReportService {
 
 		if (f != null) {
 			for (Integer patientId : Context.getService(MOHFacilityService.class)
-					.getPatientsInFacilityMissingCCCNumbers(f).getMemberIds()) {
+					.getPatientsInFacilityMissingCCCNumbers(f)) {
 				c.add(Context.getPatientService().getPatient(patientId).getUuid());
 			}
 		}

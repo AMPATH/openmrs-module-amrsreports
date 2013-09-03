@@ -2,7 +2,6 @@ package org.openmrs.module.amrsreports.service.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -12,19 +11,11 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.db.MOHFacilityDAO;
-import org.openmrs.module.amrsreports.db.hibernate.MohHibernateCoreDAO;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.MohCoreService;
-import org.openmrs.module.reporting.cohort.EvaluatedCohort;
-import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
-import org.openmrs.module.reporting.evaluation.EvaluationContext;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.context.PersonEvaluationContext;
 import org.openmrs.util.MetadataComparator;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -131,21 +122,19 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 		return m;
 	}
 
-	private Cohort getEnrolledPatientsForFacility(MOHFacility facility) {
+	private List<Integer> getEnrolledPatientsForFacility(MOHFacility facility) {
 		return dao.getEnrolledPatientsForFacility(facility);
 	}
 
 	@Override
 	public Integer countPatientsInFacilityMissingCCCNumbers(MOHFacility facility) {
-		Cohort c = getEnrolledPatientsForFacility(facility);
-		Cohort missing = dao.getPatientsInCohortMissingCCCNumbers(c);
-		return missing.size();
+		return getPatientsInFacilityMissingCCCNumbers(facility).size();
 	}
 
 	@Override
-	public Cohort getPatientsInFacilityMissingCCCNumbers(MOHFacility facility) {
-		Cohort c = getEnrolledPatientsForFacility(facility);
-		Cohort missing = dao.getPatientsInCohortMissingCCCNumbers(c);
+	public List<Integer> getPatientsInFacilityMissingCCCNumbers(MOHFacility facility) {
+		List<Integer> c = getEnrolledPatientsForFacility(facility);
+		List<Integer> missing = dao.getPatientsInCohortMissingCCCNumbers(c);
 		return missing;
 	}
 
@@ -170,16 +159,16 @@ public class MOHFacilityServiceImpl implements MOHFacilityService {
 
 		// get some required information
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
-		Cohort c = getEnrolledPatientsForFacility(facility);
+		List<Integer> c = getEnrolledPatientsForFacility(facility);
 		Integer serial = dao.getLatestSerialNumberForFacility(facility);
 
 		// start a counter for our progress
 		Integer count = 0;
 
 		// loop over members of the filtered cohort
-		Cohort missing = dao.getPatientsInCohortMissingCCCNumbers(c);
+		List<Integer> missing = dao.getPatientsInCohortMissingCCCNumbers(c);
 
-		for (Integer patientId : missing.getMemberIds()) {
+		for (Integer patientId : missing) {
 
 			// get the patient
 			Patient p = Context.getPatientService().getPatient(patientId);
