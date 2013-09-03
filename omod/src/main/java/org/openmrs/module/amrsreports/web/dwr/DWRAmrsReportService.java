@@ -219,18 +219,18 @@ public class DWRAmrsReportService {
 		if (mohFacility == null)
 			return new HashSet<Integer>();
 
-		List<Location> facilityLocations = new ArrayList<Location>(mohFacility.getLocations());
-		context.addParameterValue("locationList", facilityLocations);
-
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+		definition.setFacility(mohFacility);
 
 		try {
 			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
-			return cohort.getMemberIds();
+			if (cohort != null)
+				return cohort.getMemberIds();
 		} catch (EvaluationException e) {
 			log.error(e);
 		}
 
+		log.warn("No cohort found for facility #" + facilityId);
 		return new HashSet<Integer>();
 	}
 

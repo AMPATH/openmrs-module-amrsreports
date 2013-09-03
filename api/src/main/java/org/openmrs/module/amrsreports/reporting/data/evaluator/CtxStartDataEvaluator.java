@@ -16,7 +16,9 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -44,17 +46,15 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 		if (context.getBaseCohort().isEmpty())
 			return data;
 
-		String hql = "from Obs" +
-				" where voided = false" +
-				"   and person.personId in (:patientIds)" +
-				"   and concept.id = 1263" +
-				"   and obsDatetime between '2001-01-01' and :reportDate" +
-				"   and valueCoded.id = 916" +
-				"   order by obsDatetime asc";
+		String hql = "select personId, obsDatetime" +
+				"	from Obs" +
+				" 	where voided = false" +
+				"   	and personId in (:patientIds)" +
+				"   	and concept.id = 1263" +
+				"   	and valueCoded.id = 916";
 
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("patientIds", context.getBaseCohort());
-		m.put("reportDate", context.getEvaluationDate());
 
 		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromHQL(hql, m);
 
@@ -67,24 +67,21 @@ public class CtxStartDataEvaluator extends DrugStartStopDataEvaluator {
 		return data;
 	}
 
-	private Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
-		Set<Date> dateSet = new LinkedHashSet<Date>();
-		if (map.containsKey(key))
-			dateSet.addAll(map.get(key));
-		return dateSet;
-	}
-
 	/**
 	 * replaces reportDate and personIds with data from private variables before generating a date map
 	 */
 	private ListMap<Integer, Date> makeDatesMapFromHQL(final String query, final Map<String, Object> substitutions) {
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
-		List<Object> queryResult = qs.executeHqlQuery(query, substitutions);
+		MohCoreService mcs = Context.getService(MohCoreService.class);
+		List<Object> queryResult = mcs.executeScrollingHqlQuery(query, substitutions);
 
 		ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
 		for (Object o : queryResult) {
-			Obs obs = (Obs) o;
-			dateListMap.putInList(obs.getPersonId(), obs.getObsDatetime());
+			Object[] parts = (Object[]) o;
+			if (parts.length == 2) {
+				Integer pId = (Integer) parts[0];
+				Date date = (Date) parts[1];
+				dateListMap.putInList(pId, date);
+			}
 		}
 
 		return dateListMap;

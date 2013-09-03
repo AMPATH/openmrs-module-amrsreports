@@ -8,6 +8,7 @@ import org.openmrs.Cohort;
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.db.QueuedReportDAO;
@@ -91,6 +92,22 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		timer.stop();
 		String cohortTime = timer.toString();
 		timer.reset();
+
+		// find the persisted temporary cohort
+		Cohort savedCohort = Context.getCohortService().getCohortByUuid(AmrsReportsConstants.SAVED_COHORT_UUID);
+
+		// initialize it if the temporary cohort does not yet exist
+		if (savedCohort == null) {
+			savedCohort = new Cohort();
+			savedCohort.setName("AMRS Reports");
+			savedCohort.setDescription("Temporary cohort for AMRS Reports Module; refreshed for each report.");
+			savedCohort.setUuid(AmrsReportsConstants.SAVED_COHORT_UUID);
+		}
+
+		// update and save the cohort
+		savedCohort.setMemberIds(cohort.getMemberIds());
+		Context.getCohortService().saveCohort(savedCohort);
+
 		timer.start();
 
 		// get the time the report was started (not finished)

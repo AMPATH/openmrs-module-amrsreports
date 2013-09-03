@@ -30,4 +30,6 @@ public interface MOHFacilityDAO {
 	public Integer getLatestSerialNumberForFacility(MOHFacility facility);
 
 	public Cohort getEnrolledPatientsForFacility(MOHFacility facility);
+
+	public Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility);
 }

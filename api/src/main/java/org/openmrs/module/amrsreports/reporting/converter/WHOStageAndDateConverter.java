@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -20,7 +21,7 @@ public class WHOStageAndDateConverter implements DataConverter {
 
 	@Override
 	public Object convert(Object original) {
-		Obs o = (Obs) original;
+		ObsRepresentation o = (ObsRepresentation) original;
 
 		if (o == null)
 			return "";
@@ -37,7 +38,7 @@ public class WHOStageAndDateConverter implements DataConverter {
 
 	@Override
 	public Class<?> getInputDataType() {
-		return Obs.class;
+		return ObsRepresentation.class;
 	}
 
 	@Override

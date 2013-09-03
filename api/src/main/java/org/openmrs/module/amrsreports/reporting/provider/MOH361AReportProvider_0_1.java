@@ -13,10 +13,15 @@ import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.MultiplePatientIdentifierConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ObsValueDatetimeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedAgeAtDateOfOtherDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedGenderDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPatientIdentifierDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPersonAttributeDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPreferredNameDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
@@ -39,13 +44,7 @@ import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -117,38 +116,38 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString, new MultiplePatientIdentifierConverter());
+		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
+		cccColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
 		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
 		idTypes.remove(pit);
-		PatientIdentifierDataDefinition idColumn = new PatientIdentifierDataDefinition("Identifier");
+		CohortRestrictedPatientIdentifierDataDefinition idColumn = new CohortRestrictedPatientIdentifierDataDefinition("Identifier");
 		idColumn.setTypes(idTypes);
 		idColumn.setIncludeFirstNonNullOnly(true);
 		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
 
 		// d. Patient's Name
-		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
+		dsd.addColumn("Name", new CohortRestrictedPreferredNameDataDefinition(), nullString);
 
 		// e1. Date of Birth
-		dsd.addColumn("Date of Birth", new BirthdateDataDefinition(), nullString,
+		dsd.addColumn("Date of Birth", new CohortRestrictedBirthdateDataDefinition(), nullString,
 				new BirthdateConverter(MOHReportUtil.DATE_FORMAT));
 
 		// e2. Age at Enrollment
-
 		MappedData<EnrollmentDateDataDefinition> mappedDef = new MappedData<EnrollmentDateDataDefinition>();
 		mappedDef.setParameterizable(enrollmentDate);
 		mappedDef.addConverter(new DateConverter());
-		AgeAtDateOfOtherDataDefinition ageAtEnrollment = new AgeAtDateOfOtherDataDefinition();
+		CohortRestrictedAgeAtDateOfOtherDataDefinition ageAtEnrollment = new CohortRestrictedAgeAtDateOfOtherDataDefinition();
 		ageAtEnrollment.setEffectiveDateDefinition(mappedDef);
 		dsd.addColumn("Age at Enrollment", ageAtEnrollment, nullString, new DecimalAgeConverter(2));
 
 		// f. Sex
-		dsd.addColumn("Sex", new GenderDataDefinition(), nullString);
+		dsd.addColumn("Sex", new CohortRestrictedGenderDataDefinition(), nullString);
 
 		// g. Entry point: From where?
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(MohEvaluableNameConstants.POINT_OF_HIV_TESTING);
-		dsd.addColumn("Entry Point", new PersonAttributeDataDefinition("entryPoint", pat), nullString, new EntryPointConverter());
+		dsd.addColumn("Entry Point", new CohortRestrictedPersonAttributeDataDefinition("entryPoint", pat), nullString, new EntryPointConverter());
 
 		// h. Confirmed HIV+ Date
 		dsd.addColumn("Confirmed HIV Date", enrollmentDate, nullString);
@@ -197,7 +196,7 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
 
 		// informative column for the destination clinics
-		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());
+		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsRepresentationValueDatetimeConverter());
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");

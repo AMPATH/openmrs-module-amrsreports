@@ -32,23 +32,16 @@ public class SerialNumberDataEvaluator implements PersonDataEvaluator {
 		MOHFacility facility = (MOHFacility) context.getParameterValue("facility");
 
 		// request all CCC numbers for that facility
-		Map<Integer, PatientIdentifier> cccMap = Context.getService(MOHFacilityService.class)
-				.getCCCNumberMapForFacility(facility);
+		Map<Integer, String> cccMap = Context.getService(MOHFacilityService.class)
+				.getSerialNumberMapForFacility(facility);
 
 		// populate them, leaving the rest null
 		for (Integer personId : context.getBaseCohort().getMemberIds()) {
 			ret.addData(personId,
-					cccMap.containsKey(personId) ? getSerialNumberFromIdentifier(cccMap.get(personId)) : AmrsReportsConstants.TRANSFER_IN);
+					cccMap.containsKey(personId) ? cccMap.get(personId) : AmrsReportsConstants.TRANSFER_IN);
 		}
 
 		return ret;
 	}
 
-	private String getSerialNumberFromIdentifier(PatientIdentifier identifier) {
-		Integer dashLocation = identifier.getIdentifier().indexOf("-");
-		if (dashLocation == -1)
-			return identifier.getIdentifier();
-
-		return identifier.getIdentifier().substring(dashLocation + 1);
-	}
 }

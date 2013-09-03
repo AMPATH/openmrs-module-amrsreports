@@ -1,6 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
-import org.openmrs.Obs;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
@@ -14,7 +14,7 @@ public class LastRTCDateDataDefinition extends BaseDataDefinition implements Per
 
 	@Override
 	public Class<?> getDataType() {
-		return Obs.class;
+		return ObsRepresentation.class;
 	}
 
 }

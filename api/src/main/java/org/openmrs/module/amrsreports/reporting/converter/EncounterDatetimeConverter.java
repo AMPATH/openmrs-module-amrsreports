@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.openmrs.Encounter;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.util.Date;

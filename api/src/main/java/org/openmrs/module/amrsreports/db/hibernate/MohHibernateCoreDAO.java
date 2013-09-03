@@ -17,9 +17,12 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -33,7 +36,6 @@ import org.openmrs.api.db.DAOException;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.db.MohCoreDAO;
-import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.util.MohFetchOrdering;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
@@ -66,13 +68,13 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientObservations(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction, java.util.Date)
 	 */
 	@Override
 	public List<Obs> getPatientObservations(final Integer patientId,
-	                                        final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                        final MohFetchRestriction mohFetchRestriction,
-	                                        final Date evaluationDate) throws DAOException {
+											final Map<String, Collection<OpenmrsObject>> restrictions,
+											final MohFetchRestriction mohFetchRestriction,
+											final Date evaluationDate) throws DAOException {
 		// build the criteria
 		Criteria criteria = buildPatientObservationsCriteria(patientId, restrictions, mohFetchRestriction, evaluationDate);
 
@@ -83,15 +85,14 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientObservationsWithEncounterRestrictions(Integer, java.util.Map, java.util.Map,
-	 *      org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientObservationsWithEncounterRestrictions(Integer, java.util.Map, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction, java.util.Date)
 	 */
 	@Override
 	public List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
-	                                                                 final Map<String, Collection<OpenmrsObject>> obsRestrictions,
-	                                                                 final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
-	                                                                 final MohFetchRestriction mohFetchRestriction,
-	                                                                 final Date evaluationDate) {
+																	 final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+																	 final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+																	 final MohFetchRestriction mohFetchRestriction,
+																	 final Date evaluationDate) {
 
 		// build the criteria
 		Criteria criteria = buildPatientObservationsCriteria(patientId, obsRestrictions, mohFetchRestriction, evaluationDate);
@@ -157,9 +158,9 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	 * @return a Criteria for use in evaluation
 	 */
 	private Criteria buildPatientObservationsCriteria(final Integer patientId,
-	                                                  final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                                  final MohFetchRestriction mohFetchRestriction,
-	                                                  final Date evaluationDate) {
+													  final Map<String, Collection<OpenmrsObject>> restrictions,
+													  final MohFetchRestriction mohFetchRestriction,
+													  final Date evaluationDate) {
 
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.add(Restrictions.eq("personId", patientId));
@@ -197,13 +198,13 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	/**
-	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction)
+	 * @see MohCoreDAO#getPatientEncounters(Integer, java.util.Map, org.openmrs.module.amrsreports.util.MohFetchRestriction, java.util.Date)
 	 */
 	@Override
 	public List<Encounter> getPatientEncounters(final Integer patientId,
-	                                            final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                            final MohFetchRestriction mohFetchRestriction,
-	                                            final Date evaluationDate) throws DAOException {
+												final Map<String, Collection<OpenmrsObject>> restrictions,
+												final MohFetchRestriction mohFetchRestriction,
+												final Date evaluationDate) throws DAOException {
 		// create a hibernate criteria on the encounter object
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Encounter.class);
 		// restrict the encounter that will be returned to specific patient only
@@ -359,21 +360,97 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 	}
 
 	@Override
-	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort) {
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(HIVCareEnrollment.class)
-				.add(Restrictions.in("patient.personId", cohort))
-				.setProjection(Projections.projectionList()
-						.add(Projections.property("patient.personId"))
-						.add(Projections.property("lastWHOStage"))
-						.add(Projections.property("lastWHOStageDate")));
+	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions) {
+		Query q = sessionFactory.openStatelessSession().createQuery(query);
 
-		Map<Integer, WHOStageAndDate> ret = new LinkedHashMap<Integer, WHOStageAndDate>();
-		Iterator<Object[]> it = crit.list().iterator();
-		while (it.hasNext()) {
-			Object[] row = it.next();
-			ret.put((Integer) row[0], new WHOStageAndDate((String) row[1], (Date) row[2]));
+		applySubstitutions(q, substitutions);
+
+		// optimizations go here
+		q.setFetchSize(Integer.MIN_VALUE);
+		q.setReadOnly(true);
+
+		List<Object> res = new ArrayList<Object>();
+
+		long i = 0;
+
+		ScrollableResults sr = q.scroll(ScrollMode.FORWARD_ONLY);
+		while (sr.next()) {
+
+			// rows always come back as an array
+			Object[] o = sr.get();
+
+			// but if there is only one object in the row, add it instead of the array
+			if (o.length == 1)
+				res.add(o[0]);
+			else
+				res.add(o);
+
+			if (++i % 500 == 0)
+				log.warn("processed #" + i);
 		}
-		return ret;
+
+		log.warn("done. processed " + i + " total rows.");
+
+		sr.close();
+
+		return res;
 	}
 
+	@Override
+	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions) {
+
+//		StatelessSession s = sessionFactory.openStatelessSession();
+//		SQLQuery q = s.createSQLQuery(query);
+		SQLQuery q = sessionFactory.getCurrentSession().createSQLQuery(query);
+
+		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
+			if (e.getValue() instanceof Collection) {
+				q.setParameterList(e.getKey(), (Collection) e.getValue());
+			} else if (e.getValue() instanceof Object[]) {
+				q.setParameterList(e.getKey(), (Object[]) e.getValue());
+			} else if (e.getValue() instanceof Cohort) {
+				q.setParameterList(e.getKey(), ((Cohort) e.getValue()).getMemberIds());
+			} else if (e.getValue() instanceof Date) {
+				q.setDate(e.getKey(), (Date) e.getValue());
+			} else {
+				q.setParameter(e.getKey(), e.getValue());
+			}
+		}
+
+		q.setReadOnly(true);
+
+		List<Object> r = q.list();
+
+//		s.close();
+
+		return r;
+	}
+
+	@Override
+	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions) {
+		Query q = sessionFactory.openStatelessSession().createQuery(query);
+
+		applySubstitutions(q, substitutions);
+
+		// optimizations go here
+		q.setReadOnly(true);
+
+		return q.list();
+	}
+
+	private void applySubstitutions(Query q, Map<String, Object> substitutions) {
+		for (Map.Entry<String, Object> e : substitutions.entrySet()) {
+			if (e.getValue() instanceof Collection) {
+				q.setParameterList(e.getKey(), (Collection) e.getValue());
+			} else if (e.getValue() instanceof Object[]) {
+				q.setParameterList(e.getKey(), (Object[]) e.getValue());
+			} else if (e.getValue() instanceof Cohort) {
+				q.setParameterList(e.getKey(), ((Cohort) e.getValue()).getMemberIds());
+			} else if (e.getValue() instanceof Date) {
+				q.setDate(e.getKey(), (Date) e.getValue());
+			} else {
+				q.setParameter(e.getKey(), e.getValue());
+			}
+		}
+	}
 }
