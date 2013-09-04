@@ -1,8 +1,6 @@
 package org.openmrs.module.amrsreports.service;
 
-import org.openmrs.Cohort;
 import org.openmrs.Location;
-import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,5 +57,5 @@ public interface MOHFacilityService {
 	Integer getLatestSerialNumberForFacility(MOHFacility facility);
 
 	@Transactional(readOnly = true)
-	Map<Integer,String> getSerialNumberMapForFacility(MOHFacility facility);
+	Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility);
 }
