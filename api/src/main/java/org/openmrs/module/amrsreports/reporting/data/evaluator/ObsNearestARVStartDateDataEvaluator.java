@@ -114,7 +114,7 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 		m.put("onOrBefore", context.getEvaluationDate());
 
 		// execute the HQL
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
+		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
 		// create a listmap of the observations
 		ListMap<Integer, Obs> obsListMap = new ListMap<Integer, Obs>();
