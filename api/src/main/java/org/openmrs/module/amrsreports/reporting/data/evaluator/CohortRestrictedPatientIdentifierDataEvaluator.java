@@ -72,7 +72,7 @@ public class CohortRestrictedPatientIdentifierDataEvaluator implements PatientDa
 				"	where c.uuid = :cohortUuid" +
 				") ");
 		hql.append("and pi.identifierType.patientIdentifierTypeId in (:idTypes) ");
-		hql.append("order by pi.preferred asc");
+		hql.append("order by pi.preferred desc");
 
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
