@@ -35,6 +35,7 @@ import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -95,9 +96,10 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 		report.addParameter(facility);
 		dsd.addParameter(facility);
 
-		// sort by serial number, then by date
-		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
+		// sort by transfer status (transfers go last), then by date, then serial number
+		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 
@@ -203,6 +205,9 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 		// informative column for the destination clinics
 		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString,
 				new PropertyConverter(ObsRepresentation.class, "valueDatetime"));
+
+		// transfer status column (used for sorting, not needed in output)
+		dsd.addColumn("Transfer Status", new TransferStatusDataDefinition(), nullString);
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");
