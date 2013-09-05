@@ -18,9 +18,9 @@ import org.openmrs.Encounter;
 
 import java.util.Comparator;
 
-public class EncounterRepresentationDatetimeComparator implements Comparator<Encounter> {
+public class EncounterRepresentationDatetimeComparator implements Comparator<EncounterRepresentation> {
 	@Override
-	public int compare(Encounter a, Encounter b) {
+	public int compare(EncounterRepresentation a, EncounterRepresentation b) {
 		if (a == null ^ b == null) {
 			return (a == null) ? -1 : 1;
 		}
@@ -40,4 +40,5 @@ public class EncounterRepresentationDatetimeComparator implements Comparator<Enc
 		return a.getEncounterDatetime().compareTo(b.getEncounterDatetime());
 
 	}
+
 }

@@ -5,12 +5,15 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentation;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.data.FirstEncounterAtFacilityDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.converter.PropertyConverter;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -75,11 +78,11 @@ public class JerTestReportProvider extends ReportProvider {
 //		// b. date chronic HIV+ care started
 //		EnrollmentDateDataDefinition enrollmentDate = new EnrollmentDateDataDefinition();
 //		dsd.addColumn("Date Chronic HIV Care Started", enrollmentDate, nullString);
-
-		// extra column to help understand reason for including in this cohort
-		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(),
-				"facility=${facility}", new EncounterDatetimeConverter());
-
+//
+//		// extra column to help understand reason for including in this cohort
+//		dsd.addColumn("First Encounter Date At Facility", new FirstEncounterAtFacilityDataDefinition(),
+//				"facility=${facility}", new EncounterDatetimeConverter());
+//
 //		// c. Unique Patient Number
 //		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 //		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
@@ -147,10 +150,12 @@ public class JerTestReportProvider extends ReportProvider {
 //		// s. Date ART started (Transfer to ART register)
 //		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString);
 //
-//		// additional columns for troubleshooting
-//		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
-//		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
-//		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
+		// additional columns for troubleshooting
+		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
+		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString,
+				new PropertyConverter(EncounterRepresentation.class, "encounterDatetime"));
+		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString,
+				new PropertyConverter(EncounterRepresentation.class, "location"));
 //
 //		// informative column for the destination clinics
 //		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());

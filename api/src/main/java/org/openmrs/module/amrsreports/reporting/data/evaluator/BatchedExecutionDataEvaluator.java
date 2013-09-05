@@ -20,8 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
-import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
+import org.openmrs.module.amrsreports.reporting.common.DataRepresentation;
 import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -31,12 +30,13 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluator {
+public abstract class BatchedExecutionDataEvaluator<T extends DataRepresentation> implements PersonDataEvaluator {
 
 	private Log log = LogFactory.getLog(getClass());
 
@@ -67,7 +67,7 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 
 		log.info("number of partitions: " + partitions.size());
 
-		Map<String, Object> m = getSubstitutions();
+		Map<String, Object> m = getSubstitutions(context);
 
 		String hql = getHQL();
 
@@ -88,13 +88,13 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 			timer.reset();
 			timer.start();
 
-			SortedSetMap<Integer, ObsRepresentation> obsForPatients = new SortedSetMap<Integer, ObsRepresentation>();
-			obsForPatients.setSetComparator(new ObsRepresentationDatetimeComparator());
+			SortedSetMap<Integer, T> results = new SortedSetMap<Integer, T>();
+			results.setSetComparator(getResultsComparator());
 
 			for (Object o : queryResult) {
-				Map<String, Object> obs = (Map<String, Object>) o;
-				ObsRepresentation or = new ObsRepresentation(obs);
-				obsForPatients.putInList(or.getPersonId(), or);
+				Map<String, Object> res = (Map<String, Object>) o;
+				T t = renderSingleResult(res);
+				results.putInList(t.getPersonId(), t);
 			}
 
 			timer.stop();
@@ -102,8 +102,8 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 			timer.reset();
 			timer.start();
 
-			for (Integer pId : obsForPatients.keySet()) {
-				c.addData(pId, doExecute(pId, obsForPatients.get(pId), context));
+			for (Integer pId : results.keySet()) {
+				c.addData(pId, doExecute(pId, results.get(pId), context));
 			}
 
 			Context.flushSession();
@@ -112,7 +112,7 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 			timer.stop();
 			String timeConsuming = timer.toString();
 
-			log.warn(String.format("Get: %s | Load: %s | Consume: %s | Patients: %d", timeGetting, timeLoading, timeConsuming, partition.size()));
+			log.info(String.format("Getting: %s | Loading: %s | Consuming: %s | Patients: %d", timeGetting, timeLoading, timeConsuming, partition.size()));
 		}
 
 		// perform post-actions, return the data if it failed
@@ -121,9 +121,13 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 		return c;
 	}
 
-	protected abstract PersonDataDefinition setDefinition(PersonDataDefinition definition);
+	protected abstract T renderSingleResult(Map<String, Object> m);
 
-	protected abstract Object doExecute(Integer pId, SortedSet<ObsRepresentation> o, EvaluationContext context);
+	protected abstract Comparator<T> getResultsComparator();
+
+	protected abstract PersonDataDefinition setDefinition(PersonDataDefinition def);
+
+	protected abstract Object doExecute(Integer pId, SortedSet<T> o, EvaluationContext context);
 
 	protected abstract boolean doBefore(EvaluationContext context, EvaluatedPersonData c);
 
@@ -131,6 +135,6 @@ public abstract class BatchedExecutionDataEvaluator implements PersonDataEvaluat
 
 	protected abstract String getHQL();
 
-	protected abstract Map<String, Object> getSubstitutions();
+	protected abstract Map<String, Object> getSubstitutions(EvaluationContext context);
 
 }

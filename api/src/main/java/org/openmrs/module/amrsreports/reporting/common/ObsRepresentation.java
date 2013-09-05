@@ -17,9 +17,8 @@ package org.openmrs.module.amrsreports.reporting.common;
 import java.util.Date;
 import java.util.Map;
 
-public class ObsRepresentation {
+public class ObsRepresentation extends DataRepresentation {
 
-	private Integer personId;
 	private Integer conceptId;
 	private Integer valueCodedId;
 	private Double valueNumeric;
@@ -27,24 +26,18 @@ public class ObsRepresentation {
 	private Date obsDatetime;
 
 	public ObsRepresentation() {
-		// pass
+		super();
 	}
 
 	public ObsRepresentation(Map<String, Object> m) {
-		personId = m.containsKey("personId") ? (Integer) m.get("personId") : null;
+
+		super(m);
+
 		conceptId = m.containsKey("conceptId") ? (Integer) m.get("conceptId") : null;
 		valueCodedId = m.containsKey("valueCodedId") ? (Integer) m.get("valueCodedId") : null;
 		valueNumeric = m.containsKey("valueNumeric") ? (Double) m.get("valueNumeric") : null;
 		valueDatetime = m.containsKey("valueDatetime") ? (Date) m.get("valueDatetime") : null;
 		obsDatetime = m.containsKey("obsDatetime") ? (Date) m.get("obsDatetime") : null;
-	}
-
-	public Integer getPersonId() {
-		return personId;
-	}
-
-	public void setPersonId(Integer personId) {
-		this.personId = personId;
 	}
 
 	public Integer getConceptId() {

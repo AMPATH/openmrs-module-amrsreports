@@ -7,6 +7,7 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
@@ -19,6 +20,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,13 +32,23 @@ import java.util.SortedSet;
  * Evaluator for ART Eligibility
  */
 @Handler(supports = EligibilityForARTDataDefinition.class, order = 50)
-public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluator {
+public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluator<ObsRepresentation> {
 
 	private Log log = LogFactory.getLog(getClass());
 
 	private Map<Integer, Object> artStartDates;
 
 	private EligibilityForARTDataDefinition definition;
+
+	@Override
+	protected ObsRepresentation renderSingleResult(Map<String, Object> m) {
+		return new ObsRepresentation(m);
+	}
+
+	@Override
+	protected Comparator<ObsRepresentation> getResultsComparator() {
+		return new ObsRepresentationDatetimeComparator();
+	}
 
 	@Override
 	protected PersonDataDefinition setDefinition(PersonDataDefinition def) {
@@ -122,7 +134,7 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 	}
 
 	@Override
-	protected Map<String, Object> getSubstitutions() {
+	protected Map<String, Object> getSubstitutions(EvaluationContext context) {
 		List<Integer> questionConcepts = Arrays.asList(
 				MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_BY_FACS),
 				MohCacheUtils.getConceptId(MohEvaluableNameConstants.CD4_PERCENT),

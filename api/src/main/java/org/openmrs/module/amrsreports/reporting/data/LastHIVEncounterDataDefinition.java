@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
 import org.openmrs.Encounter;
+import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentation;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
@@ -14,6 +15,6 @@ public class LastHIVEncounterDataDefinition extends BaseDataDefinition implement
 
 	@Override
 	public Class<?> getDataType() {
-		return Encounter.class;
+		return EncounterRepresentation.class;
 	}
 }

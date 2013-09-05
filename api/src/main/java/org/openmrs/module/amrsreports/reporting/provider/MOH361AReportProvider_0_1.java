@@ -7,13 +7,13 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
-import org.openmrs.module.amrsreports.reporting.converter.EncounterLocationConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedAgeAtDateOfOtherDataDefinition;
@@ -44,6 +44,7 @@ import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.converter.PropertyConverter;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -192,11 +193,16 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 
 		// additional columns for troubleshooting
 		LastHIVEncounterDataDefinition lastHIVEncounter = new LastHIVEncounterDataDefinition();
-		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString, new EncounterDatetimeConverter());
-		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString, new EncounterLocationConverter());
+
+		dsd.addColumn("Last HIV Encounter Date", lastHIVEncounter, nullString,
+				new PropertyConverter(EncounterRepresentation.class, "encounterDatetime"));
+
+		dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString,
+				new PropertyConverter(EncounterRepresentation.class, "locationName"));
 
 		// informative column for the destination clinics
-		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsRepresentationValueDatetimeConverter());
+		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString,
+				new PropertyConverter(ObsRepresentation.class, "valueDatetime"));
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");
