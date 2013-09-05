@@ -23,6 +23,7 @@ import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,16 +48,30 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 	 * @should properly format two starts followed by one stop
 	 * @should properly format one start followed by two stops
 	 * @should properly format two start and stop periods
+	 * @should ignore same date in both start and stop dates
 	 */
 	protected String buildRangeInformation(final Set<Date> startDates, final Set<Date> stopDates, Date evaluationDate) {
-		Iterator<Date> startDateIterator = startDates.iterator();
-		Iterator<Date> stopDateIterator = stopDates.iterator();
 
+		// make copies of the start and stop date sets
+		Set<Date> starts = new LinkedHashSet<Date>(startDates);
+		Set<Date> stops = new LinkedHashSet<Date>(stopDates);
+
+		// slim down the start and stop date sets to include only unique dates
+		starts.removeAll(stopDates);
+		stops.removeAll(startDates);
+
+		// use iterators to walk through the dates
+		Iterator<Date> startDateIterator = starts.iterator();
+		Iterator<Date> stopDateIterator = stops.iterator();
+
+		// this will be used to create the final result
 		List<Date[]> ranges = new ArrayList<Date[]>();
 
+		// initialize first dates
 		Date startDate = safeNext(startDateIterator, evaluationDate);
 		Date stopDate = safeNext(stopDateIterator, evaluationDate);
 
+		// loop through date sets looking for matches
 		do {
 			if (stopDate != null) {
 				// stop is before start, range is: Unknown - stop date

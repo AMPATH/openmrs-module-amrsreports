@@ -14,6 +14,7 @@
 
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -177,6 +178,23 @@ public class DrugStartStopDataEvaluatorTest {
 		String expected = MOHReportUtil.joinAsSingleCell(
 				"12/10/1975 - 14/10/1975",
 				"16/10/1975 - 18/10/1975");
+
+		assertThat(evaluator.buildRangeInformation(startDates, stopDates, evaluationDate), is(expected));
+	}
+
+	/**
+	 * @verifies ignore same date in both start and stop dates
+	 * @see DrugStartStopDataEvaluator#buildRangeInformation(java.util.Set, java.util.Set, java.util.Date)
+	 */
+	@Test
+	public void buildRangeInformation_shouldIgnoreSameDateInBothStartAndStopDates() throws Exception {
+		addStartDate("12 Oct 1975");
+		addStopDate("14 Oct 1975");
+		addStartDate("14 Oct 1975");
+		addStopDate("18 Oct 1975");
+
+		String expected = MOHReportUtil.joinAsSingleCell(
+				"12/10/1975 - 18/10/1975");
 
 		assertThat(evaluator.buildRangeInformation(startDates, stopDates, evaluationDate), is(expected));
 	}
