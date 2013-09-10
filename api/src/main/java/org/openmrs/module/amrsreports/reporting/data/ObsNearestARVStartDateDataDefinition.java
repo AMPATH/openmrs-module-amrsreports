@@ -16,6 +16,7 @@ package org.openmrs.module.amrsreports.reporting.data;
 
 import org.openmrs.Concept;
 import org.openmrs.Obs;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
@@ -47,7 +48,7 @@ public class ObsNearestARVStartDateDataDefinition extends BaseDataDefinition imp
 
 	@Override
 	public Class<?> getDataType() {
-		return Obs.class;
+		return ObsRepresentation.class;
 	}
 
 	public List<Concept> getQuestions() {

@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
@@ -50,7 +51,7 @@ public class FirstWHOStageDataEvaluator extends BatchedExecutionDataEvaluator<Ob
 	}
 
 	@Override
-	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c) {
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
 		// pass
 		return true;
 	}

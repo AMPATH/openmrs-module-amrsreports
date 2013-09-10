@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
@@ -43,7 +44,7 @@ public class LastRTCDateDataEvaluator extends BatchedExecutionDataEvaluator<ObsR
 	}
 
 	@Override
-	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c) {
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
 		return true;
 	}
 

@@ -2,6 +2,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
@@ -96,7 +97,7 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 	}
 
 	@Override
-	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c) {
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
 		EvaluatedPersonData otherColumn;
 
 		try {

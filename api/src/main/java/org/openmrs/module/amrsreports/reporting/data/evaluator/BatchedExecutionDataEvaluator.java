@@ -51,15 +51,17 @@ public abstract class BatchedExecutionDataEvaluator<T extends DataRepresentation
 			return c;
 		}
 
+		Cohort cohort = new Cohort(context.getBaseCohort().getMemberIds());
+
 		// perform pre-actions, return the data if it failed
-		if (!doBefore(context, c))
+		if (!doBefore(context, c, cohort))
 			return c;
 
 		// create cohort partitions
 		int partitionSize = AmrsReportsConstants.DEFAULT_BATCH_SIZE;
 		List<Cohort> partitions = new LinkedList<Cohort>();
 		List<Integer> ids = new ArrayList<Integer>();
-		ids.addAll(context.getBaseCohort().getMemberIds());
+		ids.addAll(cohort.getMemberIds());
 		for (int i = 0; i < ids.size(); i += partitionSize) {
 			partitions.add(new Cohort(ids.subList(i,
 					i + Math.min(partitionSize, ids.size() - i))));
@@ -129,7 +131,7 @@ public abstract class BatchedExecutionDataEvaluator<T extends DataRepresentation
 
 	protected abstract Object doExecute(Integer pId, SortedSet<T> o, EvaluationContext context);
 
-	protected abstract boolean doBefore(EvaluationContext context, EvaluatedPersonData c);
+	protected abstract boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort);
 
 	protected abstract void doAfter(EvaluationContext context, EvaluatedPersonData c);
 

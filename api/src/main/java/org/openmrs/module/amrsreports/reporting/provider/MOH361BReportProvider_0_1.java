@@ -8,7 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ObsValueNumericConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
@@ -23,9 +23,6 @@ import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
-import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredAddressDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -124,7 +121,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 				Context.getConceptService().getConcept(5497),
 				Context.getConceptService().getConcept(730)
 		);
-		dsd.addColumn("CD4 at ART Start", cd4Def, nullString, new ObsValueNumericConverter(1));
+		dsd.addColumn("CD4 at ART Start", cd4Def, nullString, new ObsRepresentationValueNumericConverter(1));
 
 		// k. Height at start of ARVs
 		ObsNearestARVStartDateDataDefinition heightDef = new ObsNearestARVStartDateDataDefinition(
@@ -132,7 +129,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 				Context.getConceptService().getConcept(5090)
 		);
 		heightDef.setAgeLimit(12);
-		dsd.addColumn("Height at ART Start", heightDef, nullString, new ObsValueNumericConverter(1));
+		dsd.addColumn("Height at ART Start", heightDef, nullString, new ObsRepresentationValueNumericConverter(1));
 
 		// l. Weight at start of ARVs
 		ObsNearestARVStartDateDataDefinition weightDef = new ObsNearestARVStartDateDataDefinition(
@@ -140,7 +137,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 				Context.getConceptService().getConcept(5089)
 		);
 		weightDef.setAgeLimit(12);
-		dsd.addColumn("Weight at ART Start", weightDef, nullString, new ObsValueNumericConverter(1));
+		dsd.addColumn("Weight at ART Start", weightDef, nullString, new ObsRepresentationValueNumericConverter(1));
 
 		// m. CTX start date
 		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
