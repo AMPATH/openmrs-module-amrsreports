@@ -98,7 +98,7 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 
 		// sort by transfer status (transfers go last), then by date, then serial number
 		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Date Chronic HIV Care Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
