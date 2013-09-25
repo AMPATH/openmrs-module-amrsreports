@@ -10,7 +10,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
@@ -62,6 +61,30 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 		sessionFactory.getCurrentSession().delete(facility);
 	}
 
+	public Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility) {
+		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
+
+		String hql = "select pi.patient.patientId, substring(pi.identifier,7,5)" +
+				"	from PatientIdentifier as pi" +
+				"	where" +
+				"		pi.voided = false" +
+				"		and pi.identifierType.id = :identifierTypeId" +
+				"		and substring(pi.identifier,1,5) = :facilityCode";
+
+		Query q = sessionFactory.getCurrentSession().createQuery(hql);
+		q.setInteger("identifierTypeId", pit.getId());
+		q.setString("facilityCode", facility.getCode());
+
+		List<Object> res = q.list();
+		Map<Integer, String> m = new HashMap<Integer, String>();
+		for (Object r : res) {
+			Object[] a = (Object[]) r;
+			m.put((Integer) a[0], (String) a[1]);
+		}
+
+		return m;
+	}
+
 	@Override
 	public List<PatientIdentifier> getCCCNumbersForFacility(MOHFacility facility) {
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
@@ -110,11 +133,11 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 	}
 
 	@Override
-	public Cohort getPatientsInCohortMissingCCCNumbers(Cohort c) {
+	public List<Integer> getPatientsInCohortMissingCCCNumbers(List<Integer> c) {
 		PatientIdentifierType pit = Context.getService(MohCoreService.class).getCCCNumberIdentifierType();
 
 		if (c == null || c.isEmpty())
-			return new Cohort();
+			return new ArrayList<Integer>();
 
 		String sql = "select p.person_id" +
 				" from person p left join patient_identifier pi" +
@@ -122,13 +145,13 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 				"     and pi.identifier_type = " + pit.getPatientIdentifierTypeId() +
 				"     and pi.voided = 0" +
 				" where" +
-				"   p.person_id in (" + StringUtils.join(c.getMemberIds(), ",") +
+				"   p.person_id in (" + StringUtils.join(c, ",") +
 				")" +
 				"	and pi.uuid is null";
 
 		SQLQuery q = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
-		return new Cohort(q.list());
+		return (List<Integer>) q.list();
 	}
 
 	@Override
@@ -153,7 +176,7 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 	}
 
 	@Override
-	public Cohort getEnrolledPatientsForFacility(MOHFacility facility) {
+	public List<Integer> getEnrolledPatientsForFacility(MOHFacility facility) {
 		String hql = "select e.patient.patientId from HIVCareEnrollment e" +
 				" where e.enrollmentLocation in (:locationList)" +
 				"  and e.enrollmentDate is not null" +
@@ -163,7 +186,7 @@ public class HibernateMOHFacilityDAO implements MOHFacilityDAO {
 		Query q = sessionFactory.getCurrentSession().createQuery(hql);
 		q.setParameterList("locationList", new ArrayList<Location>(facility.getLocations()));
 
-		return new Cohort((List<Integer>) q.list());
+		return (List<Integer>) q.list();
 	}
 
 }

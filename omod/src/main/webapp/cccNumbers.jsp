@@ -3,13 +3,12 @@
 
 <openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/cccNumbers.list"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
-
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js"/>
 
 <openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css"/>
+
+<%@ include file="localHeader.jsp" %>
 
 <style>
     .bold { font-weight: bold; }
@@ -335,8 +334,6 @@
     }
 
 </script>
-
-<%@ include file="localHeader.jsp" %>
 
 <h2>Manage CCC Numbers</h2>
 

@@ -32,4 +32,5 @@ public interface QueuedReportService {
 
 	@Transactional(readOnly = true)
 	public QueuedReport getQueuedReport(Integer reportId);
+
 }

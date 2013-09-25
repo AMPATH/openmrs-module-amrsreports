@@ -6,6 +6,9 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
+
+import java.io.IOException;
 
 /**
  * Processor for queued reports
@@ -38,7 +41,7 @@ public class ReportQueueProcessor {
 
 		try {
 			Context.getService(QueuedReportService.class).processQueuedReport(queuedReport);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error("Unable to process amrs reports queue!", e);
             queuedReport.setStatus(QueuedReport.STATUS_ERROR);
             Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);

@@ -4,7 +4,6 @@
 
 <openmrs:require privilege="View Reports" otherwise="/login.htm" redirect="/module/amrsreports/viewReport.form" />
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.tools.min.js" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/TableTools.min.js" />
@@ -16,9 +15,8 @@
 <openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css" />
 <openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css" />
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
 
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
+<%@ include file="localHeader.jsp"%>
 
 <script type="text/javascript">
 	$j(document).ready(function(){
@@ -127,9 +125,9 @@
 
 </script>
 
-<%@ include file="localHeader.jsp"%>
+<h2>View Report</h2>
 
-<b class="boxHeader">View Report</b>
+<b class="boxHeader">Report Details</b>
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
 
 <c:if test="${not empty records}">

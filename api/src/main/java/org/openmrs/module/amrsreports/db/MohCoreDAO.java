@@ -18,7 +18,6 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.api.db.DAOException;
-import org.openmrs.module.amrsreports.model.WHOStageAndDate;
 import org.openmrs.module.amrsreports.util.MohFetchRestriction;
 
 import java.util.Collection;
@@ -38,22 +37,26 @@ public interface MohCoreDAO {
 	Cohort getObservationCohort(List<Concept> concepts, Date startDate, Date endDate) throws DAOException;
 
 	List<Encounter> getPatientEncounters(final Integer patientId,
-	                                     final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                     final MohFetchRestriction mohFetchRestriction,
-	                                     final Date evaluationDate) throws DAOException;
+										 final Map<String, Collection<OpenmrsObject>> restrictions,
+										 final MohFetchRestriction mohFetchRestriction,
+										 final Date evaluationDate) throws DAOException;
 
 	List<Obs> getPatientObservations(final Integer patientId,
-	                                 final Map<String, Collection<OpenmrsObject>> restrictions,
-	                                 final MohFetchRestriction mohFetchRestriction,
-	                                 final Date evaluationDate) throws DAOException;
+									 final Map<String, Collection<OpenmrsObject>> restrictions,
+									 final MohFetchRestriction mohFetchRestriction,
+									 final Date evaluationDate) throws DAOException;
 
 	List<Obs> getPatientObservationsWithEncounterRestrictions(final Integer patientId,
-	                                                          final Map<String, Collection<OpenmrsObject>> obsRestrictions,
-	                                                          final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
-	                                                          final MohFetchRestriction mohFetchRestriction,
-	                                                          final Date evaluationDate);
+															  final Map<String, Collection<OpenmrsObject>> obsRestrictions,
+															  final Map<String, Collection<OpenmrsObject>> encounterRestrictions,
+															  final MohFetchRestriction mohFetchRestriction,
+															  final Date evaluationDate);
 
 	public Map<Integer, Date> getEnrollmentDateMap(Set<Integer> cohort);
 
-	public Map<Integer, WHOStageAndDate> getWHOStageAndDateMap(Set<Integer> cohort);
+	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions);
+
+	public List<Object> executeSqlQuery(String query, Map<String, Object> substitutions);
+
+	public List<Object> executeHqlQuery(String query, Map<String, Object> substitutions);
 }

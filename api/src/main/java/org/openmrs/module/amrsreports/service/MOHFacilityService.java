@@ -1,8 +1,6 @@
 package org.openmrs.module.amrsreports.service;
 
-import org.openmrs.Cohort;
 import org.openmrs.Location;
-import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,21 +38,24 @@ public interface MOHFacilityService {
 	@Transactional
 	void purgeFacility(MOHFacility facility);
 
-	@Transactional
-	public Map<Integer,PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility);
+	@Transactional(readOnly = true)
+	public Map<Integer, PatientIdentifier> getCCCNumberMapForFacility(MOHFacility facility);
 
-	@Transactional
-	public Map<Integer,Integer> getFacilityIdToLatestSerialNumberMap();
+	@Transactional(readOnly = true)
+	public Map<Integer, Integer> getFacilityIdToLatestSerialNumberMap();
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public Integer countPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
 
 	@Transactional
 	Integer assignMissingIdentifiersForFacility(MOHFacility facility);
 
-	@Transactional
-	Cohort getPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
+	@Transactional(readOnly = true)
+	List<Integer> getPatientsInFacilityMissingCCCNumbers(MOHFacility facility);
 
 	@Transactional
 	Integer getLatestSerialNumberForFacility(MOHFacility facility);
+
+	@Transactional(readOnly = true)
+	Map<Integer, String> getSerialNumberMapForFacility(MOHFacility facility);
 }

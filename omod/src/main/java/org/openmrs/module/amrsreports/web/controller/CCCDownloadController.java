@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 
 @Controller
 public class CCCDownloadController {
@@ -65,7 +66,7 @@ public class CCCDownloadController {
 			return;
 
 		// get the patients
-		Cohort c = fs.getPatientsInFacilityMissingCCCNumbers(facility);
+		List<Integer> c = fs.getPatientsInFacilityMissingCCCNumbers(facility);
 
 		if (c.isEmpty())
 			// TODO say something ...
@@ -87,7 +88,7 @@ public class CCCDownloadController {
 
 		// build the SQL
 		List<String> inserts = new ArrayList<String>();
-		for (Integer patientId : c.getMemberIds()) {
+		for (Integer patientId : c) {
 			Patient p = Context.getPatientService().getPatient(patientId);
 			HIVCareEnrollment hce = Context.getService(HIVCareEnrollmentService.class).getHIVCareEnrollmentForPatient(p);
 			String identifier = String.format("%s-%05d", facility.getCode(), serial++);

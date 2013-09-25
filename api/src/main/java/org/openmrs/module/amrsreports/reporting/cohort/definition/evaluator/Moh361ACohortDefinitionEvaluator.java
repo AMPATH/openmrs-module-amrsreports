@@ -16,7 +16,9 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Evaluator for MOH 361A Cohort Definition
@@ -35,6 +37,9 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 		if (definition == null)
 			return null;
 
+		if (definition.getFacility() == null)
+			return null;
+
 		String reportDate = sdf.format(context.getEvaluationDate());
 
 		String sql =
@@ -45,7 +50,10 @@ public class Moh361ACohortDefinitionEvaluator implements CohortDefinitionEvaluat
 						"  and enrollment_date <= ':reportDate'" +
 						"  and enrollment_location_id in ( :locationList )";
 
-		List<Location> locationList = (List<Location>) context.getParameterValue("locationList");
+		List<Location> locationList = new ArrayList<Location>();
+		locationList.addAll(definition.getFacility().getLocations());
+		context.addParameterValue("locationList", locationList);
+
 		for (Location location : locationList) {
 			String personAttributeQuery =
 					" union " +

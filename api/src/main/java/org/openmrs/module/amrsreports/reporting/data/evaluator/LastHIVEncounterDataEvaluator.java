@@ -1,68 +1,80 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Encounter;
+import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
-import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentationDatetimeComparator;
 import org.openmrs.module.amrsreports.reporting.data.LastHIVEncounterDataDefinition;
-import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
-import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
-import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * Handler for last HIV encounter data
  */
 @Handler(supports = LastHIVEncounterDataDefinition.class, order = 50)
-public class LastHIVEncounterDataEvaluator implements PersonDataEvaluator {
+public class LastHIVEncounterDataEvaluator extends BatchedExecutionDataEvaluator<EncounterRepresentation> {
+
+	private LastHIVEncounterDataDefinition definition;
 
 	@Override
-	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
+	protected EncounterRepresentation renderSingleResult(Map<String, Object> m) {
+		return new EncounterRepresentation(m);
+	}
 
-		LastHIVEncounterDataDefinition def = (LastHIVEncounterDataDefinition) definition;
-		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
+	@Override
+	protected Comparator<EncounterRepresentation> getResultsComparator() {
+		return new EncounterRepresentationDatetimeComparator();
+	}
 
-		if (context.getBaseCohort() == null || context.getBaseCohort().isEmpty()) {
-			return c;
-		}
+	@Override
+	protected PersonDataDefinition setDefinition(PersonDataDefinition def) {
+		definition = (LastHIVEncounterDataDefinition) def;
+		return definition;
+	}
 
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+	@Override
+	protected Object doExecute(Integer pId, SortedSet<EncounterRepresentation> o, EvaluationContext context) {
+		return o.last();
+	}
 
-		// use HQL to do our bidding
-		String hql = "from Encounter" +
-				" where voided=false" +
-				" and patientId in (:patientIds)" +
-				" and encounterType.encounterTypeId in (:encounterTypeIds)" +
-				" and encounterDatetime <= :onOrBefore" +
-				" order by encounterDatetime desc";
+	@Override
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
+		return true;
+	}
 
-		List<Integer> encounterTypeIds = Arrays.asList(1, 2, 3, 4, 13);
+	@Override
+	protected void doAfter(EvaluationContext context, EvaluatedPersonData c) {
+		// pass
+	}
+
+	@Override
+	protected String getHQL() {
+		return "select new map(" +
+				"   e.patientId as personId," +
+				"   e.encounterDatetime as encounterDatetime," +
+				"	e.location.name as locationName" +
+				" )" +
+				" from Encounter e" +
+				" where e.voided = false" +
+				"   and e.patientId in (:personIds) " +
+				"   and e.encounterType.id in (:encounterTypeIds)" +
+				"   and e.encounterDatetime <= :onOrBefore";
+	}
+
+	@Override
+	protected Map<String, Object> getSubstitutions(EvaluationContext context) {
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
-		m.put("encounterTypeIds", encounterTypeIds);
+		m.put("encounterTypeIds", Arrays.asList(1, 2, 3, 4, 13));
 		m.put("onOrBefore", context.getEvaluationDate());
 
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
-
-		ListMap<Integer, Encounter> encForPatients = new ListMap<Integer, Encounter>();
-		for (Object o : queryResult) {
-			Encounter enc = (Encounter) o;
-			encForPatients.putInList(enc.getPatientId(), enc);
-		}
-
-		for (Integer pId : encForPatients.keySet()) {
-			List<Encounter> l = encForPatients.get(pId);
-			c.addData(pId, l.get(0));
-		}
-
-		return c;
+		return m;
 	}
 }

@@ -1,0 +1,66 @@
+.queuedReportsSection {
+    border: 1px solid #ddd;
+    margin-top: 1em;
+}
+
+.queuedReportsSectionTitle {
+    background-color: #ddd;
+    line-height: 2em;
+    font-size: 1.2em;
+    padding-left: 0.5em;
+}
+
+.queuedReportsSectionContent {
+    margin: 1em;
+}
+
+.queuedReportsSubSection {
+    border: 1px solid #def;
+    margin: 0.5em 0;
+}
+
+.queuedReportsSubSectionTitle {
+    line-height: 1.75em;
+    padding-left: 0.75em;
+    background-color: #def;
+}
+
+.queuedReportsSubSectionContent {
+    margin: 0.5em 0.75em;
+    line-height: 1.5em;
+}
+
+.moreLink a {
+    padding-left: 1em;
+    font-style: italic;
+}
+
+.actions {
+    display: inline-block;
+    width: 10em;
+    text-align: center;
+}
+
+.reportName {
+    display: inline-block;
+    width: 15em;
+    text-align: center;
+}
+
+.evaluationDate {
+    display: inline-block;
+    width: 10em;
+}
+
+.scheduledDate {
+    display: inline-block;
+    width: 17em;
+}
+
+#wrapper {
+    margin: 0 1em;
+}
+
+.extraContent {
+    display: none;
+}

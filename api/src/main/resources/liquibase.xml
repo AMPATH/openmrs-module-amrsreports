@@ -134,9 +134,12 @@
 
     <changeSet id="amrsreports-2013-02-06-b" author="jkeiper">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_person_ref"/>
-            </not>
+            <and>
+                <columnExists tableName="amrsreports_hiv_care_enrollment" columnName="person_id"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_person_ref"/>
+                </not>
+            </and>
         </preConditions>
         <comment>
             Adding HIV care HIVCareEnrollment foreign-key constraint on person_id column
@@ -243,7 +246,7 @@
     <changeSet id="amrsreports-2013-02-06-h" author="jkeiper">
         <preConditions onFail="MARK_RAN">
             <not>
-                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_encounter_ref"/>
+                <foreignKeyConstraintExists foreignKeyName="amrsreports_hiv_care_enrollment_first_hiv_encounter_ref"/>
             </not>
         </preConditions>
         <comment>
@@ -357,6 +360,7 @@
             <column name="facility_id" type="int">
                 <constraints nullable="false" />
             </column>
+
             <column name="evaluation_date" type="datetime">
                 <constraints nullable="false" />
             </column>
@@ -411,6 +415,20 @@
         </comment>
         <addColumn tableName="amrsreports_queued_report">
             <column name="xls_file_location" type="varchar(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="amrsreports-2013-03-27a" author="aojwang">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="amrsreports_queued_report" columnName="repeat_interval"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding repeat_interval to the amrsreports_queued_report table
+        </comment>
+        <addColumn tableName="amrsreports_queued_report">
+            <column name="repeat_interval" type="int(11)"/>
         </addColumn>
     </changeSet>
 

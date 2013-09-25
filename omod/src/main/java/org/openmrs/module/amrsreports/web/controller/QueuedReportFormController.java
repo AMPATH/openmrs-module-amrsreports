@@ -10,41 +10,41 @@ import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
+import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Collection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 
 /**
  * controller for Run AMRS Reports page
  */
 @Controller
+@SessionAttributes("queuedReports")
 public class QueuedReportFormController {
 
-	private static final Log log = LogFactory.getLog(QueuedReportFormController.class);
+	private final Log log = LogFactory.getLog(getClass());
 
 	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
-
-	@ModelAttribute("queuedReports")
-	public List<QueuedReport> getQueuedReports() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_NEW);
-	}
-
-	@ModelAttribute("currentReport")
-	public List<QueuedReport> getCurrentReport() {
-		return Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(QueuedReport.STATUS_RUNNING);
-	}
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getFacilities() {
@@ -56,41 +56,106 @@ public class QueuedReportFormController {
 		return ReportProviderRegistrar.getInstance().getAllReportProviders();
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
-	public String preparePage() {
-		return FORM_VIEW;
+	@ModelAttribute("datetimeFormat")
+	public String getDatetimeFormat() {
+		SimpleDateFormat sdf = Context.getDateFormat();
+		String format = sdf.toPattern();
+		format += " h:mm a";
+		return format;
+	}
+
+	@ModelAttribute("now")
+	public String getNow() {
+		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
+		return sdf.format(new Date());
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
 	public String processForm(HttpServletRequest request,
-	                        @RequestParam(value = "immediate", required = false) Boolean immediate,
-	                        @RequestParam("reportDate") Date reportDate,
-	                        @RequestParam("dateScheduled") Date dateScheduled,
-	                        @RequestParam("facility") Integer facilityId,
-	                        @RequestParam("reportName") String reportName) throws Exception {
+							  @ModelAttribute("queuedReports") QueuedReport editedReport,
+							  BindingResult errors,
+							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits
+	) throws Exception {
 
-		// find the facility
-		MOHFacility facility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+		// determine the repeat interval by units
+		repeatIntervalUnits = repeatIntervalUnits.toLowerCase().trim();
 
-		// create a queued report
-		QueuedReport queuedReport = new QueuedReport();
-		queuedReport.setFacility(facility);
-		queuedReport.setReportName(reportName);
-		queuedReport.setEvaluationDate(reportDate);
-		if (immediate == null)
-			queuedReport.setDateScheduled(dateScheduled);
-		else
-			queuedReport.setDateScheduled(new Date());
+		// ignore if the repeat interval is empty / zero
+		if (editedReport.getRepeatInterval() == null || editedReport.getRepeatInterval() < 0) {
+			editedReport.setRepeatInterval(0);
+
+		} else if (editedReport.getRepeatInterval() > 0) {
+
+			if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "minutes")) {
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60);
+			} else if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "hours")) {
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60);
+			} else {
+				// assume days
+				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60 * 24);
+			}
+		}
 
 		// save it
 		QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
-		queuedReportService.saveQueuedReport(queuedReport);
+		queuedReportService.saveQueuedReport(editedReport);
 
 		// kindly respond
 		HttpSession httpSession = request.getSession();
 		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for processing.");
 
 		return SUCCESS_VIEW;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
+	public String editQueuedReport(
+			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
+			ModelMap modelMap) {
+
+		QueuedReport queuedReport = null;
+
+		if (queuedReportId != null)
+			queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
+
+		if (queuedReport == null) {
+			queuedReport = new QueuedReport();
+		}
+
+		modelMap.put("queuedReports", queuedReport);
+
+		Integer interval = queuedReport.getRepeatInterval();
+		Integer repeatInterval;
+
+		if (interval < 60) {
+			modelMap.put("units", "seconds");
+			repeatInterval = interval;
+		} else if (interval < 3600) {
+			modelMap.put("units", "minutes");
+			repeatInterval = interval / 60;
+		} else if (interval < 86400) {
+			modelMap.put("units", "hours");
+			repeatInterval = interval / 3600;
+		} else {
+			modelMap.put("units", "days");
+			repeatInterval = interval / 86400;
+		}
+
+		modelMap.put("repeatInterval", repeatInterval.toString());
+
+		return FORM_VIEW;
+	}
+
+	@InitBinder
+	private void dateBinder(WebDataBinder binder) {
+		// The date format to parse or output your dates
+		SimpleDateFormat dateFormat = Context.getDateFormat();
+
+		// Another date format for datetime
+		SimpleDateFormat datetimeFormat = new SimpleDateFormat(getDatetimeFormat());
+
+		// Register them as custom editors for the Date type
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(datetimeFormat, true));
 	}
 
 }

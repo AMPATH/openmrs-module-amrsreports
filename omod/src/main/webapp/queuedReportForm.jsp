@@ -1,103 +1,179 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
-
 <%@ include file="/WEB-INF/template/header.jsp" %>
+
 
 <openmrs:require privilege="Run Reports" otherwise="/login.htm" redirect="/module/amrsreports/queuedReport.form"/>
 
-<openmrs:htmlInclude file="/dwr/util.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.dataTables.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery.tools.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/TableTools.min.js"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/js/ZeroClipboard.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/jquery-ui-timepicker-addon.min.js"/>
+<openmrs:htmlInclude file="/moduleResources/amrsreports/js/openmrs-1.9.js"/>
 
-<openmrs:htmlInclude file="/scripts/jquery/dataTables/css/dataTables.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/smoothness/jquery-ui-1.8.16.custom.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/dataTables_jui.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/TableTools/css/TableTools_JUI.css"/>
-<openmrs:htmlInclude file="/moduleResources/amrsreports/css/amrsreports.css" />
+<openmrs:htmlInclude file="/moduleResources/amrsreports/css/jquery-ui-timepicker-addon.css"/>
 
-<openmrs:htmlInclude file="/dwr/interface/DWRAmrsReportService.js"/>
+<%@ include file="localHeader.jsp" %>
+
+
+<c:if test="${not empty queuedReports.queuedReportId}">
+    <h2>Edit Scheduled Report</h2>
+</c:if>
+
+<c:if test="${empty queuedReports.queuedReportId}">
+    <h2>Add Scheduled Report</h2>
+</c:if>
 
 <style>
-    .hidden { display: none; }
+    fieldset.visualPadding {
+        padding: 1em;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    input.hasDatepicker {
+        width: 14em;
+    }
 </style>
 
 <script type="text/javascript">
 
     var reportDate;
-    var dateScheduled;
+    var scheduleDate;
 
     $j(document).ready(function () {
-        reportDate = new DatePicker("<openmrs:datePattern/>", "reportDate", { defaultDate: new Date() });
+
+        reportDate = new DatePicker("<openmrs:datePattern/>", "evaluationDate", {
+//            defaultDate: new Date()
+        });
         reportDate.setDate(new Date());
 
-        dateScheduled = new DatePicker("<openmrs:datePattern/>", "dateScheduled", { defaultDate: new Date() });
-        dateScheduled.setDate(new Date());
-
-        $j("#immediately").click(function(){
-            if ($j("#immediately").is(":checked")) {
-                $j("#dateScheduled").attr("disabled", "disabled");
-            } else {
-                $j("#dateScheduled").removeAttr("disabled");
-            }
+        scheduleDate = new DateTimePicker("<openmrs:datePattern/>", "h:mm TT", "dateScheduled", {
+            hourGrid: 6,
+            minuteGrid: 10,
+            stepMinute: 5
         });
+
     });
 
 </script>
 
-<%@ include file="localHeader.jsp" %>
 
-<c:if test="${not empty queuedReports}">
-
-    <b class="boxHeader">Queued Reports</b>
-    <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
-        <c:forEach var="r" items="${queuedReports}">
-            <div class="queued">
-                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
-            </div>
-        </c:forEach>
-        <c:if test="${not empty queuedReports and not empty currentReport}">
-            <hr />
-        </c:if>
-        <c:forEach var="r" items="${currentReport}">
-            <div class="running">
-                ${r.reportName} for ${r.facility} as of <openmrs:formatDate date="${r.evaluationDate}" type="textbox"/>
-                (run on <openmrs:formatDate date="${r.dateScheduled}" type="textbox"/>)
-            </div>
-        </c:forEach>
-    </div>
-    <br />
-</c:if>
-
-<b class="boxHeader">Add a Scheduled Report</b>
+<b class="boxHeader">Scheduled Report Details</b>
 
 <div class="box" style=" width:99%; height:auto;  overflow-x: auto;">
+
+    <spring:hasBindErrors name="queuedReports">
+        <spring:message code="fix.error"/>
+        <br/>
+    </spring:hasBindErrors>
+
     <form method="POST">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
-                <label for="reportDate">Report Date (as of):</label>
-                <input type="text" name="reportDate" id="reportDate"/> <br /> <br />
-                <label for="dateScheduled">Schedule Date (run at midnight on):</label>
-                <input type="text" name="dateScheduled" id="dateScheduled"/>
-                    <em>or</em>
-                <input type="checkbox" name="immediate" id="immediate" value="true"/> Queue Immediately
+            <table cellspacing="0" cellpadding="2">
+                <tr>
+                    <td class="right">
+                        <label for="evaluationDate">Report date (as of):</label>
+                    </td>
+                    <td>
+                        <spring:bind path="queuedReports.evaluationDate">
+                            <input type="text" id="evaluationDate" name="${status.expression}" value="${status.value}"/>
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                    <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
+                        </spring:bind>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="right">
+                        <label for="dateScheduled">Schedule date (run on):</label>
+                    </td>
+                    <td>
+                        <spring:bind path="queuedReports.dateScheduled">
+                            <input type="text" id="dateScheduled" name="${status.expression}" value="${status.value}"/>
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                    <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
+                        </spring:bind>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="right">
+                        <label for="repeatInterval">Repeat Interval:</label>
+                    </td>
+                    <td>
+                        <spring:bind path="queuedReports.repeatInterval">
+                            <input type="text" name="${status.expression}" id="repeatInterval" value="${repeatInterval}"/>
+                            <c:if test="${status.error}">
+                                Error codes:
+                                <c:forEach items="${status.errorMessages}" var="error">
+                                    <c:out value="${error}"/>
+                                </c:forEach>
+                            </c:if>
+                        </spring:bind>
+
+                        <select name="repeatIntervalUnits" id="repeatIntervalUnits">
+
+                            <option value="minutes"
+                                <c:if test="${units == 'minutes'}">selected</c:if> >Minutes</option>
+                            <option value="hours"
+                                <c:if test="${units == 'hours'}">selected</c:if> >Hours</option>
+                            <option value="days"
+                                <c:if test="${units == 'days'}">selected</c:if> >Days</option>
+
+                        </select>
+
+                        <span class="description">
+                            An interval of zero (0) will make this report run only once.
+                        </span>
+                    </td>
+                </tr>
+            </table>
         </fieldset>
+
         <fieldset class="visualPadding">
             <legend>Location</legend>
-            <c:forEach var="facility" items="${facilities}">
-                <input type="radio" name="facility" value="${facility.facilityId}"/> ${facility.code} - ${facility.name} <br/>
-            </c:forEach>
+            <spring:bind path="queuedReports.facility.facilityId">
+                <select name="${status.expression}" id="facility" size="10">
+                    <c:forEach var="facility" items="${facilities}">
+                        <option
+                        <c:if test="${status.value==facility.facilityId}">selected</c:if> value="${facility.facilityId}">${facility.code}
+                        - ${facility.name} </option>
+                    </c:forEach>
+                </select>
+                <c:if test="${status.error}">
+                    Error codes:
+                    <c:forEach items="${status.errorMessages}" var="error">
+                        <c:out value="${error}"/>
+                    </c:forEach>
+                </c:if>
+            </spring:bind>
         </fieldset>
+
         <fieldset class="visualPadding">
             <legend>Reports</legend>
-            <c:forEach var="report" items="${reportProviders}">
-                <div class="reportProvider<c:if test="${not report.visible}"> hidden</c:if>">
-                    <input type="radio" name="reportName" value="${report.name}"/> ${report.name}
-                </div>
-            </c:forEach>
+            <spring:bind path="queuedReports.reportName">
+                <c:forEach var="report" items="${reportProviders}">
+                    <div class="reportProvider <c:if test="${not report.visible}"> hidden</c:if>">
+                        <input type="radio" name="reportName"
+                               <c:if test="${status.value==report.name}">checked</c:if>
+                               value="${report.name}" /> ${report.name}
+                    </div>
+                </c:forEach>
+                <c:if test="${status.error}">
+                    Error codes:
+                    <c:forEach items="${status.errorMessages}" var="error">
+                        <c:out value="${error}"/>
+                    </c:forEach>
+                </c:if>
+            </spring:bind>
         </fieldset>
+
         <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
     </form>
 </div>

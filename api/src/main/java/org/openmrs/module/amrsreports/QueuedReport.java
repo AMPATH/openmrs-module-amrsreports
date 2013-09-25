@@ -12,9 +12,10 @@ public class QueuedReport extends BaseOpenmrsObject {
 	private Integer queuedReportId;
 	private String reportName;
 	private MOHFacility facility;
-	private Date evaluationDate;
-	private Date dateScheduled;
-	private String status;
+	private Date evaluationDate = new Date();
+	private Date dateScheduled = new Date();
+	private String status = STATUS_NEW;
+    private Integer repeatInterval = 0;
 	private String csvFilename;
 	private String xlsFilename;
 
@@ -96,4 +97,12 @@ public class QueuedReport extends BaseOpenmrsObject {
 	public void setXlsFilename(String xlsFilename) {
 		this.xlsFilename = xlsFilename;
 	}
+
+    public Integer getRepeatInterval() {
+        return repeatInterval;
+    }
+
+    public void setRepeatInterval(Integer repeatInterval) {
+        this.repeatInterval = repeatInterval;
+    }
 }
