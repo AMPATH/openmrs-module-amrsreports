@@ -47,6 +47,7 @@ public class PregnancyTableBuilder {
 					"  `pregnancy_date` datetime NOT NULL," +
 					"  `due_date` datetime DEFAULT NULL," +
 					"  `due_date_source` varchar(255) DEFAULT NULL," +
+					"  `due_date_invalid` boolean DEFAULT FALSE" +
 					"  `edd_fh` datetime DEFAULT NULL," +
 					"  `edd_edc` datetime DEFAULT NULL," +
 					"  `edd_wkmn` datetime DEFAULT NULL," +
@@ -75,7 +76,9 @@ public class PregnancyTableBuilder {
 					"  :column" +
 					" )" +
 					"  select " +
-					"    e.patient_id, DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date, 1" +
+					"    e.patient_id as person_id," +
+					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
+					"    1" +
 					"  from " +
 					"    obs o" +
 					"    join encounter e" +
@@ -87,10 +90,8 @@ public class PregnancyTableBuilder {
 					"  where " +
 					"    o.voided = 0" +
 					"    and ( :criteria )" +
-					"  group by" +
-					"    p_date" +
 					"  order by" +
-					"    p_date asc" +
+					"    person_id asc, p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
 					"  :column = 1";
 
@@ -101,7 +102,7 @@ public class PregnancyTableBuilder {
 					"  edd_lmp" +
 					" )" +
 					"  select " +
-					"    e.patient_id," +
+					"    e.patient_id as person_id," +
 					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
 					"    DATE_ADD(value_datetime, INTERVAL (287) DAY) as d_date" +
 					"  from " +
@@ -116,10 +117,8 @@ public class PregnancyTableBuilder {
 					"    o.voided = 0" +
 					"    and concept_id in (1836)" +
 					"    and value_datetime IS NOT NULL" +
-					"  group by" +
-					"    p_date" +
 					"  order by" +
-					"    p_date asc" +
+					"    person_id asc, p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
 					"  edd_lmp = VALUES(edd_lmp)";
 
@@ -131,7 +130,7 @@ public class PregnancyTableBuilder {
 					"  eddpreg" +
 					" )" +
 					"  select " +
-					"    e.patient_id," +
+					"    e.patient_id as person_id," +
 					"    DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') as p_date," +
 					"    value_datetime as d_date," +
 					"    1" +
@@ -147,10 +146,8 @@ public class PregnancyTableBuilder {
 					"    o.voided = 0" +
 					"    and concept_id in (1854, 5596)" +
 					"    and value_datetime IS NOT NULL" +
-					"  group by" +
-					"    p_date" +
 					"  order by" +
-					"    p_date asc" +
+					"    person_id asc, p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
 					"  edd_edc = VALUES(edd_edc)," +
 					"  eddpreg = 1";
@@ -162,7 +159,7 @@ public class PregnancyTableBuilder {
 					"	:source," +
 					"   :column" +
 					" ) SELECT" +
-					"	e.patient_id, " +
+					"	e.patient_id as person_id, " +
 					"	DATE_FORMAT(e.encounter_datetime, '%Y-%m-%d') AS p_date," +
 					"	DATE_ADD(o.obs_datetime, INTERVAL (280 - (o.value_numeric * :days)) DAY) AS d_date," +
 					"   1" +
@@ -171,13 +168,17 @@ public class PregnancyTableBuilder {
 					" WHERE" +
 					"	o.voided = 0" +
 					"	and ( :criteria )" +
-					" GROUP BY" +
-					"	p_date" +
-					" ORDER BY" +
-					"	p_date asc" +
+					"  order by" +
+					"    person_id asc, p_date asc" +
 					" ON DUPLICATE KEY UPDATE" +
 					"	:source = VALUES(:source)," +
 					"   :column = 1";
+
+	private static final String UPDATE_FALSE_EDD = "" +
+			"UPDATE amrsreports_pregancy" +
+			" SET due_date_invalid=true" +
+			" WHERE" +
+			"   pregnancy_date AFTER (DATE_ADD(due_date INTERVAL (37) DAYS)";
 
 	private static final String UPDATE_EDD_PREFERENCE =
 			"UPDATE amrsreports_pregnancy" +
@@ -195,7 +196,7 @@ public class PregnancyTableBuilder {
 	private static final String DISTINCT_PEOPLE_WITH_DUE_DATES =
 			"select distinct person_id" +
 					" from amrsreports_pregnancy" +
-					" where due_date is not null";
+					" where due_date is not null and due_date_invalid is false";
 
 	private static String EDDS_FOR_PERSON =
 			"select pregnancy_id, pregnancy_date, due_date" +
@@ -209,7 +210,7 @@ public class PregnancyTableBuilder {
 					" SET episode = :episode" +
 					" WHERE pregnancy_id = :rowId";
 
-	private static final Integer ACCEPTABLE_EDD_GAP = 30;
+	private static final Integer ACCEPTABLE_EDD_GAP = 40;
 
 	/**
 	 * drops, creates and fills out the pregnancy table
@@ -258,6 +259,9 @@ public class PregnancyTableBuilder {
 		// select EDD based on priorities
 		TableBuilderUtil.runUpdateSQL(UPDATE_EDD_PREFERENCE);
 
+		// indicate whether a due date is probably not valid
+		TableBuilderUtil.runUpdateSQL(UPDATE_FALSE_EDD);
+
 		// get unique people
 		List<List<Object>> people = admin.executeSQL(DISTINCT_PEOPLE_WITH_DUE_DATES, true);
 
@@ -284,12 +288,9 @@ public class PregnancyTableBuilder {
 				// start a new episode.
 				if (benchmark == null || edd.after(benchmark)) {
 					Date encDate = (Date) row.get(1);
-					benchmark = addWeeksToDate(encDate, 40);
+					benchmark = addWeeksToDate(encDate, ACCEPTABLE_EDD_GAP);
 					episode++;
 				}
-
-				// 87158
-				// 513336
 
 				// update this row with the episode number
 				updateEpisode(rowId, episode);
