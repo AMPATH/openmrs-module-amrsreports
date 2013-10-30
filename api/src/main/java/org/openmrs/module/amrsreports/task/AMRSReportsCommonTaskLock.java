@@ -18,8 +18,8 @@ public class AMRSReportsCommonTaskLock {
 	 * initializes as unlocked
 	 */
 	public AMRSReportsCommonTaskLock() {
-		this.locked = false;
-		this.lastLockingClass = null;
+		locked = false;
+		lastLockingClass = null;
 	}
 
 	/**
@@ -50,16 +50,16 @@ public class AMRSReportsCommonTaskLock {
 			return false;
 		}
 
-		if (this.locked) {
-			if (this.lastLockingClass != null)
-				log.warn("Lock requested by " + lockingClass.getSimpleName() + ", but held by " + this.lastLockingClass.getSimpleName());
+		if (locked) {
+			if (lastLockingClass != null)
+				log.warn("Lock requested by " + lockingClass.getSimpleName() + ", but held by " + lastLockingClass.getSimpleName());
 			else
 				log.warn("Lock requested by " + lockingClass.getSimpleName() + ", but held by unknown class");
 			return false;
 		}
 
-		this.lastLockingClass = lockingClass;
-		this.locked = true;
+		lastLockingClass = lockingClass;
+		locked = true;
 
 		log.info("Lock granted to " + lockingClass.getSimpleName());
 
@@ -72,15 +72,15 @@ public class AMRSReportsCommonTaskLock {
 	 * @should release a lock if the lockingClass matches
 	 */
 	public Boolean releaseLock(Class lockingClass) {
-		if (this.lastLockingClass == lockingClass) {
+		if (lastLockingClass == lockingClass) {
 			log.info("Releasing lock held by " + lockingClass.getSimpleName());
-			this.locked = false;
-		} else if (this.lastLockingClass != null)
-			log.warn("Lock release requested by " + lockingClass.getSimpleName() + ", but held by " + this.lastLockingClass.getSimpleName());
+			locked = false;
+		} else if (lastLockingClass != null)
+			log.warn("Lock release requested by " + lockingClass.getSimpleName() + ", but held by " + lastLockingClass.getSimpleName());
 		else
 			log.warn("Lock release requested by " + lockingClass.getSimpleName() + ", but held by unknown class");
 
-		return !this.locked;
+		return !locked;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class AMRSReportsCommonTaskLock {
 	 * @return last locking class
 	 */
 	public Class getLastLockingClass() {
-		return this.lastLockingClass;
+		return lastLockingClass;
 	}
 
 }

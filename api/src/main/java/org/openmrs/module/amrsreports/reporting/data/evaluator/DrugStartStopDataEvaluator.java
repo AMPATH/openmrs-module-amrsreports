@@ -14,67 +14,123 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Obs;
-import org.openmrs.logic.result.Result;
-import org.openmrs.module.amrsreports.rule.util.MohRuleUtils;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  */
 public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator {
 
-	private Date safeNext(final Iterator<Date> dateInterator) {
+	private Date safeNext(final Iterator<Date> dateIterator, Date evaluationDate) {
 		Date returnValue = null;
-		if (dateInterator.hasNext())
-			returnValue = dateInterator.next();
+		while (dateIterator.hasNext() && (returnValue == null || returnValue.after(evaluationDate)))
+			returnValue = dateIterator.next();
 		return returnValue;
 	}
 
-	protected String buildRangeInformation(final Set<Date> startDates, final Set<Date> stopDates) {
-		Iterator<Date> startDateIterator = startDates.iterator();
-		Iterator<Date> stopDateIterator = stopDates.iterator();
+	/**
+	 * @should return blank result for no dates found
+	 * @should properly format a single start date
+	 * @should properly format a single stop date
+	 * @should properly format a start and stop date
+	 * @should properly format two starts followed by one stop
+	 * @should properly format one start followed by two stops
+	 * @should properly format two start and stop periods
+	 * @should ignore same date in both start and stop dates
+	 */
+	protected String buildRangeInformation(final Set<Date> startDates, final Set<Date> stopDates, Date evaluationDate) {
 
+		// make copies of the start and stop date sets
+		Set<Date> starts = new LinkedHashSet<Date>(startDates);
+		Set<Date> stops = new LinkedHashSet<Date>(stopDates);
+
+		// slim down the start and stop date sets to include only unique dates
+		starts.removeAll(stopDates);
+		stops.removeAll(startDates);
+
+		// use iterators to walk through the dates
+		Iterator<Date> startDateIterator = starts.iterator();
+		Iterator<Date> stopDateIterator = stops.iterator();
+
+		// this will be used to create the final result
 		List<Date[]> ranges = new ArrayList<Date[]>();
 
-		Date stopDate = safeNext(stopDateIterator);
-		Date startDate = safeNext(startDateIterator);
+		// initialize first dates
+		Date startDate = safeNext(startDateIterator, evaluationDate);
+		Date stopDate = safeNext(stopDateIterator, evaluationDate);
+
+		// loop through date sets looking for matches
 		do {
 			if (stopDate != null) {
 				// stop is before start, range is: Unknown - stop date
 				if (startDate != null) {
 					if (stopDate.before(startDate)) {
-						ranges.add(new Date[]{null, stopDate});
-						stopDate = safeNext(stopDateIterator);
-					} else {
-						// we will take this start date (earliest) and pair it with the stop
+
+						// skip stop dates until after the start date
+						do {
+							stopDate = safeNext(stopDateIterator, evaluationDate);
+						} while (stopDate != null && stopDate.before(startDate));
+
+						// stopDate is ready to rock, even if it is null
 						ranges.add(new Date[]{startDate, stopDate});
-						// start ignoring all other start in between the above start and stop pair.
-						while (startDateIterator.hasNext() && stopDate.after(startDate)) {
-							startDate = safeNext(startDateIterator);
-						}
-						stopDate = safeNext(stopDateIterator);
+
+						// get the next stopDate or null
+						stopDate = safeNext(stopDateIterator, evaluationDate);
+
+					} else {
+
+						// advance forward in start dates until right before the next stop date
+						Date nextStart;
+						do {
+							nextStart = safeNext(startDateIterator, evaluationDate);
+						} while (nextStart != null && nextStart.before(stopDate));
+
+						// at this point, nextStart is after stopDate, so we pair startDate with stopDate
+						ranges.add(new Date[]{startDate, stopDate});
+
+						// now update startDate
+						startDate = nextStart;
+
+						// ... and get the next stopDate
+						stopDate = safeNext(stopDateIterator, evaluationDate);
 					}
 				} else {
+
+					// no more startDates, so advance forward to final stopDate
+					Date nextStop;
+					do {
+						nextStop = safeNext(stopDateIterator, evaluationDate);
+						if (nextStop != null && evaluationDate.after(nextStop))
+							stopDate = nextStop;
+					} while (nextStop != null && evaluationDate.after(nextStop));
+
 					ranges.add(new Date[]{null, stopDate});
-					stopDate = safeNext(stopDateIterator);
+
+					// flag that we are finished
+					stopDate = null;
 				}
 			} else {
 				if (startDate != null) {
-					// stop date is null and start date is not null, range is: start date - unknown
+					// stop date is null and start date is not null, range is: start date - [blank]
 					ranges.add(new Date[]{startDate, null});
-					// we don't have stop date anymore, move the start date forward all the way.
-					while (startDateIterator.hasNext())
-						startDate = safeNext(startDateIterator);
+
+					// flag that we are finished
+					startDate = null;
 				}
 			}
-		} while (startDateIterator.hasNext() || stopDateIterator.hasNext());
+		} while (startDate != null || stopDate != null);
 
 		// build the response
 		List<String> results = new ArrayList<String>();
@@ -88,4 +144,37 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 
 		return MOHReportUtil.joinAsSingleCell(results);
 	}
+
+	protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
+		Set<Date> dateSet = new TreeSet<Date>();
+		if (map.containsKey(key))
+			dateSet.addAll(map.get(key));
+		return dateSet;
+	}
+
+	/**
+	 * executes sql query and generates a ListMap<Integer, Date>
+	 */
+	protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
+		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
+		return makeDatesMap(data);
+	}
+
+	/**
+	 * generates a map of integers to lists of dates, assuming this is the kind of response expected from the SQL
+	 */
+	protected ListMap<Integer, Date> makeDatesMap(List<Object> data) {
+		ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
+		for (Object o : data) {
+			Object[] parts = (Object[]) o;
+			if (parts.length == 2) {
+				Integer pId = (Integer) parts[0];
+				Date date = (Date) parts[1];
+				dateListMap.putInList(pId, date);
+			}
+		}
+
+		return dateListMap;
+	}
+
 }

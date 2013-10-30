@@ -229,7 +229,7 @@ public class HIVCareEnrollmentBuilder {
 					"			patient_id, encounter_datetime as last_encounter_date, location_id as last_encounter_location" +
 					"		from (" +
 					"			select" +
-					"				patient_id, encounter_datetime, location_id" +
+					"				ae.patient_id, encounter_datetime, location_id" +
 					"			from " +
 					"				encounter" +
 					"				join amrsreports_hiv_care_enrollment ae" +

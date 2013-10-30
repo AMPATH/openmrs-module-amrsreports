@@ -15,7 +15,6 @@ import java.util.Map;
  */
 public class EntryPointConverter implements DataConverter {
 
-	private final Log log = LogFactory.getLog(this.getClass());
 	private static Map<String, String> locationMap;
 
 	static {
@@ -60,9 +59,6 @@ public class EntryPointConverter implements DataConverter {
 		PersonAttribute pa = (PersonAttribute) original;
 
 		String entryPoint = locationMap.get(pa.getValue());
-
-		if (log.isDebugEnabled())
-			log.debug("entryPoint is " + entryPoint);
 
 		if (entryPoint != null)
 			return entryPoint;

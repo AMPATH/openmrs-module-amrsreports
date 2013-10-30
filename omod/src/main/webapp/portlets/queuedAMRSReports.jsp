@@ -50,6 +50,10 @@
                                         <a href="viewReport.form?reportId=${r.id}">View</a>
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </c:when>
+                                    <c:when test="${model.status == 'NEW'}">
+                                        <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
+
+                                    </c:when>
                                 </c:choose>
                             </span>
 
@@ -57,17 +61,26 @@
 
                             <span class="evaluationDate">as of <openmrs:formatDate date="${r.evaluationDate}"
                                                                                    type="textbox"/></span>
+                            <c:choose>
+                                <c:when test="${model.status == 'NEW'}">
 
-                            <span class="scheduledDate">ran on <openmrs:formatDate date="${r.dateScheduled}"
-                                                                                   format="${model.datetimeFormat}"/></span>
+                                        <span class="scheduledDate">run on <openmrs:formatDate date="${r.dateScheduled}"
+                                                                                               format="${model.datetimeFormat}"/></span><span class="interval" seconds="${r.repeatInterval}"> &nbsp;&nbsp;tt</span>
+                                </c:when>
+                                <c:otherwise>
+                                     <span class="scheduledDate">ran on <openmrs:formatDate date="${r.dateScheduled}"
+                                                                                            format="${model.datetimeFormat}"/></span>
+                                </c:otherwise>
+                            </c:choose>
+
                         </div>
                     </c:forEach>
 
                     <c:if test="${extra == true}">
-                        </div>
-                    </c:if>
                 </div>
+                </c:if>
             </div>
-        </c:forEach>
     </div>
+    </c:forEach>
+</div>
 </div>

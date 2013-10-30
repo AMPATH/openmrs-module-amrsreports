@@ -19,50 +19,68 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
-import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.reporting.common.Age;
-import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.AgeAtDateOfOtherDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
-import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 import org.openmrs.module.reporting.data.person.service.PersonDataService;
-import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * Handler for last HIV encounter data
  */
 @Handler(supports = ObsNearestARVStartDateDataDefinition.class, order = 50)
-public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator {
+public class ObsNearestARVStartDateDataEvaluator extends BatchedExecutionDataEvaluator<ObsRepresentation> {
+
+	private ObsNearestARVStartDateDataDefinition definition;
 
 	private final Log log = LogFactory.getLog(getClass());
 
 	@Override
-	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
-		ObsNearestARVStartDateDataDefinition def = (ObsNearestARVStartDateDataDefinition) definition;
-		EvaluatedPersonData c = new EvaluatedPersonData(def, context);
+	protected ObsRepresentation renderSingleResult(Map<String, Object> m) {
+		return new ObsRepresentation(m);
+	}
 
-		Cohort cohort = new Cohort(context.getBaseCohort().getMemberIds());
+	@Override
+	protected Comparator<ObsRepresentation> getResultsComparator() {
+		return new ObsRepresentationDatetimeComparator();
+	}
 
-		// give up early if the cohort is empty
-		if (cohort == null || cohort.isEmpty()) {
-			return c;
-		}
+	@Override
+	protected PersonDataDefinition setDefinition(PersonDataDefinition def) {
+		definition = (ObsNearestARVStartDateDataDefinition) def;
+		return definition;
+	}
 
-		if (def.getAgeLimit() != null) {
+	@Override
+	protected Object doExecute(Integer pId, SortedSet<ObsRepresentation> o, EvaluationContext context) {
+		ObsRepresentation or = o.first();
+		if (!or.getObsDatetime().after(context.getEvaluationDate()))
+			return or;
+		return null;
+	}
+
+	@Override
+	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
+
+		// if the age limit is set, remove anyone whose age is above the limit from the cohort
+		if (definition.getAgeLimit() != null) {
 
 			// create a mapped Date ART Started definition
 			DateARTStartedDataDefinition artStarted = new DateARTStartedDataDefinition();
@@ -75,7 +93,15 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 			startAge.setEffectiveDateDefinition(mappedDef);
 
 			// evaluate it
-			EvaluatedPersonData startAges = Context.getService(PersonDataService.class).evaluate(startAge, context);
+			EvaluatedPersonData startAges = null;
+			try {
+				startAges = Context.getService(PersonDataService.class).evaluate(startAge, context);
+			} catch (EvaluationException e) {
+				log.warn("could not evaluate AgeAtDateOfOtherDataDefinition, ignoring age limit.", e);
+			}
+
+			if (startAges == null)
+				return true;
 
 			// get the evaluated data
 			Map<Integer, Object> artStartAges = startAges.getData();
@@ -83,51 +109,43 @@ public class ObsNearestARVStartDateDataEvaluator implements PersonDataEvaluator 
 			// loop and remove from base cohort if over the age limit
 			for (Integer personId : artStartAges.keySet()) {
 				Age age = (Age) artStartAges.get(personId);
-				if (age.getFullYears() > def.getAgeLimit())
+				if (age.getFullYears() > definition.getAgeLimit())
 					cohort.removeMember(personId);
 			}
 		}
 
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+		return true;
+	}
 
-		// define the HQL
-		String hql = "FROM Obs AS o, HIVCareEnrollment AS hce" +
+	@Override
+	protected void doAfter(EvaluationContext context, EvaluatedPersonData c) {
+		// pass
+	}
+
+	@Override
+	protected String getHQL() {
+		return "select new map(" +
+				"		o.personId as personId, " +
+				"		o.concept.id as conceptId," +
+				"		o.valueCoded.id as valueCodedId," +
+				"		o.valueNumeric as valueNumeric," +
+				"		o.obsDatetime as obsDatetime)" +
+				" FROM Obs AS o, HIVCareEnrollment AS hce" +
 				" WHERE" +
 				"	o.person.personId = hce.patient.personId" +
 				"   AND o.voided = false" +
-				"	AND o.personId in (:patientIds)" +
+				"	AND o.personId in (:personIds) " +
 				"	AND o.concept.conceptId in (:conceptIds)" +
-				"	AND o.obsDatetime <= :onOrBefore" +
 				"	AND o.obsDatetime BETWEEN SUBDATE(hce.firstARVDate, 21) AND ADDDATE(hce.firstARVDate, 7)" +
 				" ORDER BY" +
 				"	o.person.personId asc, ABS(DATEDIFF(o.obsDatetime, hce.firstARVDate)) asc";
+	}
 
-		// set the variables
+	@Override
+	protected Map<String, Object> getSubstitutions(EvaluationContext context) {
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", cohort);
-		m.put("onOrBefore", context.getEvaluationDate());
-		m.put("conceptIds", getListOfIds(def.getQuestions()));
-
-		// execute the HQL
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
-
-		// create a listmap of the observations
-		ListMap<Integer, Obs> obsListMap = new ListMap<Integer, Obs>();
-		for (Object o : queryResult) {
-
-			// each result is an array: [Obs, HIVCareEnrollment]
-			Object[] arr = (Object[]) o;
-			Obs obs = (Obs) arr[0];
-
-			obsListMap.putInList(obs.getPersonId(), obs);
-		}
-
-		// fill response data by taking first in list (if it's in there)
-		for (Integer pId : obsListMap.keySet()) {
-			c.addData(pId, obsListMap.get(pId).get(0));
-		}
-
-		return c;
+		m.put("conceptIds", getListOfIds(definition.getQuestions()));
+		return m;
 	}
 
 	private List<Integer> getListOfIds(List<Concept> questions) {

@@ -13,10 +13,13 @@
  */
 
 package org.openmrs.module.amrsreports.web.controller;
+
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,16 +31,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @Controller
 @RequestMapping("**/queuedAMRSReports.portlet")
 public class QueuedAMRSReportsPortletController extends PortletController {
+
     /**
      * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
      *      java.util.Map)
      */
     @Override
     protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
+
         String status = (String) model.get("status");
 
         Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
@@ -46,17 +50,16 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
             List<QueuedReport> queuedReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
 
-                    for (QueuedReport thisReport : queuedReports) {
+            for (QueuedReport thisReport : queuedReports) {
 
-                        MOHFacility thisMohFacility = thisReport.getFacility();
+                MOHFacility thisMohFacility = thisReport.getFacility();
 
-                        if (!queuedReportsMap.containsKey(thisMohFacility))
-                            queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
-
-                        queuedReportsMap.get(thisMohFacility).add(thisReport);
-                    }
+                if (!queuedReportsMap.containsKey(thisMohFacility))
+                    queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
 
+                queuedReportsMap.get(thisMohFacility).add(thisReport);
+            }
         }
 
         model.put("queuedReportsMap", queuedReportsMap);
@@ -66,9 +69,11 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
         SimpleDateFormat sdf = Context.getDateFormat();
         String format = sdf.toPattern();
-        format += " hh:mm a";
+        format += " 'at' hh:mm a";
 
         model.put("datetimeFormat", format);
     }
+
+
 
 }

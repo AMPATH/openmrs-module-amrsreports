@@ -58,30 +58,22 @@ public class DWRAmrsReportService {
 
 		File fileDirectory = OpenmrsUtil.getDirectoryInApplicationDataDirectory(folderName);
 
-		File amrsFile = null;
-		FileInputStream fstream = null;
-		DataInputStream in = null;
-		BufferedReader br = null;
-		String record = null;
-		String[] splitByComma = null;
-		String finaldata = new String();
-		List<String> recordsAfterAll = new ArrayList<String>();
 		StringBuilder strColumnData = new StringBuilder();
-		String columns = new String();
-		String[] columnsSplit = null;
-		String[] valuesArray;
+
 		try {
-			amrsFile = new File(fileDirectory, file);
-			fstream = new FileInputStream(amrsFile);
-			in = new DataInputStream(fstream);
-			br = new BufferedReader(new InputStreamReader(in));
+			File amrsFile = new File(fileDirectory, file);
+			FileInputStream fstream = new FileInputStream(amrsFile);
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
 			//get the first row to be used as columns
-			columns = br.readLine();
-			columnsSplit = columns.split(",");
-			//log.info(columnsSplit);
+			String columns = br.readLine();
+			String[] columnsSplit = columns.split(",");
+
+			String record;
 			while ((record = br.readLine()) != null) {
 
-				splitByComma = record.split(",");
+				String[] splitByComma = record.split(",");
 
 				if (stripLeadingAndTrailingQuotes(splitByComma[0]).equals(id)) {
 					for (int i = 0; i < columnsSplit.length; i++) {
@@ -219,18 +211,18 @@ public class DWRAmrsReportService {
 		if (mohFacility == null)
 			return new HashSet<Integer>();
 
-		List<Location> facilityLocations = new ArrayList<Location>(mohFacility.getLocations());
-		context.addParameterValue("locationList", facilityLocations);
-
 		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+		definition.setFacility(mohFacility);
 
 		try {
 			Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
-			return cohort.getMemberIds();
+			if (cohort != null)
+				return cohort.getMemberIds();
 		} catch (EvaluationException e) {
 			log.error(e);
 		}
 
+		log.warn("No cohort found for facility #" + facilityId);
 		return new HashSet<Integer>();
 	}
 
@@ -345,7 +337,7 @@ public class DWRAmrsReportService {
 
 		if (f != null) {
 			for (Integer patientId : Context.getService(MOHFacilityService.class)
-					.getPatientsInFacilityMissingCCCNumbers(f).getMemberIds()) {
+					.getPatientsInFacilityMissingCCCNumbers(f)) {
 				c.add(Context.getPatientService().getPatient(patientId).getUuid());
 			}
 		}

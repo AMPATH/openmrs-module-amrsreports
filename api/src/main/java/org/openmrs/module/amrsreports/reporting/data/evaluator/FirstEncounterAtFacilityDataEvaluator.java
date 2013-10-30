@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.data.FirstEncounterAtFacilityDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
@@ -41,27 +42,29 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 		MOHFacility facility = (MOHFacility) context.getParameterValue("facility");
 
 		// fail quickly if the facility does not exist
-		if (facility == null)   {
+		if (facility == null) {
 			log.warn("No facility provided; returning empty data.");
 			return c;
 		}
 
-		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
-
 		// use HQL to do our bidding
 		String hql = "from Encounter" +
 				" where voided=false" +
-				" and patientId in (:patientIds)" +
+				" and patientId in (" +
+				" select elements(c.memberIds) from Cohort as c" +
+				"	where c.uuid = :cohortUuid" +
+				" ) " +
 				" and location in (:locationList)" +
 				" and encounterDatetime <= :onOrBefore" +
 				" order by encounterDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
 		m.put("locationList", facility.getLocations());
 		m.put("onOrBefore", context.getEvaluationDate());
 
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
+		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
+		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
 		ListMap<Integer, Encounter> encForPatients = new ListMap<Integer, Encounter>();
 		for (Object o : queryResult) {
