@@ -6,16 +6,6 @@
 <script type="text/javascript">
     $j(document).ready(function(){
 
-<<<<<<< HEAD
-        $j('.show_hide').showHide({
-            speed: 1000,
-            easing: 'swing',
-            changeText: 1,
-            showText: 'View All', // the button text to show when a div is closed
-            hideText: 'View Last Two' // the button text to show when a div is open
-        });
-    });
-=======
         $j(".interval").each(function(){
             var intervalString = getScheduleInterval($j(this).attr("seconds"));
             $j(this).text(intervalString);
@@ -60,7 +50,7 @@
 
         return "every " + repeatInterval + " " + units;
     }
->>>>>>> upstream/master
+
 </script>
 
 <%@ include file="localHeader.jsp" %>

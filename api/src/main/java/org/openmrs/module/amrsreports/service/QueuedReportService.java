@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.service;
 
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.springframework.transaction.annotation.Transactional;
