@@ -5,7 +5,6 @@ import org.openmrs.module.amrsreports.QueuedReport;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO for QueuedReport objects
@@ -24,6 +23,6 @@ public interface QueuedReportDAO {
 
 	public QueuedReport getQueuedReport(Integer reportId);
 
-    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities, String status);
+	public List<QueuedReport> getQueuedReportsByFacilities(List<MOHFacility> allowedFacilities, String status);
 
 }

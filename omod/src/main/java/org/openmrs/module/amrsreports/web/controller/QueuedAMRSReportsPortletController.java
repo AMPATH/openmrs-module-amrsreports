@@ -31,59 +31,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("**/queuedAMRSReports.portlet")
 public class QueuedAMRSReportsPortletController extends PortletController {
 
-    /**
-     * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
-     *      java.util.Map)
-     */
-    @Override
-    protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
+	/**
+	 * @see org.openmrs.web.controller.PortletController#populateModel(javax.servlet.http.HttpServletRequest,
+	 *      java.util.Map)
+	 */
+	@Override
+	protected void populateModel(HttpServletRequest request, Map<String, Object> model) {
 
-        String status = (String) model.get("status");
+		String status = (String) model.get("status");
 
-        Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
-        UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
+		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
+		UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
 
-        if (Context.isAuthenticated() && status != null) {
+		if (Context.isAuthenticated() && status != null) {
 
-            User currentUser = Context.getAuthenticatedUser();
+			User currentUser = Context.getAuthenticatedUser();
 
-            List<MOHFacility> relevantFacilities = userFacilityService.getAllowedFacilitiesForUser(currentUser);
+			List<MOHFacility> relevantFacilities = userFacilityService.getAllowedFacilitiesForUser(currentUser);
 
-            List<QueuedReport> reports = Context.getService(QueuedReportService.class).getReportsByFacilities
-                    (relevantFacilities,status);
+			List<QueuedReport> reports = Context.getService(QueuedReportService.class).getQueuedReportsByFacilities
+					(relevantFacilities, status);
 
-            for (QueuedReport thisReport : reports) {
+			for (QueuedReport thisReport : reports) {
 
-                MOHFacility thisMohFacility = thisReport.getFacility();
+				MOHFacility thisMohFacility = thisReport.getFacility();
 
-                if (!queuedReportsMap.containsKey(thisMohFacility))
-                    queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
+				if (!queuedReportsMap.containsKey(thisMohFacility))
+					queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
 
-                queuedReportsMap.get(thisMohFacility).add(thisReport);
-            }
+				queuedReportsMap.get(thisMohFacility).add(thisReport);
+			}
+		}
 
+		model.put("queuedReportsMap", queuedReportsMap);
 
+		// date time format -- needs to come from here because we can make it locale-specific
+		// TODO extract this to a utility if used more than once
 
-        }
+		SimpleDateFormat sdf = Context.getDateFormat();
+		String format = sdf.toPattern();
+		format += " hh:mm a";
 
-        model.put("queuedReportsMap", queuedReportsMap);
-
-        // date time format -- needs to come from here because we can make it locale-specific
-        // TODO extract this to a utility if used more than once
-
-        SimpleDateFormat sdf = Context.getDateFormat();
-        String format = sdf.toPattern();
-        format += " hh:mm a";
-
-        model.put("datetimeFormat", format);
-
-
-    }
-
+		model.put("datetimeFormat", format);
+	}
 }

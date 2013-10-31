@@ -5,11 +5,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
-
-import org.openmrs.Location;
-import org.openmrs.Role;
-import org.openmrs.User;
-
 import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
@@ -19,8 +14,8 @@ import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.db.QueuedReportDAO;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
-import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -33,7 +28,6 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.util.RoleConstants;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -231,12 +225,10 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 	@Override
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
-         UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
-         List<MOHFacility>allowedFacilities=userFacilityService.getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
+		UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
+		List<MOHFacility> allowedFacilities = userFacilityService.getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
 
-
-
-                 return dao.getReportsByFacilities(allowedFacilities,status);
+		return dao.getQueuedReportsByFacilities(allowedFacilities, status);
 
 	}
 
@@ -244,9 +236,10 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 	public QueuedReport getQueuedReport(Integer reportId) {
 		return dao.getQueuedReport(reportId);
 	}
-    @Override
-    public List<QueuedReport> getReportsByFacilities(List<MOHFacility> allowedFacilities, String status) {
-        return dao.getReportsByFacilities(allowedFacilities,status);
-    }
+
+	@Override
+	public List<QueuedReport> getQueuedReportsByFacilities(List<MOHFacility> facilities, String status) {
+		return dao.getQueuedReportsByFacilities(facilities, status);
+	}
 
 }
