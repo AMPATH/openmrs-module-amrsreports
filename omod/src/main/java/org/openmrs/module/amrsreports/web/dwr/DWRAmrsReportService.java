@@ -12,18 +12,23 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
+import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.RunQueuedReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.util.PrivilegeConstants;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -39,8 +44,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -225,6 +232,62 @@ public class DWRAmrsReportService {
 		log.warn("No cohort found for facility #" + facilityId);
 		return new HashSet<Integer>();
 	}
+
+    /**
+     * helper method for determining cohort size per location and report date
+     */
+    public Map<String,Integer> getCohortCountForFacilityPerProvider(Integer facilityId,
+                                                             Date evaluationDate) throws Exception {
+        Map<String,Integer> cohort = this.getCohortByProviders(facilityId, evaluationDate);
+        return cohort;
+    }
+    /**
+     * provide the list of patients for a given location and evaluation date
+     */
+    public Map<String,Integer> getCohortByProviders(Integer facilityId, Date evaluationDate) throws Exception {
+
+        EvaluationContext context = new EvaluationContext();
+        context.setEvaluationDate(evaluationDate);
+
+        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+        if (mohFacility == null)
+            return new HashMap<String, Integer>();
+
+        Map<String,Integer> cohortResult = new HashMap<String, Integer>();
+
+        /**
+         * get report providers
+         */
+
+        List<ReportProvider> allReportProviders = ReportProviderRegistrar.getInstance().getAllReportProviders();
+
+        for(ReportProvider reportProvider: allReportProviders){
+
+            CohortDefinition definition = reportProvider.getCohortDefinition();
+
+            // set up parameters
+            Parameter facility = new Parameter();
+            facility.setName("facility");
+            facility.setType(MOHFacility.class);
+
+            // add to report and data set definition
+            definition.addParameter(facility);
+
+            try {
+                Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
+                if (cohort != null){
+                    cohortResult.put(reportProvider.getName(),cohort.getMemberIds().size());
+
+                }
+            } catch (EvaluationException e) {
+                log.error(e);
+            }
+
+        }
+
+        return cohortResult;
+    }
 
 	/**
 	 * Handles the ajax call for starting a task
