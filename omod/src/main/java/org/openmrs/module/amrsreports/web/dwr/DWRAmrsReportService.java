@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * DWR service for AMRS Reports web pages
@@ -235,7 +236,13 @@ public class DWRAmrsReportService {
     public Map<String,Integer> getCohortCountForFacilityPerProvider(Integer facilityId,
                                                              Date evaluationDate) throws Exception {
         Map<String,Integer> cohort = this.getCohortByProviders(facilityId, evaluationDate);
-        return cohort;
+
+        /*
+        * sort the map to match criteria for fetching all report providers
+        * */
+        Map<String,Integer> treeMap = new TreeMap<String,Integer>(cohort);
+        return treeMap;
+
     }
     /**
      * provide the list of patients for a given location and evaluation date
@@ -280,47 +287,6 @@ public class DWRAmrsReportService {
 
         }
 
-        return cohortResult;
-    }
-
-
-    public <T extends AMRSReportsCohortDefinition> Map<String,Integer> calculateCountPerProvider(Integer facilityId,
-                                                                                                 Date evaluationDate) throws Exception{
-
-        EvaluationContext context = new EvaluationContext();
-        context.setEvaluationDate(evaluationDate);
-
-        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
-
-        if (mohFacility == null)
-            return new HashMap<String, Integer>();
-
-        Map<String,Integer> cohortResult = new HashMap<String, Integer>();
-
-        /**
-         * get report providers
-         */
-
-        List<ReportProvider> allReportProviders = ReportProviderRegistrar.getInstance().getAllReportProviders();
-        for(ReportProvider reportProvider: allReportProviders){
-
-            T thisDef = (T)reportProvider.getCohortDefinition();
-            thisDef.setFacility(mohFacility);
-
-            try {
-                Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(thisDef, context);
-                if (cohort != null){
-                    cohortResult.put(reportProvider.getName(),cohort.getMemberIds().size());
-
-                }
-                else{
-                    cohortResult.put(reportProvider.getName(),0);
-                }
-            } catch (EvaluationException e) {
-                log.error(e);
-            }
-
-        }
 
         return cohortResult;
     }

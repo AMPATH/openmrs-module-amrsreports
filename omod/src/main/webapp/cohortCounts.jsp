@@ -54,7 +54,8 @@
             for (var key in mapResult) {
                 if (mapResult.hasOwnProperty(key)) {
 
-                    finalStr = finalStr + key + mapResult[key] + "|"
+
+                    finalStr = finalStr + "<div align=\"left\">" + mapResult[key] + "</div>"
 
                 }
             }
@@ -83,6 +84,9 @@
             <tr>
                 <th><a id="selectAll">All</a> | <a id="selectNone">None</a></th>
                 <th>Facility</th>
+                <c:forEach var="provider" items="${reportProviders}" varStatus="status">
+                        <th>${provider.name}</th>
+                </c:forEach>
                 <th>Size</th>
             </tr>
             </thead>
@@ -91,7 +95,7 @@
                 <tr>
                     <td align="center"><input name="location" type="checkbox" location="${facility.facilityId}" value="${facility.facilityId}"/></td>
                     <td>${facility.name}</td>
-                    <td align="right"><span class="size" location="${facility.facilityId}">--</span></td>
+                    <td align="right"><div class="size" location="${facility.facilityId}">--</div></td>
                 </tr>
             </c:forEach>
             </tbody>
