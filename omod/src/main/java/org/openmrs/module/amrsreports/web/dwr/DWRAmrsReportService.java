@@ -4,14 +4,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
-import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361ACohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.AMRSReportsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
@@ -20,16 +20,12 @@ import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.RunQueuedReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.util.PrivilegeConstants;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
@@ -218,7 +214,7 @@ public class DWRAmrsReportService {
 		if (mohFacility == null)
 			return new HashSet<Integer>();
 
-		Moh361ACohortDefinition definition = new Moh361ACohortDefinition();
+		AMRSReportsCohortDefinition definition = new AMRSReportsCohortDefinition();
 		definition.setFacility(mohFacility);
 
 		try {
@@ -264,21 +260,61 @@ public class DWRAmrsReportService {
 
         for(ReportProvider reportProvider: allReportProviders){
 
-            CohortDefinition definition = reportProvider.getCohortDefinition();
+            reportProvider.getCohortDefinition().getClass();
 
-            // set up parameters
-            Parameter facility = new Parameter();
-            facility.setName("facility");
-            facility.setType(MOHFacility.class);
-
-            // add to report and data set definition
-            definition.addParameter(facility);
+            AMRSReportsCohortDefinition thisDef = (AMRSReportsCohortDefinition)reportProvider.getCohortDefinition();
+            thisDef.setFacility(mohFacility);
 
             try {
-                Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(definition, context);
+                Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(thisDef, context);
                 if (cohort != null){
                     cohortResult.put(reportProvider.getName(),cohort.getMemberIds().size());
 
+                }
+                else{
+                    cohortResult.put(reportProvider.getName(),0);
+                }
+            } catch (EvaluationException e) {
+                log.error(e);
+            }
+
+        }
+
+        return cohortResult;
+    }
+
+
+    public <T extends AMRSReportsCohortDefinition> Map<String,Integer> calculateCountPerProvider(Integer facilityId,
+                                                                                                 Date evaluationDate) throws Exception{
+
+        EvaluationContext context = new EvaluationContext();
+        context.setEvaluationDate(evaluationDate);
+
+        MOHFacility mohFacility = Context.getService(MOHFacilityService.class).getFacility(facilityId);
+
+        if (mohFacility == null)
+            return new HashMap<String, Integer>();
+
+        Map<String,Integer> cohortResult = new HashMap<String, Integer>();
+
+        /**
+         * get report providers
+         */
+
+        List<ReportProvider> allReportProviders = ReportProviderRegistrar.getInstance().getAllReportProviders();
+        for(ReportProvider reportProvider: allReportProviders){
+
+            T thisDef = (T)reportProvider.getCohortDefinition();
+            thisDef.setFacility(mohFacility);
+
+            try {
+                Cohort cohort = Context.getService(CohortDefinitionService.class).evaluate(thisDef, context);
+                if (cohort != null){
+                    cohortResult.put(reportProvider.getName(),cohort.getMemberIds().size());
+
+                }
+                else{
+                    cohortResult.put(reportProvider.getName(),0);
                 }
             } catch (EvaluationException e) {
                 log.error(e);

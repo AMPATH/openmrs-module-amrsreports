@@ -12,25 +12,6 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
  */
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 @Localized("reporting.MOH361BCohortDefinition")
-public class Moh361BCohortDefinition extends BaseCohortDefinition {
+public class Moh361BCohortDefinition extends AMRSReportsCohortDefinition {
 
-	@ConfigurationProperty
-	private MOHFacility facility;
-
-	public Moh361BCohortDefinition() {
-		super();
-	}
-
-	public Moh361BCohortDefinition(MOHFacility facility) {
-		super();
-		this.facility = facility;
-	}
-
-	public MOHFacility getFacility() {
-		return facility;
-	}
-
-	public void setFacility(MOHFacility facility) {
-		this.facility = facility;
-	}
 }

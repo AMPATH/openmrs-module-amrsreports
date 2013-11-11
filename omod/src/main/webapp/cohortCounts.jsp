@@ -15,7 +15,7 @@
             event.preventDefault();
             $j("[name=location]:checked").each(function(){
                 var facilityId = $j(this).val();
-                getFacilityCount(facilityId, reportDate.getDate(), function(){
+                getFacilityCountByProvider(facilityId, reportDate.getDate(), function(){
                     $j("[name=location][location=" + facilityId + "]").removeAttr("checked");
                 });
             });
@@ -46,6 +46,25 @@
             callback();
         });
     }
+
+    function getFacilityCountByProvider(facilityId, reportDate, callback) {
+        $j(".size[location=" + facilityId + "]").html("Calculating ...");
+        DWRAmrsReportService.getCohortCountForFacilityPerProvider(facilityId, reportDate, function(mapResult){
+            var finalStr = ""
+            for (var key in mapResult) {
+                if (mapResult.hasOwnProperty(key)) {
+
+                    finalStr = finalStr + key + mapResult[key] + "|"
+
+                }
+            }
+            $j(".size[location=" + facilityId + "]").html(finalStr);
+            callback();
+        });
+    }
+
+
+
 </script>
 
 <h2>View Cohort Counts</h2>
