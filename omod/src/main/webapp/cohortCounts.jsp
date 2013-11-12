@@ -55,7 +55,8 @@
                 if (mapResult.hasOwnProperty(key)) {
 
 
-                    finalStr = finalStr + "<div align=\"left\">" + mapResult[key] + "</div>"
+                    finalStr = finalStr + "<div style=\'float:left;width:150px;margin: 0 auto\'>" + mapResult[key] +
+                            "</div>"
 
                 }
             }
@@ -84,10 +85,11 @@
             <tr>
                 <th><a id="selectAll">All</a> | <a id="selectNone">None</a></th>
                 <th>Facility</th>
+                <th>
                 <c:forEach var="provider" items="${reportProviders}" varStatus="status">
-                        <th>${provider.name}</th>
+                        <div style="float:left;width:150px;margin: 0 auto">${provider.name}</div>
                 </c:forEach>
-                <th>Size</th>
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -95,7 +97,7 @@
                 <tr>
                     <td align="center"><input name="location" type="checkbox" location="${facility.facilityId}" value="${facility.facilityId}"/></td>
                     <td>${facility.name}</td>
-                    <td align="right"><div class="size" location="${facility.facilityId}">--</div></td>
+                    <td align="left"><div class="size" location="${facility.facilityId}">--</div></td>
                 </tr>
             </c:forEach>
             </tbody>
