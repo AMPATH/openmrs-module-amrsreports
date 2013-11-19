@@ -47,7 +47,7 @@ public class PregnancyTableBuilder {
 					"  `pregnancy_date` datetime NOT NULL," +
 					"  `due_date` datetime DEFAULT NULL," +
 					"  `due_date_source` varchar(255) DEFAULT NULL," +
-					"  `due_date_invalid` boolean DEFAULT FALSE" +
+					"  `due_date_invalid` boolean DEFAULT FALSE," +
 					"  `edd_fh` datetime DEFAULT NULL," +
 					"  `edd_edc` datetime DEFAULT NULL," +
 					"  `edd_wkmn` datetime DEFAULT NULL," +
@@ -178,7 +178,7 @@ public class PregnancyTableBuilder {
 			"UPDATE amrsreports_pregancy" +
 			" SET due_date_invalid=true" +
 			" WHERE" +
-			"   pregnancy_date AFTER (DATE_ADD(due_date INTERVAL (37) DAYS)";
+			"   pregnancy_date AFTER (DATE_ADD(due_date INTERVAL (37) DAYS))";
 
 	private static final String UPDATE_EDD_PREFERENCE =
 			"UPDATE amrsreports_pregnancy" +
