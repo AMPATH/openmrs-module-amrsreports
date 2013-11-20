@@ -1,10 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp" %>
 <%@ include file="/WEB-INF/template/header.jsp" %>
-
 <openmrs:require privilege="View Locations" otherwise="/login.htm" redirect="/module/amrsreports/cohortCounts.list"/>
-
 <%@ include file="localHeader.jsp" %>
-
 <script type="text/javascript">
 
     var reportDate;
@@ -15,7 +12,7 @@
             event.preventDefault();
             $j("[name=location]:checked").each(function(){
                 var facilityId = $j(this).val();
-                getFacilityCount(facilityId, reportDate.getDate(), function(){
+                getFacilityCountByProvider(facilityId, reportDate.getDate(), function(){
                     $j("[name=location][location=" + facilityId + "]").removeAttr("checked");
                 });
             });
@@ -46,6 +43,23 @@
             callback();
         });
     }
+
+    function getFacilityCountByProvider(facilityId, reportDate, callback) {
+        $j(".size[location=" + facilityId + "]").html("Calculating ...");
+        DWRAmrsReportService.getCohortCountForFacilityPerProvider(facilityId, reportDate, function(mapResult){
+
+                for (var key in mapResult) {
+
+                var rptName = key.replace("'", '-');
+                $j(".size[location=" + facilityId + "]").filter(".size[reportname=" + rptName +"]").html(mapResult[key]);
+            }
+
+            callback();
+        });
+    }
+
+
+
 </script>
 
 <h2>View Cohort Counts</h2>
@@ -64,7 +78,11 @@
             <tr>
                 <th><a id="selectAll">All</a> | <a id="selectNone">None</a></th>
                 <th>Facility</th>
-                <th>Size</th>
+
+                <c:forEach var="provider" items="${reportProviders}" varStatus="status">
+                    <th>${provider.name}</th>
+                </c:forEach>
+
             </tr>
             </thead>
             <tbody>
@@ -72,7 +90,12 @@
                 <tr>
                     <td align="center"><input name="location" type="checkbox" location="${facility.facilityId}" value="${facility.facilityId}"/></td>
                     <td>${facility.name}</td>
-                    <td align="right"><span class="size" location="${facility.facilityId}">--</span></td>
+                    <c:forEach var="provider" items="${reportProviders}" varStatus="status">
+                        <td align="left"><div class="size" location="${facility.facilityId}"
+                                              reportname="${fn:replace(provider.name,
+                                '\'', '-')}">--</div></td>
+                    </c:forEach>
+
                 </tr>
             </c:forEach>
             </tbody>
