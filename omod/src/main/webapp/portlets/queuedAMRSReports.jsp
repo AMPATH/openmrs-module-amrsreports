@@ -54,6 +54,10 @@
                                         <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
 
                                     </c:when>
+                                    <c:when test="${model.status == 'ERROR'}">
+                                        <a href="queuedReport.form?queuedReportId=${r.id}">Resubmit</a>
+
+                                    </c:when>
                                 </c:choose>
                             </span>
 
