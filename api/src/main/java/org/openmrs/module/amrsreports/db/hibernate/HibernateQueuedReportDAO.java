@@ -4,12 +4,12 @@ import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.openmrs.Location;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.db.QueuedReportDAO;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Hibernate implementation of the QueuedReportDAO
@@ -33,7 +33,7 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 
 		Criteria c = sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
 				.add(Restrictions.le("dateScheduled", date))
-				.add(Restrictions.in("status", new String[]{ QueuedReport.STATUS_RUNNING, QueuedReport.STATUS_NEW }))
+				.add(Restrictions.in("status", new String[]{QueuedReport.STATUS_RUNNING, QueuedReport.STATUS_NEW}))
 				.addOrder(Order.asc("dateScheduled"))
 				.setMaxResults(1);
 
@@ -63,6 +63,16 @@ public class HibernateQueuedReportDAO implements QueuedReportDAO {
 	@Override
 	public QueuedReport getQueuedReport(Integer reportId) {
 		return (QueuedReport) sessionFactory.getCurrentSession().get(QueuedReport.class, reportId);
+	}
+
+	@Override
+	public List<QueuedReport> getQueuedReportsByFacilities(List<MOHFacility> facilities, String status) {
+		return sessionFactory.getCurrentSession().createCriteria(QueuedReport.class)
+				.add(Restrictions.eq("status", status))
+				.add(Restrictions.in("facility", facilities))
+				.addOrder(Order.asc("facility.name"))
+				.addOrder(Order.desc("dateScheduled"))
+				.list();
 	}
 
 }

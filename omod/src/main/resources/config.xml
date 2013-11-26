@@ -78,7 +78,7 @@
                 <include method="viewMoreDetailsRender"/>
                 <include method="downloadCSV"/>
                 <include method="downloadPDF"/>
-                <include method="getCohortCountForFacility"/>
+                <include method="getCohortCountForFacilityPerProvider"/>
                 <include method="getCohort"/>
                 <include method="startTaskRunner"/>
                 <include method="stopTaskRunner"/>
@@ -103,7 +103,7 @@
 			DWRAmrsReportService.viewMoreDetailsRender(String bff, String id);
 			DWRAmrsReportService.downloadCSV(String csvFile);
 			DWRAmrsReportService.downloadPDF(String file);
-        	DWRAmrsReportService.getCohortCountForFacility(Integer facilityId, Date evaluationDate);
+        	DWRAmrsReportService.getCohortCountForFacilityPerProvider(Integer facilityId, Date evaluationDate);
             DWRAmrsReportService.getCohort(Integer locationId, Date evaluationDate);
             DWRAmrsReportService.startTaskRunner(String taskName);
             DWRAmrsReportService.stopTaskRunner();

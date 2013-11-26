@@ -174,8 +174,10 @@
             </spring:bind>
         </fieldset>
 
-        <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
+                <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
+
     </form>
+
 </div>
 
 <%@ include file="/WEB-INF/template/footer.jsp" %>

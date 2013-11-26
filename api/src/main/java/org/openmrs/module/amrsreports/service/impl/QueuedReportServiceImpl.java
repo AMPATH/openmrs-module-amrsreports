@@ -15,6 +15,7 @@ import org.openmrs.module.amrsreports.db.QueuedReportDAO;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -224,12 +225,21 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 
 	@Override
 	public List<QueuedReport> getQueuedReportsWithStatus(String status) {
-		return dao.getQueuedReportsWithStatus(status);
+		UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
+		List<MOHFacility> allowedFacilities = userFacilityService.getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
+
+		return dao.getQueuedReportsByFacilities(allowedFacilities, status);
+
 	}
 
 	@Override
 	public QueuedReport getQueuedReport(Integer reportId) {
 		return dao.getQueuedReport(reportId);
+	}
+
+	@Override
+	public List<QueuedReport> getQueuedReportsByFacilities(List<MOHFacility> facilities, String status) {
+		return dao.getQueuedReportsByFacilities(facilities, status);
 	}
 
 }

@@ -98,7 +98,7 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 
 		// sort by transfer status (transfers go last), then by date, then serial number
 		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Date Chronic HIV Care Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
@@ -119,16 +119,22 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
-		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition("CCC", pit);
+		CohortRestrictedPatientIdentifierDataDefinition cccColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"CCC", pit);
 		cccColumn.setIncludeFirstNonNullOnly(true);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
-		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
-		idTypes.remove(pit);
-		CohortRestrictedPatientIdentifierDataDefinition idColumn = new CohortRestrictedPatientIdentifierDataDefinition("Identifier");
-		idColumn.setTypes(idTypes);
-		idColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
+		// AMRS Universal ID
+		CohortRestrictedPatientIdentifierDataDefinition uidColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Universal ID", Context.getPatientService().getPatientIdentifierType(8));
+		uidColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Universal ID", uidColumn, nullString);
+
+		// AMRS Medical Record Number
+		CohortRestrictedPatientIdentifierDataDefinition mrnColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Medical Record Number", Context.getPatientService().getPatientIdentifierType(3));
+		mrnColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Medical Record Number", mrnColumn, nullString);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new CohortRestrictedPreferredNameDataDefinition(), nullString);

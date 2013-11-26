@@ -8,6 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
+import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
@@ -23,6 +24,7 @@ import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
+import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredAddressDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -78,12 +80,17 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		cccColumn.setIncludeFirstNonNullOnly(true);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
-		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
-		idTypes.remove(pit);
-		CohortRestrictedPatientIdentifierDataDefinition idColumn = new CohortRestrictedPatientIdentifierDataDefinition("Identifier");
-		idColumn.setTypes(idTypes);
-		idColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
+		// AMRS Universal ID
+		CohortRestrictedPatientIdentifierDataDefinition uidColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Universal ID", Context.getPatientService().getPatientIdentifierType(8));
+		uidColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Universal ID", uidColumn, nullString);
+
+		// AMRS Medical Record Number
+		CohortRestrictedPatientIdentifierDataDefinition mrnColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Medical Record Number", Context.getPatientService().getPatientIdentifierType(3));
+		mrnColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Medical Record Number", mrnColumn, nullString);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new CohortRestrictedPreferredNameDataDefinition(), nullString);
@@ -141,6 +148,19 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// m. CTX start date
 		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
+
+		// ah. 6 month CD4 count (and aq, az, bi)
+		ObsForPersonDataDefinition sixMonthWeight = new ObsForPersonDataDefinition(
+				"6 Month Weight",
+				null,
+				Context.getConceptService().getConcept(5089),
+				null,
+				null);
+
+		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 6));
+		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 12));
+		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 18));
+		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 24));
 
 		report.addDataSetDefinition(dsd, null);
 

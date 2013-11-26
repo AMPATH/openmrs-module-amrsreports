@@ -21,6 +21,9 @@
 
     });
 
+
+
+
     function getScheduleInterval(interval){
         var units;
         var repeatInterval;
@@ -50,6 +53,7 @@
 
         return "every " + repeatInterval + " " + units;
     }
+
 </script>
 
 <%@ include file="localHeader.jsp" %>

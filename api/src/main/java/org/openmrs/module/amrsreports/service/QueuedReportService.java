@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.service;
 
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +33,8 @@ public interface QueuedReportService {
 
 	@Transactional(readOnly = true)
 	public QueuedReport getQueuedReport(Integer reportId);
+
+	@Transactional(readOnly = true)
+	public List<QueuedReport> getQueuedReportsByFacilities(List<MOHFacility> facilities, String status);
 
 }

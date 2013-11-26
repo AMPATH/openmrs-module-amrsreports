@@ -35,6 +35,7 @@ import org.openmrs.module.amrsreports.reporting.data.LastRTCDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -99,8 +100,9 @@ public class MOH361AReportProvider_0_2 extends ReportProvider {
 		dsd.addParameter(facility);
 
 		// sort by serial number, then by date
+		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Date Chronic HIV Care Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("First Encounter Date At Facility", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 
@@ -124,12 +126,17 @@ public class MOH361AReportProvider_0_2 extends ReportProvider {
 		cccColumn.setIncludeFirstNonNullOnly(true);
 		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
 
-		List<PatientIdentifierType> idTypes = Context.getPatientService().getAllPatientIdentifierTypes();
-		idTypes.remove(pit);
-		CohortRestrictedPatientIdentifierDataDefinition idColumn = new CohortRestrictedPatientIdentifierDataDefinition("Identifier");
-		idColumn.setTypes(idTypes);
-		idColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("AMPATH Identifier", idColumn, nullString);
+		// AMRS Universal ID
+		CohortRestrictedPatientIdentifierDataDefinition uidColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Universal ID", Context.getPatientService().getPatientIdentifierType(8));
+		uidColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Universal ID", uidColumn, nullString);
+
+		// AMRS Medical Record Number
+		CohortRestrictedPatientIdentifierDataDefinition mrnColumn = new CohortRestrictedPatientIdentifierDataDefinition(
+				"AMRS Medical Record Number", Context.getPatientService().getPatientIdentifierType(3));
+		mrnColumn.setIncludeFirstNonNullOnly(true);
+		dsd.addColumn("AMRS Medical Record Number", mrnColumn, nullString);
 
 		// d. Patient's Name
 		dsd.addColumn("Name", new CohortRestrictedPreferredNameDataDefinition(), nullString);
@@ -202,6 +209,9 @@ public class MOH361AReportProvider_0_2 extends ReportProvider {
 
 		// informative column for the destination clinics
 		dsd.addColumn("Last Return to Clinic Date", new LastRTCDateDataDefinition(), nullString, new ObsValueDatetimeConverter());
+
+		// transfer status column (used for sorting, not needed in output)
+		dsd.addColumn("Transfer Status", new TransferStatusDataDefinition(), nullString);
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");

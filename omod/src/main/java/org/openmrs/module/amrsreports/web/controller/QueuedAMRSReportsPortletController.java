@@ -12,14 +12,19 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
+/*
+* This class serves requests for reports (queued,running, completed and failed)
+*
+* */
+
 package org.openmrs.module.amrsreports.web.controller;
 
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
-import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.web.controller.PortletController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,18 +50,23 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 		String status = (String) model.get("status");
 
 		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
+		UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
 
 		if (Context.isAuthenticated() && status != null) {
 
-			List<QueuedReport> queuedReports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
+			User currentUser = Context.getAuthenticatedUser();
 
-			for (QueuedReport thisReport : queuedReports) {
+			List<MOHFacility> relevantFacilities = userFacilityService.getAllowedFacilitiesForUser(currentUser);
+
+			List<QueuedReport> reports = Context.getService(QueuedReportService.class).getQueuedReportsByFacilities
+					(relevantFacilities, status);
+
+			for (QueuedReport thisReport : reports) {
 
 				MOHFacility thisMohFacility = thisReport.getFacility();
 
 				if (!queuedReportsMap.containsKey(thisMohFacility))
 					queuedReportsMap.put(thisMohFacility, new ArrayList<QueuedReport>());
-
 
 				queuedReportsMap.get(thisMohFacility).add(thisReport);
 			}
@@ -69,11 +79,8 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
 		SimpleDateFormat sdf = Context.getDateFormat();
 		String format = sdf.toPattern();
-		format += " 'at' hh:mm a";
+		format += " hh:mm a";
 
 		model.put("datetimeFormat", format);
 	}
-
-
-
 }
