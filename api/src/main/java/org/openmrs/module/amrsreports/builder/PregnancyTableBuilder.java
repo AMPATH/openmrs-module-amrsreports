@@ -175,10 +175,10 @@ public class PregnancyTableBuilder {
 					"   :column = 1";
 
 	private static final String UPDATE_FALSE_EDD = "" +
-			"UPDATE amrsreports_pregancy" +
+			"UPDATE amrsreports_pregnancy" +
 			" SET due_date_invalid=true" +
 			" WHERE" +
-			"   pregnancy_date AFTER (DATE_ADD(due_date INTERVAL (37) DAYS))";
+			"   pregnancy_date >= DATE_ADD(due_date, INTERVAL 37 DAY)";
 
 	private static final String UPDATE_EDD_PREFERENCE =
 			"UPDATE amrsreports_pregnancy" +
