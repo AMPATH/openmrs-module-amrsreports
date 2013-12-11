@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
@@ -115,10 +116,12 @@ public class QueuedReportFormController {
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
+            @RequestParam(value = "status", required = false) String status,
 			ModelMap modelMap
                                 ) {
 
 		QueuedReport queuedReport = null;
+        String inlineInstruction ="";
 
 
 		if (queuedReportId != null)
@@ -128,9 +131,14 @@ public class QueuedReportFormController {
 			queuedReport = new QueuedReport();
 		}
 
-
+        if (status.equals("ERROR")) {
+            inlineInstruction = "Check the new scheduled date and submit when finished";
+            queuedReport.setDateScheduled(new Date());/*
+            queuedReport.setStatus(QueuedReport.STATUS_NEW);*/
+        }
 
 		modelMap.put("queuedReports", queuedReport);
+        modelMap.put("inlineInstruction",inlineInstruction);
 
 		Integer interval = queuedReport.getRepeatInterval();
 		Integer repeatInterval;
