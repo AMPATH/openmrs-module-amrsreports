@@ -51,7 +51,11 @@
                                         <a href="downloadxls.htm?reportId=${r.id}">Download</a>
                                     </c:when>
                                     <c:when test="${model.status == 'NEW'}">
-                                        <a href="queuedReport.form?queuedReportId=${r.id}">Edit</a>
+                                        <a href="queuedReport.form?queuedReportId=${r.id}&status=${model.status}">Edit</a>
+
+                                    </c:when>
+                                    <c:when test="${model.status == 'ERROR'}">
+                                        <a href="queuedReport.form?queuedReportId=${r.id}&status=${model.status}">Resubmit</a>
 
                                     </c:when>
                                 </c:choose>

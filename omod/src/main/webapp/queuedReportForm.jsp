@@ -93,6 +93,9 @@
                     <td>
                         <spring:bind path="queuedReports.dateScheduled">
                             <input type="text" id="dateScheduled" name="${status.expression}" value="${status.value}"/>
+                            <span class="description">
+                                ${inlineInstruction}
+                        </span>
                             <c:if test="${status.error}">
                                 Error codes:
                                 <c:forEach items="${status.errorMessages}" var="error">
