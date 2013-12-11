@@ -24,6 +24,7 @@ public class ObsRepresentation extends DataRepresentation {
 	private Double valueNumeric;
 	private Date valueDatetime;
 	private Date obsDatetime;
+	private Integer order;
 
 	public ObsRepresentation() {
 		super();
@@ -38,6 +39,7 @@ public class ObsRepresentation extends DataRepresentation {
 		valueNumeric = m.containsKey("valueNumeric") ? (Double) m.get("valueNumeric") : null;
 		valueDatetime = m.containsKey("valueDatetime") ? (Date) m.get("valueDatetime") : null;
 		obsDatetime = m.containsKey("obsDatetime") ? (Date) m.get("obsDatetime") : null;
+		order = m.containsKey("order") ? (Integer) m.get("order") : null;
 	}
 
 	public Integer getConceptId() {
@@ -80,4 +82,11 @@ public class ObsRepresentation extends DataRepresentation {
 		this.obsDatetime = obsDatetime;
 	}
 
+	public Integer getOrder() {
+		return order;
+	}
+
+	public void setOrder(Integer order) {
+		this.order = order;
+	}
 }

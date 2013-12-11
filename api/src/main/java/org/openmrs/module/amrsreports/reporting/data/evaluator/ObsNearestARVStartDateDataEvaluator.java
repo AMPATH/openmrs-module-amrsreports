@@ -22,7 +22,7 @@ import org.openmrs.Concept;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
-import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationOrderComparator;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.reporting.common.Age;
@@ -59,7 +59,7 @@ public class ObsNearestARVStartDateDataEvaluator extends BatchedExecutionDataEva
 
 	@Override
 	protected Comparator<ObsRepresentation> getResultsComparator() {
-		return new ObsRepresentationDatetimeComparator();
+		return new ObsRepresentationOrderComparator();
 	}
 
 	@Override
@@ -129,16 +129,15 @@ public class ObsNearestARVStartDateDataEvaluator extends BatchedExecutionDataEva
 				"		o.concept.id as conceptId," +
 				"		o.valueCoded.id as valueCodedId," +
 				"		o.valueNumeric as valueNumeric," +
-				"		o.obsDatetime as obsDatetime)" +
+				"		o.obsDatetime as obsDatetime," +
+				"		ABS(DATEDIFF(o.obsDatetime, hce.firstARVDate)) as order)" +
 				" FROM Obs AS o, HIVCareEnrollment AS hce" +
 				" WHERE" +
 				"	o.person.personId = hce.patient.personId" +
 				"   AND o.voided = false" +
 				"	AND o.personId in (:personIds) " +
 				"	AND o.concept.conceptId in (:conceptIds)" +
-				"	AND o.obsDatetime BETWEEN SUBDATE(hce.firstARVDate, 21) AND ADDDATE(hce.firstARVDate, 7)" +
-				" ORDER BY" +
-				"	o.person.personId asc, ABS(DATEDIFF(o.obsDatetime, hce.firstARVDate)) asc";
+				"	AND o.obsDatetime BETWEEN SUBDATE(hce.firstARVDate, 21) AND ADDDATE(hce.firstARVDate, 7)";
 	}
 
 	@Override
