@@ -14,12 +14,11 @@
 
 package org.openmrs.module.amrsreports.reporting.converter;
 
-import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
-import org.openmrs.module.reporting.data.converter.DataConverter;
+import org.openmrs.Obs;
 
 import java.util.List;
 
-public class IntervalObsValueNumericConverter extends ObsRepresentationValueNumericConverter {
+public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 
 	private int interval = 0;
 
@@ -30,12 +29,12 @@ public class IntervalObsValueNumericConverter extends ObsRepresentationValueNume
 
 	@Override
 	public Object convert(Object original) {
-		List<ObsRepresentation> o = (List<ObsRepresentation>) original;
+		List<Obs> o = (List<Obs>) original;
 		if (o == null || o.size() == 0)
 			return null;
 
 		// pick the first one ...
-		ObsRepresentation or = o.get(0);
+		Obs or = o.get(0);
 
 		return super.convert(or);
 	}
