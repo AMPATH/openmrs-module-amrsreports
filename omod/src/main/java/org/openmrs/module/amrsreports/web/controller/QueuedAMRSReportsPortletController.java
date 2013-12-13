@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
 		String status = (String) model.get("status");
 
-		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new HashMap<MOHFacility, List<QueuedReport>>();
+		Map<MOHFacility, List<QueuedReport>> queuedReportsMap = new LinkedHashMap<MOHFacility, List<QueuedReport>>();
 		UserFacilityService userFacilityService = Context.getService(UserFacilityService.class);
 
 		if (Context.isAuthenticated() && status != null) {
