@@ -48,7 +48,8 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("01/02/2010 - 5.00 kg", converter.convert(original));
+//		Assert.assertEquals("01/02/2010 - 5.00 kg", converter.convert(original));
+		Assert.assertEquals("Mth 1) 5.00 kg", converter.convert(original));
 	}
 
 	/**
@@ -68,7 +69,8 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("25/01/2010 - 4.20 kg", converter.convert(original));
+//		Assert.assertEquals("25/01/2010 - 4.20 kg", converter.convert(original));
+		Assert.assertEquals("Mth 1) 4.20 kg", converter.convert(original));
 	}
 
 	/**
@@ -88,7 +90,8 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("05/02/2010 - 3.91 kg", converter.convert(original));
+//		Assert.assertEquals("05/02/2010 - 3.91 kg", converter.convert(original));
+		Assert.assertEquals("Mth 1) 3.91 kg", converter.convert(original));
 	}
 
 	/**
@@ -109,7 +112,8 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("02/02/2010 - 3.91 kg", converter.convert(original));
+//		Assert.assertEquals("02/02/2010 - 3.91 kg", converter.convert(original));
+		Assert.assertEquals("Mth 1) 3.91 kg", converter.convert(original));
 	}
 
 	/**
@@ -167,7 +171,32 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals(MOHReportUtil.joinAsSingleCell("02/02/2010 - 3.91 kg", "27/01/2014 - 5.22 kg"),
+//		Assert.assertEquals(MOHReportUtil.joinAsSingleCell("02/02/2010 - 3.91 kg", "27/01/2014 - 5.22 kg"),
+//				converter.convert(original));
+		Assert.assertEquals(MOHReportUtil.joinAsSingleCell("Mth 1) 3.91 kg", "Mth 49) 5.22 kg"),
 				converter.convert(original));
+	}
+
+	/**
+	 * @verifies pick one of multiple observations on the same day
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldPickOneOfMultipleObservationsOnTheSameDay() throws Exception {
+		SortedObsFromDate original = new SortedObsFromDate();
+		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+		ConceptNumeric c = makeConceptNumeric("CD4, BY FACS", "cells/µL");
+		ConceptNumeric d = makeConceptNumeric("CD4%, BY FACS", "%");
+
+		SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+		data.add(makeObs(c, 109.0d, MohTestUtils.makeDate("25 Jan 2010")));
+		data.add(makeObs(d, 9.0d, MohTestUtils.makeDate("25 Jan 2010")));
+		original.setData(data);
+
+		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(1, 1);
+
+//		Assert.assertEquals("25/01/2010 - 109.0 cells/µL", converter.convert(original));
+		Assert.assertEquals("Mth 1) 109.0 cells/µL", converter.convert(original));
 	}
 }

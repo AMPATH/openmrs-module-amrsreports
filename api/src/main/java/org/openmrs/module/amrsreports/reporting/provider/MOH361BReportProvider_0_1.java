@@ -5,6 +5,9 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConceptNames;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
+import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
@@ -160,13 +163,26 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		artDateMap.addConverter(new DateConverter());
 
 		// ah. 6 month CD4 count (and aq, az, bi)
+		SortedObsSinceOtherDefinitionDataDefinition sixMonthCD4 = new SortedObsSinceOtherDefinitionDataDefinition("6 Month CD4");
+		sixMonthCD4.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.CD4_COUNT));
+		sixMonthCD4.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.CD4_PERCENT));
+		sixMonthCD4.setEffectiveDateDefinition(artDateMap);
+
+		// ai. 6 Month Weight (and ar, ba, bj)
 		SortedObsSinceOtherDefinitionDataDefinition sixMonthWeight = new SortedObsSinceOtherDefinitionDataDefinition("6 Month Weight");
-		sixMonthWeight.setQuestion(Context.getConceptService().getConcept(5089));
+		sixMonthWeight.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.WEIGHT));
 		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
+		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
+
+		dsd.addColumn("12 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 12));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 12));
+
+		dsd.addColumn("18 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 18));
 		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 18));
+
+		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
 
 		report.addDataSetDefinition(dsd, null);
