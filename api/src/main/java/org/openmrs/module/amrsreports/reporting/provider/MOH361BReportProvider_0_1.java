@@ -19,11 +19,15 @@ import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPersonAttri
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPreferredNameDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.EnrollmentDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
+import org.openmrs.module.reporting.data.converter.DateConverter;
 import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredAddressDataDefinition;
@@ -72,7 +76,8 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
 		// b. Date ART started (Transfer to ART register)
-		dsd.addColumn("Date ART Started", new DateARTStartedDataDefinition(), nullString);
+		DateARTStartedDataDefinition dateARTStarted = new DateARTStartedDataDefinition();
+		dsd.addColumn("Date ART Started", dateARTStarted, nullString);
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
@@ -149,13 +154,15 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// m. CTX start date
 		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
+		// create mapped definition of dateARTStarted
+		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
+		artDateMap.setParameterizable(dateARTStarted);
+		artDateMap.addConverter(new DateConverter());
+
 		// ah. 6 month CD4 count (and aq, az, bi)
-		ObsForPersonDataDefinition sixMonthWeight = new ObsForPersonDataDefinition(
-				"6 Month Weight",
-				null,
-				Context.getConceptService().getConcept(5089),
-				null,
-				null);
+		SortedObsSinceOtherDefinitionDataDefinition sixMonthWeight = new SortedObsSinceOtherDefinitionDataDefinition("6 Month Weight");
+		sixMonthWeight.setQuestion(Context.getConceptService().getConcept(5089));
+		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 6));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(2, 12));
