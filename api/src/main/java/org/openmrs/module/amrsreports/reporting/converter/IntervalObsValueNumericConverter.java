@@ -41,6 +41,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 	 * @should find the observation closest to the correct date
 	 * @should not find an observation if not within 2 weeks of the correct date
 	 * @should find observations 48 month intervals after specified interval
+	 * @should pick one of multiple observations on the same day
 	 */
 	@Override
 	public Object convert(Object original) {
@@ -74,7 +75,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 				if (found || thisDate.after(upper.getTime())) {
 
 					// update results
-					updateResults(results, target, before, after, found);
+					updateResults(results, target, before, after, found, thisInterval);
 
 					// reset variables and move forward 24 months
 					do {
@@ -99,21 +100,21 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 		}
 
 		// at this time, if anything remains in the data, we should add it
-		updateResults(results, target, before, after, found);
+		updateResults(results, target, before, after, found, thisInterval);
 
 		return MOHReportUtil.joinAsSingleCell(results);
 	}
 
-	private void updateResults(List<String> results, Calendar target, Obs before, Obs after, Boolean found) {
+	private void updateResults(List<String> results, Calendar target, Obs before, Obs after, Boolean found, Integer interval) {
 		if (before == null && found) {
-			nullSafeAdd(results, format(after));
+			nullSafeAdd(results, format(after, interval));
 		} else if (after == null) {
-			nullSafeAdd(results, format(before));
+			nullSafeAdd(results, format(before, interval));
 		} else if ((target.getTimeInMillis() - before.getObsDatetime().getTime()) <=
 				(after.getObsDatetime().getTime() - target.getTimeInMillis())) {
-			nullSafeAdd(results, format(before));
+			nullSafeAdd(results, format(before, interval));
 		} else {
-			nullSafeAdd(results, format(after));
+			nullSafeAdd(results, format(after, interval));
 		}
 	}
 
@@ -132,16 +133,17 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 		}
 	}
 
-	private String format(Obs after) {
-		if (after == null)
+	private String format(Obs obs, Integer interval) {
+		if (obs == null)
 			return null;
 
-		Object o = super.convert(after);
+		Object o = super.convert(obs);
 
 		if (o == null)
 			return null;
 
-		return String.format("%s - %s", MOHReportUtil.formatdates(after.getObsDatetime()), o);
+		return String.format("Mth %d) %s", interval, o);
+//		return String.format("%s - %s", MOHReportUtil.formatdates(obs.getObsDatetime()), o);
 	}
 
 	@Override
