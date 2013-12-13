@@ -16,7 +16,9 @@ package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -39,6 +41,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 	 * @should find an observation after the correct date
 	 * @should find the observation closest to the correct date
 	 * @should not find an observation if not within 2 weeks of the correct date
+	 * @should find observations 48 month intervals after specified interval
 	 */
 	@Override
 	public Object convert(Object original) {
@@ -47,58 +50,93 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 		if (o == null || o.getData().size() == 0)
 			return null;
 
-		// get the reference date
-		Calendar c = Calendar.getInstance();
-		c.setTime(o.getReferenceDate());
-		c.add(Calendar.MONTH, this.getInterval());
+		// loop through the following logic in 48 month increments until nothing is found
+		// TODO do this more efficiently so we only crawl through the list once
+		Integer thisInterval = null;
+		Boolean found = true;
+		List<String> results = new ArrayList<String>();
 
-		// get bounding range for possible values
-		Calendar lower = Calendar.getInstance();
-		lower.setTime(c.getTime());
-		lower.add(Calendar.WEEK_OF_MONTH, -2);
+		while (found) {
+			// initialize thisInterval or increase by 48 months
+			thisInterval = thisInterval == null ? this.getInterval() : thisInterval + 48;
 
-		Calendar upper = Calendar.getInstance();
-		upper.setTime(c.getTime());
-		upper.add(Calendar.WEEK_OF_MONTH, 2);
+			// get the reference date
+			Calendar c = Calendar.getInstance();
+			c.setTime(o.getReferenceDate());
+			c.add(Calendar.MONTH, thisInterval);
 
-		// find the closest obs on either side of the date
-		Iterator<Obs> io = o.getData().iterator();
-		Boolean found = false;
-		Obs before = null;
-		Obs after = null;
+			// get bounding range for possible values
+			Calendar lower = Calendar.getInstance();
+			lower.setTime(c.getTime());
+			lower.add(Calendar.WEEK_OF_MONTH, -2);
 
-		while (io.hasNext() && !found) {
-			Obs current = io.next();
+			Calendar upper = Calendar.getInstance();
+			upper.setTime(c.getTime());
+			upper.add(Calendar.WEEK_OF_MONTH, 2);
 
-			// avoid the obvious possible issues
-			if (current != null && current.getObsDatetime() != null) {
+			// find the closest obs on either side of the date
+			Obs before = null;
+			Obs after = null;
+			found = false;
 
-				// check to be sure it is in the right range
-				Date thisDate = current.getObsDatetime();
-				if (thisDate.after(lower.getTime()) && thisDate.before(upper.getTime())) {
-					if (thisDate.before(c.getTime())) {
-						before = current;
-					} else {
-						after = current;
-						found = true;
+			// keep looking through the list unless we found the best obs
+			Iterator<Obs> io = o.getData().iterator();
+			while (io.hasNext() && !found) {
+				Obs current = io.next();
+
+				// avoid the obvious possible issues
+				if (current != null && current.getObsDatetime() != null) {
+
+					// check to be sure it is in the right range
+					Date thisDate = current.getObsDatetime();
+					if (thisDate.after(lower.getTime()) && thisDate.before(upper.getTime())) {
+						if (thisDate.before(c.getTime())) {
+							before = current;
+						} else {
+							after = current;
+							found = true;
+						}
 					}
 				}
 			}
+
+			// determine which one (before or after) to show
+			if (before == null && found) {
+				nullSafeAdd(results, format(after));
+			} else if (after == null) {
+				nullSafeAdd(results, format(before));
+			} else if ((c.getTimeInMillis() - before.getObsDatetime().getTime()) <=
+					(after.getObsDatetime().getTime() - c.getTimeInMillis())) {
+				nullSafeAdd(results, format(before));
+			} else {
+				nullSafeAdd(results, format(after));
+			}
+
+			// set found flag if we actually found an obs before
+			if (before != null) {
+				found = true;
+			}
 		}
 
-		if (before == null) {
-			return super.convert(after);
-		}
+		return MOHReportUtil.joinAsSingleCell(results);
+	}
 
-		if (after == null) {
-			return super.convert(before);
+	private void nullSafeAdd(List<String> list, String s) {
+		if (s != null) {
+			list.add(s);
 		}
+	}
 
-		if ((c.getTimeInMillis() - before.getObsDatetime().getTime()) <= (after.getObsDatetime().getTime() - c.getTimeInMillis())) {
-			return super.convert(before);
-		}
+	private String format(Obs after) {
+		if (after == null)
+			return null;
 
-		return super.convert(after);
+		Object o = super.convert(after);
+
+		if (o == null)
+			return null;
+
+		return String.format("%s - %s", MOHReportUtil.formatdates(after.getObsDatetime()), o);
 	}
 
 	@Override

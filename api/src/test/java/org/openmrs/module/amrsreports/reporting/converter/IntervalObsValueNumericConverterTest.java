@@ -23,6 +23,7 @@ import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.model.SortedObsFromDate;
 import org.openmrs.module.amrsreports.reporting.common.ObsDatetimeComparator;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
 import java.util.Date;
 import java.util.Locale;
@@ -47,7 +48,7 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("5.00 kg", converter.convert(original));
+		Assert.assertEquals("01/02/2010 - 5.00 kg", converter.convert(original));
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("4.20 kg", converter.convert(original));
+		Assert.assertEquals("25/01/2010 - 4.20 kg", converter.convert(original));
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("3.91 kg", converter.convert(original));
+		Assert.assertEquals("05/02/2010 - 3.91 kg", converter.convert(original));
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class IntervalObsValueNumericConverterTest {
 
 		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
 
-		Assert.assertEquals("3.91 kg", converter.convert(original));
+		Assert.assertEquals("02/02/2010 - 3.91 kg", converter.convert(original));
 	}
 
 	/**
@@ -145,5 +146,28 @@ public class IntervalObsValueNumericConverterTest {
 		o.setValueNumeric(valueNumeric);
 		o.setObsDatetime(date);
 		return o;
+	}
+
+	/**
+	 * @verifies find observations 48 month intervals after specified interval
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldFindObservations48MonthIntervalsAfterSpecifiedInterval() throws Exception {
+		SortedObsFromDate original = new SortedObsFromDate();
+		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
+
+		SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+		data.add(makeObs(c, 4.2d, MohTestUtils.makeDate("25 Jan 2010")));
+		data.add(makeObs(c, 3.912d, MohTestUtils.makeDate("02 Feb 2010")));
+		data.add(makeObs(c, 5.221d, MohTestUtils.makeDate("27 Jan 2014")));
+		original.setData(data);
+
+		IntervalObsValueNumericConverter converter = new IntervalObsValueNumericConverter(2, 1);
+
+		Assert.assertEquals(MOHReportUtil.joinAsSingleCell("02/02/2010 - 3.91 kg", "27/01/2014 - 5.22 kg"),
+				converter.convert(original));
 	}
 }
