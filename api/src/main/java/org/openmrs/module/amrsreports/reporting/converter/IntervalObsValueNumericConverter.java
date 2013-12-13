@@ -21,9 +21,7 @@ import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
 
 public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 
@@ -36,6 +34,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 
 	/**
 	 * Finds a value nearest the specified interval (in months) from the reference date
+	 *
 	 * @should find an observation on the correct date
 	 * @should find an observation before the correct date
 	 * @should find an observation after the correct date
@@ -50,75 +49,81 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 		if (o == null || o.getData().size() == 0)
 			return null;
 
-		// loop through the following logic in 48 month increments until nothing is found
-		// TODO do this more efficiently so we only crawl through the list once
-		Integer thisInterval = null;
-		Boolean found = true;
 		List<String> results = new ArrayList<String>();
 
-		while (found) {
-			// initialize thisInterval or increase by 48 months
-			thisInterval = thisInterval == null ? this.getInterval() : thisInterval + 48;
+		// get the target and range dates
+		Calendar target = Calendar.getInstance();
+		Calendar lower = Calendar.getInstance();
+		Calendar upper = Calendar.getInstance();
 
-			// get the reference date
-			Calendar c = Calendar.getInstance();
-			c.setTime(o.getReferenceDate());
-			c.add(Calendar.MONTH, thisInterval);
+		// find the closest obs on either side of the date
+		Obs before = null, after = null;
+		Boolean found = false;
+		Integer thisInterval = this.getInterval();
+		initializeDates(o.getReferenceDate(), target, lower, upper, thisInterval);
 
-			// get bounding range for possible values
-			Calendar lower = Calendar.getInstance();
-			lower.setTime(c.getTime());
-			lower.add(Calendar.WEEK_OF_MONTH, -2);
+		// loop from beginning to end of all observations
+		for (Obs current : o.getData()) {
 
-			Calendar upper = Calendar.getInstance();
-			upper.setTime(c.getTime());
-			upper.add(Calendar.WEEK_OF_MONTH, 2);
+			// avoid the obvious possible issues
+			if (current != null && current.getObsDatetime() != null) {
 
-			// find the closest obs on either side of the date
-			Obs before = null;
-			Obs after = null;
-			found = false;
+				Date thisDate = current.getObsDatetime();
 
-			// keep looking through the list unless we found the best obs
-			Iterator<Obs> io = o.getData().iterator();
-			while (io.hasNext() && !found) {
-				Obs current = io.next();
+				// if the current date is after the range, advance to the next range
+				if (found || thisDate.after(upper.getTime())) {
 
-				// avoid the obvious possible issues
-				if (current != null && current.getObsDatetime() != null) {
+					// update results
+					updateResults(results, target, before, after, found);
 
-					// check to be sure it is in the right range
-					Date thisDate = current.getObsDatetime();
-					if (thisDate.after(lower.getTime()) && thisDate.before(upper.getTime())) {
-						if (thisDate.before(c.getTime())) {
-							before = current;
-						} else {
-							after = current;
-							found = true;
-						}
+					// reset variables and move forward 24 months
+					do {
+						thisInterval += 24;
+						initializeDates(o.getReferenceDate(), target, lower, upper, thisInterval);
+						before = null;
+						after = null;
+						found = false;
+					} while (thisDate.after(upper.getTime()));
+				}
+
+				// check to be sure it is in the right range
+				if (thisDate.after(lower.getTime()) && thisDate.before(upper.getTime())) {
+					if (thisDate.before(target.getTime())) {
+						before = current;
+					} else {
+						after = current;
+						found = true;
 					}
 				}
 			}
-
-			// determine which one (before or after) to show
-			if (before == null && found) {
-				nullSafeAdd(results, format(after));
-			} else if (after == null) {
-				nullSafeAdd(results, format(before));
-			} else if ((c.getTimeInMillis() - before.getObsDatetime().getTime()) <=
-					(after.getObsDatetime().getTime() - c.getTimeInMillis())) {
-				nullSafeAdd(results, format(before));
-			} else {
-				nullSafeAdd(results, format(after));
-			}
-
-			// set found flag if we actually found an obs before
-			if (before != null) {
-				found = true;
-			}
 		}
 
+		// at this time, if anything remains in the data, we should add it
+		updateResults(results, target, before, after, found);
+
 		return MOHReportUtil.joinAsSingleCell(results);
+	}
+
+	private void updateResults(List<String> results, Calendar target, Obs before, Obs after, Boolean found) {
+		if (before == null && found) {
+			nullSafeAdd(results, format(after));
+		} else if (after == null) {
+			nullSafeAdd(results, format(before));
+		} else if ((target.getTimeInMillis() - before.getObsDatetime().getTime()) <=
+				(after.getObsDatetime().getTime() - target.getTimeInMillis())) {
+			nullSafeAdd(results, format(before));
+		} else {
+			nullSafeAdd(results, format(after));
+		}
+	}
+
+	private void initializeDates(Date referenceDate, Calendar target, Calendar lower, Calendar upper, Integer thisInterval) {
+		target.setTime(referenceDate);
+		target.add(Calendar.MONTH, thisInterval);
+		lower.setTime(target.getTime());
+		lower.add(Calendar.WEEK_OF_MONTH, -2);
+		upper.setTime(target.getTime());
+		upper.add(Calendar.WEEK_OF_MONTH, 2);
 	}
 
 	private void nullSafeAdd(List<String> list, String s) {
