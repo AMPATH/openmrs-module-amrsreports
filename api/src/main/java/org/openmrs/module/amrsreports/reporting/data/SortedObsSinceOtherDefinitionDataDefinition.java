@@ -22,6 +22,9 @@ import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefin
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Instead of providing just a List, we guarantee it is a SortedSet
  */
@@ -31,7 +34,7 @@ public class SortedObsSinceOtherDefinitionDataDefinition extends BaseDataDefinit
 	private MappedData<? extends PersonDataDefinition> effectiveDateDefinition;
 
 	@ConfigurationProperty(required=true)
-	private Concept question;
+	private List<Concept> questions;
 
 	public SortedObsSinceOtherDefinitionDataDefinition() {
 		super();
@@ -62,11 +65,17 @@ public class SortedObsSinceOtherDefinitionDataDefinition extends BaseDataDefinit
 		this.effectiveDateDefinition = effectiveDateDefinition;
 	}
 
-	public Concept getQuestion() {
-		return question;
+	public List<Concept> getQuestions() {
+		if (questions == null)
+			questions = new ArrayList<Concept>();
+		return questions;
 	}
 
-	public void setQuestion(Concept question) {
-		this.question = question;
+	public void setQuestions(List<Concept> questions) {
+		this.questions = questions;
+	}
+
+	public void addQuestion(Concept question) {
+		this.getQuestions().add(question);
 	}
 }

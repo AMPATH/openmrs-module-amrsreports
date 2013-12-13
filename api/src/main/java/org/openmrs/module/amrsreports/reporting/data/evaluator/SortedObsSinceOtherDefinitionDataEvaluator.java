@@ -67,8 +67,8 @@ public class SortedObsSinceOtherDefinitionDataEvaluator implements PersonDataEva
 			m.put("patientIds", context.getBaseCohort());
 		}
 
-		hql.append("and 		concept.conceptId = :question ");
-		m.put("question", def.getQuestion().getConceptId());
+		hql.append("and 		concept in (:questionList) ");
+		m.put("questionList", def.getQuestions());
 
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
 
