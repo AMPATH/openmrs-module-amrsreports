@@ -20,13 +20,4 @@ public class ARTMonthZeroConverterTest {
 
     }
 
-    @Test
-    public void testConvert() {
-        Date dateOne = new Date("12/1/2012");
-
-        ARTMonthZeroConverter artMonthZeroConverter = new ARTMonthZeroConverter();
-
-        Assert.assertEquals("December", artMonthZeroConverter.convert(dateOne));
-
-    }
 }
