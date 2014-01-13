@@ -13,17 +13,24 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPersonAttributeDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
+import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,10 +63,25 @@ public class TbTreatmentStartDateDataEvaluator extends DrugStartStopDataEvaluato
 		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
 
 
+        /*get tb registration number for patients*/
+        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(17);
+        CohortRestrictedPersonAttributeDataDefinition patientTBRegistrationDetails = new CohortRestrictedPersonAttributeDataDefinition(pat);
+
+        EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);
+        Map<Integer,Object> regDetails = tbRegData.getData();
+
+        List allDetails = new ArrayList();
+
 
 		for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 			Set<Date> startDates = safeFind(mappedStartDates, memberId);
-			data.addData(memberId, startDates);
+            String tbRegistrationNo = (String)regDetails.get(memberId);
+
+            /*Add findings to the list*/
+
+            allDetails.add(startDates);
+            allDetails.add(tbRegistrationNo);
+			data.addData(memberId, allDetails);
 		}
 
 		return data;
