@@ -9,6 +9,7 @@ import org.openmrs.module.amrsreports.AmrsReportsConceptNames;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.converter.ARTMonthZeroConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
@@ -78,9 +79,11 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// patient id ... until we get this thing working proper
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
+        //save definition in a variable
+        DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
+
 		// b. Date ART started (Transfer to ART register)
-		DateARTStartedDataDefinition dateARTStarted = new DateARTStartedDataDefinition();
-		dsd.addColumn("Date ART Started", dateARTStarted, nullString);
+		dsd.addColumn("Date ART Started", dateARTStartedDataDefinition, nullString);
 
 		// c. Unique Patient Number
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
@@ -159,8 +162,11 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// create mapped definition of dateARTStarted
 		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
-		artDateMap.setParameterizable(dateARTStarted);
+		artDateMap.setParameterizable(dateARTStartedDataDefinition);
 		artDateMap.addConverter(new DateConverter());
+
+        //aa. month zero
+        dsd.addColumn("Month 0", dateARTStartedDataDefinition, nullString, new ARTMonthZeroConverter());
 
 		// ah. 6 month CD4 count (and aq, az, bi)
 		SortedObsSinceOtherDefinitionDataDefinition sixMonthCD4 = new SortedObsSinceOtherDefinitionDataDefinition("6 Month CD4");
