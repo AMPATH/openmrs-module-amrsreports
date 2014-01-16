@@ -26,6 +26,20 @@ import java.util.Set;
 @Handler(supports = INHStartDateDataDefinition.class, order = 50)
 public class INHStartDateDataEvaluator implements PersonDataEvaluator {
 
+    /**
+     * @should test for TUBERCULOSIS TREATMENT STARTED
+     * @should test for CURRENT MEDICATIONS
+     * @should test for PATIENT REPORTED CURRENT TUBERCULOSIS PROPHYLAXIS
+     * @should test for PREVIOUS MEDICATIONS USED PAST THREE MONTHS
+     * @should test for PATIENT REPORTED CURRENT TUBERCULOSIS TREATMENT
+     * @should test for PATIENT REPORTED OPPORTUNISTIC INFECTION PROPHYLAXIS
+     * @should test for TUBERCULOSIS PROPHYLAXIS STARTED
+     * @should test for TUBERCULOSIS DRUG TREATMENT START DATE
+     * @param definition
+     * @param context
+     * @return
+     * @throws EvaluationException
+     */
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
@@ -39,7 +53,8 @@ public class INHStartDateDataEvaluator implements PersonDataEvaluator {
 
 		String obsINHSQL = "select person_id, min(obs_datetime) " +
                 "from obs " +
-                "where voided=0 and (concept_id in(1270,1193,1110,1637,1111,6903,1264,1113) and value_coded=656)" +
+                "where person_id in (:patientIds)"+
+               " and voided=0 and (concept_id in(1270,1193,1110,1637,1111,6903,1264,1113) and value_coded=656)" +
                 "group by person_id";
 
 		Map<Integer, Date> inhObs = makeDateMapFromSQL(obsINHSQL, m);
