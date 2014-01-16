@@ -218,7 +218,7 @@ public class INHStartDateDataEvaluatorTest extends BaseModuleContextSensitiveTes
 
 
     /**
-     *@should tests combination of TUTUBERCULOSIS DRUG TREATMENT START DATE and TUBERCULOSIS_TREATMENT_STARTED  date
+     *@should tests combination of PATIENT_REPORTED_OPPORTUNISTIC_INFECTION_PROPHYLAXIS and TUBERCULOSIS_PROPHYLAXIS_STARTED  date
      * @should return obs datetime
      */
 
