@@ -231,10 +231,38 @@ public class INHStartDateDataEvaluatorTest extends BaseModuleContextSensitiveTes
         MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_PROPHYLAXIS_STARTED,
                 MohEvaluableNameConstants.ISONIAZID, "18 Oct 1990");
 
+
         EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
         Map<Integer, Object> data = actual.getData();
         assertThat(data.size(), is(1));
         assertEvaluatesTo("1979-10-18 00:00:00.0");
+
+    }
+
+    /**
+     *@should tests combination of several conditions  date
+     * @should return obs datetime
+     */
+
+    @Test
+    public void shouldReturnFirstDateFromAsetOfDates() throws Exception {
+
+        MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.PATIENT_REPORTED_OPPORTUNISTIC_INFECTION_PROPHYLAXIS,
+                MohEvaluableNameConstants.ISONIAZID, "18 Oct 1979");
+
+        MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_PROPHYLAXIS_STARTED,
+                MohEvaluableNameConstants.ISONIAZID, "18 Oct 1990");
+
+        MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.CURRENT_MEDICATIONS,
+                MohEvaluableNameConstants.ISONIAZID, "17 Oct 1975");
+
+        MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED,
+                MohEvaluableNameConstants.ISONIAZID, "16 Oct 1975");
+
+        EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
+        Map<Integer, Object> data = actual.getData();
+        assertThat(data.size(), is(1));
+        assertEvaluatesTo("1975-10-16 00:00:00.0");
 
     }
 
