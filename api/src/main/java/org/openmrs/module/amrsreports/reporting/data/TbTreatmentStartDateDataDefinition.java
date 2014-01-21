@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.amrsreports.reporting.data;
 
+import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
@@ -28,6 +29,6 @@ public class TbTreatmentStartDateDataDefinition extends BaseDataDefinition imple
 
 	@Override
 	public Class<?> getDataType() {
-		return List.class;
+		return PatientTBTreatmentData.class;
 	}
 }

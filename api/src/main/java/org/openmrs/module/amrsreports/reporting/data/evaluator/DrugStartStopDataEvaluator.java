@@ -157,6 +157,7 @@ public abstract class DrugStartStopDataEvaluator implements PersonDataEvaluator 
 	 */
 	protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
 		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
+
 		return makeDatesMap(data);
 	}
 

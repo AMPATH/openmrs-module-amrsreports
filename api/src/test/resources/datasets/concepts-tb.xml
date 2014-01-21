@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <concept concept_id="1113" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-07-15 00:00:00.0" version="" changed_by="1" date_changed="2005-02-18 15:55:07.0" uuid="a8989396-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1268" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" uuid="a899e0ac-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1256" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e282-1350-11df-a1f1-0026b9348838"/>
+
+  <concept_name concept_id="1113" name="TUBERCULOSIS DRUG TREATMENT START DATE" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="1113" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1268" name="TUBERCULOSIS TREATMENT PLAN" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1268" voided="0" uuid="a941f4b8-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1256" name="START DRUGS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1256" voided="0" uuid="a941f666-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+
+  <person_attribute_type person_attribute_type_id="17" name="TB Registration Number" description="No assigned to TB Patients" format=""  searchable="0" creator="1" date_created="2005-01-12 00:00:00.0" sort_weight="4" retired="0"  uuid="a941f666-1650-12df-a1f1-0026b9348838"  />
+
+</dataset>
+
+
+

@@ -8,7 +8,9 @@ import org.openmrs.ConceptName;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAddress;
+import org.openmrs.PersonAttribute;
 import org.openmrs.PersonName;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
@@ -87,6 +89,20 @@ public class MohTestUtils {
 
 		return patient;
 	}
+    /*
+    * Add Person Attribute to an existing patient
+    * */
+
+    public static Patient addAttribute(Patient p,Integer attrbId,String attribVal){
+
+        PersonAttribute personAttribute = Context.getPersonService().getPersonAttribute(attrbId);
+        personAttribute.setValue(attribVal);
+        personAttribute.setPerson(p);
+        p = Context.getPatientService().savePatient(p);
+
+        return p;
+
+    }
 
 	/**
 	 * generate a date from a string
@@ -112,5 +128,14 @@ public class MohTestUtils {
 		o.setObsDatetime(MohTestUtils.makeDate(date));
 		Context.getObsService().saveObs(o, null);
 	}
+
+    public static void addDateTimeObs(Patient p, String conceptName, String conceptAnswer, String date) {
+        Obs o = new Obs();
+        o.setPerson(p);
+        o.setConcept(MohCacheUtils.getConcept(conceptName));
+        o.setValueDatetime(MohTestUtils.makeDate(conceptAnswer));
+        o.setObsDatetime(MohTestUtils.makeDate(date));
+        Context.getObsService().saveObs(o, null);
+    }
 
 }
