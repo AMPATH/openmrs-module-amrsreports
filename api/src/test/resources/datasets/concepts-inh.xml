@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <concept concept_id="1270" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-07-15 00:00:00.0" version="" changed_by="1" date_changed="2005-02-18 15:55:07.0" uuid="a8989396-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1193" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" uuid="a899e0ac-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1110" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e282-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1637" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00.0" version="" changed_by="1" date_changed="2011-05-19 08:32:27.0" uuid="a89ae56a-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1111" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 19:24:15.0" version="" changed_by="1" date_changed="2008-07-09 01:21:40.0" uuid="a89b7eee-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="6903" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 19:29:40.0" version="" uuid="a89b82cu-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1264" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 19:29:40.0" version="" uuid="a89b82cv-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="1113" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 19:29:40.0" version="" uuid="a89b82cq-1350-11df-a1f1-0026b9348838"/>
+  <concept concept_id="656" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 19:29:40.0" version="" uuid="a89b82cz-1350-11df-a1f1-0026b9348838"/>
+
+
+
+  <concept_name concept_id="1270" name="TUBERCULOSIS TREATMENT STARTED" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="1270" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1193" name="CURRENT MEDICATIONS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1193" voided="0" uuid="a941f4b8-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1110" name="PATIENT REPORTED CURRENT TUBERCULOSIS PROPHYLAXIS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1110" voided="0" uuid="a941f666-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1637" name="PREVIOUS MEDICATIONS USED PAST THREE MONTHS" locale="en" creator="1" date_created="2005-02-09 00:00:00.0" concept_name_id="1637" voided="0" uuid="a9431528-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1111" name="PATIENT REPORTED CURRENT TUBERCULOSIS TREATMENT" locale="en" creator="1" date_created="2005-02-22 19:24:15.0" concept_name_id="1111" voided="0" uuid="a9435d26-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="6903" name="PATIENT REPORTED OPPORTUNISTIC INFECTION PROPHYLAXIS" locale="en" creator="1" date_created="2005-02-22 19:29:40.0" concept_name_id="6903" voided="0" uuid="a9435e02-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1264" name="TUBERCULOSIS PROPHYLAXIS STARTED" locale="en" creator="1" date_created="2005-02-22 19:29:40.0" concept_name_id="1264" voided="0" uuid="a9435e03-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="1113" name="TUBERCULOSIS DRUG TREATMENT START DATE" locale="en" creator="1" date_created="2005-02-22 19:29:40.0" concept_name_id="1113" voided="0" uuid="a9435e04-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="656"  name="ISONIAZID" locale="en" creator="1" date_created="2005-02-22 19:29:40.0" concept_name_id="656" voided="0" uuid="a9435e09-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+
+</dataset>

@@ -127,6 +127,7 @@ public class MohTestUtils {
 		o.setValueCoded(MohCacheUtils.getConcept(conceptAnswer));
 		o.setObsDatetime(MohTestUtils.makeDate(date));
 		Context.getObsService().saveObs(o, null);
+
 	}
 
     public static void addDateTimeObs(Patient p, String conceptName, String conceptAnswer, String date) {

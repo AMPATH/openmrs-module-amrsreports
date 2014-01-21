@@ -14,7 +14,7 @@ import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReas
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EncounterDatetimeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.EntryPointConverter;
-import org.openmrs.module.amrsreports.reporting.converter.PMTCTDatesConverter;
+import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageAndDateConverter;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedAgeAtDateOfOtherDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
@@ -59,7 +59,6 @@ import org.openmrs.util.OpenmrsClassLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -181,7 +180,7 @@ public class MOH361AReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("TB Treatment Start Stop Date", new TbStartStopDataDefinition(), nullString);
 
 		// n. Pregnancy Yes?, Due date, PMTCT refer
-		dsd.addColumn("Pregnancy EDD and Referral", new PmtctPregnancyDataDefinition(), nullString, new PMTCTDatesConverter());
+		dsd.addColumn("Pregnancy EDD and Referral", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter("%s | PMTCT"));
 
 		// o. LTFU / TO / Dead and date when the event occurred
 		dsd.addColumn("LTFU TO DEAD", new LTFUTODeadDataDefinition(), nullString, nullStringConverter);
