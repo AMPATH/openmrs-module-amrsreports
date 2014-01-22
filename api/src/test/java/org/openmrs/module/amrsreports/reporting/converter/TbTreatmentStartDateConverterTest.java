@@ -21,9 +21,9 @@ public class TbTreatmentStartDateConverterTest extends TestCase {
                 new Date("25 May 2013")));
 
         String expected = (
-                "05/12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
-                        "02/04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
-                        "25/05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+                "12/2012" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+                        "04/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
+                        "05/2013" + AmrsReportsConstants.INTER_CELL_SEPARATOR +
                         "TB/560/2013");
 
 

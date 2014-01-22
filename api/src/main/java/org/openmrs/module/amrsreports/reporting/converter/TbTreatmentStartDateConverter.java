@@ -24,7 +24,7 @@ public class TbTreatmentStartDateConverter implements DataConverter {
         PatientTBTreatmentData details = (PatientTBTreatmentData) original;
         Set<Date> listOfDates = details.getEvaluationDates();
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yyyy");
         List finalList = new ArrayList();
 
         for(Date d:listOfDates){
