@@ -13,14 +13,13 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
-import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedPersonAttributeDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.TbStartStopDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
+import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -31,7 +30,6 @@ import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,24 +41,25 @@ import java.util.TreeSet;
  */
 @Handler(supports = TbTreatmentStartDateDataDefinition.class, order = 50)
 public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
+
     /**
-     * @should return value_datetime for TUBERCULOSIS DRUG TREATMENT START DATE
-     * @should return obs_datetime when drug TUBERCULOSIS TREATMENT PLAN is START DRUGS
      * @param definition
      * @param context
      * @return
      * @throws EvaluationException
+     * @should return value_datetime for TUBERCULOSIS DRUG TREATMENT START DATE
+     * @should return obs_datetime when drug TUBERCULOSIS TREATMENT PLAN is START DRUGS
      */
-	@Override
-	public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
-		EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
+    @Override
+    public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
+        EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
 
-		if (context.getBaseCohort().isEmpty())
-			return data;
+        if (context.getBaseCohort().isEmpty())
+            return data;
 
-		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("personIds", context.getBaseCohort());
-        //AND value_coded=1256
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("personIds", context.getBaseCohort());
+
         String sql = "select person_id, " +
                 " CASE " +
                 "     WHEN (concept_id=1113) THEN value_datetime" +
@@ -73,48 +72,52 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
                 "		and concept_id in (1113,1268)" +
                 "		and voided = 0";
 
-		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
+        ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
 
         /*get tb registration number for patients*/
-        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(17);
+        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO);
         PersonAttributeDataDefinition patientTBRegistrationDetails = new PersonAttributeDataDefinition(pat);
 
         EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);
-        PatientTBTreatmentData details = new PatientTBTreatmentData();
+
         Map<Integer, Object> regDetails = null;
         Set<Date> startDates = null;
 
-        if(tbRegData.getData()!=null)
+        if (tbRegData.getData() != null)
             regDetails = tbRegData.getData();
 
 
-            for (Integer memberId : context.getBaseCohort().getMemberIds()) {
-                if(!mappedStartDates.isEmpty()){
-                    startDates = safeFind(mappedStartDates, memberId);
+        for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 
-                }
+            PatientTBTreatmentData details = new PatientTBTreatmentData();
 
-                String tbRegistrationNo = null;
-                if(regDetails!=null)
-                    tbRegistrationNo = (String)regDetails.get(memberId);
+            if (!mappedStartDates.isEmpty()) {
+                startDates = safeFind(mappedStartDates, memberId);
 
-                if(tbRegistrationNo!=null)
-                    details.setTbRegNO(tbRegistrationNo);
+            }
 
-                if(startDates.size()>0)
-                    details.setEvaluationDates(startDates);
+            String tbRegistrationNo = null;
+            if (regDetails != null){
+                Object regNoObj = regDetails.get(memberId);
+                tbRegistrationNo = String.valueOf(regNoObj);
+            }
+            if (tbRegistrationNo != null)
+                details.setTbRegNO(tbRegistrationNo);
+
+            if (startDates.size() > 0)
+                details.setEvaluationDates(startDates);
 
             /*Add findings to the list*/
 
-                data.addData(memberId, details);
-            }
+            data.addData(memberId, details);
+        }
 
-		return data;
-	}
+        return data;
+    }
 
     protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
         Set<Date> dateSet = new TreeSet<Date>();
-        if (map.size()>0 && map.containsKey(key))
+        if (map.size() > 0 && map.containsKey(key))
             dateSet.addAll(map.get(key));
         return dateSet;
     }
@@ -124,7 +127,7 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
      */
     protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
         List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
-            return makeDatesMap(data);
+        return makeDatesMap(data);
 
     }
 

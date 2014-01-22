@@ -9,8 +9,10 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.Person;
 import org.openmrs.PersonAddress;
 import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
@@ -95,9 +97,12 @@ public class MohTestUtils {
 
     public static Patient addAttribute(Patient p,Integer attrbId,String attribVal){
 
-        PersonAttribute personAttribute = Context.getPersonService().getPersonAttribute(attrbId);
+        PersonAttribute personAttribute = new PersonAttribute();
+        personAttribute.setAttributeType(new PersonAttributeType(attrbId));
         personAttribute.setValue(attribVal);
-        personAttribute.setPerson(p);
+        personAttribute.setDateCreated(new Date());
+        personAttribute.setVoided(false);
+        p.addAttribute(personAttribute);
         p = Context.getPatientService().savePatient(p);
 
         return p;

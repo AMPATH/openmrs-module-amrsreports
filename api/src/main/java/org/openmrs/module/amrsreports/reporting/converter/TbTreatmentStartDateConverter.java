@@ -2,6 +2,8 @@ package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
+import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.text.SimpleDateFormat;
@@ -19,26 +21,26 @@ public class TbTreatmentStartDateConverter implements DataConverter {
         if (original == null)
             return null;
 
-        List details = (List) original;
-        Set<Date> listOfDates = (Set<Date>) details.get(0);
-        List<Date> thisList = new ArrayList<Date>(listOfDates);
-        Date firstTbTreatment = thisList.get(0);
-
-        String regNo = (String)details.get(1);
+        PatientTBTreatmentData details = (PatientTBTreatmentData) original;
+        Set<Date> listOfDates = details.getEvaluationDates();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        simpleDateFormat.format(firstTbTreatment);
+        List finalList = new ArrayList();
 
-        List formattedOutput = new ArrayList();
-        formattedOutput.add(firstTbTreatment);
-        formattedOutput.add(regNo);
+        for(Date d:listOfDates){
+            finalList.add(simpleDateFormat.format(d));
 
-        return StringUtils.join(formattedOutput, AmrsReportsConstants.INTER_CELL_SEPARATOR);
+        }
+
+        finalList.add(details.getTbRegNO());
+
+
+        return StringUtils.join(finalList, AmrsReportsConstants.INTER_CELL_SEPARATOR);
     }
 
     @Override
     public Class<?> getInputDataType() {
-        return List.class;
+        return PatientTBTreatmentData.class;
     }
 
     @Override

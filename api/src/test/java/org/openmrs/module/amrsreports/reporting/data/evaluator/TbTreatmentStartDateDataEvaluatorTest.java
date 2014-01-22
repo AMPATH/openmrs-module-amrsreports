@@ -102,7 +102,7 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
     @Test
     public void shouldReturnRegNOObs_datetimeIfTUBERCULOSIS_TREATMENT_PLAN_Equals_START_DRUGS() throws Exception {
 
-        MohTestUtils.addAttribute(patient,17,"TB/200/2010");
+        MohTestUtils.addAttribute(patient,MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO,"TB/200/2010");
         MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN,
                 MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
 
@@ -110,6 +110,8 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
         List<Date> tbStartDates = new ArrayList<Date>(actual.getEvaluationDates());
         assertThat(tbStartDates.size(), is(1));
         assertThat(String.valueOf(tbStartDates.get(0)), is("1975-10-16 00:00:00.0"));
+
+        assertThat(actual.getTbRegNO(),is("TB/200/2010"));
 
     }
 
@@ -119,7 +121,18 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
      */
     @Test
     public void shouldReturnRegNOandTUBERCULOSIS_DRUG_TREATMENT_START_DATE() throws Exception {
-        Assert.assertTrue(true);
+
+        MohTestUtils.addAttribute(patient,MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO,"TB/800/2010");
+        MohTestUtils.addDateTimeObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_DRUG_TREATMENT_START_DATE,
+                "10 Oct 1975 ", "16 Oct 1990");
+
+        PatientTBTreatmentData actual  = getActualResult();
+        List<Date> tbStartDates = new ArrayList<Date>(actual.getEvaluationDates());
+
+        assertThat(tbStartDates.size(), is(1));
+        assertThat(String.valueOf(tbStartDates.get(0)), is("1975-10-10 00:00:00.0"));
+
+        assertThat(actual.getTbRegNO(),is("TB/800/2010"));
 
     }
 
