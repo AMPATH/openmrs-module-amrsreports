@@ -13,14 +13,12 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -43,113 +41,119 @@ import java.util.TreeSet;
 @Handler(supports = TbTreatmentStartDateDataDefinition.class, order = 50)
 public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
 
-    /**
-     * @param definition
-     * @param context
-     * @return
-     * @throws EvaluationException
-     * @should return value_datetime for TUBERCULOSIS DRUG TREATMENT START DATE
-     * @should return obs_datetime when drug TUBERCULOSIS TREATMENT PLAN is START DRUGS
-     */
-    @Override
-    public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
-        EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
+	/**
+	 * @param definition
+	 * @param context
+	 * @return
+	 * @throws EvaluationException
+	 * @should return value_datetime for TUBERCULOSIS DRUG TREATMENT START DATE
+	 * @should return obs_datetime when drug TUBERCULOSIS TREATMENT PLAN is START DRUGS
+	 */
+	@Override
+	public EvaluatedPersonData evaluate(final PersonDataDefinition definition, final EvaluationContext context) throws EvaluationException {
+		EvaluatedPersonData data = new EvaluatedPersonData(definition, context);
 
-        if (context.getBaseCohort().isEmpty())
-            return data;
+		if (context.getBaseCohort().isEmpty())
+			return data;
 
-        Map<String, Object> m = new HashMap<String, Object>();
-        m.put("personIds", context.getBaseCohort());
+		Map<String, Object> m = new HashMap<String, Object>();
+		m.put("personIds", context.getBaseCohort());
 
-        String sql = "select person_id, " +
-                " CASE " +
-                "     WHEN (concept_id=1113) THEN value_datetime" +
-                "     WHEN (concept_id=1268 and value_coded=1256)  THEN obs_datetime " +
-                " END" +
-                " start_date" +
-                " from obs  " +
-                " 	  where" +
-                "		person_id in (:personIds)" +
-                "		and concept_id in (1113,1268)" +
-                "		and voided = 0";
+		String sql = "select person_id, " +
+				" CASE " +
+				"     WHEN (concept_id=1113) THEN value_datetime" +
+				"     WHEN (concept_id=1268 and value_coded=1256)  THEN obs_datetime " +
+				" END" +
+				" start_date" +
+				" from obs  " +
+				" 	  where" +
+				"		person_id in (:personIds)" +
+				"		and concept_id in (1113,1268)" +
+				"		and voided = 0";
 
-        ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
+		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
 
         /*get tb registration number for patients*/
-        String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
-        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(Integer.valueOf(typeId));
+		String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
+		PersonAttributeType pat = null;
 
-        PersonAttributeDataDefinition patientTBRegistrationDetails = new PersonAttributeDataDefinition(pat);
+		try {
+			pat = Context.getPersonService().getPersonAttributeType(Integer.valueOf(typeId));
+		} catch (NumberFormatException e) {
+			pat = Context.getPersonService().getPersonAttributeType(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE_DEFAULT);
+		}
 
-        EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);
+		PersonAttributeDataDefinition patientTBRegistrationDetails = new PersonAttributeDataDefinition(pat);
 
-        Map<Integer, Object> regDetails = null;
-        Set<Date> startDates = null;
+		EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);
 
-        if (tbRegData.getData() != null)
-            regDetails = tbRegData.getData();
+		Map<Integer, Object> regDetails = null;
+		Set<Date> startDates = null;
+
+		if (tbRegData.getData() != null)
+			regDetails = tbRegData.getData();
 
 
-        for (Integer memberId : context.getBaseCohort().getMemberIds()) {
+		for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 
-            PatientTBTreatmentData details = new PatientTBTreatmentData();
+			PatientTBTreatmentData details = new PatientTBTreatmentData();
 
-            if (!mappedStartDates.isEmpty()) {
-                startDates = safeFind(mappedStartDates, memberId);
+			if (!mappedStartDates.isEmpty()) {
+				startDates = safeFind(mappedStartDates, memberId);
 
-            }
+			}
 
-            String tbRegistrationNo = null;
-            if (regDetails != null){
-                Object regNoObj = regDetails.get(memberId);
-                tbRegistrationNo = String.valueOf(regNoObj);
-            }
-            if (tbRegistrationNo != null)
-                details.setTbRegNO(tbRegistrationNo);
+			String tbRegistrationNo = null;
+			if (regDetails != null) {
+				Object regNoObj = regDetails.get(memberId);
+				tbRegistrationNo = String.valueOf(regNoObj);
+			}
+			if (tbRegistrationNo != null)
+				details.setTbRegNO(tbRegistrationNo);
 
-            if (startDates.size() > 0)
-                details.setEvaluationDates(startDates);
+			if (startDates.size() > 0)
+				details.setEvaluationDates(startDates);
 
             /*Add findings to the list*/
 
-            data.addData(memberId, details);
-        }
+			data.addData(memberId, details);
+		}
 
-        return data;
-    }
+		return data;
+	}
 
-    protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
-        Set<Date> dateSet = new TreeSet<Date>();
-        if (map.size() > 0 && map.containsKey(key))
-            dateSet.addAll(map.get(key));
-        return dateSet;
-    }
+	protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
+		Set<Date> dateSet = new TreeSet<Date>();
+		if (map.size() > 0 && map.containsKey(key))
+			dateSet.addAll(map.get(key));
+		return dateSet;
+	}
 
-    /**
-     * executes sql query and generates a ListMap<Integer, Date>
-     */
-    protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
-        List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
-        return makeDatesMap(data);
+	/**
+	 * executes sql query and generates a ListMap<Integer, Date>
+	 */
+	protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
+		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
+		return makeDatesMap(data);
+	}
 
-    }
+	/**
+	 * generates a map of integers to lists of dates, assuming this is the kind of response expected from the SQL
+	 */
+	protected ListMap<Integer, Date> makeDatesMap(List<Object> data) {
+		ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
+		for (Object o : data) {
+			Object[] parts = (Object[]) o;
+			if (parts.length == 2) {
+				Integer pId = (Integer) parts[0];
+				Date date = (Date) parts[1];
+				if (pId != null && date != null) {
+					dateListMap.putInList(pId, date);
+				}
+			}
+		}
 
-    /**
-     * generates a map of integers to lists of dates, assuming this is the kind of response expected from the SQL
-     */
-    protected ListMap<Integer, Date> makeDatesMap(List<Object> data) {
-        ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
-        for (Object o : data) {
-            Object[] parts = (Object[]) o;
-            if (parts.length == 2) {
-                Integer pId = (Integer) parts[0];
-                Date date = (Date) parts[1];
-                dateListMap.putInList(pId, date);
-
-            }
-        }
-
-        return dateListMap;
-    }
+		return dateListMap;
+	}
 
 }
