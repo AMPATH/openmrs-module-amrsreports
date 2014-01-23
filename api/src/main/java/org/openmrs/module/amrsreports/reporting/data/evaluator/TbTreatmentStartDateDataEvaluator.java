@@ -17,6 +17,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
@@ -75,7 +76,9 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
         ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
 
         /*get tb registration number for patients*/
-        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO);
+        String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
+        PersonAttributeType pat = Context.getPersonService().getPersonAttributeType(Integer.valueOf(typeId));
+
         PersonAttributeDataDefinition patientTBRegistrationDetails = new PersonAttributeDataDefinition(pat);
 
         EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);

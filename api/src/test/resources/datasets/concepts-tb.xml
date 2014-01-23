@@ -10,6 +10,8 @@
 
   <person_attribute_type person_attribute_type_id="17" name="TB Registration Number" description="No assigned to TB Patients" format=""  searchable="0" creator="1" date_created="2005-01-12 00:00:00.0" sort_weight="4" retired="0"  uuid="a941f666-1650-12df-a1f1-0026b9348838"  />
 
+  <global_property property="amrsreports.tbRegistrationAttributeType" property_value="17" description="No assigned to TB Patients"  uuid="2823ac08-d464-4e06-acb4-78546b7725d1"  />
+
 </dataset>
 
 

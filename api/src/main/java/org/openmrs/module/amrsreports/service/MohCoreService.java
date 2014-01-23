@@ -18,6 +18,7 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
@@ -154,6 +155,9 @@ public interface MohCoreService extends OpenmrsService {
 
 	@Transactional(readOnly = true)
 	public PatientIdentifierType getCCCNumberIdentifierType();
+
+    @Transactional(readOnly = true)
+    public PersonAttributeType getTBRegAttributeType();
 
 	@Transactional(readOnly = true)
 	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions);

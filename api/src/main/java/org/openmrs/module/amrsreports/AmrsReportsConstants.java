@@ -11,6 +11,7 @@ public class AmrsReportsConstants {
 
 	public static final char DEFAULT_CSV_DELIMITER = ',';
 
+    public static final String TB_REGISTRATION_NO_ATTRIBUTE_TYPE = "amrsreports.tbRegistrationAttributeType";
 	public static final String GP_CCC_NUMBER_IDENTIFIER_TYPE = "amrsreports.cccIdentifierType";
 
 	public static final String GP_PRODUCTION_SERVER_URL = "amrsreports.productionServerURL";

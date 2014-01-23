@@ -321,9 +321,6 @@ public interface MohEvaluableNameConstants {
     public static final String ISONIAZID = "ISONIAZID";
 
 
-    //Attribute type for Tb Registration No
-    public static Integer TB_REG_ATTRIBUTE_NO = 17;
-
 	// Age group for use in some rules
 	public static enum AgeGroup {
 		UNDER_EIGHTEEN_MONTHS,

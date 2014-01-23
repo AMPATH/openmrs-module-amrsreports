@@ -9,6 +9,7 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartStopDataDefinition;
@@ -40,6 +41,7 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
     private PersonEvaluationContext evaluationContext;
     private TbTreatmentStartDateDataEvaluator evaluator;
     private TbTreatmentStartDateDataDefinition definition;
+    private Integer tbRegAtrrType;
 
     @Before
     public void setUp() throws Exception {
@@ -56,6 +58,9 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
 
         definition = new TbTreatmentStartDateDataDefinition();
         evaluator = new TbTreatmentStartDateDataEvaluator();
+
+        String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
+        tbRegAtrrType = Integer.valueOf(typeId);
     }
 
     /**
@@ -102,7 +107,7 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
     @Test
     public void shouldReturnRegNOObs_datetimeIfTUBERCULOSIS_TREATMENT_PLAN_Equals_START_DRUGS() throws Exception {
 
-        MohTestUtils.addAttribute(patient,MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO,"TB/200/2010");
+        MohTestUtils.addAttribute(patient, tbRegAtrrType, "TB/200/2010");
         MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN,
                 MohEvaluableNameConstants.START_DRUGS, "16 Oct 1975");
 
@@ -122,7 +127,7 @@ public class TbTreatmentStartDateDataEvaluatorTest extends BaseModuleContextSens
     @Test
     public void shouldReturnRegNOandTUBERCULOSIS_DRUG_TREATMENT_START_DATE() throws Exception {
 
-        MohTestUtils.addAttribute(patient,MohEvaluableNameConstants.TB_REG_ATTRIBUTE_NO,"TB/800/2010");
+        MohTestUtils.addAttribute(patient,tbRegAtrrType,"TB/800/2010");
         MohTestUtils.addDateTimeObs(patient, MohEvaluableNameConstants.TUBERCULOSIS_DRUG_TREATMENT_START_DATE,
                 "10 Oct 1975 ", "16 Oct 1990");
 

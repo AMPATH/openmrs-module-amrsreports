@@ -20,6 +20,7 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.OpenmrsObject;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -120,7 +121,13 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 		return Context.getPatientService().getPatientIdentifierType(Integer.valueOf(typeId));
 	}
 
-	@Override
+    @Override
+    public PersonAttributeType getTBRegAttributeType() {
+        String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
+        return Context.getPersonService().getPersonAttributeType(Integer.valueOf(typeId));
+    }
+
+    @Override
 	public List<Object> executeScrollingHqlQuery(String query, Map<String, Object> substitutions) {
 		return mohCoreDAO.executeScrollingHqlQuery(query, substitutions);
 	}
