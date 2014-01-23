@@ -14,6 +14,7 @@ import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConverter;
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
+import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
@@ -27,6 +28,7 @@ import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -164,9 +166,10 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// n. INH Start
 		dsd.addColumn("INH Start Dates", new INHStartDateDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
-		// o. TB Treatment
+		// o. TB Treatment Start Month / Year
+        dsd.addColumn("TB Treatment Start Dates", new TbTreatmentStartDateDataDefinition(), nullString, new TbTreatmentStartDateConverter());
 
-		// p, q, r. Pregnancies
+        // p, q, r. Pregnancies
 		dsd.addColumn("Pregnancies", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter("%s"));
 
 		// create mapped definition of dateARTStarted
