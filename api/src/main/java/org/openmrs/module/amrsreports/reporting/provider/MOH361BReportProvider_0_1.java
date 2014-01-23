@@ -14,6 +14,7 @@ import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConverter;
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
+import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
@@ -119,7 +120,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// g1. Address
 		PreferredAddressDataDefinition padd = new PreferredAddressDataDefinition();
-		dsd.addColumn("Address", padd, nullString);
+		dsd.addColumn("Address", padd, nullString, new PersonAddressConverter());
 
 		// g2. Phone Number
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
