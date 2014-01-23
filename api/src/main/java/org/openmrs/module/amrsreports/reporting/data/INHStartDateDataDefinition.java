@@ -1,6 +1,5 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
-import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
@@ -11,12 +10,11 @@ import java.util.Date;
 /**
  * finds the last RTC date
  */
-@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class INHStartDateDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return Date.class;
 	}
-
 }

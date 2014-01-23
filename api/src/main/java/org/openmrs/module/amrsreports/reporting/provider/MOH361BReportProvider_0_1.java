@@ -164,7 +164,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("CTX Start Dates", new CtxStartDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
 
 		// n. INH Start
-		dsd.addColumn("INH Start Dates", new INHStartDateDataDefinition(), nullString, new DateListCustomConverter(MONTH_AND_YEAR_FORMAT));
+		dsd.addColumn("INH Start Dates", new INHStartDateDataDefinition(), nullString, new DateConverter(MONTH_AND_YEAR_FORMAT));
 
 		// o. TB Treatment Start Month / Year
         dsd.addColumn("TB Treatment Start Dates", new TbTreatmentStartDateDataDefinition(), nullString, new TbTreatmentStartDateConverter());
