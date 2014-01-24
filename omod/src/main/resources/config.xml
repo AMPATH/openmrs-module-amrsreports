@@ -64,6 +64,11 @@
         <description>Identifier type for CCC Number identifiers</description>
     </globalProperty>
     <globalProperty>
+        <property>${project.parent.artifactId}.tbRegistrationAttributeType</property>
+        <defaultValue>17</defaultValue>
+        <description>Person Attribute Type for TB Registration Number</description>
+    </globalProperty>
+    <globalProperty>
         <property>${project.parent.artifactId}.productionServerURL</property>
         <defaultValue>https://amrs.ampath.or.ke/amrs</defaultValue>
         <description>URL for accessing the production server when creating patient identifiers.</description>
