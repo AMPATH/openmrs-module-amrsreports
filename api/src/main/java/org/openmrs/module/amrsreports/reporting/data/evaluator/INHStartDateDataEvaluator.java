@@ -4,6 +4,7 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -14,6 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Handler INH start month/year column
@@ -38,46 +41,60 @@ public class INHStartDateDataEvaluator implements PersonDataEvaluator {
 		if (context.getBaseCohort().isEmpty())
 			return ret;
 
+        Set<Date> inhDates = null;
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("patientIds", context.getBaseCohort());
 
-		String obsINHSQL = "select person_id, min(obs_datetime) " +
+		String obsINHSQL = "select person_id, obs_datetime " +
 				"from obs" +
 				" where person_id in (:patientIds)" +
 				" and voided=0" +
 				" and concept_id in (1270,1193,1110,1637,1111,6903,1264,1113)" +
-				" and value_coded=656" +
-				" group by person_id";
+				" and value_coded=656";
 
-		Map<Integer, Date> inhObs = makeDateMapFromSQL(obsINHSQL, m);
+		ListMap<Integer, Date> inhObs = makeDatesMapFromSQL(obsINHSQL, m);
 
 		for (Integer personId : context.getBaseCohort().getMemberIds()) {
-			ret.addData(personId, inhObs.get(personId));
+
+            inhDates = safeFind(inhObs, personId);
+			ret.addData(personId, inhDates);
 		}
 
 		return ret;
 	}
 
-	private Map<Integer, Date> makeDateMapFromSQL(String sql, Map<String, Object> substitutions) {
-		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
-		return makeDateMap(data);
-	}
+    /**
+     * executes sql query and generates a ListMap<Integer, Date>
+     */
+    protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
+        List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
+        return makeDatesMap(data);
+    }
 
-	/**
-	 * generates a map of integers to dates, assuming this is the kind of response expected from the SQL
-	 */
-	private Map<Integer, Date> makeDateMap(List<Object> data) {
-		Map<Integer, Date> m = new HashMap<Integer, Date>();
-		for (Object o : data) {
-			Object[] parts = (Object[]) o;
-			if (parts.length == 2) {
-				Integer pId = (Integer) parts[0];
-				Date date = (Date) parts[1];
-				m.put(pId, date);
-			}
-		}
+    /**
+     * generates a map of integers to lists of dates, assuming this is the kind of response expected from the SQL
+     */
+    protected ListMap<Integer, Date> makeDatesMap(List<Object> data) {
+        ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
+        for (Object o : data) {
+            Object[] parts = (Object[]) o;
+            if (parts.length == 2) {
+                Integer pId = (Integer) parts[0];
+                Date date = (Date) parts[1];
+                if (pId != null && date != null) {
+                    dateListMap.putInList(pId, date);
+                }
+            }
+        }
 
-		return m;
-	}
+        return dateListMap;
+    }
+
+    protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
+        Set<Date> dateSet = new TreeSet<Date>();
+        if (map.size() > 0 && map.containsKey(key))
+            dateSet.addAll(map.get(key));
+        return dateSet;
+    }
 
 }
