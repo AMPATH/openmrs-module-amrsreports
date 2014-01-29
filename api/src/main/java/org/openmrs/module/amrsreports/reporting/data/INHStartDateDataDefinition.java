@@ -6,6 +6,7 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * finds the last RTC date
@@ -15,6 +16,6 @@ public class INHStartDateDataDefinition extends BaseDataDefinition implements Pe
 
 	@Override
 	public Class<?> getDataType() {
-		return Date.class;
+		return Set.class;
 	}
 }
