@@ -107,13 +107,12 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
 
 			}
 
-			String tbRegistrationNo = null;
+			String tbRegistrationNo = "";
 			if (regDetails != null) {
 				Object regNoObj = regDetails.get(memberId);
 				tbRegistrationNo = String.valueOf(regNoObj);
 			}
-			if (tbRegistrationNo != null)
-				details.setTbRegNO(tbRegistrationNo);
+			details.setTbRegNO(tbRegistrationNo);
 
 			if (startDates.size() > 0)
 				details.setEvaluationDates(startDates);
