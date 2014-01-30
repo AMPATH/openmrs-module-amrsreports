@@ -26,7 +26,7 @@ public class TbTreatmentStartDateConverter implements DataConverter {
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/yyyy");
 		List finalList = new ArrayList();
-        String tbNo = "";
+
 		if (listOfDates != null) {
 			for (Date d : listOfDates) {
 				finalList.add(simpleDateFormat.format(d));
@@ -34,10 +34,10 @@ public class TbTreatmentStartDateConverter implements DataConverter {
 		}
 
 		if (details.getTbRegNO() != null) {
-            tbNo =details.getTbRegNO();
 
+            finalList.add(details.getTbRegNO());
 		}
-        finalList.add(tbNo);
+
 
 		return StringUtils.join(finalList, AmrsReportsConstants.INTER_CELL_SEPARATOR);
 	}
