@@ -18,13 +18,15 @@ import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
+import java.util.Set;
+
 /**
  */
-@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class PmtctPregnancyDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@Override
 	public Class<?> getDataType() {
-		return String.class;
+		return Set.class;
 	}
 }

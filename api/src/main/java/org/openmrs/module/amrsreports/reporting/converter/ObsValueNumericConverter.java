@@ -28,12 +28,18 @@ public class ObsValueNumericConverter implements DataConverter {
 		this.setPrecision(precision);
 	}
 
+	/**
+	 * @should return a blank string if valueNumeric is null
+	 */
 	@Override
 	public Object convert(Object original) {
 
 		Obs o = (Obs) original;
 
 		if (o == null)
+			return "";
+
+		if (o.getValueNumeric() == null)
 			return "";
 
 		// TODO figure out why we have to get the concept ...
