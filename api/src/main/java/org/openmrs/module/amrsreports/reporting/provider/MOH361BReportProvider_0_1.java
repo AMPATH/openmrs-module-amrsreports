@@ -171,7 +171,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("TB Treatment Start Dates", new TbTreatmentStartDateDataDefinition(), nullString, new TbTreatmentStartDateConverter());
 
 		// p, q, r. Pregnancies
-		dsd.addColumn("Pregnancies", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter("%s"));
+		dsd.addColumn("Pregnancies", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter());
 
 		// create mapped definition of dateARTStarted
 		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
