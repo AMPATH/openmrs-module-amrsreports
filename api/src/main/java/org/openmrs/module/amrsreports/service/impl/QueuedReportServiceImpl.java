@@ -207,7 +207,7 @@ public class QueuedReportServiceImpl implements QueuedReportService {
 		if (queuedReport == null)
 			return queuedReport;
 
-		if (queuedReport.getStatus() == null ||queuedReport.getStatus().equals("ERROR") )
+		if (queuedReport.getStatus() == null || queuedReport.getStatus().equals("ERROR"))
 			queuedReport.setStatus(QueuedReport.STATUS_NEW);
 
 		return dao.saveQueuedReport(queuedReport);

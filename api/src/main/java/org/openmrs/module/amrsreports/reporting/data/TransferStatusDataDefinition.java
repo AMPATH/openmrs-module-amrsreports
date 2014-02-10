@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Transfer In Date column
  */
-@Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class TransferStatusDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	public TransferStatusDataDefinition() {
