@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.web.controller;
 
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,17 @@ public class AmrsReportsSettingsController {
 		return Context.getAdministrationService()
 				.getGlobalProperty(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE);
 	}
+
+    @ModelAttribute("attributeTypes")
+    public List<PersonAttributeType> getAllPersonAttributeTypes() {
+        return Context.getPersonService().getAllPersonAttributeTypes();
+    }
+
+    @ModelAttribute("tbRegistrationAttributeType")
+    public String getTbRegistrationNoAttributeType() {
+        return Context.getAdministrationService()
+                .getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
+    }
 
 	@ModelAttribute("productionServerURL")
 	public String getProductionServerURL() {

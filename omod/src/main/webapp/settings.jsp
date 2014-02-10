@@ -122,6 +122,25 @@
                 </form>
             </td>
         </tr>
+
+        <tr>
+            <td>TB Registration Attribute Type</td>
+            <td id="tbRegistrationAttributeType">
+                <form>
+                    <input type="hidden" name="property" value="amrsreports.tbRegistrationAttributeType"/>
+                    <select name="value" onchange="enableSaveFor('tbRegistrationAttributeType')">
+                        <option value=""></option>
+                        <c:forEach items="${attributeTypes}" var="attributeType">
+                            <option value="${attributeType.id}"
+                            <c:if test="${attributeType.id == tbRegistrationAttributeType}">selected</c:if>
+                            >${attributeType.name}</option>
+                        </c:forEach>
+                    </select>
+                    <input type="submit" name="save" onclick="return saveGPFor('tbRegistrationAttributeType')" value="save"/>
+                    <span class="saved">saved</span>
+                </form>
+            </td>
+        </tr>
         <tr>
             <td>Production Server URL</td>
             <td id="productionServerURL">

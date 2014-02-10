@@ -415,6 +415,8 @@ public class MohHibernateCoreDAO implements MohCoreDAO {
 			} else {
 				q.setParameter(e.getKey(), e.getValue());
 			}
+
+
 		}
 
 		q.setReadOnly(true);

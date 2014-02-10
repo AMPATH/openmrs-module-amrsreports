@@ -22,7 +22,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-public class PMTCTDatesConverter implements DataConverter {
+public class FormattedDateSetConverter implements DataConverter {
+
+	private String format;
+
+	public FormattedDateSetConverter() {
+		// pass
+	}
+
+	public FormattedDateSetConverter(String format) {
+		this.format = format;
+	}
 
 	/**
 	 * converts a set of dates into proper formats for the PMTCT column in 361A
@@ -31,17 +41,22 @@ public class PMTCTDatesConverter implements DataConverter {
 	 * @should return a blank string if no dates exist
 	 * @should return null if the parameter is null
 	 */
-	@Override
 	public Object convert(Object original) {
 
+		// die early if not needed
 		if (original == null)
 			return null;
+
+		// set default format
+		if (format == null)
+			format = "%s";
 
 		Set<Date> o = (Set<Date>) original;
 
 		List<String> out = new ArrayList<String>();
 		for (Date d : o) {
-			out.add(String.format("%s | PMTCT", MOHReportUtil.formatdates(d)));
+
+			out.add(String.format(format, MOHReportUtil.formatdates(d)));
 		}
 
 		return MOHReportUtil.joinAsSingleCell(out);
@@ -55,5 +70,13 @@ public class PMTCTDatesConverter implements DataConverter {
 	@Override
 	public Class<?> getDataType() {
 		return String.class;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
 	}
 }

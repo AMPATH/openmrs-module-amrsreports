@@ -311,6 +311,16 @@ public interface MohEvaluableNameConstants {
 
 	public static final String UNKNOWN = "Unknown";
 
+    //Additional constants for INH startDate
+    public static final String TUBERCULOSIS_TREATMENT_STARTED_1270 = "TUBERCULOSIS TREATMENT STARTED";
+    public static final String PATIENT_REPORTED_CURRENT_TUBERCULOSIS_PROPHYLAXIS = "PATIENT REPORTED CURRENT TUBERCULOSIS PROPHYLAXIS";
+    public static final String PREVIOUS_MEDICATIONS_USED_PAST_THREE_MONTHS = "PREVIOUS MEDICATIONS USED PAST THREE MONTHS";
+    public static final String PATIENT_REPORTED_OPPORTUNISTIC_INFECTION_PROPHYLAXIS = "PATIENT REPORTED OPPORTUNISTIC INFECTION PROPHYLAXIS";
+    public static final String TUBERCULOSIS_PROPHYLAXIS_STARTED = "TUBERCULOSIS PROPHYLAXIS STARTED";
+    public static final String TB_DRUG_START_DATE = "TB DRUG START DATE";
+    public static final String ISONIAZID = "ISONIAZID";
+
+
 	// Age group for use in some rules
 	public static enum AgeGroup {
 		UNDER_EIGHTEEN_MONTHS,

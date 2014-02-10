@@ -3,10 +3,12 @@ package org.openmrs.module.amrsreports.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
+import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +46,11 @@ public class CCCNumberController {
 
 	@ModelAttribute("facilities")
 	public List<MOHFacility> getAllFacilities() {
-		return Context.getService(MOHFacilityService.class).getAllFacilities(true);
+
+        User currentUser = Context.getAuthenticatedUser();
+        List<MOHFacility> relevantFacilities = Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(currentUser);
+
+		return relevantFacilities;
 	}
 
 	@ModelAttribute("serials")

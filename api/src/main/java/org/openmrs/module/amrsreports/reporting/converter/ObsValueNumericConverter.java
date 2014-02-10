@@ -1,7 +1,10 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.text.DecimalFormat;
@@ -15,6 +18,8 @@ public class ObsValueNumericConverter implements DataConverter {
 
 	private static final DecimalFormat df = new DecimalFormat();
 
+	private Log log = LogFactory.getLog(getClass());
+
 	public ObsValueNumericConverter() {
 		// pass
 	}
@@ -23,15 +28,31 @@ public class ObsValueNumericConverter implements DataConverter {
 		this.setPrecision(precision);
 	}
 
+	/**
+	 * @should return a blank string if valueNumeric is null
+	 */
 	@Override
 	public Object convert(Object original) {
 
 		Obs o = (Obs) original;
 
-		if (o == null || !(o.getConcept() instanceof ConceptNumeric))
+		if (o == null)
 			return "";
 
-		ConceptNumeric cn = (ConceptNumeric) o.getConcept();
+		if (o.getValueNumeric() == null)
+			return "";
+
+		// TODO figure out why we have to get the concept ...
+		ConceptNumeric cn;
+		if (o.getConcept() instanceof ConceptNumeric) {
+			cn = (ConceptNumeric) o.getConcept();
+		} else {
+			cn = Context.getConceptService().getConceptNumeric(o.getConcept().getConceptId());
+		}
+
+		if (cn == null)
+			return "";
+
 		String units = cn.getUnits();
 
 		String value;
