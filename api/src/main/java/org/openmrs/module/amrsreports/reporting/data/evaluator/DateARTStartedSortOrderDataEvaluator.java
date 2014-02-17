@@ -1,5 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
@@ -25,6 +27,14 @@ import java.util.Map;
 @Handler(supports = DateARTStartedSortOrderDataDefinition.class, order = 50)
 public class DateARTStartedSortOrderDataEvaluator implements PersonDataEvaluator {
 
+    private Log log = LogFactory.getLog(this.getClass());
+    /**
+     * @should extract year and month values from ART Start Date
+     * @param definition
+     * @param context
+     * @return
+     * @throws EvaluationException
+     */
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
@@ -35,20 +45,22 @@ public class DateARTStartedSortOrderDataEvaluator implements PersonDataEvaluator
 			return c;
 		}
 
-        DateARTStartedSortOrderDataDefinition dateARTStartedSortOrderDataDefinition = new DateARTStartedSortOrderDataDefinition();
+        DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
 
-        EvaluatedPersonData artStartDateData = Context.getService(PersonDataService.class).evaluate(dateARTStartedSortOrderDataDefinition, context);
+        EvaluatedPersonData artStartDateData = Context.getService(PersonDataService.class).evaluate(dateARTStartedDataDefinition, context);
 
         Map<Integer,Object> actualData = artStartDateData.getData();
-
+        System.out.println("IT CONTAINS THE IIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDdd  "+actualData.size());
         //define date pattern
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
         for(Integer personID: context.getBaseCohort().getMemberIds()){
 
-            Date dateArtStarted = (Date)actualData.get(personID);
-            String fDate = simpleDateFormat.format(dateArtStarted);
-            c.addData(personID, fDate);
+            if (actualData.containsKey(personID)){
 
+                Date dateArtStarted = (Date)actualData.get(personID);
+                   String fDate = simpleDateFormat.format(dateArtStarted);
+                c.addData(personID, fDate);
+            }
         }
 
 		return c;

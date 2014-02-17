@@ -85,7 +85,6 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
         dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
         dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
         dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
-        dsd.addSortCriteria("Unique Patient Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 

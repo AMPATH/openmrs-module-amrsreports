@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <amrsreports_hiv_care_enrollment enrollment_id="1" patient_id="100" first_arv_date="2004-07-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="2" patient_id="101" first_arv_date="2004-08-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="3" patient_id="102" first_arv_date="2004-09-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="4" patient_id="103" first_arv_date="2005-07-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="5" patient_id="104" first_arv_date="2005-08-15" />
+
+  <!--add cohort-->
+  <cohort cohort_id="1" name="Date ART Started" description="Sample Cohort" uuid="AMRSReportsTemporaryCohort000000000000" creator="1" date_created="2012-07-15 00:00:00.0" voided="0" />
+  <!--Add cohort_member details-->
+  <cohort_member cohort_id="1" patient_id="100" />
+  <cohort_member cohort_id="1" patient_id="101" />
+  <cohort_member cohort_id="1" patient_id="102" />
+  <cohort_member cohort_id="1" patient_id="103" />
+  <cohort_member cohort_id="1" patient_id="104" />
+  <cohort_member cohort_id="1" patient_id="105" />
+
+
+</dataset>
+
+
+

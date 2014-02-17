@@ -60,7 +60,7 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 				Date firstARVDate = (Date) parts[1];
 				c.addData(pId, firstARVDate);
 			}
-		}
+        }
 
 		return c;
 	}
