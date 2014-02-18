@@ -29,7 +29,7 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static Concept getConcept(final String conceptName) {
-		MohConceptCacheInstance cacheInstance = (MohConceptCacheInstance) MohConceptCacheInstance.getInstance();
+		MohConceptCacheInstance cacheInstance = MohConceptCacheInstance.getInstance();
 		Concept concept = cacheInstance.get(conceptName);
 		if (concept == null) {
 			concept = Context.getConceptService().getConcept(conceptName);
@@ -50,7 +50,7 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static EncounterType getEncounterType(final String encounterTypeName) {
-		MohEncounterTypeCacheInstance cacheInstance = (MohEncounterTypeCacheInstance) MohEncounterTypeCacheInstance.getInstance();
+		MohEncounterTypeCacheInstance cacheInstance = MohEncounterTypeCacheInstance.getInstance();
 		EncounterType encounterType = cacheInstance.get(encounterTypeName);
 		if (encounterType == null) {
 			encounterType = Context.getEncounterService().getEncounterType(encounterTypeName);
@@ -64,7 +64,7 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static PatientIdentifierType getPatientIdentifierType(final String patientIdentifierTypeName) {
-		MohPatientIdentifierTypeCacheInstance cacheInstance = (MohPatientIdentifierTypeCacheInstance) MohPatientIdentifierTypeCacheInstance.getInstance();
+		MohPatientIdentifierTypeCacheInstance cacheInstance = MohPatientIdentifierTypeCacheInstance.getInstance();
 		PatientIdentifierType patientIdentifierType = cacheInstance.get(patientIdentifierTypeName);
 		if (patientIdentifierType == null) {
 			patientIdentifierType = Context.getPatientService().getPatientIdentifierTypeByName(patientIdentifierTypeName);
