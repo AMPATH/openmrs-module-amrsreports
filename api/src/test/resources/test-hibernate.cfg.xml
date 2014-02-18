@@ -9,5 +9,8 @@
         <mapping resource="QueuedReport.hbm.xml"/>
         <mapping resource="HIVCareEnrollment.hbm.xml"/>
         <mapping resource="UserFacility.hbm.xml"/>
+
+        <!-- from Drug History Module -->
+        <mapping resource="DrugEvent.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>
