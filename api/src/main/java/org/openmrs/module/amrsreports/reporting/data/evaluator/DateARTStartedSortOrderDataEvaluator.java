@@ -50,7 +50,6 @@ public class DateARTStartedSortOrderDataEvaluator implements PersonDataEvaluator
         EvaluatedPersonData artStartDateData = Context.getService(PersonDataService.class).evaluate(dateARTStartedDataDefinition, context);
 
         Map<Integer,Object> actualData = artStartDateData.getData();
-        System.out.println("IT CONTAINS THE IIIIIIIIIIIIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDdd  "+actualData.size());
         //define date pattern
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM");
         for(Integer personID: context.getBaseCohort().getMemberIds()){

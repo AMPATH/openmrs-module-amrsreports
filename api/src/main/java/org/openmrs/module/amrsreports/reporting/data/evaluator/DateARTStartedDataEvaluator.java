@@ -5,6 +5,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -38,20 +39,23 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		StringBuilder hql = new StringBuilder();
 		Map<String, Object> m = new HashMap<String, Object>();
 
+        //TODO: Find out why hql returns empty set
 		hql.append("select hce.patient.patientId, hce.firstARVDate");
 		hql.append(" from HIVCareEnrollment as hce");
 		hql.append(" where");
+		hql.append(" hce.patient.patientId in (:patientIds) " );
+		hql.append(" and hce.firstARVDate <= :onOrBefore ");
 
-		hql.append(" hce.patient.patientId in (" +
-				"	SELECT elements(c.memberIds) from Cohort as c" +
-				"	where c.uuid = :cohortUuid" +
-				") ");
-		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
+        String sql = "select patient_id, first_arv_date from " +
+                "amrsreports_hiv_care_enrollment  " +
+                "where patient_id in (:patientIds)  " +
+                "and first_arv_date <= :onOrBefore";
 
-		hql.append("and hce.firstARVDate <= :onOrBefore ");
+
 		m.put("onOrBefore", context.getEvaluationDate());
+        m.put("patientIds", context.getBaseCohort());
 
-		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
+        List<Object> queryResult = Context.getService(MohCoreService.class).executeSqlQuery(sql, m);
 
 		for (Object o : queryResult) {
 			Object[] parts = (Object[]) o;

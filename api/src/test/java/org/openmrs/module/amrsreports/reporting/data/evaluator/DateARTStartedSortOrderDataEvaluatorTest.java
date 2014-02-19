@@ -1,19 +1,24 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import junit.framework.Assert;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Cohort;
 import org.openmrs.Patient;
+import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedSortOrderDataDefinition;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.PersonEvaluationContext;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,17 +51,21 @@ public class DateARTStartedSortOrderDataEvaluatorTest extends BaseModuleContextS
     }
 
     @Test
-    public void shouldReturnAListOfDates()  throws EvaluationException{
+    public void shouldReturnAListOfFormattedDates()  throws EvaluationException{
 
-        /*EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
+        EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
         Map<Integer, Object> data =  actual.getData();
 
-        for(Integer cohortMember: evaluationContext.getBaseCohort().getMemberIds()){
+        ArrayList<String> expected = new ArrayList<String>(Arrays.asList("2004-07","2004-08","2004-09","2005-07","2005-08"));
 
-                Object membData = data.get(cohortMember);
+        List finalList = new ArrayList();
 
-        }*/
-        Assert.assertTrue(1>0);
+        for(Integer patientID : evaluationContext.getBaseCohort().getMemberIds()){
+              finalList.add(data.get(patientID));
+
+        }
+
+        Assert.assertEquals(expected,finalList);
     }
 
 
