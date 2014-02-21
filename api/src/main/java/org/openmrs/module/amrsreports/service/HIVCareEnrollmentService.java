@@ -12,4 +12,7 @@ public interface HIVCareEnrollmentService extends OpenmrsService {
 
 	@Transactional
 	public HIVCareEnrollment getHIVCareEnrollmentForPatient(Patient patient);
+
+	@Transactional
+	public HIVCareEnrollment saveHIVCareEnrollment(HIVCareEnrollment hce);
 }

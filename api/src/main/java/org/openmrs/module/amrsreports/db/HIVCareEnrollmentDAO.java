@@ -10,4 +10,5 @@ public interface HIVCareEnrollmentDAO {
 
 	public HIVCareEnrollment getHIVCareEnrollmentForPatient(Patient patient);
 
+	public HIVCareEnrollment saveHIVCareEnrollment(HIVCareEnrollment hce);
 }

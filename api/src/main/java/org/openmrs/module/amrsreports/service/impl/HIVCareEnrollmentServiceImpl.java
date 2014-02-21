@@ -25,4 +25,9 @@ public class HIVCareEnrollmentServiceImpl extends BaseOpenmrsService implements 
 	public HIVCareEnrollment getHIVCareEnrollmentForPatient(Patient patient) {
 		return dao.getHIVCareEnrollmentForPatient(patient);
 	}
+
+	@Override
+	public HIVCareEnrollment saveHIVCareEnrollment(HIVCareEnrollment hce) {
+		return dao.saveHIVCareEnrollment(hce);
+	}
 }
