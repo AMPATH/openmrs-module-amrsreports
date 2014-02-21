@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.task;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.amrsreports.builder.ARVTableBuilder;
+import org.openmrs.module.amrsreports.builder.DrugEventBuilder;
 import org.openmrs.module.amrsreports.builder.HIVCareEnrollmentBuilder;
 import org.openmrs.module.amrsreports.builder.PregnancyTableBuilder;
 
@@ -17,6 +18,9 @@ public class UpdateHIVCareEnrollmentTask extends AMRSReportsTask {
 	public void doExecute() {
 		// build the ARV Tables
 		ARVTableBuilder.getInstance().execute();
+
+		// build drug history
+		DrugEventBuilder.getInstance().execute();
 
 		// build the pregnancy table
 		PregnancyTableBuilder.getInstance().execute();
