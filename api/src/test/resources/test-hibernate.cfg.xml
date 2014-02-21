@@ -12,5 +12,6 @@
 
         <!-- from Drug History Module -->
         <mapping resource="DrugEvent.hbm.xml"/>
+        <mapping resource="DrugSnapshot.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>

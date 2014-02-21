@@ -16,17 +16,26 @@ package org.openmrs.module.amrsreports.builder;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.drughistory.DrugEventTrigger;
 import org.openmrs.module.drughistory.DrugEventType;
+import org.openmrs.module.drughistory.DrugSnapshot;
 import org.openmrs.module.drughistory.api.DrugEventService;
+import org.openmrs.module.drughistory.api.DrugSnapshotService;
+import org.openmrs.module.reporting.common.ListMap;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 public class DrugEventBuilder {
@@ -40,8 +49,7 @@ public class DrugEventBuilder {
 	public static final String DRUG_ETRAVIRINE = "ETRAVIRINE";
 	public static final String DRUG_INDINAVIR = "INDINAVIR";
 	public static final String DRUG_LAMIVUDINE = "LAMIVUDINE";
-	// TODO find a single concept for Lopinavir ... LOPINAVIR AND RITONAVIR perhaps
-	// public static final String DRUG_LOPINAVIR = "LOPINAVIR";
+	public static final String DRUG_LOPINAVIR = "LOPINAVIR";
 	public static final String DRUG_NELFINAVIR = "NELFINAVIR";
 	public static final String DRUG_NEVIRAPINE = "NEVIRAPINE";
 	public static final String DRUG_RALTEGRAVIR = "RALTEGRAVIR";
@@ -60,6 +68,7 @@ public class DrugEventBuilder {
 	private ConceptService conceptService;
 
 	private static DrugEventBuilder instance;
+	private DrugSnapshotService drugSnapshotService;
 
 	public static DrugEventBuilder getInstance() {
 		if (instance == null)
@@ -79,7 +88,7 @@ public class DrugEventBuilder {
 				MohCacheUtils.getConcept(DRUG_ETRAVIRINE),
 				MohCacheUtils.getConcept(DRUG_INDINAVIR),
 				MohCacheUtils.getConcept(DRUG_LAMIVUDINE),
-//				MohCacheUtils.getConcept(DRUG_LOPINAVIR),
+				MohCacheUtils.getConcept(DRUG_LOPINAVIR),
 				MohCacheUtils.getConcept(DRUG_NELFINAVIR),
 				MohCacheUtils.getConcept(DRUG_NEVIRAPINE),
 				MohCacheUtils.getConcept(DRUG_RALTEGRAVIR),
@@ -118,7 +127,7 @@ public class DrugEventBuilder {
 		drugAnswers.put(DRUG_ETRAVIRINE, getConcepts(6158));
 		drugAnswers.put(DRUG_INDINAVIR, getConcepts(749));
 		drugAnswers.put(DRUG_LAMIVUDINE, getConcepts(628, 630, 792, 817, 1400, 6467, 6679, 6964, 6965));
-//		drugAnswers.put(DRUG_LOPINAVIR, getConcepts(794));
+		drugAnswers.put(DRUG_LOPINAVIR, getConcepts(794, 9026));
 		drugAnswers.put(DRUG_NELFINAVIR, getConcepts(635));
 		drugAnswers.put(DRUG_NEVIRAPINE, getConcepts(631, 792, 6467));
 		drugAnswers.put(DRUG_RALTEGRAVIR, getConcepts(6156));
@@ -152,6 +161,8 @@ public class DrugEventBuilder {
 	 * @should find occurrences of ZIDOVUDINE
 	 * @should find occurrences of UNKNOWN
 	 * @should find occurrences of OTHER
+	 * @should create an HIVCareEnrollment with proper firstARVDate for matching snapshot
+	 * @should not create an HIVCareEnrollment if no snapshots match the criteria
 	 */
 	public void execute() {
 
@@ -161,10 +172,40 @@ public class DrugEventBuilder {
 		}
 
 		// tell the drug event service to regenerate snapshots
-		// getDrugEventService().regenerateSnapshots();
+		getDrugSnapshotService().generateDrugSnapshots(null);
 
-		// find first ART dates by looking for regimens ... ?
-		// TODO
+		// find first ART dates
+		Properties params = new Properties();
+		params.put("drugs", ARV_DRUGS);
+//		params.put("atLeast", 3);
+
+		List<DrugSnapshot> snapshots = getDrugSnapshotService().getDrugSnapshots(params);
+
+		// allocate snapshots to individuals and trim to those we care about
+		ListMap<Person, DrugSnapshot> m = new ListMap<Person, DrugSnapshot>();
+
+		for (DrugSnapshot snapshot : snapshots) {
+			Set<Concept> s = new HashSet<Concept>(snapshot.getConcepts());
+			s.retainAll(ARV_DRUGS);
+			if (s.size() >= 3) {
+				m.putInList(snapshot.getPerson(), snapshot);
+			}
+		}
+
+		// add dates to HIV Care Enrollment records
+		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
+		for (Person p : m.keySet()) {
+			Patient pt = Context.getPatientService().getPatient(p.getPersonId());
+			if (pt != null) {
+				HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);
+				if (hce == null) {
+					hce = new HIVCareEnrollment();
+					hce.setPatient(pt);
+				}
+				hce.setFirstARVDate(m.get(p).get(0).getDateTaken());
+				hceService.saveHIVCareEnrollment(hce);
+			}
+		}
 	}
 
 	/**
@@ -207,6 +248,12 @@ public class DrugEventBuilder {
 		if (conceptService == null)
 			conceptService = Context.getConceptService();
 		return conceptService;
+	}
+
+	public DrugSnapshotService getDrugSnapshotService() {
+		if (drugSnapshotService == null)
+			drugSnapshotService = Context.getService(DrugSnapshotService.class);
+		return drugSnapshotService;
 	}
 
 	private Concept getConcept(int conceptId) {
