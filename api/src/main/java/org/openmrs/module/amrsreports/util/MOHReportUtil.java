@@ -7,9 +7,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
+import org.openmrs.module.amrsreports.builder.DrugEventBuilder;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.reporting.common.DrugSnapshotDateComparator;
+import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
+import org.openmrs.module.drughistory.DrugSnapshot;
+import org.openmrs.module.drughistory.api.DrugSnapshotService;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -30,8 +36,11 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 
 /**
@@ -71,7 +80,7 @@ public class MOHReportUtil {
 	 */
 	public static void renderCSVFromReportData(ReportData results, OutputStream out) throws IOException {
 
-		CSVWriter w = new CSVWriter(new OutputStreamWriter(out,"UTF-8"), AmrsReportsConstants.DEFAULT_CSV_DELIMITER);
+		CSVWriter w = new CSVWriter(new OutputStreamWriter(out, "UTF-8"), AmrsReportsConstants.DEFAULT_CSV_DELIMITER);
 
 		DataSet dataset = getFirstDataSetForReportData(results);
 
@@ -123,7 +132,7 @@ public class MOHReportUtil {
 		return results;
 	}
 
-	public static String formatdates(Date date){
+	public static String formatdates(Date date) {
 		if (date == null)
 			return "Unknown";
 
@@ -136,47 +145,48 @@ public class MOHReportUtil {
 	}
 
 	/**
-     * determine the age group for a patient at a given date
-     * @should determine the age group for a patient at a given date
-     * @param birthdate birth date of the patient whose age is used in the calculations
-     * @param when the date upon which the age should be identified
-     * @return the appropriate age group
-     */
-    public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
-        //birthdate = patient.getBirthdate();
-        if (birthdate == null) {
-            return null;
-        }
+	 * determine the age group for a patient at a given date
+	 *
+	 * @param birthdate birth date of the patient whose age is used in the calculations
+	 * @param when      the date upon which the age should be identified
+	 * @return the appropriate age group
+	 * @should determine the age group for a patient at a given date
+	 */
+	public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
+		//birthdate = patient.getBirthdate();
+		if (birthdate == null) {
+			return null;
+		}
 
-        Calendar now = Calendar.getInstance();
-        if (when != null) {
-            now.setTime(when);
-        }
+		Calendar now = Calendar.getInstance();
+		if (when != null) {
+			now.setTime(when);
+		}
 
-        Calendar then = Calendar.getInstance();
-        then.setTime(birthdate);
+		Calendar then = Calendar.getInstance();
+		then.setTime(birthdate);
 
-        int ageInMonths = 0;
-        while (!then.after(now)) {
-            then.add(Calendar.MONTH, 1);
-            ageInMonths++;
-        }
-        ageInMonths--;
+		int ageInMonths = 0;
+		while (!then.after(now)) {
+			then.add(Calendar.MONTH, 1);
+			ageInMonths++;
+		}
+		ageInMonths--;
 
-        if (ageInMonths < 18) {
-            return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
-        }
+		if (ageInMonths < 18) {
+			return MohEvaluableNameConstants.AgeGroup.UNDER_EIGHTEEN_MONTHS;
+		}
 
-        if (ageInMonths < 60) {
-            return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
-        }
+		if (ageInMonths < 60) {
+			return MohEvaluableNameConstants.AgeGroup.EIGHTEEN_MONTHS_TO_FIVE_YEARS;
+		}
 
-        if (ageInMonths < 144) {
-            return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
-        }
+		if (ageInMonths < 144) {
+			return MohEvaluableNameConstants.AgeGroup.FIVE_YEARS_TO_TWELVE_YEARS;
+		}
 
-        return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
-    }
+		return MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
+	}
 
 	/**
 	 * helper method to reduce code for validation methods
@@ -187,5 +197,36 @@ public class MOHReportUtil {
 	 */
 	public static boolean compareConceptToName(Concept concept, String name) {
 		return OpenmrsUtil.nullSafeEquals(concept, MohCacheUtils.getConcept(name));
+	}
+
+
+	public static SortedSetMap<Integer, DrugSnapshot> getARVSnapshotsMap() {
+		return getARVSnapshotsMap(null);
+	}
+
+	/**
+	 * gets ARV-related DrugSnapshots mapped to persons
+	 */
+	public static SortedSetMap<Integer, DrugSnapshot> getARVSnapshotsMap(Cohort cohort) {
+
+		Properties params = new Properties();
+		params.put("drugs", DrugEventBuilder.ARV_DRUGS);
+		if (cohort != null) {
+			params.put("cohort", cohort);
+		}
+
+		List<DrugSnapshot> snapshots = Context.getService(DrugSnapshotService.class).getDrugSnapshots(params);
+
+		SortedSetMap<Integer, DrugSnapshot> m = new SortedSetMap<Integer, DrugSnapshot>();
+		m.setSetComparator(new DrugSnapshotDateComparator());
+
+		for (DrugSnapshot snapshot : snapshots) {
+			Set<Concept> s = new HashSet<Concept>(snapshot.getConcepts());
+			s.retainAll(DrugEventBuilder.ARV_DRUGS);
+			if (s.size() >= 3) {
+				m.putInList(snapshot.getPerson().getPersonId(), snapshot);
+			}
+		}
+		return m;
 	}
 }

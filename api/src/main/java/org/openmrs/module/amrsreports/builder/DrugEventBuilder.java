@@ -22,13 +22,14 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
+import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.drughistory.DrugEventTrigger;
 import org.openmrs.module.drughistory.DrugEventType;
 import org.openmrs.module.drughistory.DrugSnapshot;
 import org.openmrs.module.drughistory.api.DrugEventService;
 import org.openmrs.module.drughistory.api.DrugSnapshotService;
-import org.openmrs.module.reporting.common.ListMap;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,13 +71,7 @@ public class DrugEventBuilder {
 	private static DrugEventBuilder instance;
 	private DrugSnapshotService drugSnapshotService;
 
-	public static DrugEventBuilder getInstance() {
-		if (instance == null)
-			instance = new DrugEventBuilder();
-		return instance;
-	}
-
-	private DrugEventBuilder() {
+	static {
 
 		ARV_DRUGS = new HashSet<Concept>(Arrays.asList(
 				MohCacheUtils.getConcept(DRUG_ABACAVIR),
@@ -101,42 +96,48 @@ public class DrugEventBuilder {
 		));
 
 		QUESTIONS_START = new HashSet<Concept>(Arrays.asList(
-				getConcept(1250),
-				getConcept(1895)
+				MohCacheUtils.getConcept(1250),
+				MohCacheUtils.getConcept(1895)
 		));
 
 		QUESTIONS_CONTINUE = new HashSet<Concept>(Arrays.asList(
-				getConcept(966),
-				getConcept(1088),
-				getConcept(2154)
+				MohCacheUtils.getConcept(966),
+				MohCacheUtils.getConcept(1088),
+				MohCacheUtils.getConcept(2154)
 		));
 
 		QUESTIONS_STOP = new HashSet<Concept>(Arrays.asList(
-				getConcept(1086),
-				getConcept(1087),
-				getConcept(2157)
+				MohCacheUtils.getConcept(1086),
+				MohCacheUtils.getConcept(1087),
+				MohCacheUtils.getConcept(2157)
 		));
 
 		drugAnswers = new HashMap<String, Set<Concept>>();
-		drugAnswers.put(DRUG_ABACAVIR, getConcepts(814, 817, 6679));
-		drugAnswers.put(DRUG_ATAZANAVIR, getConcepts(6159, 6160));
-		drugAnswers.put(DRUG_DARUNAVIR, getConcepts(6157));
-		drugAnswers.put(DRUG_DIDANOSINE, getConcepts(796));
-		drugAnswers.put(DRUG_EFAVIRENZ, getConcepts(633, 6964));
-		drugAnswers.put(DRUG_EMTRICITABINE, getConcepts(791, 6180));
-		drugAnswers.put(DRUG_ETRAVIRINE, getConcepts(6158));
-		drugAnswers.put(DRUG_INDINAVIR, getConcepts(749));
-		drugAnswers.put(DRUG_LAMIVUDINE, getConcepts(628, 630, 792, 817, 1400, 6467, 6679, 6964, 6965));
-		drugAnswers.put(DRUG_LOPINAVIR, getConcepts(794, 9026));
-		drugAnswers.put(DRUG_NELFINAVIR, getConcepts(635));
-		drugAnswers.put(DRUG_NEVIRAPINE, getConcepts(631, 792, 6467));
-		drugAnswers.put(DRUG_RALTEGRAVIR, getConcepts(6156));
-		drugAnswers.put(DRUG_RITONAVIR, getConcepts(794, 795, 6160));
-		drugAnswers.put(DRUG_STAVUDINE, getConcepts(625, 792, 6965));
-		drugAnswers.put(DRUG_TENOFOVIR, getConcepts(802, 1400, 6180, 6964));
-		drugAnswers.put(DRUG_ZIDOVUDINE, getConcepts(630, 797, 817, 6467));
-		drugAnswers.put(DRUG_UNKNOWN, getConcepts(5811));
-		drugAnswers.put(DRUG_OTHER, getConcepts(5424));
+		drugAnswers.put(DRUG_ABACAVIR, MohCacheUtils.getConcepts(814, 817, 6679));
+		drugAnswers.put(DRUG_ATAZANAVIR, MohCacheUtils.getConcepts(6159, 6160));
+		drugAnswers.put(DRUG_DARUNAVIR, MohCacheUtils.getConcepts(6157));
+		drugAnswers.put(DRUG_DIDANOSINE, MohCacheUtils.getConcepts(796));
+		drugAnswers.put(DRUG_EFAVIRENZ, MohCacheUtils.getConcepts(633, 6964));
+		drugAnswers.put(DRUG_EMTRICITABINE, MohCacheUtils.getConcepts(791, 6180));
+		drugAnswers.put(DRUG_ETRAVIRINE, MohCacheUtils.getConcepts(6158));
+		drugAnswers.put(DRUG_INDINAVIR, MohCacheUtils.getConcepts(749));
+		drugAnswers.put(DRUG_LAMIVUDINE, MohCacheUtils.getConcepts(628, 630, 792, 817, 1400, 6467, 6679, 6964, 6965));
+		drugAnswers.put(DRUG_LOPINAVIR, MohCacheUtils.getConcepts(794, 9026));
+		drugAnswers.put(DRUG_NELFINAVIR, MohCacheUtils.getConcepts(635));
+		drugAnswers.put(DRUG_NEVIRAPINE, MohCacheUtils.getConcepts(631, 792, 6467));
+		drugAnswers.put(DRUG_RALTEGRAVIR, MohCacheUtils.getConcepts(6156));
+		drugAnswers.put(DRUG_RITONAVIR, MohCacheUtils.getConcepts(794, 795, 6160));
+		drugAnswers.put(DRUG_STAVUDINE, MohCacheUtils.getConcepts(625, 792, 6965));
+		drugAnswers.put(DRUG_TENOFOVIR, MohCacheUtils.getConcepts(802, 1400, 6180, 6964));
+		drugAnswers.put(DRUG_ZIDOVUDINE, MohCacheUtils.getConcepts(630, 797, 817, 6467));
+		drugAnswers.put(DRUG_UNKNOWN, MohCacheUtils.getConcepts(5811));
+		drugAnswers.put(DRUG_OTHER, MohCacheUtils.getConcepts(5424));
+	}
+
+	public static DrugEventBuilder getInstance() {
+		if (instance == null)
+			instance = new DrugEventBuilder();
+		return instance;
 	}
 
 	/**
@@ -175,35 +176,32 @@ public class DrugEventBuilder {
 		getDrugSnapshotService().generateDrugSnapshots(null);
 
 		// find first ART dates
-		Properties params = new Properties();
-		params.put("drugs", ARV_DRUGS);
-//		params.put("atLeast", 3);
-
-		List<DrugSnapshot> snapshots = getDrugSnapshotService().getDrugSnapshots(params);
-
 		// allocate snapshots to individuals and trim to those we care about
-		ListMap<Person, DrugSnapshot> m = new ListMap<Person, DrugSnapshot>();
+		SortedSetMap<Person, DrugSnapshot> m = MOHReportUtil.getARVSnapshotsMap();
 
-		for (DrugSnapshot snapshot : snapshots) {
-			Set<Concept> s = new HashSet<Concept>(snapshot.getConcepts());
-			s.retainAll(ARV_DRUGS);
-			if (s.size() >= 3) {
-				m.putInList(snapshot.getPerson(), snapshot);
-			}
-		}
-
-		// add dates to HIV Care Enrollment records
+		// add dates and locations to HIV Care Enrollment records
 		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
 		for (Person p : m.keySet()) {
-			Patient pt = Context.getPatientService().getPatient(p.getPersonId());
-			if (pt != null) {
-				HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);
-				if (hce == null) {
-					hce = new HIVCareEnrollment();
-					hce.setPatient(pt);
+			// make sure we have a snapshot to work with
+			DrugSnapshot ds = m.get(p).first();
+			if (ds != null) {
+				// find the relevant patient
+				Patient pt = Context.getPatientService().getPatient(p.getPersonId());
+				if (pt != null) {
+					// get the enrollment info or make a new one
+					HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);
+					if (hce == null) {
+						hce = new HIVCareEnrollment();
+						hce.setPatient(pt);
+					}
+					// set date and location of first ARVs
+					hce.setFirstARVDate(ds.getDateTaken());
+					if (ds.getEncounter() != null) {
+						hce.setFirstARVLocation(ds.getEncounter().getLocation());
+					}
+					// save it
+					hceService.saveHIVCareEnrollment(hce);
 				}
-				hce.setFirstARVDate(m.get(p).get(0).getDateTaken());
-				hceService.saveHIVCareEnrollment(hce);
 			}
 		}
 	}
@@ -256,15 +254,4 @@ public class DrugEventBuilder {
 		return drugSnapshotService;
 	}
 
-	private Concept getConcept(int conceptId) {
-		return getConceptService().getConcept(conceptId);
-	}
-
-	private Set<Concept> getConcepts(Integer... conceptIds) {
-		Set<Concept> c = new HashSet<Concept>();
-		for (Integer conceptId : conceptIds) {
-			c.add(getConcept(conceptId));
-		}
-		return c;
-	}
 }
