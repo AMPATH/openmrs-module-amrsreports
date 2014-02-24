@@ -321,6 +321,19 @@ public interface MohEvaluableNameConstants {
     public static final String ISONIAZID = "ISONIAZID";
 
 
+    //Constants for TB Status
+    public static final String PATIENT_REPORTED_X_RAY_CHEST = "PATIENT REPORTED X-RAY, CHEST";
+    public static final String NORMAL = "NORMAL";
+    public static final String SPUTUM_FOR_AFB = "SPUTUM FOR AFB";
+    public static final String COUGH_DURATION_CODED = "COUGH DURATION, CODED";
+    public static final String WEEKS = "WEEKS";
+    public static final String MONTHS = "MONTHS";
+    public static final String CONTINUOUS = "CONTINUOUS";
+    public static final String REVIEW_OF_SYSTEMS_GENERAL = "REVIEW OF SYSTEMS, GENERAL";
+    public static final String COUGH_FOR_MORE_THAN_TWO_WEEKS = "COUGH FOR MORE THAN TWO WEEKS";
+    public static final String STOP_ALL_MEDICATIONS = "STOP ALL MEDICATIONS";
+    public static final String NOT_DONE = "NOT DONE";
+
 	// Age group for use in some rules
 	public static enum AgeGroup {
 		UNDER_EIGHTEEN_MONTHS,
