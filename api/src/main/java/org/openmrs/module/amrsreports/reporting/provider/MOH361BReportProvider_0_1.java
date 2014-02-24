@@ -17,6 +17,7 @@ import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConver
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
+import org.openmrs.module.amrsreports.reporting.converter.RegimenHistoryConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
@@ -25,10 +26,12 @@ import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinitio
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.RegimenHistoryDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.drughistory.Regimen;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
@@ -209,6 +212,9 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
+
+		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
+		dsd.addColumn("Original Regimen", regimenHistory, nullString, new RegimenHistoryConverter(Regimen.LINE_FIRST, 0));
 
 		report.addDataSetDefinition(dsd, null);
 
