@@ -17,6 +17,7 @@ import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValue
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
+import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
@@ -203,7 +204,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
         // Add  columns for sort order (used for sorting, not needed in output)
-        dsd.addColumn("Transfer Status", new TransferStatusDataDefinition(), "facility=${facility}");
+        dsd.addColumn("Transfer Status", new ARTTransferStatusDataDefinition(), "facility=${facility}");
 
         Map<String, Object> mappings = new HashMap<String, Object>();
         mappings.put("facility", "${facility}");
