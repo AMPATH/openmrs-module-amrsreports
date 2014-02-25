@@ -19,23 +19,23 @@ import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.model.SortedObsFromDate;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.reporting.data.converter.DataConverter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class TBStatusConverter extends ObsValueNumericConverter {
+public class TBStatusConverter implements DataConverter {
 
     //Define string constants for status codes
-    private static final String NO_SIGNS_AND_SYMPTOMS = "No Signs";
-    private static final String TB_SUSPECT = "TB Suspect";
-    private static final String ON_TREATMENT = "On TB Treatment";
-    private static final String SCREENING_NOT_DONE = "Screening not done";
+    public static final String NO_SIGNS_AND_SYMPTOMS = "1-No Signs and symptoms";
+    public static final String TB_SUSPECT = "2-TB Suspect";
+    public static final String ON_TREATMENT = "3-On TB Treatment";
+    public static final String SCREENING_NOT_DONE = "4-TB Screening not done";
 	private int interval = 0;
 
-	public TBStatusConverter(int precision, int interval) {
-		this.setPrecision(precision);
+	public TBStatusConverter(int interval) {
 		this.setInterval(interval);
 	}
 
@@ -144,13 +144,12 @@ public class TBStatusConverter extends ObsValueNumericConverter {
 		if (obs == null)
 			return null;
 
-		Object o = super.convert(obs);
+		String statusCode = getTBStatusCode(obs);
 
-		if (o == null)
+		if (statusCode.equals(null))
 			return null;
 
-		return String.format("Mth %d) %s", interval, o);
-//		return String.format("%s - %s", MOHReportUtil.formatdates(obs.getObsDatetime()), o);
+		return String.format("Mth %d) %s", interval, statusCode);
 	}
 
 	@Override
@@ -171,7 +170,7 @@ public class TBStatusConverter extends ObsValueNumericConverter {
 		this.interval = interval;
 	}
 
-    protected String getStatusCode(Obs obs){
+    protected String getTBStatusCode(Obs obs){
 
         Integer conceptId = obs.getConcept().getConceptId();
         Integer conceptAnswer = obs.getValueCoded().getConceptId();
