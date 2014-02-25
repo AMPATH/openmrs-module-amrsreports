@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <amrsreports_hiv_care_enrollment enrollment_id="1" patient_id="6" first_arv_date="2004-07-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="2" patient_id="7" first_arv_date="2004-08-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="3" patient_id="8" first_arv_date="2004-09-15" />
+  <amrsreports_hiv_care_enrollment enrollment_id="4" patient_id="9" first_arv_date="2005-07-15" />
+</dataset>
+
+
+

@@ -19,17 +19,21 @@ import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValue
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
+import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.DateARTStartedSortOrderDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
@@ -52,6 +56,8 @@ import org.openmrs.util.OpenmrsClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -79,6 +85,11 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// set up the DSD
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
 		dsd.setName("allPatients");
+
+        // sort by serial number, then by date
+        dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
+        dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.DESC);
+        dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
 
@@ -198,6 +209,17 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		sixMonthWeight.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.WEIGHT));
 		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
+        // Add  columns for sort order (used for sorting, not needed in output)
+        dsd.addColumn("Transfer Status", new ARTTransferStatusDataDefinition(), "facility=${facility}");
+
+        Map<String, Object> mappings = new HashMap<String, Object>();
+        mappings.put("facility", "${facility}");
+
+        dsd.addColumn("Year Month Sorting",new DateARTStartedSortOrderDataDefinition(),nullString);
+
+
+
+
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
 
@@ -210,7 +232,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
 
-		report.addDataSetDefinition(dsd, null);
+        report.addDataSetDefinition(dsd, mappings);
 
 		return report;
 	}

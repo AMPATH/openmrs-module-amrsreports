@@ -34,19 +34,18 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
 		StringBuilder hql = new StringBuilder();
-		Map<String, Object> m = new HashMap<String, Object>();
-
-		hql.append("select hce.patient.patientId, hce.firstARVDate");
-		hql.append(" from HIVCareEnrollment as hce");
+		hql.append("select patient.id, firstARVDate");
+		hql.append(" from HIVCareEnrollment");
 		hql.append(" where");
+		hql.append("   patient.id in (:patientIds)");
+		hql.append("   and firstARVDate <= :onOrBefore");
 
-		hql.append(" hce.patient.patientId in (:patientIds)");
+		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("patientIds", context.getBaseCohort());
-
-		hql.append(" and hce.firstARVDate <= :onOrBefore");
 		m.put("onOrBefore", context.getEvaluationDate());
 
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
+
 
 		for (Object o : queryResult) {
 			Object[] parts = (Object[]) o;
