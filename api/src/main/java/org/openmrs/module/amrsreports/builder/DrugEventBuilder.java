@@ -17,7 +17,6 @@ package org.openmrs.module.amrsreports.builder;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
-import org.openmrs.Person;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
@@ -34,9 +33,7 @@ import org.openmrs.module.drughistory.api.DrugSnapshotService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 public class DrugEventBuilder {
@@ -177,16 +174,16 @@ public class DrugEventBuilder {
 
 		// find first ART dates
 		// allocate snapshots to individuals and trim to those we care about
-		SortedSetMap<Person, DrugSnapshot> m = MOHReportUtil.getARVSnapshotsMap();
+		SortedSetMap<Integer, DrugSnapshot> m = MOHReportUtil.getARVSnapshotsMap();
 
 		// add dates and locations to HIV Care Enrollment records
 		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
-		for (Person p : m.keySet()) {
+		for (Integer pId : m.keySet()) {
 			// make sure we have a snapshot to work with
-			DrugSnapshot ds = m.get(p).first();
+			DrugSnapshot ds = m.get(pId).first();
 			if (ds != null) {
 				// find the relevant patient
-				Patient pt = Context.getPatientService().getPatient(p.getPersonId());
+				Patient pt = Context.getPatientService().getPatient(pId);
 				if (pt != null) {
 					// get the enrollment info or make a new one
 					HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);

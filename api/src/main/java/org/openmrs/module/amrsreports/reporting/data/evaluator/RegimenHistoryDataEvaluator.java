@@ -14,7 +14,7 @@
 
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Obs;
@@ -65,7 +65,7 @@ public class RegimenHistoryDataEvaluator implements PersonDataEvaluator {
 		for (Integer pId : snapshots.keySet()) {
 			if (snapshots.get(pId) != null) {
 				Iterator<DrugSnapshot> dsI = snapshots.get(pId).iterator();
-				Iterator<Obs> oI = reasons.containsKey(pId) ? reasons.get(pId).iterator() : Iterators.<Obs>empty();
+				Iterator<Obs> oI = reasons.containsKey(pId) ? reasons.get(pId).iterator() : IteratorUtils.emptyIterator();
 
 				List<RegimenChange> res = new ArrayList<RegimenChange>();
 				while (dsI.hasNext()) {
