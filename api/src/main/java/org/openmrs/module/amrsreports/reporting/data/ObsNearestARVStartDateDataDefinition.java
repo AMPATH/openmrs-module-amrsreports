@@ -15,16 +15,18 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
 import org.openmrs.Concept;
-import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
+import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class ObsNearestARVStartDateDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@ConfigurationProperty(required = true)
