@@ -16,7 +16,6 @@ package org.openmrs.module.amrsreports;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.Activator;
-import org.openmrs.module.amrsreports.reporting.provider.JerTestReportProvider;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider_0_1;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361AReportProvider_0_2;
 import org.openmrs.module.amrsreports.reporting.provider.MOH361BReportProvider_0_1;
@@ -28,9 +27,9 @@ import org.openmrs.module.amrsreports.util.TaskRunnerThread;
  */
 @SuppressWarnings("deprecation")
 public class AmrsReportModuleActivator implements Activator {
-	
+
 	private Log log = LogFactory.getLog(this.getClass());
-	
+
 	/**
 	 * @see org.openmrs.module.Activator#startup()
 	 */
@@ -41,9 +40,8 @@ public class AmrsReportModuleActivator implements Activator {
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider_0_1());
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361AReportProvider_0_2());
 		ReportProviderRegistrar.getInstance().registerReportProvider(new MOH361BReportProvider_0_1());
-		ReportProviderRegistrar.getInstance().registerReportProvider(new JerTestReportProvider());
 	}
-	
+
 	/**
 	 * @see org.openmrs.module.Activator#shutdown()
 	 */
@@ -56,5 +54,5 @@ public class AmrsReportModuleActivator implements Activator {
 			log.warn("problem destroying Task Runner Thread instance", throwable);
 		}
 	}
-	
+
 }

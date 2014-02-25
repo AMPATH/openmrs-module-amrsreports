@@ -143,7 +143,6 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 			return null;
 
 		return String.format("Mth %d) %s", interval, o);
-//		return String.format("%s - %s", MOHReportUtil.formatdates(obs.getObsDatetime()), o);
 	}
 
 	@Override

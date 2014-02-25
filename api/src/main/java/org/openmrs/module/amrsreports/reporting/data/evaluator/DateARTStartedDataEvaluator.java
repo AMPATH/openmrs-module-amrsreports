@@ -2,8 +2,6 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -42,13 +40,10 @@ public class DateARTStartedDataEvaluator implements PersonDataEvaluator {
 		hql.append(" from HIVCareEnrollment as hce");
 		hql.append(" where");
 
-		hql.append(" hce.patient.patientId in (" +
-				"	SELECT elements(c.memberIds) from Cohort as c" +
-				"	where c.uuid = :cohortUuid" +
-				") ");
-		m.put("cohortUuid", AmrsReportsConstants.SAVED_COHORT_UUID);
+		hql.append(" hce.patient.patientId in (:patientIds)");
+		m.put("patientIds", context.getBaseCohort());
 
-		hql.append("and hce.firstARVDate <= :onOrBefore ");
+		hql.append(" and hce.firstARVDate <= :onOrBefore");
 		m.put("onOrBefore", context.getEvaluationDate());
 
 		List<Object> queryResult = qs.executeHqlQuery(hql.toString(), m);
