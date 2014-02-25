@@ -27,23 +27,14 @@ public class PersonAddressConverter implements DataConverter {
 
 	/**
 	 * Convert the address into a readable format.  We are using the built-in Kenya template format, but doing it by hand.
-	 * <p/>
-	 * <pre>
-	 * <lineByLineFormat>
-	 *     <string>address1</string>
-	 *     <string>address2</string>
-	 *     <string>address3 cityVillage</string>
-	 *     <string>address5 address6</string>
-	 *     <string>address4 countyDistrict</string>
-	 *     <string>stateProvince postalCode</string>
-	 *     <string>latitude longitude</string>
-	 *     <string>country</string>
-	 * </lineByLineFormat>
-	 * </pre>
 	 *
-	 * @should not include blank lines if data does not exist for that line
-	 * @should not have lines with leading or trailing spaces
-	 * @should return null for a null input
+	 * Village: {cityVillage}
+	 * Sublocation: {address5}, Location: {address6}
+	 * Division: {address4}, District: {countyDistrict}
+	 * Province: {stateProvince}, Postal Code: {postalCode}
+	 * GPS: {latitude}, {longitude}
+	 * Country: {country}
+	 *
 	 * @should fill in an address in the Kenyan format
 	 */
 	@Override
@@ -51,17 +42,20 @@ public class PersonAddressConverter implements DataConverter {
 		if (original == null)
 			return null;
 
+		String nullValue = "___";
+		
 		PersonAddress pa = (PersonAddress) original;
 		List<String> lines = new ArrayList<String>();
 
-		lines.add(ObjectUtil.nvlStr(pa.getAddress1(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getAddress2(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getAddress3(), "") + " " + ObjectUtil.nvlStr(pa.getCityVillage(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getAddress5(), "") + " " + ObjectUtil.nvlStr(pa.getAddress6(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getAddress4(), "") + " " + ObjectUtil.nvlStr(pa.getCountyDistrict(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getStateProvince(), "") + " " + ObjectUtil.nvlStr(pa.getPostalCode(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getLatitude(), "") + " " + ObjectUtil.nvlStr(pa.getLongitude(), ""));
-		lines.add(ObjectUtil.nvlStr(pa.getCountry(), ""));
+		lines.add("Village: " + ObjectUtil.nvlStr(pa.getCityVillage(), nullValue));
+		lines.add("Sublocation: " + ObjectUtil.nvlStr(pa.getAddress5(), nullValue) +
+				", Location: " + ObjectUtil.nvlStr(pa.getAddress6(), nullValue));
+		lines.add("Division: " + ObjectUtil.nvlStr(pa.getAddress4(), nullValue) +
+				", District: " + ObjectUtil.nvlStr(pa.getCountyDistrict(), nullValue));
+		lines.add("Province: " + ObjectUtil.nvlStr(pa.getStateProvince(), nullValue) +
+				", Postal Code: " + ObjectUtil.nvlStr(pa.getPostalCode(), nullValue));
+		lines.add("GPS: " + ObjectUtil.nvlStr(pa.getLatitude(), nullValue) + ", " + ObjectUtil.nvlStr(pa.getLongitude(), nullValue));
+		lines.add("Country: " + ObjectUtil.nvlStr(pa.getCountry(), nullValue));
 
 		List<String> out = new ArrayList<String>();
 

@@ -14,59 +14,14 @@
 
 package org.openmrs.module.amrsreports.reporting.converter;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.PersonAddress;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
-import org.openmrs.module.reporting.common.ObjectUtil;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class PersonAddressConverterTest {
-	/**
-	 * @verifies not include blank lines if data does not exist for that line
-	 * @see PersonAddressConverter#convert(Object)
-	 */
-	@Test
-	public void convert_shouldNotIncludeBlankLinesIfDataDoesNotExistForThatLine() throws Exception {
-		PersonAddress pa = new PersonAddress();
-		pa.setAddress1("Foo");
-		pa.setAddress2("Bar");
-
-		String expected = MOHReportUtil.joinAsSingleCell("Foo", "Bar");
-		String actual = (String) new PersonAddressConverter().convert(pa);
-
-		assertThat(actual, is(expected));
-	}
-
-	/**
-	 * @verifies not have lines with leading or trailing spaces
-	 * @see PersonAddressConverter#convert(Object)
-	 */
-	@Test
-	public void convert_shouldNotHaveLinesWithLeadingOrTrailingSpaces() throws Exception {
-		PersonAddress pa = new PersonAddress();
-		pa.setAddress3("Foo");
-		pa.setAddress6("Bar");
-
-		String expected = MOHReportUtil.joinAsSingleCell("Foo", "Bar");
-		String actual = (String) new PersonAddressConverter().convert(pa);
-
-		assertThat(actual, is(expected));
-	}
-
-	/**
-	 * @verifies return null for a null input
-	 * @see PersonAddressConverter#convert(Object)
-	 */
-	@Test
-	public void convert_shouldReturnNullForANullInput() throws Exception {
-		String expected = null;
-		String actual = (String) new PersonAddressConverter().convert(null);
-		assertThat(actual, is(expected));
-	}
-
 	/**
 	 * @verifies fill in an address in the Kenyan format
 	 * @see PersonAddressConverter#convert(Object)
@@ -89,14 +44,12 @@ public class PersonAddressConverterTest {
 		pa.setCountry("M");
 
 		String expected = MOHReportUtil.joinAsSingleCell(
-				"A",
-				"B",
-				"C D",
-				"E F",
-				"G H",
-				"I J",
-				"K L",
-				"M"
+				"Village: D",
+				"Sublocation: E, Location: F",
+				"Division: G, District: H",
+				"Province: I, Postal Code: J",
+				"GPS: K, L",
+				"Country: M"
 		);
 
 		String actual = (String) new PersonAddressConverter().convert(pa);
