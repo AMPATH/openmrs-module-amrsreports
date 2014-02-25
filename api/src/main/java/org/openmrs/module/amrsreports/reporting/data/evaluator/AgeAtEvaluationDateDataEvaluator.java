@@ -3,10 +3,8 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.CohortRestrictedBirthdateDataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateToAgeConverter;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
-import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
@@ -27,7 +25,7 @@ public class AgeAtEvaluationDateDataEvaluator implements PersonDataEvaluator {
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
-		EvaluatedPersonData c = Context.getService(PersonDataService.class).evaluate(new CohortRestrictedBirthdateDataDefinition(), context);
+		EvaluatedPersonData c = Context.getService(PersonDataService.class).evaluate(new BirthdateDataDefinition(), context);
 		AgeAtEvaluationDateDataDefinition add = (AgeAtEvaluationDateDataDefinition) definition;
 
 		BirthdateToAgeConverter converter = new BirthdateToAgeConverter(context.getEvaluationDate());

@@ -1,7 +1,9 @@
 package org.openmrs.module.amrsreports.reporting.provider;
 
 import org.apache.commons.io.IOUtils;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -31,6 +33,8 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DateConverter;
+import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.converter.PropertyConverter;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
@@ -88,25 +92,27 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Date ART Started", dateARTStartedDataDefinition, nullString);
 
 		// c. Unique Patient Number
+
+		PropertyConverter identifierConverter = new PropertyConverter(PatientIdentifier.class, "identifier");
 		PatientIdentifierType pit = service.getCCCNumberIdentifierType();
 		PatientIdentifierDataDefinition cccColumn = new PatientIdentifierDataDefinition("CCC", pit);
 		cccColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("Unique Patient Number", cccColumn, nullString);
+		dsd.addColumn("Unique Patient Number", cccColumn, nullString, identifierConverter);
 
 		// AMRS Universal ID
 		PatientIdentifierDataDefinition uidColumn = new PatientIdentifierDataDefinition(
 				"AMRS Universal ID", Context.getPatientService().getPatientIdentifierType(8));
 		uidColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("AMRS Universal ID", uidColumn, nullString);
+		dsd.addColumn("AMRS Universal ID", uidColumn, nullString, identifierConverter);
 
 		// AMRS Medical Record Number
 		PatientIdentifierDataDefinition mrnColumn = new PatientIdentifierDataDefinition(
 				"AMRS Medical Record Number", Context.getPatientService().getPatientIdentifierType(3));
 		mrnColumn.setIncludeFirstNonNullOnly(true);
-		dsd.addColumn("AMRS Medical Record Number", mrnColumn, nullString);
+		dsd.addColumn("AMRS Medical Record Number", mrnColumn, nullString, identifierConverter);
 
 		// d. Patient's Name
-		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString);
+		dsd.addColumn("Name", new PreferredNameDataDefinition(), nullString, new ObjectFormatter());
 
 		// e. Sex
 		dsd.addColumn("Sex", new GenderDataDefinition(), nullString);
@@ -125,7 +131,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// g2. Phone Number
 		PersonAttributeType pat = Context.getPersonService().getPersonAttributeTypeByName(CONTACT_PHONE_ATTRIBUTE_TYPE);
 		PersonAttributeDataDefinition patientPhoneContact = new PersonAttributeDataDefinition(pat);
-		dsd.addColumn("Phone Number", patientPhoneContact, nullString);
+		dsd.addColumn("Phone Number", patientPhoneContact, nullString, new PropertyConverter(PersonAttribute.class, "value"));
 
 		// h. Reason for Eligibility
 
