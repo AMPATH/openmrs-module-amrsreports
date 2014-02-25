@@ -39,6 +39,10 @@ import java.util.Map;
 @Handler(supports = TBStatusDataDefinition.class, order = 50)
 public class TBStatusDataEvaluator implements PersonDataEvaluator {
 
+	public TBStatusDataEvaluator() {
+		super();
+	}
+
 	/**
 	 * @should return the obs that match the passed definition configuration
 	 * @see org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator#evaluate(org.openmrs.module.reporting.data.person.definition.PersonDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)

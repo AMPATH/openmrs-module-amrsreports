@@ -28,11 +28,11 @@ import java.util.List;
 
 public class TBStatusConverter implements DataConverter {
 
-    //Define string constants for status codes
-    public static final String NO_SIGNS_AND_SYMPTOMS = "1-No Signs and symptoms";
-    public static final String TB_SUSPECT = "2-TB Suspect";
-    public static final String ON_TREATMENT = "3-On TB Treatment";
-    public static final String SCREENING_NOT_DONE = "4-TB Screening not done";
+	//Define string constants for status codes
+	public static final String NO_SIGNS_AND_SYMPTOMS = "1-No Signs and symptoms";
+	public static final String TB_SUSPECT = "2-TB Suspect";
+	public static final String ON_TREATMENT = "3-On TB Treatment";
+	public static final String SCREENING_NOT_DONE = "4-TB Screening not done";
 	private int interval = 0;
 
 	public TBStatusConverter(int interval) {
@@ -170,74 +170,74 @@ public class TBStatusConverter implements DataConverter {
 		this.interval = interval;
 	}
 
-    protected String getTBStatusCode(Obs obs){
+	protected String getTBStatusCode(Obs obs) {
 
-        Integer conceptId = obs.getConcept().getConceptId();
-        Integer conceptAnswer = obs.getValueCoded().getConceptId();
+		Integer conceptId = obs.getConcept().getConceptId();
+		Integer conceptAnswer = obs.getValueCoded().getConceptId();
 
-        //check if answer indicates a patient is on tb treatment
-            if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.STOP_ALL_MEDICATIONS)) ){
-                return ON_TREATMENT;
-            }
+		//check if answer indicates a patient is on tb treatment
+		if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.STOP_ALL_MEDICATIONS))) {
+			return ON_TREATMENT;
+		}
 
-        //check for no signs and symptoms
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))){
-            if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))){
-                return NO_SIGNS_AND_SYMPTOMS;
-            }
-        }
+		//check for no signs and symptoms
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
+			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
+				return NO_SIGNS_AND_SYMPTOMS;
+			}
+		}
 
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))){
-            if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))){
-               return NO_SIGNS_AND_SYMPTOMS;
-            }
-        }
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
+				return NO_SIGNS_AND_SYMPTOMS;
+			}
+		}
 
-       //check if it is TB suspect cases
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_DURATION_CODED))){
-            if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.WEEKS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.MONTHS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.CONTINUOUS)) ){
-                return TB_SUSPECT;
-            }
-        }
+		//check if it is TB suspect cases
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_DURATION_CODED))) {
+			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.WEEKS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.MONTHS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.CONTINUOUS))) {
+				return TB_SUSPECT;
+			}
+		}
 
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))){
-            if(!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))){
-                return TB_SUSPECT;
-            }
-        }
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
+				return TB_SUSPECT;
+			}
+		}
 
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REVIEW_OF_SYSTEMS_GENERAL))){
-            if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_FOR_MORE_THAN_TWO_WEEKS)) ){
-                return TB_SUSPECT;
-            }
-        }
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REVIEW_OF_SYSTEMS_GENERAL))) {
+			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_FOR_MORE_THAN_TWO_WEEKS))) {
+				return TB_SUSPECT;
+			}
+		}
 
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))){
-            if(!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL)) ){
-                return TB_SUSPECT;
-            }
-        }
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
+			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
+				return TB_SUSPECT;
+			}
+		}
 
-       //check for On Treatment
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED))){
-            if(!conceptAnswer.equals(null)){
-                return ON_TREATMENT;
-            }
-        }
+		//check for On Treatment
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED))) {
+			if (!conceptAnswer.equals(null)) {
+				return ON_TREATMENT;
+			}
+		}
 
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN))){
-            if(!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE)) ){
-                return ON_TREATMENT;
-            }
-        }
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN))) {
+			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE))) {
+				return ON_TREATMENT;
+			}
+		}
 
-        //Check if concept suggests TB screening not done
-        if(conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))){
-            if(!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))){
-                return SCREENING_NOT_DONE;
-            }
-        }
+		//Check if concept suggests TB screening not done
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
+				return SCREENING_NOT_DONE;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 }
