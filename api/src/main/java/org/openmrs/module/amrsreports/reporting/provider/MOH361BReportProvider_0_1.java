@@ -12,6 +12,7 @@ import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARTMonthZeroConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConverter;
@@ -19,17 +20,21 @@ import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumeri
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
 import org.openmrs.module.amrsreports.reporting.converter.RegimenHistoryConverter;
+import org.openmrs.module.amrsreports.reporting.converter.TBStatusConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
+import org.openmrs.module.amrsreports.reporting.data.ARTSerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.RegimenHistoryDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TBStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -102,16 +107,18 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.DESC);
 		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
+
+		// a. Serial Number
+		dsd.addColumn("Serial Number", new ARTSerialNumberDataDefinition(), "facility=${facility}");
 
 		// patient id ... until we get this thing working proper
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
-		//save definition in a variable
-		DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
-
 		// b. Date ART started (Transfer to ART register)
+		DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
 		dsd.addColumn("Date ART Started", dateARTStartedDataDefinition, nullString);
 
 		// c. Unique Patient Number
@@ -157,6 +164,8 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString, new PropertyConverter(PersonAttribute.class, "value"));
 
 		// h. Reason for Eligibility
+		EligibilityForARTDataDefinition eligibility = new EligibilityForARTDataDefinition();
+		dsd.addColumn("Reason Medically Eligible for ART", eligibility, nullString, new ARVPatientSnapshotReasonConverter());
 
 		// i. WHO Stage at start of ARVs
 		ObsNearestARVStartDateDataDefinition whoDef = new ObsNearestARVStartDateDataDefinition(
@@ -223,15 +232,19 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
+		dsd.addColumn("6 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(6));
 
 		dsd.addColumn("12 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 12));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 12));
+		dsd.addColumn("12 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(12));
 
 		dsd.addColumn("18 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 18));
 		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 18));
+		dsd.addColumn("18 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(18));
 
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
+		dsd.addColumn("24 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(24));
 
 		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
 		dsd.addColumn("Original Regimen", regimenHistory, nullString, new RegimenHistoryConverter(Regimen.LINE_FIRST, 0));

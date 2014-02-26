@@ -32,7 +32,7 @@ public class TBStatusConverter implements DataConverter {
 	public static final String NO_SIGNS_AND_SYMPTOMS = "1-No Signs and symptoms";
 	public static final String TB_SUSPECT = "2-TB Suspect";
 	public static final String ON_TREATMENT = "3-On TB Treatment";
-	public static final String SCREENING_NOT_DONE = "4-TB Screening not done";
+	public static final String SCREENING_NOT_DONE = "4-TB Screening Not Done";
 	private int interval = 0;
 
 	public TBStatusConverter(int interval) {
@@ -180,6 +180,13 @@ public class TBStatusConverter implements DataConverter {
 			return ON_TREATMENT;
 		}
 
+        //Check if concept suggests TB screening not done
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
+                return SCREENING_NOT_DONE;
+            }
+        }
+
 		//check for no signs and symptoms
 		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
 			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
@@ -231,12 +238,7 @@ public class TBStatusConverter implements DataConverter {
 			}
 		}
 
-		//Check if concept suggests TB screening not done
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
-			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
-				return SCREENING_NOT_DONE;
-			}
-		}
+
 
 		return null;
 	}
