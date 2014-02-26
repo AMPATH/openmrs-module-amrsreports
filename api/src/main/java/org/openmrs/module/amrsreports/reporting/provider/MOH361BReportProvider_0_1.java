@@ -12,6 +12,8 @@ import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARTMonthZeroConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
+import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConverter;
@@ -26,6 +28,7 @@ import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefini
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.DateARTStartedDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
@@ -159,6 +162,8 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		dsd.addColumn("Phone Number", patientPhoneContact, nullString, new PropertyConverter(PersonAttribute.class, "value"));
 
 		// h. Reason for Eligibility
+		EligibilityForARTDataDefinition eligibility = new EligibilityForARTDataDefinition();
+		dsd.addColumn("Reason Medically Eligible for ART", eligibility, nullString, new ARVPatientSnapshotReasonConverter());
 
 		// i. WHO Stage at start of ARVs
 		ObsNearestARVStartDateDataDefinition whoDef = new ObsNearestARVStartDateDataDefinition(
