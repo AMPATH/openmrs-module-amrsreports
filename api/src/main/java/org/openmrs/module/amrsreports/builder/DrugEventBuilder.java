@@ -15,6 +15,8 @@
 package org.openmrs.module.amrsreports.builder;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
@@ -37,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class DrugEventBuilder {
+
+	protected final Log log = LogFactory.getLog(this.getClass());
 
 	public static final String DRUG_ABACAVIR = "ABACAVIR";
 	public static final String DRUG_ATAZANAVIR = "ATAZANAVIR";
@@ -207,6 +211,8 @@ public class DrugEventBuilder {
 	 * generates drug events based on the given drug
 	 */
 	private void updateARVs(String drug) {
+
+		log.info("Generating DrugEvents for " + drug);
 
 		// do nothing if we have no drug to work with
 		if (StringUtils.isBlank(drug))
