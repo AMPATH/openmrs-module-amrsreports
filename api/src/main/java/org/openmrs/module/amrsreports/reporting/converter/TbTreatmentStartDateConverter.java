@@ -33,11 +33,9 @@ public class TbTreatmentStartDateConverter implements DataConverter {
 			}
 		}
 
-		if (details.getTbRegNO() != null) {
-
+		if (StringUtils.isNotBlank(details.getTbRegNO())) {
             finalList.add(details.getTbRegNO());
 		}
-
 
 		return StringUtils.join(finalList, AmrsReportsConstants.INTER_CELL_SEPARATOR);
 	}

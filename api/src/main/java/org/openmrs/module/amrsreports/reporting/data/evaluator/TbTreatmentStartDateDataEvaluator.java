@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.APIException;
@@ -104,13 +105,15 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
 
 			if (!mappedStartDates.isEmpty()) {
 				startDates = safeFind(mappedStartDates, memberId);
-
 			}
 
-			String tbRegistrationNo = "";
+			String tbRegistrationNo = null;
 			if (regDetails != null) {
 				Object regNoObj = regDetails.get(memberId);
-				tbRegistrationNo = String.valueOf(regNoObj);
+				if (regNoObj != null) {
+					PersonAttribute pa = (PersonAttribute) regNoObj;
+					tbRegistrationNo = pa.getValue();
+				}
 			}
 			details.setTbRegNO(tbRegistrationNo);
 
