@@ -20,6 +20,7 @@ import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValue
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
+import org.openmrs.module.amrsreports.reporting.data.ARTSerialNumberDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
@@ -102,13 +103,14 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// set up the columns ...
 
+		// a. Serial Number
+		dsd.addColumn("Serial Number", new ARTSerialNumberDataDefinition(), "facility=${facility}");
+
 		// patient id ... until we get this thing working proper
 		dsd.addColumn("Person ID", new PersonIdDataDefinition(), nullString);
 
-		//save definition in a variable
-		DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
-
 		// b. Date ART started (Transfer to ART register)
+		DateARTStartedDataDefinition dateARTStartedDataDefinition = new DateARTStartedDataDefinition();
 		dsd.addColumn("Date ART Started", dateARTStartedDataDefinition, nullString);
 
 		// c. Unique Patient Number
