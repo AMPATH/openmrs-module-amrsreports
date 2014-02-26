@@ -18,6 +18,7 @@ import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConver
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
+import org.openmrs.module.amrsreports.reporting.converter.TBStatusConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
 import org.openmrs.module.amrsreports.reporting.data.ARTTransferStatusDataDefinition;
@@ -28,6 +29,7 @@ import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.TBStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
@@ -220,15 +222,19 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
+        dsd.addColumn("6 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(6));
 
 		dsd.addColumn("12 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 12));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 12));
+        dsd.addColumn("12 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(12));
 
 		dsd.addColumn("18 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 18));
 		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 18));
+        dsd.addColumn("18 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(18));
 
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
+        dsd.addColumn("24 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(24));
 
 		// Add  columns for sort order (used for sorting, not needed in output)
 		dsd.addColumn("Transfer Status", new ARTTransferStatusDataDefinition(), "facility=${facility}");

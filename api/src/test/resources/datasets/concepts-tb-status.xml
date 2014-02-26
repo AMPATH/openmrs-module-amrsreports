@@ -16,6 +16,7 @@
   <concept concept_id="1260" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e294-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="1118" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e295-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="1256" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e282-1250-11df-a1f1-0026b9348838"/>
+  <concept concept_id="656" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e299-1250-11df-a1f1-0026b9348838"/>
 
   <concept_name concept_id="7178" name="PATIENT REPORTED X-RAY, CHEST" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="7178" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348845" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="307" name="SPUTUM FOR AFB" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="307" voided="0" uuid="a941f4b8-1350-11df-a1f1-0026b9348846" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
@@ -33,5 +34,6 @@
   <concept_name concept_id="1260" name="STOP ALL MEDICATIONS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1260" voided="0" uuid="a941f666-1350-11df-a1f1-0026b9348859" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="1118" name="NOT DONE" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="1118" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348860" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="1256" name="START DRUGS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1256" voided="0" uuid="a941f666-1250-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="656" name="ISONIAZID" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="656" voided="0" uuid="a941f666-1250-11df-a1f1-0026b9348890" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
 
 </dataset>

@@ -112,6 +112,74 @@ public class TBStatusConverterTest extends BaseModuleContextSensitiveTest {
 		Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
 	}
 
+    /**
+     * @verifies find the observation indicating that a patient is on treatment
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldVerifyApatientOnTBTreatmentUsingTreatmentPlan() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN, MohEvaluableNameConstants.START_DRUGS, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+    }
+
+    /**
+     * @verifies a patient is on medication when valueCoded is STOP_ALL_MEDICATIONS
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldVerifyApatientOnTBTreatmentUsingSTOP_ALL_MEDICATIONS() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN, MohEvaluableNameConstants.STOP_ALL_MEDICATIONS, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient is on treatment
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldVerifyApatientOnTBTreatmentUsingTUBERCULOSIS_TREATMENT_STARTED() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED, MohEvaluableNameConstants.ISONIAZID, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+    }
+
+    /**
+     * @verifies that a patient had not undergone TB Screening
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldVerifyNotDoneResult() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.SPUTUM_FOR_AFB, MohEvaluableNameConstants.NOT_DONE, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 4-TB Screening Not Done", converter.convert(original));
+    }
+
 	private Obs makeObs(String conceptName, String conceptAnswer, Date date) {
 		Obs o = new Obs();
 		o.setConcept(MohCacheUtils.getConcept(conceptName));
