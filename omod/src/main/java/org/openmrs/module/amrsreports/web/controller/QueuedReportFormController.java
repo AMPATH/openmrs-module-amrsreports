@@ -131,7 +131,7 @@ public class QueuedReportFormController {
 			queuedReport = new QueuedReport();
 		}
 
-        if (status.equals("ERROR")) {
+        if (OpenmrsUtil.nullSafeEquals("ERROR", status)) {
             inlineInstruction = "Check the new scheduled date and submit when finished";
             queuedReport.setDateScheduled(new Date());/*
             queuedReport.setStatus(QueuedReport.STATUS_NEW);*/

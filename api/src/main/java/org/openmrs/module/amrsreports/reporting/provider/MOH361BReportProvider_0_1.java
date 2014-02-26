@@ -8,6 +8,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConceptNames;
+import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARTMonthZeroConverter;
@@ -48,6 +49,7 @@ import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinitio
 import org.openmrs.module.reporting.data.person.definition.PreferredAddressDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportDesignResource;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
@@ -86,6 +88,15 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// set up the DSD
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
 		dsd.setName("allPatients");
+
+		// set up parameters
+		Parameter facility = new Parameter();
+		facility.setName("facility");
+		facility.setType(MOHFacility.class);
+
+		// add to report and data set definition
+		report.addParameter(facility);
+		dsd.addParameter(facility);
 
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
@@ -231,7 +242,6 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		Map<String, Object> mappings = new HashMap<String, Object>();
 		mappings.put("facility", "${facility}");
-
 		report.addDataSetDefinition(dsd, mappings);
 
 		return report;
