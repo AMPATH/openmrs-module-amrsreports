@@ -35,7 +35,7 @@ public class DateARTStartedSortOrderDataEvaluatorTest extends BaseModuleContextS
 	@Before
 	public void setUp() throws Exception {
 
-		executeDataSet("datasets/concepts-art-start-date.xml");
+		executeDataSet("datasets/art-start-date.xml");
 
 		Cohort c = new Cohort("6,7,8,9");
 		c.setId(1);

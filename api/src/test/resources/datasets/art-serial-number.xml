@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <amrsreports_hiv_care_enrollment enrollment_id="1" patient_id="6" first_arv_location_id="1" first_arv_date="2004-07-01"/>
+    <amrsreports_hiv_care_enrollment enrollment_id="2" patient_id="7" first_arv_location_id="1" first_arv_date="2004-07-02"/>
+    <amrsreports_hiv_care_enrollment enrollment_id="3" patient_id="8" first_arv_location_id="1" first_arv_date="2005-07-03"/>
+    <amrsreports_hiv_care_enrollment enrollment_id="4" patient_id="9" first_arv_location_id="1" first_arv_date="2005-08-01"/>
+    <amrsreports_hiv_care_enrollment enrollment_id="5" patient_id="501" first_arv_location_id="2" first_arv_date="2005-08-02"/>
+    <amrsreports_hiv_care_enrollment enrollment_id="6" patient_id="502" first_arv_location_id="1" first_arv_date="2005-08-03"/>
+
+    <amrsreports_facility facility_id="1" name="Facility A" code="12345" creator="1" date_created="2014-02-24" retired="0" uuid="4f1166b5-a4a2-47a4-8ca1-ed04e2106d00"/>
+    <amrsreports_facility_location facility_id="1" location_id="1"/>
+</dataset>
+
+
+
