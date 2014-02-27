@@ -47,6 +47,16 @@ public class RegimenHistoryDataEvaluator implements PersonDataEvaluator {
 
 	private Log log = LogFactory.getLog(getClass());
 
+	/**
+	 * Finds a history of regimens and reasons for change for each person in a cohort
+	 * @param definition the RegimenHistoryDataDefinition to be evaluated
+	 * @param context the evaluation context for a given report
+	 * @return an ordered list of RegimenChange objects for each person
+	 * @throws EvaluationException
+	 * @should find a regimen if it exists
+	 * @should return nothing if DrugSnapshots do not indicate a Regimen
+	 * @should only return a reason from the same encounter as the DrugSnapshot used to indicate a Regimen
+	 */
 	@Override
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
@@ -111,9 +121,10 @@ public class RegimenHistoryDataEvaluator implements PersonDataEvaluator {
 
 	private SortedSetMap<Integer, Obs> getReasons(EvaluationContext context) {
 
+		SortedSetMap<Integer, Obs> res = new SortedSetMap<Integer, Obs>();
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 
-		String encounterHql = "select encounterId" +
+		String encounterHql = "select encounter.id" +
 				"   from Obs" +
 				"	where voided = false " +
 				"		and personId in (:personIds) " +
@@ -134,13 +145,17 @@ public class RegimenHistoryDataEvaluator implements PersonDataEvaluator {
 
 		// get the encounter ids based on 1255:1849 question
 		List<Object> encounterIds = qs.executeHqlQuery(encounterHql, m);
+
+		if (encounterIds == null || encounterIds.isEmpty()) {
+			return res;
+		}
+
 		m.put("encounterIds", encounterIds);
 
 		// find all 1252 questions for reasons
 		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
 		// build a result set
-		SortedSetMap<Integer, Obs> res = new SortedSetMap<Integer, Obs>();
 		res.setSetComparator(new ObsDatetimeComparator());
 
 		for (Object o : queryResult) {
