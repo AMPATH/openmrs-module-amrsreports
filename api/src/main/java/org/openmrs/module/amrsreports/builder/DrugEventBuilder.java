@@ -45,7 +45,7 @@ public class DrugEventBuilder {
 	public static final String DRUG_ETRAVIRINE = "ETRAVIRINE";
 	public static final String DRUG_INDINAVIR = "INDINAVIR";
 	public static final String DRUG_LAMIVUDINE = "LAMIVUDINE";
-	public static final String DRUG_LOPINAVIR = "LOPINAVIR";
+//	public static final String DRUG_LOPINAVIR = "LOPINAVIR";
 	public static final String DRUG_NELFINAVIR = "NELFINAVIR";
 	public static final String DRUG_NEVIRAPINE = "NEVIRAPINE";
 	public static final String DRUG_RALTEGRAVIR = "RALTEGRAVIR";
@@ -78,7 +78,7 @@ public class DrugEventBuilder {
 				MohCacheUtils.getConcept(DRUG_ETRAVIRINE),
 				MohCacheUtils.getConcept(DRUG_INDINAVIR),
 				MohCacheUtils.getConcept(DRUG_LAMIVUDINE),
-				MohCacheUtils.getConcept(DRUG_LOPINAVIR),
+//				MohCacheUtils.getConcept(DRUG_LOPINAVIR),
 				MohCacheUtils.getConcept(DRUG_NELFINAVIR),
 				MohCacheUtils.getConcept(DRUG_NEVIRAPINE),
 				MohCacheUtils.getConcept(DRUG_RALTEGRAVIR),
@@ -117,7 +117,7 @@ public class DrugEventBuilder {
 		drugAnswers.put(DRUG_ETRAVIRINE, MohCacheUtils.getConcepts(6158));
 		drugAnswers.put(DRUG_INDINAVIR, MohCacheUtils.getConcepts(749));
 		drugAnswers.put(DRUG_LAMIVUDINE, MohCacheUtils.getConcepts(628, 630, 792, 817, 1400, 6467, 6679, 6964, 6965));
-		drugAnswers.put(DRUG_LOPINAVIR, MohCacheUtils.getConcepts(794, 9026));
+//		drugAnswers.put(DRUG_LOPINAVIR, MohCacheUtils.getConcepts(794, 9026));
 		drugAnswers.put(DRUG_NELFINAVIR, MohCacheUtils.getConcepts(635));
 		drugAnswers.put(DRUG_NEVIRAPINE, MohCacheUtils.getConcepts(631, 792, 6467));
 		drugAnswers.put(DRUG_RALTEGRAVIR, MohCacheUtils.getConcepts(6156));
