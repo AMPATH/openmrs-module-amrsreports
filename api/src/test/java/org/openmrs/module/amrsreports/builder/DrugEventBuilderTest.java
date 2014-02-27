@@ -19,10 +19,8 @@ import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.drughistory.DrugEvent;
 import org.openmrs.module.drughistory.DrugEventType;
 import org.openmrs.module.drughistory.api.DrugEventService;
@@ -31,10 +29,7 @@ import org.openmrs.util.OpenmrsUtil;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class DrugEventBuilderTest extends BaseModuleContextSensitiveTest {
@@ -265,53 +260,5 @@ public class DrugEventBuilderTest extends BaseModuleContextSensitiveTest {
 		Context.clearSession();
 
 		return found;
-	}
-
-	/**
-	 * @verifies create an HIVCareEnrollment with proper firstARVDate for matching snapshot
-	 * @see DrugEventBuilder#execute()
-	 */
-	@Test
-	public void execute_shouldCreateAnHIVCareEnrollmentWithProperFirstARVDateForMatchingSnapshot() throws Exception {
-		// verify preconditions
-		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
-		HIVCareEnrollment actual = hceService.getHIVCareEnrollmentForPatient(patient);
-		assertNull(actual);
-
-		// add the observations
-		MohTestUtils.addCodedObs(patient, "ANTIRETROVIRALS STARTED", DrugEventBuilder.DRUG_ABACAVIR, "16 Oct 1975");
-		MohTestUtils.addCodedObs(patient, "ANTIRETROVIRALS STARTED", DrugEventBuilder.DRUG_DARUNAVIR, "16 Oct 1975");
-		MohTestUtils.addCodedObs(patient, "ANTIRETROVIRALS STARTED", DrugEventBuilder.DRUG_EFAVIRENZ, "16 Oct 1975");
-
-		// run the builder
-		DrugEventBuilder.getInstance().execute();
-
-		// check for accuracy
-		actual = hceService.getHIVCareEnrollmentForPatient(patient);
-		assertNotNull(actual);
-		assertEquals(MohTestUtils.makeDate("16 Oct 1975"), actual.getFirstARVDate());
-	}
-
-	/**
-	 * @verifies not create an HIVCareEnrollment if no snapshots match the criteria
-	 * @see DrugEventBuilder#execute()
-	 */
-	@Test
-	public void execute_shouldNotCreateAnHIVCareEnrollmentIfNoSnapshotsMatchTheCriteria() throws Exception {
-		// verify preconditions
-		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
-		HIVCareEnrollment actual = hceService.getHIVCareEnrollmentForPatient(patient);
-		assertNull(actual);
-
-		// add the observations
-		MohTestUtils.addCodedObs(patient, "ANTIRETROVIRALS STARTED", DrugEventBuilder.DRUG_ABACAVIR, "16 Oct 1975");
-		MohTestUtils.addCodedObs(patient, "ANTIRETROVIRALS STARTED", DrugEventBuilder.DRUG_DARUNAVIR, "16 Oct 1975");
-
-		// run the builder
-		DrugEventBuilder.getInstance().execute();
-
-		// check for accuracy
-		actual = hceService.getHIVCareEnrollmentForPatient(patient);
-		assertNull(actual);
 	}
 }

@@ -18,17 +18,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
-import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
-import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
-import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.drughistory.DrugEventTrigger;
 import org.openmrs.module.drughistory.DrugEventType;
-import org.openmrs.module.drughistory.DrugSnapshot;
 import org.openmrs.module.drughistory.api.DrugEventService;
 import org.openmrs.module.drughistory.api.DrugSnapshotService;
 
@@ -163,8 +157,6 @@ public class DrugEventBuilder {
 	 * @should find occurrences of ZIDOVUDINE
 	 * @should find occurrences of UNKNOWN
 	 * @should find occurrences of OTHER
-	 * @should create an HIVCareEnrollment with proper firstARVDate for matching snapshot
-	 * @should not create an HIVCareEnrollment if no snapshots match the criteria
 	 */
 	public void execute() {
 
@@ -175,36 +167,6 @@ public class DrugEventBuilder {
 
 		// tell the drug event service to regenerate snapshots
 		getDrugSnapshotService().generateDrugSnapshots(null);
-
-		// find first ART dates
-		// allocate snapshots to individuals and trim to those we care about
-		SortedSetMap<Integer, DrugSnapshot> m = MOHReportUtil.getARVSnapshotsMap();
-
-		// add dates and locations to HIV Care Enrollment records
-		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
-		for (Integer pId : m.keySet()) {
-			// make sure we have a snapshot to work with
-			DrugSnapshot ds = m.get(pId).first();
-			if (ds != null) {
-				// find the relevant patient
-				Patient pt = Context.getPatientService().getPatient(pId);
-				if (pt != null) {
-					// get the enrollment info or make a new one
-					HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);
-					if (hce == null) {
-						hce = new HIVCareEnrollment();
-						hce.setPatient(pt);
-					}
-					// set date and location of first ARVs
-					hce.setFirstARVDate(ds.getDateTaken());
-					if (ds.getEncounter() != null) {
-						hce.setFirstARVLocation(ds.getEncounter().getLocation());
-					}
-					// save it
-					hceService.saveHIVCareEnrollment(hce);
-				}
-			}
-		}
 	}
 
 	/**
@@ -256,5 +218,4 @@ public class DrugEventBuilder {
 			drugSnapshotService = Context.getService(DrugSnapshotService.class);
 		return drugSnapshotService;
 	}
-
 }
