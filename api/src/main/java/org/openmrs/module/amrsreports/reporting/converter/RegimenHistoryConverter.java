@@ -15,6 +15,7 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.openmrs.module.amrsreports.model.RegimenChange;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.drughistory.Regimen;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.util.OpenmrsUtil;
@@ -26,29 +27,64 @@ public class RegimenHistoryConverter implements DataConverter {
 
 	private String line = null;
 	private Integer order = null;
+	private WhatToShow whatToShow = WhatToShow.REASON;
 
-	public RegimenHistoryConverter(String line, Integer order) {
+	public static enum WhatToShow {
+		REGIMEN, DATE, REASON
+	}
+
+	public RegimenHistoryConverter(String line, Integer order, WhatToShow whatToShow) {
 		this.line = line;
 		this.order = order;
+		this.whatToShow = whatToShow;
 	}
 
 	@Override
 	public Object convert(Object original) {
+
 		if (original == null || !(original instanceof List))
 			return null;
 
 		List<RegimenChange> regimens = (List<RegimenChange>) original;
 		Iterator<RegimenChange> rIter = regimens.iterator();
+
+		// level counter within the correct line
 		int i = 0;
+
 		while (rIter.hasNext()) {
 			RegimenChange rc = rIter.next();
+
 			// match on line or allow if not specified
-			if (line == null || OpenmrsUtil.nullSafeEquals(rc.getRegimen().getLine(), this.line)) {
+			if (line == null || OpenmrsUtil.nullSafeEquals(rc.getRegimen().getLine(), line)) {
+
 				// ensure at the right level
 				if (order == null || order == i) {
-					return rc.getRegimen().getName();
+					return format(rc);
 				}
+
+				// increase level
+				i++;
 			}
+		}
+
+		return null;
+	}
+
+	private String format(RegimenChange rc) {
+		if (rc == null) {
+			return null;
+		}
+
+		if (WhatToShow.REASON == whatToShow && rc.getRegimen() != null) {
+			return rc.getRegimen().getName();
+		}
+
+		if (WhatToShow.DATE == whatToShow && rc.getDateOccurred() != null) {
+			return MOHReportUtil.formatdates(rc.getDateOccurred());
+		}
+
+		if (WhatToShow.REASON == whatToShow && rc.getReason() != null) {
+			return rc.getReason().getDisplayString();
 		}
 
 		return null;
