@@ -213,14 +213,53 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// s. Original Regimen
 		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
-		dsd.addColumn("Original Regimen", regimenHistory, nullString, new RegimenHistoryConverter(Regimen.LINE_FIRST, 0));
+		dsd.addColumn("Original Regimen", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 0, RegimenHistoryConverter.WhatToShow.REGIMEN));
+
+		// t, u, v. 1st Line Regimen 1st Substitution
+		dsd.addColumn("1st Line 1st Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("1st Line 1st Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("1st Line 1st Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// t, u, v. 1st Line Regimen 2nd Substitution
+		dsd.addColumn("1st Line 2nd Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("1st Line 2nd Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("1st Line 2nd Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// w. 2nd Line Regimen and Reason
+		dsd.addColumn("2nd Line Regimen", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 0, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line Regimen Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 0, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// x, y, z. 2nd Line Regimen 1st Substitution
+		dsd.addColumn("2nd Line 1st Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line 1st Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("2nd Line 1st Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// x, y, z. 2nd Line Regimen 2nd Substitution
+		dsd.addColumn("2nd Line 2nd Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line 2nd Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("2nd Line 2nd Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.REASON));
 
 		// create mapped definition of dateARTStarted
 		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
 		artDateMap.setParameterizable(dateARTStartedDataDefinition);
 		artDateMap.addConverter(new DateConverter());
 
-		//aa. month zero
+		// aa. month zero
 		dsd.addColumn("Month 0", dateARTStartedDataDefinition, nullString, new ARTMonthZeroConverter());
 
 		// ah. 6 month CD4 count (and aq, az, bi)
