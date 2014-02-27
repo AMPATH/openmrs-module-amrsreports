@@ -211,6 +211,10 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// p, q, r. Pregnancies
 		dsd.addColumn("Pregnancies", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter());
 
+		// s. Original Regimen
+		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
+		dsd.addColumn("Original Regimen", regimenHistory, nullString, new RegimenHistoryConverter(Regimen.LINE_FIRST, 0));
+
 		// create mapped definition of dateARTStarted
 		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
 		artDateMap.setParameterizable(dateARTStartedDataDefinition);
@@ -230,26 +234,26 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		sixMonthWeight.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.WEIGHT));
 		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
+		// aj. 6 Month TB Status (and as, bb, bk)
+		TBStatusDataDefinition tbStatusDataDefinition = new TBStatusDataDefinition();
+
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
-		dsd.addColumn("6 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(6));
+		dsd.addColumn("6 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(6));
 
 		dsd.addColumn("12 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 12));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 12));
-		dsd.addColumn("12 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(12));
+		dsd.addColumn("12 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(12));
 
 		dsd.addColumn("18 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 18));
 		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 18));
-		dsd.addColumn("18 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(18));
+		dsd.addColumn("18 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(18));
 
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
-		dsd.addColumn("24 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(24));
+		dsd.addColumn("24 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(24));
 
-		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
-		dsd.addColumn("Original Regimen", regimenHistory, nullString, new RegimenHistoryConverter(Regimen.LINE_FIRST, 0));
-
-		// Add  columns for sort order (used for sorting, not needed in output)
+		// Add columns for sort order (used for sorting, not needed in output)
 		dsd.addColumn("Transfer Status", new ARTTransferStatusDataDefinition(), "facility=${facility}");
 		dsd.addColumn("Year Month Sorting", dateARTStartedDataDefinition, nullString, new DateConverter("yyyy-MM"));
 
