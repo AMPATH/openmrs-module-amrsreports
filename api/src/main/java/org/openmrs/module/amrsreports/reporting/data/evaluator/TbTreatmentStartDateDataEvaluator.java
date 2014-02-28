@@ -117,7 +117,7 @@ public class TbTreatmentStartDateDataEvaluator implements PersonDataEvaluator {
 			}
 			details.setTbRegNO(tbRegistrationNo);
 
-			if (startDates.size() > 0)
+			if (startDates != null && startDates.size() > 0)
 				details.setEvaluationDates(startDates);
 
             /*Add findings to the list*/
