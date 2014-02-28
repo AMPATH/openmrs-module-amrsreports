@@ -75,7 +75,7 @@ public class RegimenHistoryConverter implements DataConverter {
 			return null;
 		}
 
-		if (WhatToShow.REASON == whatToShow && rc.getRegimen() != null) {
+		if (WhatToShow.REGIMEN == whatToShow && rc.getRegimen() != null) {
 			return rc.getRegimen().getName();
 		}
 
