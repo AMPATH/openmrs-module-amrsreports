@@ -105,8 +105,8 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.DESC);
-		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
+//		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
@@ -275,6 +275,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// aj. 6 Month TB Status (and as, bb, bk)
 		TBStatusDataDefinition tbStatusDataDefinition = new TBStatusDataDefinition();
+		tbStatusDataDefinition.setEffectiveDateDefinition(artDateMap);
 
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
