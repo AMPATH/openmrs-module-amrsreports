@@ -7,6 +7,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.Patient;
+import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.builder.DrugEventBuilder;
@@ -14,8 +17,10 @@ import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.common.DrugSnapshotDateComparator;
 import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
+import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.drughistory.DrugSnapshot;
 import org.openmrs.module.drughistory.api.DrugSnapshotService;
+import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.dataset.DataSet;
 import org.openmrs.module.reporting.dataset.DataSetColumn;
 import org.openmrs.module.reporting.dataset.DataSetRow;
@@ -50,6 +55,30 @@ public class MOHReportUtil {
 
 	private static final Log log = LogFactory.getLog(MOHReportUtil.class);
 	public static final String DATE_FORMAT = "dd/MM/yyyy";
+
+	private static Map<Integer, String> tableDrugs;
+
+	static {
+		tableDrugs = new HashMap<Integer, String>();
+		tableDrugs.put(1, DrugEventBuilder.DRUG_ABACAVIR);
+		tableDrugs.put(2, DrugEventBuilder.DRUG_ATAZANAVIR);
+		tableDrugs.put(3, DrugEventBuilder.DRUG_DARUNAVIR);
+		tableDrugs.put(4, DrugEventBuilder.DRUG_DIDANOSINE);
+		tableDrugs.put(5, DrugEventBuilder.DRUG_EFAVIRENZ);
+		tableDrugs.put(6, DrugEventBuilder.DRUG_EMTRICITABINE);
+		tableDrugs.put(7, DrugEventBuilder.DRUG_ETRAVIRINE);
+		tableDrugs.put(8, DrugEventBuilder.DRUG_INDINAVIR);
+		tableDrugs.put(9, DrugEventBuilder.DRUG_LAMIVUDINE);
+		tableDrugs.put(10, DrugEventBuilder.DRUG_LOPINAVIR);
+		tableDrugs.put(11, DrugEventBuilder.DRUG_NELFINAVIR);
+		tableDrugs.put(12, DrugEventBuilder.DRUG_NEVIRAPINE);
+		tableDrugs.put(13, DrugEventBuilder.DRUG_RALTEGRAVIR);
+		tableDrugs.put(14, DrugEventBuilder.DRUG_RITONAVIR);
+		tableDrugs.put(15, DrugEventBuilder.DRUG_STAVUDINE);
+		tableDrugs.put(16, DrugEventBuilder.DRUG_TENOFOVIR);
+		tableDrugs.put(17, DrugEventBuilder.DRUG_ZIDOVUDINE);
+		tableDrugs.put(18, DrugEventBuilder.DRUG_OTHER);
+	}
 
 	public static String joinAsSingleCell(Collection<String> entries) {
 		return StringUtils.join(entries, AmrsReportsConstants.INTER_CELL_SEPARATOR);
@@ -227,6 +256,69 @@ public class MOHReportUtil {
 				m.putInList(snapshot.getPerson().getPersonId(), snapshot);
 			}
 		}
+		return m;
+	}
+
+	/**
+	 * creates ARV-related DrugSnapshots mapped to persons based on drug tables ...
+	 */
+	public static SortedSetMap<Integer, DrugSnapshot> getARVSnapshotsMapFromTables(Cohort cohort, Date reportDate) {
+
+		String startSQL = "select patient_id, encounter_id, encounter_date, " +
+				"   ABACAVIR, " +
+				"   ATAZANAVIR, " +
+				"   DARUNAVIR, " +
+				"   DIDANOSINE, " +
+				"   EFAVIRENZ, " +
+				"   EMTRICITABINE, " +
+				"   ETRAVIRINE, " +
+				"   INDINAVIR, " +
+				"   LAMIVUDINE, " +
+				"   LOPINAVIR, " +
+				"   NELFINAVIR, " +
+				"   NEVIRAPINE, " +
+				"   RALTEGRAVIR, " +
+				"   RITONAVIR, " +
+				"   STAVUDINE, " +
+				"   TENOFOVIR, " +
+				"   ZIDOVUDINE, " +
+				"   OTHER " +
+				" from amrsreports_arv_current" +
+				" where on_ART=1" +
+				" and patient_id in (:personIds)" +
+				" and encounter_date <= :reportDate";
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("personIds", cohort);
+		params.put("reportDate", reportDate);
+
+		SortedSetMap<Integer, DrugSnapshot> m = new SortedSetMap<Integer, DrugSnapshot>();
+		m.setSetComparator(new DrugSnapshotDateComparator());
+
+		for (Object o : Context.getService(MohCoreService.class).executeSqlQuery(startSQL, params)) {
+
+			// cast the result into an array
+			Object[] parts = (Object[]) o;
+
+			// start a new snapshot
+			DrugSnapshot ds = new DrugSnapshot();
+
+			// first three columns are person, encounter, and encounter date
+			ds.setPerson(new Person((Integer) parts[0]));
+			ds.setEncounter(new Encounter((Integer) parts[1]));
+			ds.setDateTaken((Date) parts[2]);
+
+			// loop through table drug columns and add concepts as they appear
+			for (Integer i : tableDrugs.keySet()) {
+				if ((Integer) parts[i+2] == 1) {
+					ds.addConcept(MohCacheUtils.getConcept(tableDrugs.get(i)));
+				}
+			}
+
+			// add the new snapshot to the list of return data
+			m.putInList((Integer) parts[0], ds);
+		}
+
 		return m;
 	}
 }
