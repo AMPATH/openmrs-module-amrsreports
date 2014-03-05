@@ -2,7 +2,7 @@
 <dataset>
 
   <!-- need a single concept for LOPINAVIR -->
-  
+
   <concept concept_id="625" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-02-05 13:50:48.0" uuid="a8967156-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="628" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-02-05 13:37:49.0" uuid="a89673f4-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="630" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-05-25 16:47:15.0" uuid="a896758e-1350-11df-a1f1-0026b9348838"/>
@@ -42,7 +42,6 @@
   <concept concept_id="6679" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2010-11-01 08:37:57.0" version="" changed_by="1" date_changed="2011-02-12 22:32:03.0" uuid="b7735b8a-22f2-41d6-b450-65ec7588839c"/>
   <concept concept_id="6964" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2011-05-26 14:34:47.0" version="" uuid="1c4a75d0-cc91-4752-b0a5-4b833326ff7a"/>
   <concept concept_id="6965" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2011-05-26 15:49:43.0" version="" changed_by="1" date_changed="2011-06-13 08:51:09.0" uuid="3d587177-984e-4eeb-93f2-3223b6c1dd7c"/>
-  <concept concept_id="9026" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2014-02-20 13:00:00.0" version="" uuid="3d587177-984f-4eeb-93f2-3223b6c1dd7c"/>
 
   <concept_name concept_id="625" name="STAVUDINE" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="625" voided="0" uuid="a93f38b8-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="628" name="LAMIVUDINE" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="628" voided="0" uuid="a93f3b38-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
@@ -51,6 +50,7 @@
   <concept_name concept_id="635" name="NELFINAVIR" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="635" voided="0" uuid="a93f410a-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="749" name="INDINAVIR" locale="en" creator="1" date_created="2004-03-20 00:00:00.0" concept_name_id="749" voided="0" uuid="a93fd426-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="791" name="EMTRICITABINE" locale="en" creator="1" date_created="2004-04-08 00:00:00.0" concept_name_id="791" voided="0" uuid="a94001ee-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="794" name="LOPINAVIR AND RITONAVIR" locale="en" creator="1" date_created="2004-04-08 00:00:00.0" concept_name_id="794" voided="0" uuid="a9400536-1350-11df-a1f1-0026b9348839" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="795" name="RITONAVIR" locale="en" creator="1" date_created="2004-04-08 00:00:00.0" concept_name_id="795" voided="0" uuid="a9400536-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="796" name="DIDANOSINE" locale="en" creator="1" date_created="2004-04-08 00:00:00.0" concept_name_id="796" voided="0" uuid="a9400608-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="797" name="ZIDOVUDINE" locale="en" creator="1" date_created="2004-04-08 00:00:00.0" concept_name_id="797" voided="0" uuid="a94006da-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
@@ -70,6 +70,5 @@
   <concept_name concept_id="6157" name="DARUNAVIR" locale="en" creator="1" date_created="2009-10-13 10:20:54.0" concept_name_id="5242" voided="0" uuid="a95c09f2-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="6158" name="ETRAVIRINE" locale="en" creator="1" date_created="2009-10-13 10:23:03.0" concept_name_id="5243" voided="0" uuid="a95c0b28-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="6159" name="ATAZANAVIR" locale="en" creator="1" date_created="2009-10-13 10:25:05.0" concept_name_id="5245" voided="0" uuid="a95c1366-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
-  <concept_name concept_id="9026" name="LOPINAVIR" locale="en" creator="1" date_created="2014-02-20 13:00:00.0" concept_name_id="5246" voided="0" uuid="a95c1366-1351-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
 
 </dataset>

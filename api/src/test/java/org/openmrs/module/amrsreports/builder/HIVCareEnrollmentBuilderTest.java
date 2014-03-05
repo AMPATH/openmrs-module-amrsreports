@@ -21,6 +21,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
+import org.openmrs.module.drughistory.api.DrugSnapshotService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import static org.junit.Assert.assertEquals;
@@ -56,6 +57,9 @@ public class HIVCareEnrollmentBuilderTest extends BaseModuleContextSensitiveTest
 		// run the DrugEventBuilder
 		DrugEventBuilder.getInstance().execute();
 
+		// build snapshots
+		Context.getService(DrugSnapshotService.class).generateDrugSnapshots(null);
+
 		// update first ARV date
 		HIVCareEnrollmentBuilder.getInstance().updateFirstARVDates();
 
@@ -82,6 +86,9 @@ public class HIVCareEnrollmentBuilderTest extends BaseModuleContextSensitiveTest
 
 		// run the DrugEventBuilder
 		DrugEventBuilder.getInstance().execute();
+
+		// build snapshots
+		Context.getService(DrugSnapshotService.class).generateDrugSnapshots(null);
 
 		// update first ARV date
 		HIVCareEnrollmentBuilder.getInstance().updateFirstARVDates();
