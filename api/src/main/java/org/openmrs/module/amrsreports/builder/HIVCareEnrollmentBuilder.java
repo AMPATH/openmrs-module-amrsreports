@@ -348,8 +348,8 @@ public class HIVCareEnrollmentBuilder {
 		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_WHO_STAGE_AND_DATE);
 
 		// update everyone with first ARV date
-//		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_FIRST_ARV_DATE);
-		updateFirstARVDates();
+		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_FIRST_ARV_DATE);
+//		updateFirstARVDates();
 
 		// update everyone with latest positive obs
 		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_POSITIVE);
