@@ -17,6 +17,18 @@
   <concept concept_id="1118" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e295-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="1256" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e282-1250-11df-a1f1-0026b9348838"/>
   <concept concept_id="656" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e299-1250-11df-a1f1-0026b9348838"/>
+  <concept concept_id="677" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e419-1250-11df-a1f1-0026b9348838"/>
+  <concept concept_id="678" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e429-1250-11df-a1f1-0026b9348838"/>
+  <concept concept_id="680" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e429-1250-11df-a1f1-0026b9148838"/>
+  <concept concept_id="682" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e429-1250-11df-a1f1-0026b9948838"/>
+  <concept concept_id="689" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a899e429-1250-11df-a1f1-0026b9648838"/>
+  <concept concept_id="690" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a879e429-1250-11df-a1f1-0026b9648838"/>
+  <concept concept_id="800" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a879e429-1250-11df-a1f1-0036b9648838"/>
+  <concept concept_id="801" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a879e429-1250-11df-a1f1-0046b9648838"/>
+  <concept concept_id="802" retired="0" datatype_id="4" class_id="7" is_set="0" creator="1" date_created="2005-01-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-23 21:49:05.0" uuid="a879e429-1250-11df-a1f1-0056b9648838"/>
+
+
+
 
   <concept_name concept_id="7178" name="PATIENT REPORTED X-RAY, CHEST" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="7178" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348845" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="307" name="SPUTUM FOR AFB" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="307" voided="0" uuid="a941f4b8-1350-11df-a1f1-0026b9348846" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
@@ -35,5 +47,14 @@
   <concept_name concept_id="1118" name="NOT DONE" locale="en" creator="1" date_created="2004-07-15 00:00:00.0" concept_name_id="1118" voided="0" uuid="a9411070-1350-11df-a1f1-0026b9348860" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="1256" name="START DRUGS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="1256" voided="0" uuid="a941f666-1250-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="656" name="ISONIAZID" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="656" voided="0" uuid="a941f666-1250-11df-a1f1-0026b9348890" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="677" name="HOUSEHOLD MEMBER DIAGNOSED WITH TUBERCULOSIS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="677" voided="0" uuid="a941f6676-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="678" name="TUBERCULOSIS DIAGNOSED SINCE LAST VISIT" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="678" voided="0" uuid="a941f678-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="680" name="TUBERCULOSIS DIAGNOSED THIS VISIT" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="680" voided="0" uuid="a951f677-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="682" name="TUBERCULOSIS TREATMENT DRUGS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="682" voided="0" uuid="a961f666-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="689" name="TUBERCULOSIS DIAGNOSED BASED ON" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="689" voided="0" uuid="a971f666-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="690" name="REVIEW OF TUBERCULOSIS SCREENING QUESTIONS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="690" voided="0" uuid="a971f676-1250-11df-a1f1-0026b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="800" name="TUBERCULOSIS TREATMENT STATUS" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="800" voided="0" uuid="a971f676-1250-11df-a1f1-0076b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="801" name="TUBERCULOSIS DIAGNOSED BASED ON, DETAILED" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="801" voided="0" uuid="a971f676-1250-11df-a1f1-0106b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
+  <concept_name concept_id="802" name="REASON TUBERCULOSIS TREATMENT STARTED" locale="en" creator="1" date_created="2005-01-12 00:00:00.0" concept_name_id="802" voided="0" uuid="a971f676-1250-11df-a1f1-0206b9348888" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
 
 </dataset>

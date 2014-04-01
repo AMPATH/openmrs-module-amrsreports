@@ -62,18 +62,23 @@ public class TBStatusDataEvaluator implements PersonDataEvaluator {
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 		Map<String, Object> m = new HashMap<String, Object>();
 
-        
-        String hql = "from Obs o  " +
-                " Where o.voided = false " +
-                "   and o.person.id in (:patientIds) " +
-                "   and (concept.id = 7178 and valueCoded = 1115)   " +
+        String hql = "from Obs  " +
+                " Where voided = false " +
+                "   and person.id in (:patientIds) " +
+                "   and (concept.id in (2020,2021,2022))   " +
+                "   or (concept.id = 2028 )  " +
+                "   or (concept.id = 6174 )  " +
+                "   or (concept.id = 7178 )  " +
                 "   or (concept.id = 307 )  " +
                 "   or (concept.id = 5959 and valueCoded in (1073,1074,1079))  " +
                 "   or (concept.id = 1069 and valueCoded = 6171)  " +
-                "   or (concept.id = 7178 and valueCoded != 1115)  " +
+                "   or (concept.id = 1111 and valueCoded in (1107,1267))  " +
+                "   or (concept.id = 5965 and valueCoded in (1066,1267,1794)) " +
+                "   or (concept.id = 2029 and valueCoded IS NOT NULL)  " +
+                "   or (concept.id = 6981 and valueCoded != 1067)  " +
+                "   or (concept.id = 1159 and valueCoded IS NOT NULL)  " +
                 "   or (concept.id = 1270 and valueCoded IS NOT NULL)  " +
-                "   or (concept.id = 1268 and valueCoded != 1107)  " +
-                "   or (valueCoded = 1260) " ;
+                "   or (concept.id = 1268 and (valueCoded != 1107 or valueCoded = 1260 ))  ";
 
 
 		if (context.getBaseCohort() != null) {

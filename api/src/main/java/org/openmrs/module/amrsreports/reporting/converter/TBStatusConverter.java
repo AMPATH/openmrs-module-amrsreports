@@ -175,70 +175,152 @@ public class TBStatusConverter implements DataConverter {
 		Integer conceptId = obs.getConcept().getConceptId();
 		Integer conceptAnswer = obs.getValueCoded().getConceptId();
 
-		//check if answer indicates a patient is on tb treatment
-		if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.STOP_ALL_MEDICATIONS))) {
-			return ON_TREATMENT;
-		}
-
-        //Check if concept suggests TB screening not done
-        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
-            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
+        /**
+         * Handle codes for no signs and symptoms
+         */
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NO))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.YES))) {
+                return TB_SUSPECT;
+            }
+            else if(conceptAnswer.equals(null)) {
                 return SCREENING_NOT_DONE;
             }
         }
 
-		//check for no signs and symptoms
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
-			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
-				return NO_SIGNS_AND_SYMPTOMS;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NO))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.YES))) {
+                return TB_SUSPECT;
+            }
+            else if(conceptAnswer.equals(null)) {
+                return SCREENING_NOT_DONE;
+            }
+        }
 
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
-			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
-				return NO_SIGNS_AND_SYMPTOMS;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NO))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_DRUGS))){
+               return ON_TREATMENT;
+            }
+            else if(conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.YES))) {
+                return TB_SUSPECT;
+            }
+            else if(conceptAnswer.equals(null)) {
+                return SCREENING_NOT_DONE;
+            }
+        }
 
-		//check if it is TB suspect cases
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_DURATION_CODED))) {
-			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.WEEKS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.MONTHS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.CONTINUOUS))) {
-				return TB_SUSPECT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_BASED_ON))) {
+            if (conceptAnswer.equals(null)) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if(!conceptAnswer.equals(null)) {
+                return TB_SUSPECT;
+            }
+            else if(conceptAnswer.equals(null)) {
+                return SCREENING_NOT_DONE;
+            }
+        }
 
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
-			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
-				return TB_SUSPECT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONS))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if(!conceptAnswer.equals(null)){
+                return TB_SUSPECT;
+            }
+            else if(conceptAnswer.equals(null)){
+                return SCREENING_NOT_DONE;
+            }
+        }
 
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REVIEW_OF_SYSTEMS_GENERAL))) {
-			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_FOR_MORE_THAN_TWO_WEEKS))) {
-				return TB_SUSPECT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+        }
 
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
-			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
-				return TB_SUSPECT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
+                return NO_SIGNS_AND_SYMPTOMS;
+            }
+            else if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))){
+                  return SCREENING_NOT_DONE;
+            }
+        }
 
-		//check for On Treatment
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED))) {
-			if (!conceptAnswer.equals(null)) {
-				return ON_TREATMENT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_DURATION_CODED))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.WEEKS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.MONTHS)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.CONTINUOUS))) {
+                return TB_SUSPECT;
+            }
+        }
 
-		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN))) {
-			if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE))) {
-				return ON_TREATMENT;
-			}
-		}
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NEGATIVE))) {
+                return TB_SUSPECT;
+            }
+        }
 
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REVIEW_OF_SYSTEMS_GENERAL))) {
+            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COUGH_FOR_MORE_THAN_TWO_WEEKS))) {
+                return TB_SUSPECT;
+            }
+        }
 
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NORMAL))) {
+                return TB_SUSPECT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_CURRENT_TUBERCULOSIS_TREATMENT))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COMPLETED))) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STATUS))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NO)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.COMPLETED)) ||  conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.INTERRUPTED))) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_BASED_ON_DETAILED))) {
+            if (!conceptAnswer.equals(null)) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.REASON_TUBERCULOSIS_TREATMENT_STARTED))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.UNKNOWN))) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_DRUGS))) {
+            if (!conceptAnswer.equals(null)) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_STARTED))) {
+            if (!conceptAnswer.equals(null)) {
+                return ON_TREATMENT;
+            }
+        }
+
+        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_PLAN))) {
+            if (!conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NONE)) || conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.STOP_ALL_MEDICATIONS))) {
+                return ON_TREATMENT;
+            }
+        }
 
 		return null;
 	}
