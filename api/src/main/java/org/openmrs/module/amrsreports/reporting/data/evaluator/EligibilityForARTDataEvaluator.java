@@ -3,7 +3,6 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
-import org.openmrs.Patient;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
@@ -14,7 +13,9 @@ import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefini
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.snapshot.ARVPatientSnapshot;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.reporting.common.Birthdate;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
+import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -38,6 +39,7 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 	private Log log = LogFactory.getLog(getClass());
 
 	private Map<Integer, Object> artStartDates;
+	private Map<Integer, Object> birthDates;
 
 	private EligibilityForARTDataDefinition definition;
 
@@ -70,7 +72,7 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 	 */
 	@Override
 	protected Object doExecute(Integer pId, SortedSet<ObsRepresentation> data, EvaluationContext context) {
-		Patient p = Context.getPatientService().getPatient(pId);
+		Birthdate birthdate = (Birthdate) birthDates.get(pId);
 
 		ARVPatientSnapshot snapshot = new ARVPatientSnapshot();
 		snapshot.setEvaluationDate(context.getEvaluationDate());
@@ -79,7 +81,7 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 		while (i.hasNext()) {
 			ObsRepresentation o = i.next();
 			if (snapshot.consume(o)) {
-				snapshot.setAgeGroup(MOHReportUtil.getAgeGroupAtDate(p.getBirthdate(), o.getObsDatetime()));
+				snapshot.setAgeGroup(MOHReportUtil.getAgeGroupAtDate(birthdate == null ? null : birthdate.getBirthdate(), o.getObsDatetime()));
 				if (snapshot.eligible()) {
 					Date lastDate = (Date) snapshot.get("lastDate");
 					Date artStartDate = (Date) artStartDates.get(pId);
@@ -98,15 +100,22 @@ public class EligibilityForARTDataEvaluator extends BatchedExecutionDataEvaluato
 
 	@Override
 	protected boolean doBefore(EvaluationContext context, EvaluatedPersonData c, Cohort cohort) {
-		EvaluatedPersonData otherColumn;
 
 		try {
-			otherColumn = Context.getService(PersonDataService.class).evaluate(new DateARTStartedDataDefinition(), context);
+			EvaluatedPersonData otherColumn = Context.getService(PersonDataService.class).evaluate(new DateARTStartedDataDefinition(), context);
+			artStartDates = otherColumn.getData();
 		} catch (EvaluationException e) {
 			log.error("could not evaluate Date ART Started", e);
 			return false;
 		}
-		artStartDates = otherColumn.getData();
+
+		try {
+			EvaluatedPersonData birthDateData = Context.getService(PersonDataService.class).evaluate(new BirthdateDataDefinition(), context);
+			birthDates = birthDateData.getData();
+		} catch (EvaluationException e) {
+			log.error("could not evaluate birthdates in eligibility", e);
+			return false;
+		}
 
 		return true;
 	}
