@@ -15,7 +15,6 @@
 package org.openmrs.module.amrsreports.builder;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.module.amrsreports.util.TableBuilderUtil;
 
 public class ARVTableBuilder {
@@ -129,8 +128,6 @@ public class ARVTableBuilder {
 
 	private static String TABLE_PREVIOUS = "amrsreports_arv_previous";
 	private static String QUESTIONS_PREVIOUS = "1086, 1087, 2157";
-
-	private AdministrationService administrationService;
 
 	/**
 	 * drops, creates and fills out the ARV encounter table

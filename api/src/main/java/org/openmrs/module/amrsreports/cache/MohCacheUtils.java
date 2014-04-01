@@ -20,6 +20,9 @@ import org.openmrs.EncounterType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class MohCacheUtils {
 
 	private static final Log log = LogFactory.getLog(MohCacheUtils.class);
@@ -29,13 +32,30 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static Concept getConcept(final String conceptName) {
-		MohConceptCacheInstance cacheInstance = (MohConceptCacheInstance) MohConceptCacheInstance.getInstance();
+		MohConceptCacheInstance cacheInstance = MohConceptCacheInstance.getInstance();
 		Concept concept = cacheInstance.get(conceptName);
 		if (concept == null) {
 			concept = Context.getConceptService().getConcept(conceptName);
 			cacheInstance.add(conceptName, concept);
 		}
 		return concept;
+	}
+
+	public static Integer getConceptId(String conceptName) {
+		Concept concept = getConcept(conceptName);
+		return concept.getId();
+	}
+
+	public static Concept getConcept(int conceptId) {
+		return Context.getConceptService().getConcept(conceptId);
+	}
+
+	public static Set<Concept> getConcepts(Integer... conceptIds) {
+		Set<Concept> c = new HashSet<Concept>();
+		for (Integer conceptId : conceptIds) {
+			c.add(getConcept(conceptId));
+		}
+		return c;
 	}
 
 	/**
@@ -50,7 +70,7 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static EncounterType getEncounterType(final String encounterTypeName) {
-		MohEncounterTypeCacheInstance cacheInstance = (MohEncounterTypeCacheInstance) MohEncounterTypeCacheInstance.getInstance();
+		MohEncounterTypeCacheInstance cacheInstance = MohEncounterTypeCacheInstance.getInstance();
 		EncounterType encounterType = cacheInstance.get(encounterTypeName);
 		if (encounterType == null) {
 			encounterType = Context.getEncounterService().getEncounterType(encounterTypeName);
@@ -64,7 +84,7 @@ public final class MohCacheUtils {
 	 * @return
 	 */
 	public static PatientIdentifierType getPatientIdentifierType(final String patientIdentifierTypeName) {
-		MohPatientIdentifierTypeCacheInstance cacheInstance = (MohPatientIdentifierTypeCacheInstance) MohPatientIdentifierTypeCacheInstance.getInstance();
+		MohPatientIdentifierTypeCacheInstance cacheInstance = MohPatientIdentifierTypeCacheInstance.getInstance();
 		PatientIdentifierType patientIdentifierType = cacheInstance.get(patientIdentifierTypeName);
 		if (patientIdentifierType == null) {
 			patientIdentifierType = Context.getPatientService().getPatientIdentifierTypeByName(patientIdentifierTypeName);
@@ -78,10 +98,5 @@ public final class MohCacheUtils {
 	 */
 	public static void clearEncounterTypeCache() {
 		MohEncounterTypeCacheInstance.getInstance().clear();
-	}
-
-	public static Integer getConceptId(String conceptName) {
-		Concept concept = getConcept(conceptName);
-		return concept.getId();
 	}
 }

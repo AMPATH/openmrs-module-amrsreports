@@ -14,9 +14,9 @@
 
 package org.openmrs.module.amrsreports.reporting.converter;
 
-import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -52,7 +52,7 @@ public class TBStatusConverter implements DataConverter {
 	 */
 	@Override
 	public Object convert(Object original) {
-		SortedObsFromDate o = (SortedObsFromDate) original;
+		SortedItemsFromDate<ObsRepresentation> o = (SortedItemsFromDate<ObsRepresentation>) original;
 
 		if (o == null || o.getData().size() == 0)
 			return null;
@@ -65,13 +65,13 @@ public class TBStatusConverter implements DataConverter {
 		Calendar upper = Calendar.getInstance();
 
 		// find the closest obs on either side of the date
-		Obs before = null, after = null;
+		ObsRepresentation before = null, after = null;
 		Boolean found = false;
 		Integer thisInterval = this.getInterval();
 		initializeDates(o.getReferenceDate(), target, lower, upper, thisInterval);
 
 		// loop from beginning to end of all observations
-		for (Obs current : o.getData()) {
+		for (ObsRepresentation current : o.getData()) {
 
 			// avoid the obvious possible issues
 			if (current != null && current.getObsDatetime() != null) {
@@ -112,7 +112,7 @@ public class TBStatusConverter implements DataConverter {
 		return MOHReportUtil.joinAsSingleCell(results);
 	}
 
-	private void updateResults(List<String> results, Calendar target, Obs before, Obs after, Boolean found, Integer interval) {
+	private void updateResults(List<String> results, Calendar target, ObsRepresentation before, ObsRepresentation after, Boolean found, Integer interval) {
 		if (before == null && found) {
 			nullSafeAdd(results, format(after, interval));
 		} else if (after == null) {
@@ -140,21 +140,22 @@ public class TBStatusConverter implements DataConverter {
 		}
 	}
 
-	private String format(Obs obs, Integer interval) {
+	private String format(ObsRepresentation obs, Integer interval) {
 		if (obs == null)
 			return null;
 
 		String statusCode = getTBStatusCode(obs);
 
-		if (statusCode.equals(null))
+		if (statusCode == null) {
 			return null;
+		}
 
 		return String.format("Mth %d) %s", interval, statusCode);
 	}
 
 	@Override
 	public Class<?> getInputDataType() {
-		return SortedObsFromDate.class;
+		return SortedItemsFromDate.class;
 	}
 
 	@Override
@@ -170,22 +171,22 @@ public class TBStatusConverter implements DataConverter {
 		this.interval = interval;
 	}
 
-	protected String getTBStatusCode(Obs obs) {
+	protected String getTBStatusCode(ObsRepresentation obs) {
 
-		Integer conceptId = obs.getConcept().getConceptId();
-		Integer conceptAnswer = obs.getValueCoded().getConceptId();
+		Integer conceptId = obs.getConceptId();
+		Integer conceptAnswer = obs.getValueCodedId();
 
 		//check if answer indicates a patient is on tb treatment
 		if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.STOP_ALL_MEDICATIONS))) {
 			return ON_TREATMENT;
 		}
 
-        //Check if concept suggests TB screening not done
-        if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
-            if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
-                return SCREENING_NOT_DONE;
-            }
-        }
+		//Check if concept suggests TB screening not done
+		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.SPUTUM_FOR_AFB))) {
+			if (conceptAnswer.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.NOT_DONE))) {
+				return SCREENING_NOT_DONE;
+			}
+		}
 
 		//check for no signs and symptoms
 		if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.PATIENT_REPORTED_X_RAY_CHEST))) {
@@ -237,8 +238,6 @@ public class TBStatusConverter implements DataConverter {
 				return ON_TREATMENT;
 			}
 		}
-
-
 
 		return null;
 	}

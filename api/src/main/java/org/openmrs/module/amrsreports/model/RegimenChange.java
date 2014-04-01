@@ -14,29 +14,37 @@
 
 package org.openmrs.module.amrsreports.model;
 
-import org.openmrs.Obs;
+import org.openmrs.Concept;
+import org.openmrs.module.drughistory.Regimen;
 
 import java.util.Date;
-import java.util.SortedSet;
 
-public class SortedObsFromDate {
+public class RegimenChange {
+	Regimen regimen;
+	Concept reason;
+	Date dateOccurred;
 
-	private Date referenceDate;
-	private SortedSet<Obs> data;
-
-	public Date getReferenceDate() {
-		return referenceDate;
+	public Regimen getRegimen() {
+		return regimen;
 	}
 
-	public void setReferenceDate(Date referenceDate) {
-		this.referenceDate = referenceDate;
+	public void setRegimen(Regimen regimen) {
+		this.regimen = regimen;
 	}
 
-	public SortedSet<Obs> getData() {
-		return data;
+	public Concept getReason() {
+		return reason;
 	}
 
-	public void setData(SortedSet<Obs> data) {
-		this.data = data;
+	public void setReason(Concept reason) {
+		this.reason = reason;
+	}
+
+	public Date getDateOccurred() {
+		return dateOccurred;
+	}
+
+	public void setDateOccurred(Date dateOccurred) {
+		this.dateOccurred = dateOccurred;
 	}
 }

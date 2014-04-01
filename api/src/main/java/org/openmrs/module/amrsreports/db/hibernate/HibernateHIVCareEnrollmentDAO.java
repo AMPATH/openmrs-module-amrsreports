@@ -29,4 +29,10 @@ public class HibernateHIVCareEnrollmentDAO implements HIVCareEnrollmentDAO {
 				.uniqueResult();
 	}
 
+	@Override
+	public HIVCareEnrollment saveHIVCareEnrollment(HIVCareEnrollment hce) {
+		sessionFactory.getCurrentSession().saveOrUpdate(hce);
+		return hce;
+	}
+
 }

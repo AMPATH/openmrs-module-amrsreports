@@ -15,7 +15,7 @@
 package org.openmrs.module.amrsreports.reporting.converter;
 
 import org.openmrs.Obs;
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 	 */
 	@Override
 	public Object convert(Object original) {
-		SortedObsFromDate o = (SortedObsFromDate) original;
+		SortedItemsFromDate<Obs> o = (SortedItemsFromDate<Obs>) original;
 
 		if (o == null || o.getData().size() == 0)
 			return null;
@@ -147,7 +147,7 @@ public class IntervalObsValueNumericConverter extends ObsValueNumericConverter {
 
 	@Override
 	public Class<?> getInputDataType() {
-		return SortedObsFromDate.class;
+		return SortedItemsFromDate.class;
 	}
 
 	@Override

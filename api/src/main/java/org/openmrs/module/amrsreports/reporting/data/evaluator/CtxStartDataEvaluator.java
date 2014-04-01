@@ -13,22 +13,18 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.reporting.data.CtxStartDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
-import org.openmrs.module.reporting.dataset.query.service.DataSetQueryService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

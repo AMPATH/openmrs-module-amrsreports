@@ -124,12 +124,15 @@ public class MohTestUtils {
 		return new Date();
 	}
 
-
 	public static void addCodedObs(Patient p, String conceptName, String conceptAnswer, String date) {
+		addCodedObs(p, MohCacheUtils.getConcept(conceptName), MohCacheUtils.getConcept(conceptAnswer), date);
+	}
+
+	public static void addCodedObs(Patient p, Concept concept, Concept answer, String date) {
 		Obs o = new Obs();
 		o.setPerson(p);
-		o.setConcept(MohCacheUtils.getConcept(conceptName));
-		o.setValueCoded(MohCacheUtils.getConcept(conceptAnswer));
+		o.setConcept(concept);
+		o.setValueCoded(answer);
 		o.setObsDatetime(MohTestUtils.makeDate(date));
 		Context.getObsService().saveObs(o, null);
 

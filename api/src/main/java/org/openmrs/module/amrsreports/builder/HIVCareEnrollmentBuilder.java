@@ -1,6 +1,13 @@
 package org.openmrs.module.amrsreports.builder;
 
+import org.openmrs.Patient;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.HIVCareEnrollment;
+import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
+import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
+import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.amrsreports.util.TableBuilderUtil;
+import org.openmrs.module.drughistory.DrugSnapshot;
 
 /**
  * Builds the HIV Care Enrollment table via SQL statements
@@ -342,6 +349,7 @@ public class HIVCareEnrollmentBuilder {
 
 		// update everyone with first ARV date
 		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_FIRST_ARV_DATE);
+//		updateFirstARVDates();
 
 		// update everyone with latest positive obs
 		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_LAST_POSITIVE);
@@ -371,4 +379,46 @@ public class HIVCareEnrollmentBuilder {
 		TableBuilderUtil.runUpdateSQL(QUERY_UPDATE_DISCONTINUES);
 	}
 
+	/**
+	 * find first ARV dates from DrugSnapshots and populate HIVCareEnrollments
+	 *
+	 * @should create an HIVCareEnrollment with proper firstARVDate for matching snapshot
+	 * @should not create an HIVCareEnrollment if no snapshots match the criteria
+	 */
+	protected void updateFirstARVDates() {
+
+		// allocate snapshots to individuals and trim to those we care about
+		SortedSetMap<Integer, DrugSnapshot> m = MOHReportUtil.getARVSnapshotsMap();
+
+		// add dates and locations to HIV Care Enrollment records
+		HIVCareEnrollmentService hceService = Context.getService(HIVCareEnrollmentService.class);
+		for (Integer pId : m.keySet()) {
+
+			// make sure we have a snapshot to work with
+			DrugSnapshot ds = m.get(pId).first();
+			if (ds != null) {
+
+				// find the relevant patient
+				Patient pt = Context.getPatientService().getPatient(pId);
+				if (pt != null) {
+
+					// get the enrollment info or make a new one
+					HIVCareEnrollment hce = hceService.getHIVCareEnrollmentForPatient(pt);
+					if (hce == null) {
+						hce = new HIVCareEnrollment();
+						hce.setPatient(pt);
+					}
+
+					// set date and location of first ARVs
+					hce.setFirstARVDate(ds.getDateTaken());
+					if (ds.getEncounter() != null) {
+						hce.setFirstARVLocation(ds.getEncounter().getLocation());
+					}
+
+					// save it
+					hceService.saveHIVCareEnrollment(hce);
+				}
+			}
+		}
+	}
 }

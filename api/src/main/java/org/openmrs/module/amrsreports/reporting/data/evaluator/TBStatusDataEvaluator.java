@@ -13,11 +13,11 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
-import org.openmrs.module.amrsreports.reporting.common.ObsDatetimeComparator;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentation;
+import org.openmrs.module.amrsreports.reporting.common.ObsRepresentationDatetimeComparator;
 import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.reporting.data.TBStatusDataDefinition;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -62,37 +62,44 @@ public class TBStatusDataEvaluator implements PersonDataEvaluator {
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 		Map<String, Object> m = new HashMap<String, Object>();
 
-        
-        String hql = "from Obs o  " +
-                " Where o.voided = false " +
-                "   and o.person.id in (:patientIds) " +
-                "   and (concept.id = 7178 and valueCoded = 1115)   " +
-                "   or (concept.id = 307 )  " +
-                "   or (concept.id = 5959 and valueCoded in (1073,1074,1079))  " +
-                "   or (concept.id = 1069 and valueCoded = 6171)  " +
-                "   or (concept.id = 7178 and valueCoded != 1115)  " +
-                "   or (concept.id = 1270 and valueCoded IS NOT NULL)  " +
-                "   or (concept.id = 1268 and valueCoded != 1107)  " +
-                "   or (valueCoded = 1260) " ;
 
+		String hql = "select new map(" +
+				"		personId as personId, " +
+				"		concept.id as conceptId," +
+				"		valueCoded.id as valueCodedId," +
+				"		obsDatetime as obsDatetime)" +
+				" from Obs" +
+				" Where " +
+				"   voided = false " +
+				"   and person.id in (:patientIds) " +
+				"   and (" +
+				"     (concept.id = 7178 and valueCoded.id = 1115)   " +
+				"     or (concept.id = 307 )  " +
+				"     or (concept.id = 5959 and valueCoded.id in (1073,1074,1079))  " +
+				"     or (concept.id = 1069 and valueCoded.id = 6171)  " +
+				"     or (concept.id = 7178 and valueCoded.id != 1115)  " +
+				"     or (concept.id = 1270 and valueCoded IS NOT NULL)  " +
+				"     or (concept.id = 1268 and valueCoded.id != 1107)  " +
+				"     or (valueCoded.id = 1260) " +
+				"   )";
 
 		if (context.getBaseCohort() != null) {
 			m.put("patientIds", context.getBaseCohort());
 		}
 
-
 		List<Object> queryResult = qs.executeHqlQuery(hql, m);
 
-		SortedSetMap<Integer, Obs> obsForPatients = new SortedSetMap<Integer, Obs>();
-		obsForPatients.setSetComparator(new ObsDatetimeComparator());
+		SortedSetMap<Integer, ObsRepresentation> obsForPatients = new SortedSetMap<Integer, ObsRepresentation>();
+		obsForPatients.setSetComparator(new ObsRepresentationDatetimeComparator());
 
 		for (Object o : queryResult) {
-			Obs obs = (Obs) o;
-			obsForPatients.putInList(obs.getPersonId(), obs);
+			Map<String, Object> res = (Map<String, Object>) o;
+			ObsRepresentation obsRepresentation = new ObsRepresentation(res);
+			obsForPatients.putInList(obsRepresentation.getPersonId(), obsRepresentation);
 		}
 
 		for (Integer pId : obsForPatients.keySet()) {
-			SortedObsFromDate sofd = new SortedObsFromDate();
+			SortedItemsFromDate sofd = new SortedItemsFromDate();
 
 			Object effectiveDate = effectiveDates.getData().get(pId);
 			sofd.setReferenceDate(effectiveDate == null ? null : (Date) effectiveDate);

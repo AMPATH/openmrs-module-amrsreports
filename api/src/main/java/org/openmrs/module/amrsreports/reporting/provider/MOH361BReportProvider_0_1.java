@@ -12,7 +12,6 @@ import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.Moh361BCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.ARTMonthZeroConverter;
-import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ARVPatientSnapshotReasonConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
@@ -20,6 +19,7 @@ import org.openmrs.module.amrsreports.reporting.converter.FormattedDateSetConver
 import org.openmrs.module.amrsreports.reporting.converter.IntervalObsValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ObsRepresentationValueNumericConverter;
 import org.openmrs.module.amrsreports.reporting.converter.PersonAddressConverter;
+import org.openmrs.module.amrsreports.reporting.converter.RegimenHistoryConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TBStatusConverter;
 import org.openmrs.module.amrsreports.reporting.converter.TbTreatmentStartDateConverter;
 import org.openmrs.module.amrsreports.reporting.converter.WHOStageConverter;
@@ -32,11 +32,13 @@ import org.openmrs.module.amrsreports.reporting.data.EligibilityForARTDataDefini
 import org.openmrs.module.amrsreports.reporting.data.INHStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ObsNearestARVStartDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PmtctPregnancyDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.RegimenHistoryDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TBStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
+import org.openmrs.module.drughistory.Regimen;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.MappedData;
@@ -103,7 +105,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
-		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.DESC);
+		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
@@ -209,12 +211,55 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// p, q, r. Pregnancies
 		dsd.addColumn("Pregnancies", new PmtctPregnancyDataDefinition(), nullString, new FormattedDateSetConverter());
 
+		// s. Original Regimen
+		RegimenHistoryDataDefinition regimenHistory = new RegimenHistoryDataDefinition();
+		dsd.addColumn("Original Regimen", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 0, RegimenHistoryConverter.WhatToShow.REGIMEN));
+
+		// t, u, v. 1st Line Regimen 1st Substitution
+		dsd.addColumn("1st Line 1st Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("1st Line 1st Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("1st Line 1st Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 1, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// t, u, v. 1st Line Regimen 2nd Substitution
+		dsd.addColumn("1st Line 2nd Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("1st Line 2nd Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("1st Line 2nd Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_FIRST, 2, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// w. 2nd Line Regimen and Reason
+		dsd.addColumn("2nd Line Regimen", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 0, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line Regimen Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 0, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// x, y, z. 2nd Line Regimen 1st Substitution
+		dsd.addColumn("2nd Line 1st Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line 1st Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("2nd Line 1st Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 1, RegimenHistoryConverter.WhatToShow.REASON));
+
+		// x, y, z. 2nd Line Regimen 2nd Substitution
+		dsd.addColumn("2nd Line 2nd Sub", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.REGIMEN));
+		dsd.addColumn("2nd Line 2nd Sub Date", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.DATE));
+		dsd.addColumn("2nd Line 2nd Sub Reason", regimenHistory, nullString,
+				new RegimenHistoryConverter(Regimen.LINE_SECOND, 2, RegimenHistoryConverter.WhatToShow.REASON));
+
 		// create mapped definition of dateARTStarted
 		MappedData<DateARTStartedDataDefinition> artDateMap = new MappedData<DateARTStartedDataDefinition>();
 		artDateMap.setParameterizable(dateARTStartedDataDefinition);
 		artDateMap.addConverter(new DateConverter());
 
-		//aa. month zero
+		// aa. month zero
 		dsd.addColumn("Month 0", dateARTStartedDataDefinition, nullString, new ARTMonthZeroConverter());
 
 		// ah. 6 month CD4 count (and aq, az, bi)
@@ -228,23 +273,27 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		sixMonthWeight.addQuestion(MohCacheUtils.getConcept(AmrsReportsConceptNames.WEIGHT));
 		sixMonthWeight.setEffectiveDateDefinition(artDateMap);
 
+		// aj. 6 Month TB Status (and as, bb, bk)
+		TBStatusDataDefinition tbStatusDataDefinition = new TBStatusDataDefinition();
+		tbStatusDataDefinition.setEffectiveDateDefinition(artDateMap);
+
 		dsd.addColumn("6 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 6));
 		dsd.addColumn("6 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 6));
-        dsd.addColumn("6 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(6));
+		dsd.addColumn("6 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(6));
 
 		dsd.addColumn("12 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 12));
 		dsd.addColumn("12 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 12));
-        dsd.addColumn("12 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(12));
+		dsd.addColumn("12 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(12));
 
 		dsd.addColumn("18 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 18));
 		dsd.addColumn("18 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 18));
-        dsd.addColumn("18 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(18));
+		dsd.addColumn("18 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(18));
 
 		dsd.addColumn("24 Month CD4", sixMonthCD4, nullString, new IntervalObsValueNumericConverter(1, 24));
 		dsd.addColumn("24 Month Weight", sixMonthWeight, nullString, new IntervalObsValueNumericConverter(1, 24));
-        dsd.addColumn("24 Month TB Status", new TBStatusDataDefinition(), nullString, new TBStatusConverter(24));
+		dsd.addColumn("24 Month TB Status", tbStatusDataDefinition, nullString, new TBStatusConverter(24));
 
-		// Add  columns for sort order (used for sorting, not needed in output)
+		// Add columns for sort order (used for sorting, not needed in output)
 		dsd.addColumn("Transfer Status", new ARTTransferStatusDataDefinition(), "facility=${facility}");
 		dsd.addColumn("Year Month Sorting", dateARTStartedDataDefinition, nullString, new DateConverter("yyyy-MM"));
 

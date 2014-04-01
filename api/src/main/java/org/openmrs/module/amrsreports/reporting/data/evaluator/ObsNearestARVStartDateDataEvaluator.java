@@ -109,8 +109,10 @@ public class ObsNearestARVStartDateDataEvaluator extends BatchedExecutionDataEva
 			// loop and remove from base cohort if over the age limit
 			for (Integer personId : artStartAges.keySet()) {
 				Age age = (Age) artStartAges.get(personId);
-				if (age.getFullYears() > definition.getAgeLimit())
-					cohort.removeMember(personId);
+				if (age != null && definition != null && definition.getAgeLimit() != null) {
+					if (age.getFullYears() > definition.getAgeLimit())
+						cohort.removeMember(personId);
+				}
 			}
 		}
 
