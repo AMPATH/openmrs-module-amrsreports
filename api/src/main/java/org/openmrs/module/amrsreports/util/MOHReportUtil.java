@@ -182,7 +182,7 @@ public class MOHReportUtil {
 	 * @should determine the age group for a patient at a given date
 	 */
 	public static MohEvaluableNameConstants.AgeGroup getAgeGroupAtDate(Date birthdate, Date when) {
-		//birthdate = patient.getBirthdate();
+
 		if (birthdate == null) {
 			return null;
 		}
