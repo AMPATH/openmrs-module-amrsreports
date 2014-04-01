@@ -106,7 +106,7 @@ public class MOH361BReportProvider_0_1 extends ReportProvider {
 		// sort by serial number, then by date
 		dsd.addSortCriteria("Year Month Sorting", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Transfer Status", SortCriteria.SortDirection.ASC);
-//		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
+		dsd.addSortCriteria("Date ART Started", SortCriteria.SortDirection.ASC);
 		dsd.addSortCriteria("Serial Number", SortCriteria.SortDirection.ASC);
 
 		// set up the columns ...
