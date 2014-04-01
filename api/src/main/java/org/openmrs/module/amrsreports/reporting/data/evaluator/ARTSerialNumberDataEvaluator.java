@@ -112,7 +112,7 @@ public class ARTSerialNumberDataEvaluator implements PersonDataEvaluator {
 			currentMonth = thisMonth;
 			currentSerial = 0;
 		}
-		return Integer.toString(++currentSerial);
+		return String.format("%09d", ++currentSerial);
 	}
 
 }
