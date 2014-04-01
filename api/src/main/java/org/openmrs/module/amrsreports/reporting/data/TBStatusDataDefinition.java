@@ -1,6 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.MappedData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -21,7 +21,7 @@ public class TBStatusDataDefinition extends BaseDataDefinition implements Person
 	 * @see org.openmrs.module.reporting.data.DataDefinition#getDataType()
 	 */
 	public Class<?> getDataType() {
-		return SortedObsFromDate.class;
+		return SortedItemsFromDate.class;
 	}
 
 	/**

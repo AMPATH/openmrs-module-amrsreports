@@ -21,7 +21,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.MohTestUtils;
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
 import org.openmrs.module.amrsreports.reporting.common.ObsDatetimeComparator;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 
@@ -37,7 +37,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldFindAnObservationOnTheCorrectDate() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -58,7 +58,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldFindAnObservationBeforeTheCorrectDate() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -79,7 +79,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldFindAnObservationAfterTheCorrectDate() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -100,7 +100,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldFindTheObservationClosestToTheCorrectDate() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -122,7 +122,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldNotFindAnObservationIfNotWithin2WeeksOfTheCorrectDate() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -158,7 +158,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldFindObservations48MonthIntervalsAfterSpecifiedInterval() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("Weight (KG)", "kg");
@@ -183,7 +183,7 @@ public class IntervalObsValueNumericConverterTest {
 	 */
 	@Test
 	public void convert_shouldPickOneOfMultipleObservationsOnTheSameDay() throws Exception {
-		SortedObsFromDate original = new SortedObsFromDate();
+		SortedItemsFromDate original = new SortedItemsFromDate();
 		original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
 
 		ConceptNumeric c = makeConceptNumeric("CD4, BY FACS", "cells/µL");

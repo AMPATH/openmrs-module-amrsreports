@@ -14,15 +14,13 @@
 
 package org.openmrs.module.amrsreports.model;
 
-import org.openmrs.Obs;
-
 import java.util.Date;
 import java.util.SortedSet;
 
-public class SortedObsFromDate {
+public class SortedItemsFromDate<T> {
 
 	private Date referenceDate;
-	private SortedSet<Obs> data;
+	private SortedSet<T> data;
 
 	public Date getReferenceDate() {
 		return referenceDate;
@@ -32,11 +30,11 @@ public class SortedObsFromDate {
 		this.referenceDate = referenceDate;
 	}
 
-	public SortedSet<Obs> getData() {
+	public SortedSet<T> getData() {
 		return data;
 	}
 
-	public void setData(SortedSet<Obs> data) {
+	public void setData(SortedSet<T> data) {
 		this.data = data;
 	}
 }

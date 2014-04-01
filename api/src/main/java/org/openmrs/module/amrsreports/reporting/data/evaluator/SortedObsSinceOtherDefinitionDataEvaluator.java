@@ -16,7 +16,7 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Obs;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.model.SortedObsFromDate;
+import org.openmrs.module.amrsreports.model.SortedItemsFromDate;
 import org.openmrs.module.amrsreports.reporting.common.ObsDatetimeComparator;
 import org.openmrs.module.amrsreports.reporting.common.SortedSetMap;
 import org.openmrs.module.amrsreports.reporting.data.SortedObsSinceOtherDefinitionDataDefinition;
@@ -81,7 +81,7 @@ public class SortedObsSinceOtherDefinitionDataEvaluator implements PersonDataEva
 		}
 
 		for (Integer pId : obsForPatients.keySet()) {
-			SortedObsFromDate sofd = new SortedObsFromDate();
+			SortedItemsFromDate<Obs> sofd = new SortedItemsFromDate<Obs>();
 
 			Object effectiveDate = effectiveDates.getData().get(pId);
 			sofd.setReferenceDate(effectiveDate == null ? null : (Date) effectiveDate);
