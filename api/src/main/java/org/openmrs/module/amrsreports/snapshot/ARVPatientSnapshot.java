@@ -119,6 +119,12 @@ public class ARVPatientSnapshot extends PatientSnapshot {
 	 */
 	public boolean eligible() {
 		MohEvaluableNameConstants.AgeGroup ageGroup = this.getAgeGroup();
+
+		// if no age group, assume this person is an adult
+		if (ageGroup == null) {
+			ageGroup = MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS;
+		}
+
 		// eligible if under 12 and WHO Stage is 4 or 3 with other factors
 		if (!ageGroup.equals(MohEvaluableNameConstants.AgeGroup.ABOVE_TWELVE_YEARS)) {
 			if (this.get("pedsWHOStage").equals(4)) {
