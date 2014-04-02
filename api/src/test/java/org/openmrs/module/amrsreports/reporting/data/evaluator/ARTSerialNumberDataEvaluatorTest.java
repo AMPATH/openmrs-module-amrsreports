@@ -69,8 +69,8 @@ public class ARTSerialNumberDataEvaluatorTest extends BaseModuleContextSensitive
 		EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
 		Map<Integer, Object> data = actual.getData();
 		assertNotNull(data);
-		assertEquals("1", data.get(6).toString());
-		assertEquals("2", data.get(7).toString());
+		assertEquals("000000001", data.get(6).toString());
+		assertEquals("000000002", data.get(7).toString());
 	}
 
 	/**
@@ -82,10 +82,10 @@ public class ARTSerialNumberDataEvaluatorTest extends BaseModuleContextSensitive
 		EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
 		Map<Integer, Object> data = actual.getData();
 		assertNotNull(data);
-		assertEquals("1", data.get(6).toString());
-		assertEquals("2", data.get(7).toString());
-		assertEquals("1", data.get(8).toString());
-		assertEquals("1", data.get(9).toString());
+		assertEquals("000000001", data.get(6).toString());
+		assertEquals("000000002", data.get(7).toString());
+		assertEquals("000000001", data.get(8).toString());
+		assertEquals("000000001", data.get(9).toString());
 	}
 
 	/**
@@ -97,8 +97,8 @@ public class ARTSerialNumberDataEvaluatorTest extends BaseModuleContextSensitive
 		EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
 		Map<Integer, Object> data = actual.getData();
 		assertNotNull(data);
-		assertEquals("1", data.get(9).toString());
-		assertEquals("2", data.get(502).toString());
+		assertEquals("000000001", data.get(9).toString());
+		assertEquals("000000002", data.get(502).toString());
 		assertEquals(AmrsReportsConstants.TRANSFER_IN, data.get(501).toString());
 	}
 }
