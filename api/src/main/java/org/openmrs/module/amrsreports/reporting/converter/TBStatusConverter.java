@@ -218,10 +218,8 @@ public class TBStatusConverter implements DataConverter {
         }
 
         if (conceptId.equals(MohCacheUtils.getConceptId(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_BASED_ON))) {
-            if (conceptAnswer.equals(null)) {
-                return NO_SIGNS_AND_SYMPTOMS;
-            }
-            else if(!conceptAnswer.equals(null)) {
+
+            if(!conceptAnswer.equals(null)) {
                 return TB_SUSPECT;
             }
             else if(conceptAnswer.equals(null)) {

@@ -3,6 +3,7 @@ package org.openmrs.module.amrsreports.reporting.converter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
@@ -130,7 +131,7 @@ public class TBStatusConverterTest extends BaseModuleContextSensitiveTest {
     }
 
     /**
-     * @verifies a patient is on medication when valueCoded is STOP_ALL_MEDICATIONS
+     * @verifies a patient is on treatment when valueCoded is STOP_ALL_MEDICATIONS
      * @see IntervalObsValueNumericConverter#convert(Object)
      */
     @Test
@@ -161,6 +162,142 @@ public class TBStatusConverterTest extends BaseModuleContextSensitiveTest {
         TBStatusConverter converter = new TBStatusConverter(1);
 
         Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient is a TB suspect
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnTBSuspectIfHOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSISevaluatesToYES() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS, MohEvaluableNameConstants.YES, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient has no TB Signs and symptoms
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnNoSignsAndSymptomsIfHOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSISevaluatesToNO() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS, MohEvaluableNameConstants.NO, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient is a TB suspect
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnTBSuspectIfTUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISITevaluatesToYES() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT, MohEvaluableNameConstants.YES, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient has no TB Signs and symptoms
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnNoSignsAndSymptomsIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToNO() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT, MohEvaluableNameConstants.NO, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient is a TB suspect
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnTBSuspectIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToYES() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT, MohEvaluableNameConstants.YES, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+    }
+
+
+    /**
+     * @verifies find the observation indicating that a patient is on Treatment
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnOnTBTreatmentIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToTUBERCULOSIS_TREATMENT_DRUGS() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT, MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_DRUGS, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+    }
+    /**
+     * @verifies find the observation indicating that a patient has no signs and symptoms
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnNoSignsAndSymptomsIfTUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISITevaluatesToNO() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT, MohEvaluableNameConstants.NO, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+    }
+
+    /**
+     * @verifies find the observation indicating that a patient has no signs and symptoms
+     * @see IntervalObsValueNumericConverter#convert(Object)
+     */
+    @Test
+    public void convert_shouldReturnNoSignsAndSymptomsIfREVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONSevaluatesToNONE() throws Exception {
+        SortedObsFromDate original = new SortedObsFromDate();
+        original.setReferenceDate(MohTestUtils.makeDate("01 Jan 2010"));
+
+        SortedSet<Obs> data = new TreeSet<Obs>(new ObsDatetimeComparator());
+        data.add(makeObs(MohEvaluableNameConstants.REVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONS, MohEvaluableNameConstants.NONE, MohTestUtils.makeDate("25 Jan 2010")));
+        original.setData(data);
+        TBStatusConverter converter = new TBStatusConverter(1);
+
+        Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
     }
 
     /**
