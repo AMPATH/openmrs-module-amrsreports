@@ -73,14 +73,14 @@ public class TBStatusDataEvaluator implements PersonDataEvaluator {
 				"   voided = false " +
 				"   and person.id in (:patientIds) " +
 				"   and (" +
-				"     (concept.id = 7178 and valueCoded.id = 1115)   " +
-				"     or (concept.id = 307 )  " +
+				"     (concept.id in (307,2020,2021,2022,2028,6174,7178))  " +
 				"     or (concept.id = 5959 and valueCoded.id in (1073,1074,1079))  " +
 				"     or (concept.id = 1069 and valueCoded.id = 6171)  " +
-				"     or (concept.id = 7178 and valueCoded.id != 1115)  " +
-				"     or (concept.id = 1270 and valueCoded IS NOT NULL)  " +
-				"     or (concept.id = 1268 and valueCoded.id != 1107)  " +
-				"     or (valueCoded.id = 1260) " +
+				"     or (concept.id = 1111 and valueCoded in (1107,1267))  " +
+				"     or (concept.id = 5965 and valueCoded in (1066,1267,1794)) " +
+				"     or (concept.id in (2029,1159,1270) and valueCoded IS NOT NULL)  " +
+				"     or (concept.id = 6981 and valueCoded != 1067)  " +
+				"     or (concept.id = 1268 and (valueCoded != 1107 or valueCoded = 1260))  " +
 				"   )";
 
 		if (context.getBaseCohort() != null) {

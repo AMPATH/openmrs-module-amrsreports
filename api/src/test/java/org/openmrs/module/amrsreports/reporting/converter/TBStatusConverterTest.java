@@ -143,6 +143,119 @@ public class TBStatusConverterTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
+	 * @verifies find the observation indicating that a patient is a TB suspect
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnTBSuspectIfHOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSISevaluatesToYES() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS,
+				MohEvaluableNameConstants.YES,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient has no TB Signs and symptoms
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnNoSignsAndSymptomsIfHOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSISevaluatesToNO() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS,
+				MohEvaluableNameConstants.NO,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient is a TB suspect
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnTBSuspectIfTUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISITevaluatesToYES() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT,
+				MohEvaluableNameConstants.YES,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient has no TB Signs and symptoms
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnNoSignsAndSymptomsIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToNO() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT,
+				MohEvaluableNameConstants.NO,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient is a TB suspect
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnTBSuspectIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToYES() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT,
+				MohEvaluableNameConstants.YES,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 2-TB Suspect", converter.convert(original));
+	}
+
+
+	/**
+	 * @verifies find the observation indicating that a patient is on Treatment
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnOnTBTreatmentIfTUBERCULOSIS_DIAGNOSED_THIS_VISITevaluatesToTUBERCULOSIS_TREATMENT_DRUGS() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_THIS_VISIT,
+				MohEvaluableNameConstants.TUBERCULOSIS_TREATMENT_DRUGS,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 3-On TB Treatment", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient has no signs and symptoms
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnNoSignsAndSymptomsIfTUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISITevaluatesToNO() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT,
+				MohEvaluableNameConstants.NO,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+	}
+
+	/**
+	 * @verifies find the observation indicating that a patient has no signs and symptoms
+	 * @see IntervalObsValueNumericConverter#convert(Object)
+	 */
+	@Test
+	public void convert_shouldReturnNoSignsAndSymptomsIfREVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONSevaluatesToNONE() throws Exception {
+		SortedItemsFromDate<ObsRepresentation> original = makeItemsWith(
+				MohEvaluableNameConstants.REVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONS,
+				MohEvaluableNameConstants.NONE,
+				MohTestUtils.makeDate("25 Jan 2010"));
+		TBStatusConverter converter = new TBStatusConverter(1);
+		Assert.assertEquals("Mth 1) 1-No Signs and symptoms", converter.convert(original));
+	}
+
+	/**
 	 * @verifies that a patient had not undergone TB Screening
 	 * @see IntervalObsValueNumericConverter#convert(Object)
 	 */

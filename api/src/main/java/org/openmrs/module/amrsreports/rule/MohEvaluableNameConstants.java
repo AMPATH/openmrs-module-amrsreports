@@ -322,6 +322,13 @@ public interface MohEvaluableNameConstants {
 
 
     //Constants for TB Status
+    public static final String HOUSEHOLD_MEMBER_DIAGNOSED_WITH_TUBERCULOSIS = "HOUSEHOLD MEMBER DIAGNOSED WITH TUBERCULOSIS";
+    public static final String TUBERCULOSIS_DIAGNOSED_SINCE_LAST_VISIT = "TUBERCULOSIS DIAGNOSED SINCE LAST VISIT";
+    public static final String TUBERCULOSIS_DIAGNOSED_THIS_VISIT = "TUBERCULOSIS DIAGNOSED THIS VISIT";
+    public static final String TUBERCULOSIS_DIAGNOSED_BASED_ON = "TUBERCULOSIS DIAGNOSED BASED ON";
+    public static final String REVIEW_OF_TUBERCULOSIS_SCREENING_QUESTIONS = "REVIEW OF TUBERCULOSIS SCREENING QUESTIONS";
+    public static final String COMPLETED = "COMPLETED";
+    public static final String INTERRUPTED = "INTERRUPTED";
     public static final String PATIENT_REPORTED_X_RAY_CHEST = "PATIENT REPORTED X-RAY, CHEST";
     public static final String NORMAL = "NORMAL";
     public static final String SPUTUM_FOR_AFB = "SPUTUM FOR AFB";
@@ -329,6 +336,9 @@ public interface MohEvaluableNameConstants {
     public static final String WEEKS = "WEEKS";
     public static final String MONTHS = "MONTHS";
     public static final String CONTINUOUS = "CONTINUOUS";
+    public static final String TUBERCULOSIS_TREATMENT_STATUS = "TUBERCULOSIS TREATMENT STATUS";
+    public static final String TUBERCULOSIS_DIAGNOSED_BASED_ON_DETAILED = "TUBERCULOSIS DIAGNOSED BASED ON, DETAILED";
+    public static final String REASON_TUBERCULOSIS_TREATMENT_STARTED = "REASON TUBERCULOSIS TREATMENT STARTED";
     public static final String REVIEW_OF_SYSTEMS_GENERAL = "REVIEW OF SYSTEMS, GENERAL";
     public static final String COUGH_FOR_MORE_THAN_TWO_WEEKS = "COUGH FOR MORE THAN TWO WEEKS";
     public static final String STOP_ALL_MEDICATIONS = "STOP ALL MEDICATIONS";
