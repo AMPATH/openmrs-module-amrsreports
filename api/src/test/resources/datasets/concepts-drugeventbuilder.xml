@@ -3,6 +3,7 @@
 
   <!-- need a single concept for LOPINAVIR -->
 
+  <concept concept_id="102" retired="0" datatype_id="4" class_id="4" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2005-02-16 10:59:02.0" uuid="a890d1ba-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="625" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-02-05 13:50:48.0" uuid="a8967156-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="628" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-02-05 13:37:49.0" uuid="a89673f4-1350-11df-a1f1-0026b9348838"/>
   <concept concept_id="630" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2004-01-01 00:00:00.0" version="" changed_by="1" date_changed="2011-05-25 16:47:15.0" uuid="a896758e-1350-11df-a1f1-0026b9348838"/>
@@ -43,6 +44,7 @@
   <concept concept_id="6964" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2011-05-26 14:34:47.0" version="" uuid="1c4a75d0-cc91-4752-b0a5-4b833326ff7a"/>
   <concept concept_id="6965" retired="0" datatype_id="4" class_id="3" is_set="0" creator="1" date_created="2011-05-26 15:49:43.0" version="" changed_by="1" date_changed="2011-06-13 08:51:09.0" uuid="3d587177-984e-4eeb-93f2-3223b6c1dd7c"/>
 
+  <concept_name concept_id="102" name="DRUG TOXICITY" locale="en" creator="1" date_created="2005-02-16 10:59:02.0" concept_name_id="4124" voided="0" uuid="a9553b2c-1350-11df-a1f1-0026b9348838" locale_preferred="0"/>
   <concept_name concept_id="625" name="STAVUDINE" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="625" voided="0" uuid="a93f38b8-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="628" name="LAMIVUDINE" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="628" voided="0" uuid="a93f3b38-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>
   <concept_name concept_id="631" name="NEVIRAPINE" locale="en" creator="1" date_created="2004-01-01 00:00:00.0" concept_name_id="631" voided="0" uuid="a93f3dae-1350-11df-a1f1-0026b9348838" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"/>

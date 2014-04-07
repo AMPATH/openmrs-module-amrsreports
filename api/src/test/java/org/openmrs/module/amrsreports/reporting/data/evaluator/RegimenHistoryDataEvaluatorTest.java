@@ -106,6 +106,6 @@ public class RegimenHistoryDataEvaluatorTest extends BaseModuleContextSensitiveT
 		assertEquals(1, rcList.size());
 
 		RegimenChange rc = rcList.get(0);
-		assertEquals(102, rc.getReason().getConceptId().intValue());
+		assertEquals("DRUG TOXICITY", rc.getReason());
 	}
 }

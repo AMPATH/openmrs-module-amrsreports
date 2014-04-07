@@ -14,14 +14,13 @@
 
 package org.openmrs.module.amrsreports.model;
 
-import org.openmrs.Concept;
 import org.openmrs.module.drughistory.Regimen;
 
 import java.util.Date;
 
 public class RegimenChange {
 	Regimen regimen;
-	Concept reason;
+	String reason;
 	Date dateOccurred;
 
 	public Regimen getRegimen() {
@@ -32,11 +31,11 @@ public class RegimenChange {
 		this.regimen = regimen;
 	}
 
-	public Concept getReason() {
+	public String getReason() {
 		return reason;
 	}
 
-	public void setReason(Concept reason) {
+	public void setReason(String reason) {
 		this.reason = reason;
 	}
 

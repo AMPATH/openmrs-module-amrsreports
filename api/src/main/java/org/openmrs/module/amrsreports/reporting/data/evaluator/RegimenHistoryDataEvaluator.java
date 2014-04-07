@@ -144,7 +144,7 @@ public class RegimenHistoryDataEvaluator implements PersonDataEvaluator {
 
 									// if the snapshot and reason come from the same encounter, we have a winner
 									if (OpenmrsUtil.nullSafeEquals(o.getEncounter().getId(), ds.getEncounter().getId())) {
-										rc.setReason(o.getValueCoded());
+										rc.setReason(o.getValueCoded().getDisplayString());
 										found = true;
 									}
 								}

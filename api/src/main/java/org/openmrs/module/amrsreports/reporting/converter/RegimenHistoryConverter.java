@@ -67,6 +67,7 @@ public class RegimenHistoryConverter implements DataConverter {
 			}
 		}
 
+
 		return null;
 	}
 
@@ -84,7 +85,7 @@ public class RegimenHistoryConverter implements DataConverter {
 		}
 
 		if (WhatToShow.REASON == whatToShow && rc.getReason() != null) {
-			return rc.getReason().getDisplayString();
+			return rc.getReason();
 		}
 
 		return null;
