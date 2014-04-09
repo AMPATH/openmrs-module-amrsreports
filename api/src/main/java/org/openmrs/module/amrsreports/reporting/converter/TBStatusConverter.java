@@ -173,9 +173,16 @@ public class TBStatusConverter implements DataConverter {
 
 	protected String getTBStatusCode(ObsRepresentation obs) {
 
+        if(obs==null){
+            return null;
+        }
+
 		Integer conceptId = obs.getConceptId();
 		Integer conceptAnswer = obs.getValueCodedId();
 
+        if(conceptId==null || conceptAnswer==null){
+            return null;
+        }
         /**
          * Handle codes for no signs and symptoms
          */
