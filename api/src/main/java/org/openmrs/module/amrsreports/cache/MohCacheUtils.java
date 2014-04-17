@@ -45,6 +45,19 @@ public final class MohCacheUtils {
         return concept;
     }
 
+
+	public static Concept getConcept(int conceptId) {
+		return Context.getConceptService().getConcept(conceptId);
+	}
+
+	public static Set<Concept> getConcepts(Integer... conceptIds) {
+		Set<Concept> c = new HashSet<Concept>();
+		for (Integer conceptId : conceptIds) {
+			c.add(getConcept(conceptId));
+		}
+		return c;
+	}
+
     /**
      *
      */
