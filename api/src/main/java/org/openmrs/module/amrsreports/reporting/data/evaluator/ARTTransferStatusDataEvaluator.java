@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * @should test for transfer in
+ * @should test for non-transfer
  * Handler for enrollment date column
  */
 @Handler(supports = ARTTransferStatusDataDefinition.class, order = 50)
