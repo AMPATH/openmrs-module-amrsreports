@@ -10,7 +10,7 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
  * determines ARV patient snapshots for patients
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
-public class EligibilityCriteriaDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
+public class EligibilityForARTIncludingTransferDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
 	@Override
 	public Class<?> getDataType() {
