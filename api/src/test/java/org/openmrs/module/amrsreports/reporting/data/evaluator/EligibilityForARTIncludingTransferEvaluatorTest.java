@@ -103,24 +103,12 @@ public class EligibilityForARTIncludingTransferEvaluatorTest extends BaseModuleC
 
         // retrieve result for patient #1
         ARVPatientSnapshot transferStatus = (ARVPatientSnapshot)data.get(7);
-        log.info("ARV patient snapshot in string: KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK " + data.toString());
-        /*Boolean actualStatus = (Boolean)transferStatus.get("transfer");
-        Boolean expected = true;
-        Assert.assertEquals("Test for patient #7 failed", actualStatus, expected);*/
-        Assert.assertTrue(1>0);
 
-    }
-    @Ignore
-    @Test
-    public void shouldConfirmAPatientIsNoneTransfer() throws EvaluationException {
-
-        EvaluatedPersonData actual = evaluator.evaluate(definition, evaluationContext);
-        Map<Integer, Object> data = actual.getData();
-
-        // retrieve result for patient #1
-        ARVPatientSnapshot transferStatus = (ARVPatientSnapshot)data.get(7);
         Boolean actualStatus = (Boolean)transferStatus.get("transfer");
         Boolean expected = true;
         Assert.assertEquals("Test for patient #7 failed", actualStatus, expected);
+
+
     }
+
 }
