@@ -68,8 +68,8 @@ public class ARTTransferStatusDataEvaluatorTest extends BaseModuleContextSensiti
 
         // retrieve result for patient #1
         Boolean transferStatus = (Boolean)data.get(6);
-        Boolean actualStatus = false;
-        Assert.assertEquals("Test for patient #6 failed",transferStatus,actualStatus);
+        Boolean expectedStatus = false;
+        Assert.assertEquals("Test for patient #6 failed",transferStatus,expectedStatus);
 
     }
 
@@ -81,7 +81,7 @@ public class ARTTransferStatusDataEvaluatorTest extends BaseModuleContextSensiti
 
         // retrieve result for patient #2
         Boolean transferStatus = (Boolean)data.get(7);
-        Boolean actualStatus = true;
-        Assert.assertEquals("Test for patient #7 failed",transferStatus,actualStatus);
+        Boolean expectedStatus = true;
+        Assert.assertEquals("Test for patient #7 failed",transferStatus,expectedStatus);
     }
 }

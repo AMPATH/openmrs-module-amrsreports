@@ -40,15 +40,11 @@ public class EligibilityForARTIncludingTransferEvaluator implements PersonDataEv
             // if the person transferred
             if (((Boolean) e.getValue()) == Boolean.TRUE) {
 
-                // create a new snapshot with a transfer flag
                 ARVPatientSnapshot s = new ARVPatientSnapshot();
                 s.set("transfer", true);
-
-                // add it to the results
                 results.addData(e.getKey(), s);
-            } else {
 
-                // add the patient id to the nonTransfers
+            } else {
                 nonTransfers.addMember(e.getKey());
             }
         }
@@ -56,11 +52,13 @@ public class EligibilityForARTIncludingTransferEvaluator implements PersonDataEv
         EvaluationContext eligibilityContext = context.shallowCopy();
         eligibilityContext.setBaseCohort(nonTransfers);
 
-        // now evaluate eligibility for non-transfers
+        // evaluate eligibility for non-transfers
         EvaluatedPersonData eligibility = pdservice.evaluate(new EligibilityForARTDataDefinition(), eligibilityContext);
-
         // add the results from eligibility to the final results
-        results.replaceData(eligibility.getData());
+
+        for(Integer pid: eligibilityContext.getBaseCohort().getMemberIds()){
+            results.addData(pid,eligibility.getData().get(pid));
+        }
 
         return results;
 
