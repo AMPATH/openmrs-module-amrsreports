@@ -57,13 +57,13 @@ public class LastHIVEncounterDataEvaluator extends BatchedExecutionDataEvaluator
 	@Override
 	protected String getHQL() {
 		return "select new map(" +
-				"   e.patientId as personId," +
+				"   e.patient.patientId as personId," +
 				"   e.encounterDatetime as encounterDatetime," +
 				"	e.location.name as locationName" +
 				" )" +
 				" from Encounter e" +
 				" where e.voided = false" +
-				"   and e.patientId in (:personIds) " +
+				"   and e.patient.patientId in (:personIds) " +
 				"   and e.encounterType.id in (:encounterTypeIds)" +
 				"   and e.encounterDatetime <= :onOrBefore";
 	}

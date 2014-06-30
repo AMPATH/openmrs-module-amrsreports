@@ -50,7 +50,7 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 		// use HQL to do our bidding
 		String hql = "from Encounter" +
 				" where voided=false" +
-				" and patientId in (:patientIds)" +
+				" and patient.patientId in (:patientIds)" +
 				" and location in (:locationList)" +
 				" and encounterDatetime <= :onOrBefore" +
 				" order by encounterDatetime asc";
