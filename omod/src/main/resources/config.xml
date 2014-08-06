@@ -20,11 +20,10 @@
 	<activator>${project.parent.groupId}.${project.parent.artifactId}.AmrsReportModuleActivator</activator>
 	
 	<require_modules>
-        <require_module version="0.7.0">org.openmrs.module.reporting</require_module>
-        <require_module version="0.1">org.openmrs.module.drughistory</require_module>
+        <require_module version="${reportingVersion}">org.openmrs.module.reporting</require_module>
+        <require_module version="${drughistoryVersion}">org.openmrs.module.drughistory</require_module>
     </require_modules>
-	<require_version>1.8.0</require_version>
-	
+
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>

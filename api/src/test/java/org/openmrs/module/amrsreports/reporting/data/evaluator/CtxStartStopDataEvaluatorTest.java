@@ -15,8 +15,11 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.junit.Test;
+import org.openmrs.api.APIException;
 import org.openmrs.module.amrsreports.MohTestUtils;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
+import org.openmrs.test.Verifies;
+import org.springframework.test.annotation.ExpectedException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -40,14 +43,15 @@ public class CtxStartStopDataEvaluatorTest extends DrugDataEvaluatorTestHelper {
 	}
 
 	/**
+     * From 1.9 the API would not allow coded answer to be saved with null value.
 	 * @verifies not start on PCP_PROPHYLAXIS_STARTED with null answer
 	 * @see CtxStartStopDataEvaluator#evaluate(org.openmrs.module.reporting.data.person.definition.PersonDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)
 	 */
 	@Test
+    @ExpectedException(APIException.class)
 	public void evaluate_shouldNotStartOnPCP_PROPHYLAXIS_STARTEDWithNullAnswer() throws Exception {
 		MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.PCP_PROPHYLAXIS_STARTED,
 				null, "17 Oct 1975");
-		assertEvaluatesTo("");
 	}
 
 	/**
@@ -66,10 +70,11 @@ public class CtxStartStopDataEvaluatorTest extends DrugDataEvaluatorTestHelper {
 	 * @see CtxStartStopDataEvaluator#evaluate(org.openmrs.module.reporting.data.person.definition.PersonDataDefinition, org.openmrs.module.reporting.evaluation.EvaluationContext)
 	 */
 	@Test
+    @ExpectedException(APIException.class)
+    @Verifies( method = "evaluate",value = "API does not allow saving of coded obs with null answer")
 	public void evaluate_shouldNotStopOnREASON_PCP_PROPHYLAXIS_STOPPEDWithNullAnswer() throws Exception {
 		MohTestUtils.addCodedObs(patient, MohEvaluableNameConstants.REASON_PCP_PROPHYLAXIS_STOPPED,
 				null, "19 Oct 1975");
-		assertEvaluatesTo("");
 	}
 
 	/**
