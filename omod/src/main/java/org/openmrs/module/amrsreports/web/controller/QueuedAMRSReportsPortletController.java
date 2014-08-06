@@ -59,8 +59,13 @@ public class QueuedAMRSReportsPortletController extends PortletController {
 
 			List<MOHFacility> relevantFacilities = userFacilityService.getAllowedFacilitiesForUser(currentUser);
 
-			List<QueuedReport> reports = Context.getService(QueuedReportService.class).getQueuedReportsByFacilities
-					(relevantFacilities, status);
+            List<QueuedReport> reports = null;
+			if(relevantFacilities!=null && !relevantFacilities.isEmpty()) {
+                reports = Context.getService(QueuedReportService.class).getQueuedReportsByFacilities
+					        (relevantFacilities, status);
+            }else{
+                reports = Context.getService(QueuedReportService.class).getQueuedReportsWithStatus(status);
+            }
 
 			for (QueuedReport thisReport : reports) {
 

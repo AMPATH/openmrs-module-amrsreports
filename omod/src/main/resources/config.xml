@@ -7,7 +7,7 @@
 	<name>${project.parent.name}</name>
 	<version>${project.parent.version}</version>
 	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
-	<author>AMPATH Developers (Oliver Mwalo, Nicholas Ingosi, Antony Ojwang', Alfayo Kwatuha, Jeremy Keiper)</author>
+	<author>AMPATH Developers (Oliver Mwalo, Nicholas Ingosi, Antony Ojwang', Alfayo Kwatuha, Jeremy Keiper, Willa)</author>
 	<description>
 		${project.parent.description}
 	</description>
@@ -21,7 +21,7 @@
 	
 	<require_modules>
         <require_module version="0.7.0">org.openmrs.module.reporting</require_module>
-        <require_module version="0.1-SNAPSHOT">org.openmrs.module.drughistory</require_module>
+        <require_module version="0.1">org.openmrs.module.drughistory</require_module>
     </require_modules>
 	<require_version>1.8.0</require_version>
 	
