@@ -118,7 +118,12 @@ public class MohCoreServiceImpl extends BaseOpenmrsService implements MohCoreSer
 	@Override
 	public PatientIdentifierType getCCCNumberIdentifierType() {
 		String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE);
-		return Context.getPatientService().getPatientIdentifierType(Integer.valueOf(typeId));
+        try{
+		    return Context.getPatientService().getPatientIdentifierType(Integer.valueOf(typeId));
+        }catch (NumberFormatException nfe){
+            log.error(AmrsReportsConstants.GP_CCC_NUMBER_IDENTIFIER_TYPE+"is not defined or improperly defined!",nfe);
+        }
+        return null;
 	}
 
     @Override
