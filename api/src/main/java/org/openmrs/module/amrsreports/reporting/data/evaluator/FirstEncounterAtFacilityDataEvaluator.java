@@ -50,13 +50,13 @@ public class FirstEncounterAtFacilityDataEvaluator implements PersonDataEvaluato
 		// use HQL to do our bidding
 		String hql = "from Encounter" +
 				" where voided=false" +
-				" and patientId in (:patientIds)" +
+				" and patient.patientId in (:cohort)" +
 				" and location in (:locationList)" +
 				" and encounterDatetime <= :onOrBefore" +
 				" order by encounterDatetime asc";
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("patientIds", context.getBaseCohort());
+		m.put("cohort", context.getBaseCohort());
 		m.put("locationList", facility.getLocations());
 		m.put("onOrBefore", context.getEvaluationDate());
 

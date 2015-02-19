@@ -4,7 +4,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>amrsreports</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>AMRS Reports Module</name>
 	<description>Provides easy acess to AMPATH reports, limits access and adds logic rules and cohort definitions for MOH reports.</description>
@@ -59,7 +59,7 @@
         <drughistoryVersion>0.1</drughistoryVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <MODULE_ID>${project.parent.artifactId}</MODULE_ID>
-        <MODULE_NAME>${project.parent.name}</MODULE_NAME>
+        <MODULE_NAME>${project.name}</MODULE_NAME>
         <MODULE_VERSION>${project.parent.version}</MODULE_VERSION>
         <MODULE_PACKAGE>${project.parent.groupId}.${project.parent.artifactId}</MODULE_PACKAGE>
         <openMRSVersion>1.9.7</openMRSVersion>
